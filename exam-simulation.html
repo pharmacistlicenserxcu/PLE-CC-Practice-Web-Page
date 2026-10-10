@@ -1671,6 +1671,28 @@
             </div>
           </div>
         </div>
+        <!-- Quick Resume Banner for Solo Practice Exam Session -->
+        <div id="solo-quick-resume-banner" style="display: none; background: linear-gradient(135deg, #F0FDF4, #DCFCE7); border: 1.5px solid #22C55E; border-radius: var(--radius-md); padding: 1.25rem; margin-bottom: 1.5rem; box-shadow: 0 4px 12px rgba(34, 197, 94, 0.15);">
+          <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 1rem;">
+            <div style="display: flex; align-items: center; gap: 0.85rem;">
+              <span style="font-size: 2rem;">📝</span>
+              <div>
+                <div style="font-weight: 700; color: #14532D; font-size: 1.05rem;">ตรวจพบการฝึกซ้อมเดี่ยว (Solo Practice) ที่ยังทำค้างอยู่!</div>
+                <div style="font-size: 0.88rem; color: #166534; margin-top: 0.2rem;" id="solo-quick-resume-desc">
+                  กำลังทำถึง: <span id="solo-quick-resume-station" style="font-weight: bold;">สถานีที่ 1</span> จากทั้งหมด <span id="solo-quick-resume-total" style="font-weight: 600;">-</span> สถานี
+                </div>
+              </div>
+            </div>
+            <div style="display: flex; gap: 0.5rem; align-items: center;">
+              <button type="button" class="btn btn-primary" id="btn-solo-quick-resume" style="background-color: #16A34A; border-color: #16A34A; font-weight: 600; padding: 0.6rem 1.25rem;">
+                ▶️ ซ้อมต่อทันที
+              </button>
+              <button type="button" class="btn btn-secondary" id="btn-solo-dismiss-resume" style="padding: 0.6rem 1rem;">
+                ✕ ยกเลิก / เริ่มชุดใหม่
+              </button>
+            </div>
+          </div>
+        </div>
         <div class="setup-panel card">
           <div class="card-icon" style="background-color: var(--primary-light); color: var(--primary); margin: 0 auto 1.5rem auto;">🎯</div>
           <h2 style="text-align: center; margin-bottom: 0.5rem; font-family: var(--font-title);">ระบบจำลองสอบ OSPE</h2>
@@ -4056,6 +4078,162 @@
       } catch (e) {}
     }
 
+    // ══════════════════════════════════════════════════════════════════════════
+    // Custom Non-blocking Toast & Modal Feedback System
+    // ══════════════════════════════════════════════════════════════════════════
+    function showPleToast(msg, type = 'info', duration = 3200) {
+      try {
+        let container = document.getElementById('ple-toast-container');
+        if (!container) {
+          container = document.createElement('div');
+          container.id = 'ple-toast-container';
+          container.style.cssText = 'position:fixed;top:1.25rem;right:1.25rem;z-index:1000001;display:flex;flex-direction:column;gap:0.6rem;max-width:92vw;width:370px;pointer-events:none;';
+          document.body.appendChild(container);
+        }
+
+        const icons = {
+          success: '✅',
+          error: '❌',
+          warning: '⚠️',
+          info: 'ℹ️'
+        };
+        const borders = {
+          success: '#16a34a',
+          error: '#dc2626',
+          warning: '#d97706',
+          info: '#2563eb'
+        };
+        const bgs = {
+          success: 'rgba(240, 253, 244, 0.98)',
+          error: 'rgba(254, 242, 242, 0.98)',
+          warning: 'rgba(255, 251, 235, 0.98)',
+          info: 'rgba(239, 246, 255, 0.98)'
+        };
+        const darkBgs = {
+          success: '#14532d',
+          error: '#7f1d1d',
+          warning: '#78350f',
+          info: '#1e3a8a'
+        };
+
+        const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+        const toast = document.createElement('div');
+        toast.style.cssText = `
+          pointer-events: auto;
+          display: flex;
+          align-items: flex-start;
+          gap: 0.65rem;
+          padding: 0.85rem 1.1rem;
+          background: ${isDark ? darkBgs[type] || '#1e293b' : bgs[type] || '#ffffff'};
+          color: ${isDark ? '#f8fafc' : '#0f172a'};
+          border-left: 4.5px solid ${borders[type] || '#2563eb'};
+          border-radius: 8px;
+          box-shadow: 0 10px 25px -5px rgba(0,0,0,0.18), 0 8px 10px -6px rgba(0,0,0,0.1);
+          font-size: 0.9rem;
+          line-height: 1.45;
+          opacity: 0;
+          transform: translateX(30px);
+          transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+          cursor: pointer;
+          backdrop-filter: blur(8px);
+        `;
+
+        const safeMsg = (typeof escapeHtml === 'function') ? escapeHtml(msg) : msg;
+        toast.innerHTML = `
+          <span style="font-size: 1.25rem; line-height: 1; flex-shrink: 0;">${icons[type] || 'ℹ️'}</span>
+          <div style="flex: 1; word-break: break-word;">${String(safeMsg).replace(/\\n/g, '<br>')}</div>
+          <span style="font-size: 0.85rem; opacity: 0.6; line-height: 1; margin-left: 0.25rem;">✕</span>
+        `;
+
+        container.appendChild(toast);
+        void toast.offsetWidth;
+        toast.style.opacity = '1';
+        toast.style.transform = 'translateX(0)';
+
+        let timer = setTimeout(dismiss, duration);
+        function dismiss() {
+          clearTimeout(timer);
+          toast.style.opacity = '0';
+          toast.style.transform = 'translateX(30px)';
+          setTimeout(() => {
+            if (toast.parentNode) toast.parentNode.removeChild(toast);
+          }, 250);
+        }
+        toast.onclick = dismiss;
+      } catch (e) {
+        console.log('[Toast fallback]:', msg);
+      }
+    }
+    window.showPleToast = showPleToast;
+    window.showPleAlert = (msg, type = 'info') => showPleToast(msg, type);
+
+    function showPleConfirmModal(options) {
+      return new Promise((resolve) => {
+        const modal = document.getElementById('ple-confirm-modal');
+        if (!modal) {
+          const fallback = confirm((options.title ? options.title + '\n\n' : '') + (options.message || ''));
+          resolve(fallback);
+          return;
+        }
+        const titleEl = document.getElementById('ple-confirm-title');
+        const msgEl = document.getElementById('ple-confirm-message');
+        const iconEl = document.getElementById('ple-confirm-icon');
+        const okBtn = document.getElementById('ple-confirm-ok-btn');
+        const cancelBtn = document.getElementById('ple-confirm-cancel-btn');
+
+        if (titleEl) titleEl.textContent = options.title || 'ยืนยันการทำรายการ';
+        if (msgEl) msgEl.innerHTML = String(options.message || '').replace(/\n/g, '<br>');
+        if (iconEl) iconEl.textContent = options.icon || (options.isDanger ? '⚠️' : '❓');
+        
+        if (okBtn) {
+          okBtn.textContent = options.confirmText || 'ยืนยัน';
+          if (options.isDanger) {
+            okBtn.style.backgroundColor = '#dc2626';
+            okBtn.style.borderColor = '#dc2626';
+            okBtn.style.color = '#ffffff';
+          } else {
+            okBtn.style.backgroundColor = 'var(--primary, #2563eb)';
+            okBtn.style.borderColor = 'var(--primary, #2563eb)';
+            okBtn.style.color = '#ffffff';
+          }
+        }
+        if (cancelBtn) {
+          cancelBtn.textContent = options.cancelText || 'ยกเลิก';
+        }
+
+        const cleanup = () => {
+          modal.style.display = 'none';
+          okBtn.onclick = null;
+          cancelBtn.onclick = null;
+          modal.onclick = null;
+        };
+
+        okBtn.onclick = () => {
+          cleanup();
+          if (typeof options.onConfirm === 'function') options.onConfirm();
+          resolve(true);
+        };
+        cancelBtn.onclick = () => {
+          cleanup();
+          if (typeof options.onCancel === 'function') options.onCancel();
+          resolve(false);
+        };
+        modal.onclick = (e) => {
+          if (e.target === modal) {
+            cleanup();
+            if (typeof options.onCancel === 'function') options.onCancel();
+            resolve(false);
+          }
+        };
+
+        modal.style.display = 'flex';
+      });
+    }
+    window.showPleConfirmModal = showPleConfirmModal;
+
+    // ══════════════════════════════════════════════════════════════════════════
+    // Session Resilience: Multiplayer Online Session
+    // ══════════════════════════════════════════════════════════════════════════
     const COHORT_SESSION_KEY = 'ple_cohort_session';
     const COHORT_SESSION_TTL_MS = 9000000; // 2.5 hours in milliseconds
 
@@ -4124,7 +4302,7 @@
           return;
         }
         const room = snap.val();
-        if (room.status === 'completed' || room.status === 'dissolved' || room.status === 'results') {
+        if (room.status === 'completed' || room.status === 'dissolved') {
           clearCohortSession();
           return;
         }
@@ -4223,7 +4401,7 @@
           }
         }
 
-        if (room.status === 'running') {
+        if (room.status === 'running' || room.status === 'results') {
           SimState.hasDoneCountdown = true;
           document.getElementById('exam-setup-view').style.display = 'none';
           document.getElementById('exam-running-view').style.display = 'block';
@@ -4235,12 +4413,145 @@
 
         setupLobbyRoomUI();
 
-        if (room.status === 'running') {
+        if (room.status === 'running' || room.status === 'results') {
           await applyRoomState(room);
         }
       } catch (e) {
         console.warn('Auto-reconnect failed:', e);
         if (typeof PleDiagnostics !== 'undefined') PleDiagnostics.log('warn', 'Auto-reconnect failed', e);
+      }
+    }
+
+    // ══════════════════════════════════════════════════════════════════════════
+    // Session Resilience: Solo Practice Session Persistence
+    // ══════════════════════════════════════════════════════════════════════════
+    const SOLO_SESSION_KEY = 'ple_solo_exam_session';
+    const SOLO_SESSION_TTL_MS = 14400000; // 4 hours
+
+    function saveSoloSession() {
+      try {
+        if (SimState.isLobby || SimState.role !== 'solo') return;
+        if (!SimState.stations || SimState.stations.length === 0) return;
+        if (SimState.isExamFinished || SimState.isFinishingExam) return;
+
+        const payload = {
+          currentIdx: SimState.currentIdx || 0,
+          totalStations: SimState.stations.length,
+          stations: SimState.stations.map(st => ({
+            stationNumber: st.stationNumber,
+            isRest: Boolean(st.isRest),
+            caseId: st.case?.caseId || null
+          })),
+          studentScores: SimState.studentScores || {},
+          writtenAnswers: SimState.writtenAnswers || {},
+          alarmSound: SimState.alarmSound || 'school-bell',
+          timeoutTransitionMode: SimState.timeoutTransitionMode || 'auto',
+          examGenMode: SimState.examGenMode || 'standard',
+          savedAt: Date.now()
+        };
+        const str = JSON.stringify(payload);
+        sessionStorage.setItem(SOLO_SESSION_KEY, str);
+        localStorage.setItem(SOLO_SESSION_KEY, str);
+      } catch (e) {}
+    }
+
+    function clearSoloSession() {
+      try {
+        sessionStorage.removeItem(SOLO_SESSION_KEY);
+        localStorage.removeItem(SOLO_SESSION_KEY);
+        const banner = document.getElementById('solo-quick-resume-banner');
+        if (banner) banner.style.display = 'none';
+      } catch (e) {}
+    }
+
+    function getSoloSession() {
+      try {
+        const s = sessionStorage.getItem(SOLO_SESSION_KEY);
+        if (s) {
+          const parsed = JSON.parse(s);
+          if (parsed && Array.isArray(parsed.stations) && parsed.stations.length > 0) {
+            return Object.assign({}, parsed, { fromSessionStorage: true });
+          }
+        }
+        const l = localStorage.getItem(SOLO_SESSION_KEY);
+        if (l) {
+          const parsed = JSON.parse(l);
+          if (parsed && Array.isArray(parsed.stations) && parsed.stations.length > 0) {
+            if (!parsed.savedAt || (Date.now() - parsed.savedAt < SOLO_SESSION_TTL_MS)) {
+              return Object.assign({}, parsed, { fromSessionStorage: false });
+            } else {
+              clearSoloSession();
+            }
+          }
+        }
+      } catch (e) {}
+      return null;
+    }
+
+    async function resumeSoloSession(session) {
+      if (!session || !Array.isArray(session.stations) || session.stations.length === 0) return;
+      try {
+        showGlobalLoader(true);
+        SimState.role = 'solo';
+        SimState.isLobby = false;
+        SimState.alarmSound = session.alarmSound || 'school-bell';
+        SimState.timeoutTransitionMode = session.timeoutTransitionMode || 'auto';
+        SimState.examGenMode = session.examGenMode || 'standard';
+        SimState.studentScores = session.studentScores || {};
+        SimState.writtenAnswers = session.writtenAnswers || {};
+        SimState.totalStations = session.stations.length;
+
+        // Reconstruct stations from caseId
+        SimState.stations = session.stations.map((stData, idx) => {
+          const stNum = stData.stationNumber || (idx + 1);
+          if (stData.isRest || stData.caseId === 'REST') {
+            return { stationNumber: stNum, isRest: true, case: getRestCaseData() };
+          }
+          let matchedCase = null;
+          const targetId = (stData.caseId || '').trim();
+          const rawId = targetId.replace(/^OSPE-/i, '');
+          const ospeId = targetId.startsWith('OSPE-') ? targetId : ('OSPE-' + targetId);
+          if (typeof AppState !== 'undefined' && AppState.cases) {
+            matchedCase = AppState.cases.find(c => c && c.caseId && (c.caseId.trim() === targetId || c.caseId.trim() === ospeId || c.caseId.trim() === rawId));
+          }
+          if (!matchedCase && typeof OFFLINE_DATA !== 'undefined' && OFFLINE_DATA.cases) {
+            matchedCase = OFFLINE_DATA.cases.find(c => c && c.caseId && (c.caseId.trim() === targetId || c.caseId.trim() === ospeId || c.caseId.trim() === rawId));
+          }
+          if (!matchedCase) {
+            matchedCase = (AppState.cases && AppState.cases[0]) || (typeof OFFLINE_DATA !== 'undefined' && OFFLINE_DATA.cases && OFFLINE_DATA.cases[0]);
+          }
+          return { stationNumber: stNum, isRest: false, case: matchedCase };
+        });
+
+        SimState.currentIdx = session.currentIdx !== undefined ? Math.min(session.currentIdx, SimState.stations.length - 1) : 0;
+
+        const unlockedOk = await unlockStationsIfProtected(SimState.stations);
+        if (!unlockedOk) {
+          showGlobalLoader(false);
+          return;
+        }
+
+        showGlobalLoader(false);
+        const banner = document.getElementById('solo-quick-resume-banner');
+        if (banner) banner.style.display = 'none';
+
+        document.getElementById('exam-setup-view').style.display = 'none';
+        document.getElementById('exam-running-view').style.display = 'block';
+        document.getElementById('exam-lobby-info-bar').style.display = 'none';
+        document.querySelector('.exam-layout').style.display = 'flex';
+
+        const stickyTimer = document.getElementById('exam-sticky-timer-bar');
+        if (stickyTimer) stickyTimer.style.display = 'block';
+        const stickyHeader = document.getElementById('exam-sticky-top-header');
+        if (stickyHeader) stickyHeader.style.display = 'block';
+
+        renderStation(SimState.currentIdx);
+        startTimer();
+        showPleToast(`กู้คืนเซสชันการซ้อมเดี่ยว (สถานีที่ ${SimState.currentIdx + 1}/${SimState.stations.length}) สำเร็จ`, 'success');
+      } catch (err) {
+        console.error('Error resuming solo session:', err);
+        showGlobalLoader(false);
+        showPleToast('ไม่สามารถกู้คืนเซสชันเดี่ยวได้: ' + err.message, 'error');
       }
     }
 
@@ -4253,6 +4564,83 @@
     window.getOnlineExamSession = getCohortSession;
     window.autoReconnectCohortSession = autoReconnectCohortSession;
     window.autoReconnectOnlineSession = autoReconnectCohortSession;
+    window.saveSoloSession = saveSoloSession;
+    window.clearSoloSession = clearSoloSession;
+    window.getSoloSession = getSoloSession;
+    window.resumeSoloSession = resumeSoloSession;
+
+    // ══════════════════════════════════════════════════════════════════════════
+    // Global Keyboard ESC Listener for Modals & Overlays
+    // ══════════════════════════════════════════════════════════════════════════
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') {
+        // 1. Confirm Modal
+        const confirmModal = document.getElementById('ple-confirm-modal');
+        if (confirmModal && confirmModal.style.display === 'flex') {
+          const cancelBtn = document.getElementById('ple-confirm-cancel-btn');
+          if (cancelBtn) cancelBtn.click();
+          else confirmModal.style.display = 'none';
+          return;
+        }
+        // 2. Fullscreen Room Code Projector
+        const fsCode = document.getElementById('modal-room-code-fullscreen');
+        if (fsCode && fsCode.style.display === 'flex') {
+          if (typeof closeFullscreenRoomCode === 'function') closeFullscreenRoomCode();
+          else fsCode.style.display = 'none';
+          return;
+        }
+        // 3. Station Case Detail Preview Modal
+        const stPrev = document.getElementById('modal-station-case-preview');
+        if (stPrev && stPrev.style.display === 'flex') {
+          if (typeof closeStationCasePreview === 'function') closeStationCasePreview();
+          else stPrev.style.display = 'none';
+          return;
+        }
+        // 4. Emoji Picker Modal
+        const emojiPicker = document.getElementById('lobby-emoji-picker-modal');
+        if (emojiPicker && emojiPicker.style.display === 'flex') {
+          if (typeof closeEmojiPicker === 'function') closeEmojiPicker();
+          else emojiPicker.style.display = 'none';
+          return;
+        }
+        // 5. Room Blocked Modal
+        const blockedModal = document.getElementById('modal-room-blocked');
+        if (blockedModal && blockedModal.style.display === 'flex') {
+          if (typeof closeRoomBlockedModal === 'function') closeRoomBlockedModal();
+          else blockedModal.style.display = 'none';
+          return;
+        }
+        // 6. Station Chat Drawer
+        const chatDrawer = document.getElementById('station-chat-drawer');
+        if (chatDrawer && chatDrawer.style.display === 'flex') {
+          if (typeof closeStationChatDrawer === 'function') closeStationChatDrawer();
+          else chatDrawer.style.display = 'none';
+          return;
+        }
+        // 7. Scratchpad
+        if (window.Scratchpad && typeof window.Scratchpad.isOpen === 'function' && window.Scratchpad.isOpen()) {
+          window.Scratchpad.close();
+          return;
+        }
+        // 8. Station Adjust Modals
+        const adjustModal = document.getElementById('modal-adjust-stations');
+        if (adjustModal && adjustModal.style.display === 'flex') {
+          adjustModal.style.display = 'none';
+          return;
+        }
+        const pickerModal = document.getElementById('modal-adjust-case-picker');
+        if (pickerModal && pickerModal.style.display === 'flex') {
+          pickerModal.style.display = 'none';
+          return;
+        }
+        // 9. OSPE Print Modal
+        const printModal = document.getElementById('ospe-print-modal');
+        if (printModal && printModal.style.display === 'flex') {
+          printModal.style.display = 'none';
+          return;
+        }
+      }
+    });
 
     document.addEventListener('DOMContentLoaded', () => {
       initServerTimeOffset();
@@ -4298,7 +4686,7 @@
                       return;
                     }
                     const room = snap.val();
-                    if (room.status === 'results' || room.status === 'completed' || room.status === 'dissolved') {
+                    if (room.status === 'completed' || room.status === 'dissolved') {
                       clearCohortSession();
                       return;
                     }
@@ -4319,7 +4707,7 @@
                     const snap = await _fbDb.ref('rooms/' + session.roomId).once('value');
                     if (snap.exists()) {
                       const room = snap.val();
-                      if (room.status === 'running' || room.status === 'waiting') {
+                      if (room.status === 'running' || room.status === 'setup' || room.status === 'waiting' || room.status === 'results') {
                         const banner = document.getElementById('cohort-quick-resume-banner');
                         const pinEl = document.getElementById('cohort-quick-resume-pin');
                         const modeEl = document.getElementById('cohort-quick-resume-mode');
@@ -4335,6 +4723,7 @@
                           let modeName = 'ซ้อมคู่มาตรฐาน (Standard)';
                           if (m === 'cohort_breakout') modeName = 'กลุ่มใหญ่: ห้องย่อย (Cohort Breakout)';
                           else if (m === 'carousel_rotation') modeName = 'กลุ่มใหญ่: แลปกิ๊งหมุนเวียน (Carousel Rotation)';
+                          if (room.status === 'results') modeName += ' (สรุปคะแนน)';
                           if (modeEl) modeEl.textContent = modeName;
 
                           const r = session.role || 'examinee';
@@ -4385,6 +4774,38 @@
             if (hiddenRoomInput) hiddenRoomInput.value = cleanRoom;
           } else if (window.location.hash === '#lobby') {
             toggleSetupView('lobby');
+          }
+        }
+      } catch (e) {}
+
+      // Check for solo practice session recovery
+      try {
+        const soloSession = getSoloSession();
+        if (soloSession && Array.isArray(soloSession.stations) && soloSession.stations.length > 0) {
+          const banner = document.getElementById('solo-quick-resume-banner');
+          const stEl = document.getElementById('solo-quick-resume-station');
+          const totEl = document.getElementById('solo-quick-resume-total');
+          const resumeBtn = document.getElementById('btn-solo-quick-resume');
+          const dismissBtn = document.getElementById('btn-solo-dismiss-resume');
+          if (banner) {
+            if (stEl) stEl.textContent = `สถานีที่ ${(soloSession.currentIdx || 0) + 1}`;
+            if (totEl) totEl.textContent = soloSession.stations.length;
+            banner.style.display = 'block';
+            if (resumeBtn) {
+              resumeBtn.onclick = () => {
+                resumeSoloSession(soloSession);
+              };
+            }
+            if (dismissBtn) {
+              dismissBtn.onclick = () => {
+                clearSoloSession();
+              };
+            }
+          }
+          if (soloSession.fromSessionStorage) {
+            setTimeout(() => {
+              resumeSoloSession(soloSession);
+            }, 300);
           }
         }
       } catch (e) {}
@@ -5100,7 +5521,12 @@
 
     async function dissolveExamRoom() {
       if (!SimState.roomId || !SimState.isHost) return;
-      const ok = confirm(`คุณแน่ใจหรือไม่ว่าต้องการ "ยุบห้องสอบ ${SimState.roomId}"?\n\nผู้เข้าร่วมทุกคนจะถูกตัดการเชื่อมต่อและกลับสู่หน้าหลัก`);
+      const ok = await showPleConfirmModal({
+        title: 'ยุบห้องสอบ',
+        message: `คุณแน่ใจหรือไม่ว่าต้องการ "ยุบห้องสอบ ${SimState.roomId}"?\n\nผู้เข้าร่วมทุกคนจะถูกตัดการเชื่อมต่อและกลับสู่หน้าหลัก`,
+        confirmText: 'ยุบห้องสอบ',
+        isDanger: true
+      });
       if (!ok) return;
 
       try {
@@ -5121,7 +5547,7 @@
         await leaveExamRoom(true);
       } catch (err) {
         console.error('Failed to dissolve room:', err);
-        alert('เกิดข้อผิดพลาดในการยุบห้อง: ' + err.message);
+        showPleToast('เกิดข้อผิดพลาดในการยุบห้อง: ' + err.message, 'error');
         showGlobalLoader(false);
       }
     }
@@ -5129,7 +5555,12 @@
 
     async function leaveExamRoom(isHostDissolving = false) {
       if (!isHostDissolving) {
-        const ok = confirm('คุณแน่ใจหรือไม่ว่าต้องการออกจากห้องสอบนี้?');
+        const ok = await showPleConfirmModal({
+          title: 'ออกจากห้องสอบ',
+          message: 'คุณแน่ใจหรือไม่ว่าต้องการออกจากห้องสอบนี้?',
+          confirmText: 'ออกจากห้อง',
+          isDanger: false
+        });
         if (!ok) return;
       }
       
@@ -5286,7 +5717,12 @@
 
     async function kickLobbyPlayer(targetPlayerId, targetName) {
       if (!SimState.isHost || !SimState.roomId || typeof _fbDb === 'undefined' || !_fbDb) return;
-      const ok = confirm(`คุณแน่ใจหรือไม่ว่าต้องการเตะคุณ "${targetName}" ออกจากห้องสอบนี้?`);
+      const ok = await showPleConfirmModal({
+        title: 'นำผู้สอบออกจากห้อง',
+        message: `คุณแน่ใจหรือไม่ว่าต้องการนำคุณ "${targetName}" ออกจากห้องสอบนี้?`,
+        confirmText: 'นำออก',
+        isDanger: true
+      });
       if (!ok) return;
 
       try {
@@ -6812,19 +7248,29 @@
               const unassigned = players.filter(p => !Object.values(breakouts).some(b => b.examinerId === p.id || b.participantId === p.id));
               const incompleteTables = Object.values(breakouts).filter(b => !b.examinerId || !b.participantId);
               if (unassigned.length > 0 || incompleteTables.length > 0) {
-                let warnMsg = '⚠️ แจ้งเตือนความพร้อมห้องสอบ:\n';
+                let warnMsg = 'แจ้งเตือนความพร้อมห้องสอบ:\n';
                 if (unassigned.length > 0) warnMsg += `• มีผู้เข้าร่วมที่ยังอยู่ใน Pool (ไม่มีโต๊ะสอบ): ${unassigned.length} คน\n`;
                 if (incompleteTables.length > 0) warnMsg += `• มีโต๊ะสอบที่คนยังไม่ครบ 2 คน: ${incompleteTables.length} โต๊ะ\n`;
                 warnMsg += '\nคุณแน่ใจหรือไม่ว่าต้องการเริ่มการสอบทันที?';
-                if (!confirm(warnMsg)) return;
+                const ok = await showPleConfirmModal({
+                  title: 'แจ้งเตือนความพร้อมห้องสอบ',
+                  message: warnMsg,
+                  confirmText: 'เริ่มสอบทันที',
+                  isDanger: true
+                });
+                if (!ok) return;
               }
             } else if (SimState.examMode === 'carousel_rotation') {
               const posts = rData.carouselPosts || {};
               const unassigned = players.filter(p => !Object.values(posts).some(post => post.startParticipantId === p.id || post.examinerId === p.id));
               if (unassigned.length > 0) {
-                if (!confirm(`⚠️ มีผู้เข้าร่วม ${unassigned.length} คน ที่ยังอยู่ใน Pool (ยังไม่ได้เลือกฐานเริ่มต้นหรือผู้ประเมิน)\n\nคุณแน่ใจหรือไม่ว่าต้องการเริ่มการสอบทันที?`)) {
-                  return;
-                }
+                const ok = await showPleConfirmModal({
+                  title: 'ผู้ร่วมสอบยังไม่ครบฐาน',
+                  message: `มีผู้เข้าร่วม ${unassigned.length} คน ที่ยังอยู่ใน Pool (ยังไม่ได้เลือกฐานเริ่มต้นหรือผู้ประเมิน)\n\nคุณแน่ใจหรือไม่ว่าต้องการเริ่มการสอบทันที?`,
+                  confirmText: 'เริ่มสอบทันที',
+                  isDanger: true
+                });
+                if (!ok) return;
               }
             }
           }
@@ -7254,6 +7700,7 @@
             if (stickyHeader) stickyHeader.style.display = 'block';
             renderStation(initialIdx);
             startTimer();
+            if (typeof saveSoloSession === 'function') saveSoloSession();
           }
         }, 1000);
       } else {
@@ -7262,6 +7709,7 @@
         if (stickyHeader) stickyHeader.style.display = 'block';
         renderStation(initialIdx);
         startTimer();
+        if (typeof saveSoloSession === 'function') saveSoloSession();
       }
     }
     window.launchSoloExamWithCountdown = launchSoloExamWithCountdown;
@@ -8329,6 +8777,7 @@
       });
       
       updateExamProgressUI(stationNum, c);
+      if (typeof saveSoloSession === 'function') saveSoloSession();
     }
 
     function toggleExamChecklistItem(stationNum, itemId, itemScore) {
@@ -8567,6 +9016,7 @@
           });
         }
       }
+      if (typeof saveSoloSession === 'function') saveSoloSession();
     }
 
     // Bridge for AI Auto-Checklist (called by station-chat.js when AI classifies items)
@@ -8588,11 +9038,17 @@
       }
     };
 
-    function resetCurrentStationChecklist() {
+    async function resetCurrentStationChecklist() {
       const curStation = SimState.stations[SimState.currentIdx];
       const stationNum = curStation?.stationNumber || (SimState.currentIdx + 1);
       
-      if (!confirm(`คุณต้องการรีเซ็ตการติ๊ก Checklist ของสถานีที่ ${stationNum} หรือไม่?`)) return;
+      const ok = await showPleConfirmModal({
+        title: 'รีเซ็ต Checklist',
+        message: `คุณต้องการรีเซ็ตการติ๊ก Checklist ของสถานีที่ ${stationNum} หรือไม่?`,
+        confirmText: 'รีเซ็ต',
+        isDanger: true
+      });
+      if (!ok) return;
 
       // Clear student scores for this station
       SimState.studentScores[stationNum] = [];
@@ -8656,6 +9112,7 @@
           });
         }
       }
+      if (typeof saveSoloSession === 'function') saveSoloSession();
     }
 
     function updateExamProgressUI(stationNum, c) {
@@ -11860,13 +12317,23 @@ ${caseContext || '(ยังไม่มีข้อมูลเคส)'}
           const isSuperHost = SimState.isHost && !isCandidateRole;
           if (!isSuperHost) {
             // Non-host or Candidate: can leave the room individually (not dissolve)
-            const opt = confirm('⚠️ คุณต้องการออกจากห้องสอบและกลับสู่หน้าหลักหรือไม่?\n\n(ผู้เข้าสอบและผู้ประเมินคนอื่นยังคงสอบต่อไปได้ ห้องสอบจะยังเปิดอยู่)');
+            const opt = await showPleConfirmModal({
+              title: 'ออกจากห้องสอบ',
+              message: 'คุณต้องการออกจากห้องสอบและกลับสู่หน้าหลักหรือไม่?\n\n(ผู้เข้าสอบและผู้ประเมินคนอื่นยังคงสอบต่อไปได้ ห้องสอบจะยังเปิดอยู่)',
+              confirmText: 'ออกจากห้อง',
+              isDanger: false
+            });
             if (!opt) return;
             await leaveExamRoom(false);
             return;
           }
           // Super Host: dissolve entire room
-          const opt = confirm('👑 คุณเป็น Super Host ของห้องสอบรวมนี้\n\nกด "ตกลง (OK)" เพื่อยุติการสอบทั้งห้องและยุบห้องสอบ (Dissolve)\nผู้เข้าสอบและผู้ประเมินทุกคนจะถูกพากลับสู่หน้าหลักพร้อมกัน\n\nหรือกด "ยกเลิก (Cancel)" หากต้องการสอบต่อ');
+          const opt = await showPleConfirmModal({
+            title: 'ยุติการสอบทั้งห้อง',
+            message: 'คุณเป็น Super Host ของห้องสอบรวมนี้\n\nต้องการยุติการสอบและยุบห้องสอบ (Dissolve)?\nผู้เข้าสอบและผู้ประเมินทุกคนจะถูกพากลับสู่หน้าหลักพร้อมกัน',
+            confirmText: 'ยุติและยุบห้อง',
+            isDanger: true
+          });
           if (!opt) return;
           await dissolveExamRoom();
           return;
@@ -11875,22 +12342,39 @@ ${caseContext || '(ยังไม่มีข้อมูลเคส)'}
         // In 1-on-1 Standard Room
         // Candidate must NEVER dissolve room even if they created it
         if (SimState.isHost && !isCandidateRole) {
-          const opt = confirm('⚠️ คุณเป็น Host ผู้คุมสอบของห้องนี้\n\nกด "ตกลง (OK)" เพื่อยุบห้องสอบ (Dissolve) และพาผู้เข้าสอบทุกคนกลับสู่หน้าแรก\nหรือกด "ยกเลิก (Cancel)" หากไม่ต้องการออก');
+          const opt = await showPleConfirmModal({
+            title: 'ยุบห้องสอบ',
+            message: 'คุณเป็น Host ผู้คุมสอบของห้องนี้\n\nต้องการยุบห้องสอบ (Dissolve) และพาผู้เข้าสอบทุกคนกลับสู่หน้าแรกหรือไม่?',
+            confirmText: 'ยุบห้องสอบ',
+            isDanger: true
+          });
           if (!opt) return;
           await dissolveExamRoom();
         } else {
-          const opt = confirm('⚠️ คุณต้องการออกจากการสอบจำลองและกลับสู่หน้าหลักหรือไม่?\n\n(ผู้ประเมินยังคงอยู่ในห้องสอบ)');
+          const opt = await showPleConfirmModal({
+            title: 'ออกจากการสอบ',
+            message: 'คุณต้องการออกจากการสอบจำลองและกลับสู่หน้าหลักหรือไม่?\n\n(ผู้ประเมินยังคงอยู่ในห้องสอบ)',
+            confirmText: 'ออกจากห้อง',
+            isDanger: false
+          });
           if (!opt) return;
           await leaveExamRoom(false);
         }
       } else {
-        const opt = confirm('⚠️ คุณต้องการยุติการสอบจำลอง (Solo Practice) และกลับสู่หน้าตั้งค่าหรือไม่?\n(ความคืบหน้าของรอบนี้จะถูกรีเซ็ต)');
+        const opt = await showPleConfirmModal({
+          title: 'ยุติการฝึกซ้อมเดี่ยว',
+          message: 'คุณต้องการยุติการสอบจำลอง (Solo Practice) และกลับสู่หน้าตั้งค่าหรือไม่?\n\n(ความคืบหน้าของรอบนี้จะถูกรีเซ็ต)',
+          confirmText: 'ยุติการฝึกซ้อม',
+          isDanger: true
+        });
         if (!opt) return;
+        if (typeof clearSoloSession === 'function') clearSoloSession();
         resetExamToSetup();
       }
     }
 
     function resetExamToSetup() {
+      if (typeof clearSoloSession === 'function') clearSoloSession();
       stopTimeoutAlarmSound();
       if (typeof closeManualTimeoutOverlay === 'function') closeManualTimeoutOverlay();
       if (window.Scratchpad) Scratchpad.close();
@@ -11943,6 +12427,7 @@ ${caseContext || '(ยังไม่มีข้อมูลเคส)'}
     async function finishExamSimulation() {
       if (SimState.isFinishingExam || SimState.isExamFinished) return;
       SimState.isFinishingExam = true;
+      if (typeof clearSoloSession === 'function') clearSoloSession();
 
       stopTimeoutAlarmSound();
       if (typeof closeManualTimeoutOverlay === 'function') closeManualTimeoutOverlay();
@@ -14121,15 +14606,19 @@ ${caseContext || '(ยังไม่มีข้อมูลเคส)'}
         const isHost = SimState.isHost || (SimState.cachedRoom && SimState.cachedRoom.hostId === SimState.myPlayerId);
         
         if (hasPlayers && !isHost) {
-          alert('โต๊ะสอบนี้มีผู้เข้าร่วมอยู่ เฉพาะผู้สร้างห้อง (Host) เท่านั้นที่สามารถลบได้');
+          showPleToast('โต๊ะสอบนี้มีผู้เข้าร่วมอยู่ เฉพาะผู้สร้างห้อง (Host) เท่านั้นที่สามารถลบได้', 'warning');
           return;
         }
 
         if (hasPlayers) {
           const names = [table.examinerName, table.participantName].filter(Boolean).join(', ');
-          if (!confirm(`โต๊ะ "${table.name || tableId}" มีผู้เข้าร่วมอยู่ (${names})\nต้องการลบโต๊ะสอบนี้จริงหรือไม่? ผู้เข้าร่วมจะถูกย้ายกลับสู่รายชื่อรวม (Pool)`)) {
-            return;
-          }
+          const ok = await showPleConfirmModal({
+            title: 'ยืนยันการลบโต๊ะสอบ',
+            message: `โต๊ะ "${table.name || tableId}" มีผู้เข้าร่วมอยู่ (${names})\n\nต้องการลบโต๊ะสอบนี้จริงหรือไม่? ผู้เข้าร่วมจะถูกย้ายกลับสู่รายชื่อรวม (Pool)`,
+            confirmText: 'ลบโต๊ะสอบ',
+            isDanger: true
+          });
+          if (!ok) return;
         }
 
         await _fbDb.ref(`rooms/${SimState.roomId}/breakouts/${tableId}`).remove();
@@ -15827,6 +16316,29 @@ ${caseContext || '(ยังไม่มีข้อมูลเคส)'}
     </div>
   </div>
 
+  <!-- ═══════════════════════════════════════════
+       MODAL: PLE CUSTOM CONFIRM DIALOG
+       ═══════════════════════════════════════════ -->
+  <div id="ple-confirm-modal" class="exam-modal-overlay" style="display: none; position: fixed; inset: 0; background: rgba(15, 23, 42, 0.75); backdrop-filter: blur(6px); z-index: 1000000; align-items: center; justify-content: center; padding: 1.25rem;">
+    <div class="modal-card" style="background: var(--surface); border: 1.5px solid var(--border); border-radius: var(--radius-lg); max-width: 460px; width: 100%; box-shadow: 0 25px 60px -15px rgba(0,0,0,0.4); overflow: hidden; animation: popIn 0.2s ease;" onclick="event.stopPropagation()">
+      <div style="padding: 1.5rem 1.5rem 1.25rem; text-align: center;">
+        <div id="ple-confirm-icon" style="font-size: 2.8rem; line-height: 1; margin-bottom: 0.6rem;">❓</div>
+        <h3 id="ple-confirm-title" style="font-family: var(--font-title); font-size: 1.2rem; font-weight: 700; color: var(--text-primary); margin: 0 0 0.5rem;">
+          ยืนยันการดำเนินการ
+        </h3>
+        <p id="ple-confirm-message" style="font-size: 0.92rem; color: var(--text-secondary); line-height: 1.55; margin: 0; white-space: pre-line;">
+          ข้อความยืนยัน
+        </p>
+      </div>
+      <div style="padding: 0.85rem 1.25rem; border-top: 1px solid var(--border); background: var(--bg); display: flex; justify-content: flex-end; gap: 0.75rem;">
+        <button type="button" class="btn btn-secondary" id="ple-confirm-cancel-btn" style="flex: 1; font-weight: 600; padding: 0.6rem 1rem;">ยกเลิก</button>
+        <button type="button" class="btn btn-primary" id="ple-confirm-ok-btn" style="flex: 1; font-weight: 600; padding: 0.6rem 1rem;">ตกลง</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- PLE Toast Notification Container -->
+  <div id="ple-toast-container" style="position: fixed; top: 1.25rem; right: 1.25rem; z-index: 1000001; display: flex; flex-direction: column; gap: 0.6rem; max-width: 92vw; width: 370px; pointer-events: none;"></div>
 
   <!-- ═══════════════════════════════════════════
        UNIFIED EXAM ACTION HUB & LIVE DIALOGUE SYSTEM

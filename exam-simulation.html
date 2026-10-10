@@ -4778,51 +4778,15 @@
           const roomIdInput = document.getElementById('lobby-room-id-input').value.trim();
           if (!roomIdInput) { alert('กรุณากรอกรหัสห้อง 4 หลัก'); showGlobalLoader(false); return; }
           
-          // ─── Parallel Dual-Query Room Discovery (Zero Room-Mismatch) ───
-          const fetchFb = (async () => {
-            try {
-              return await _fbDb.ref('rooms/' + roomIdInput).get();
-            } catch (e) {
-              return null;
-            }
-          })();
-
-          const fetchSb = (async () => {
-            if (!_sbClient) return null;
-            try {
-              return await _sbClient.from('exam_rooms').select('*').eq('room_code', roomIdInput).maybeSingle();
-            } catch (e) {
-              return null;
-            }
-          })();
-
-          const [snapshot, sbSnap] = await Promise.all([fetchFb, fetchSb]);
-
-          if ((!snapshot || !snapshot.exists()) && (!sbSnap || !sbSnap.data)) {
+          // ─── Direct Firebase Room Discovery (Guaranteed Realtime Consistency) ───
+          const snapshot = await _fbDb.ref('rooms/' + roomIdInput).get();
+          if (!snapshot || !snapshot.exists()) {
             throw new Error('ไม่พบห้องรหัส ' + roomIdInput + ' กรุณาตรวจสอบรหัสห้องใหม่');
           }
           
-          const roomData = (snapshot && snapshot.exists()) ? snapshot.val() : (sbSnap && sbSnap.data ? sbSnap.data : null);
+          const roomData = snapshot.val();
           if (!roomData) {
             throw new Error('ไม่พบข้อมูลห้องรหัส ' + roomIdInput);
-          }
-
-          // Register participant in Supabase cluster for tracking & stats
-          if (_sbClient && myPlayerId) {
-            (async () => {
-              try {
-                await _sbClient.from('room_participants').insert([{
-                  room_code: roomIdInput,
-                  student_id: myPlayerId,
-                  student_name: playerName,
-                  current_station: 1,
-                  is_ready: false
-                }]);
-                console.log('[DB Router] Participant mirrored to Supabase cluster.');
-              } catch (e) {
-                console.warn('[DB Router] Supabase participant mirror warning:', e);
-              }
-            })();
           }
 
           // ─── LATE JOINER & ROOM LOCK ENFORCEMENT ───
@@ -4937,6 +4901,24 @@
           
           // Add/update this player into players collection
           await _fbDb.ref(`rooms/${roomIdInput}/players/${myPlayerId}`).set(newPlayer);
+
+          // Non-blocking telemetry mirror to Supabase cluster
+          if (_sbClient && myPlayerId) {
+            (async () => {
+              try {
+                await _sbClient.from('room_participants').insert([{
+                  room_code: roomIdInput,
+                  student_id: myPlayerId,
+                  student_name: playerName,
+                  current_station: 1,
+                  is_ready: false
+                }]);
+                console.log('[DB Router] Participant mirrored to Supabase cluster.');
+              } catch (e) {
+                console.warn('[DB Router] Supabase participant mirror warning:', e);
+              }
+            })();
+          }
           
           // Update summary strings for backward compatibility
           const existingPlayers = Object.values(roomData.players || {});
@@ -11605,6 +11587,8 @@ ${caseContext || '(ยังไม่มีข้อมูลเคส)'}
             name: partName || 'ผู้เข้าสอบ',
             emoji: pEmoji,
             detail: `โต๊ะ ${tableId} (ผู้ประเมิน: ${examinerName})`,
+            rawEarned: totalEarned,
+            rawMax: totalMax,
             earned: safeFormatScore(totalEarned),
             max: safeFormatScore(totalMax),
             percent: overallPct,
@@ -11696,6 +11680,8 @@ ${caseContext || '(ยังไม่มีข้อมูลเคส)'}
             name: pData.name || 'ผู้เข้าสอบ',
             emoji: pEmoji,
             detail: pData.startStation ? `เริ่มต้นที่สถานี ${pData.startStation}` : 'แลปกิ๊งหมุนเวียน',
+            rawEarned: totalEarned,
+            rawMax: totalMax,
             earned: safeFormatScore(totalEarned),
             max: safeFormatScore(totalMax),
             percent: overallPct,
@@ -11750,6 +11736,8 @@ ${caseContext || '(ยังไม่มีข้อมูลเคส)'}
             name: p.name || 'ผู้เข้าสอบ',
             emoji: p.emoji || '👤',
             detail: 'ผู้เข้าสอบ',
+            rawEarned: totalEarned,
+            rawMax: totalMax,
             earned: safeFormatScore(totalEarned),
             max: safeFormatScore(totalMax),
             percent: overallPct,
@@ -11760,7 +11748,7 @@ ${caseContext || '(ยังไม่มีข้อมูลเคส)'}
         });
       }
 
-      leaderboard.sort((a, b) => b.percent !== a.percent ? b.percent - a.percent : b.earned - a.earned);
+      leaderboard.sort((a, b) => b.percent !== a.percent ? b.percent - a.percent : (b.rawEarned || 0) - (a.rawEarned || 0));
       return leaderboard;
     }
 
@@ -12526,13 +12514,14 @@ ${caseContext || '(ยังไม่มีข้อมูลเคส)'}
         // Render Podium & Leaderboard if multiplayer room
         const roomData = latestRoom || SimState.cachedRoom;
         const isMultiplayer = Boolean(SimState.isLobby);
-        const isHost = Boolean(SimState.isHost || (roomData && (roomData.hostId === SimState.myPlayerId || roomData.hostName === SimState.lobbyPlayerName)));
+        const isHost = isMultiplayer && Boolean(SimState.isHost || (roomData && (roomData.hostId === SimState.myPlayerId || roomData.hostName === SimState.lobbyPlayerName)));
+        const isSuperHostView = isHost && (roomData?.examMode === 'cohort_breakout' || roomData?.examMode === 'carousel_rotation' || roomData?.isSuperHost);
         const podiumSection = document.getElementById('results-podium-section');
         const personalScoreSection = document.getElementById('results-personal-score-section');
         const hostBanner = document.getElementById('results-host-summary-banner');
 
-        if (isHost) {
-          // HOST: ALWAYS HIDE PERSONAL SCORECARD (0/40), ALWAYS SHOW PODIUM + HOST BANNER
+        if (isSuperHostView) {
+          // SUPER HOST in multi-station modes: hide personal scorecard (0/40), show Master Podium + Host Banner
           if (personalScoreSection) personalScoreSection.style.display = 'none';
           if (podiumSection) podiumSection.style.display = 'block';
           if (hostBanner) hostBanner.style.display = 'block';
@@ -12541,14 +12530,15 @@ ${caseContext || '(ยังไม่มีข้อมูลเคส)'}
           renderPodiumLeaderboard(leaderboard);
           renderHostSummaryBanner(leaderboard);
         } else {
-          // PARTICIPANT / EXAMINER: Show personal scorecard
+          // SOLO PRACTICE, CANDIDATE, or STANDARD 1-ON-1 EXAMINER: Show personal scorecard
           if (personalScoreSection) personalScoreSection.style.display = 'block';
-          if (hostBanner) hostBanner.style.display = 'none';
+          if (hostBanner) hostBanner.style.display = isHost ? 'block' : 'none';
 
           if (isMultiplayer && podiumSection) {
             podiumSection.style.display = 'block';
             const leaderboard = computeLeaderboard(roomData);
             renderPodiumLeaderboard(leaderboard);
+            if (isHost) renderHostSummaryBanner(leaderboard);
           } else {
             if (podiumSection) podiumSection.style.display = 'none';
           }

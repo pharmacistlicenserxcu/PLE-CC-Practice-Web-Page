@@ -4703,15 +4703,20 @@
           
           // ─── Dual-Engine Room Registration on Supabase ───
           if (_sbClient) {
-            _sbClient.from('exam_rooms').upsert([{
-              room_code: randomRoomId,
-              host_name: playerName,
-              status: 'setup',
-              current_station: 1,
-              total_stations: fullExamSet.length
-            }], { onConflict: 'room_code' }).then(() => {
-              console.log('[DB Router] Room ' + randomRoomId + ' mirrored to Supabase cluster.');
-            }).catch(e => console.warn('[DB Router] Supabase room mirror warning:', e));
+            (async () => {
+              try {
+                await _sbClient.from('exam_rooms').upsert([{
+                  room_code: randomRoomId,
+                  host_name: playerName,
+                  status: 'setup',
+                  current_station: 1,
+                  total_stations: fullExamSet.length
+                }], { onConflict: 'room_code' });
+                console.log('[DB Router] Room ' + randomRoomId + ' mirrored to Supabase cluster.');
+              } catch (e) {
+                console.warn('[DB Router] Supabase room mirror warning:', e);
+              }
+            })();
           }
           
           SimState.roomId = randomRoomId;
@@ -4774,10 +4779,22 @@
           if (!roomIdInput) { alert('กรุณากรอกรหัสห้อง 4 หลัก'); showGlobalLoader(false); return; }
           
           // ─── Parallel Dual-Query Room Discovery (Zero Room-Mismatch) ───
-          const fetchFb = _fbDb.ref('rooms/' + roomIdInput).get().catch(() => null);
-          const fetchSb = (_sbClient)
-            ? _sbClient.from('exam_rooms').select('*').eq('room_code', roomIdInput).maybeSingle().catch(() => null)
-            : Promise.resolve(null);
+          const fetchFb = (async () => {
+            try {
+              return await _fbDb.ref('rooms/' + roomIdInput).get();
+            } catch (e) {
+              return null;
+            }
+          })();
+
+          const fetchSb = (async () => {
+            if (!_sbClient) return null;
+            try {
+              return await _sbClient.from('exam_rooms').select('*').eq('room_code', roomIdInput).maybeSingle();
+            } catch (e) {
+              return null;
+            }
+          })();
 
           const [snapshot, sbSnap] = await Promise.all([fetchFb, fetchSb]);
 
@@ -4792,15 +4809,20 @@
 
           // Register participant in Supabase cluster for tracking & stats
           if (_sbClient && myPlayerId) {
-            _sbClient.from('room_participants').insert([{
-              room_code: roomIdInput,
-              student_id: myPlayerId,
-              student_name: playerName,
-              current_station: 1,
-              is_ready: false
-            }]).then(() => {
-              console.log('[DB Router] Participant mirrored to Supabase cluster.');
-            }).catch(e => console.warn('[DB Router] Supabase participant mirror warning:', e));
+            (async () => {
+              try {
+                await _sbClient.from('room_participants').insert([{
+                  room_code: roomIdInput,
+                  student_id: myPlayerId,
+                  student_name: playerName,
+                  current_station: 1,
+                  is_ready: false
+                }]);
+                console.log('[DB Router] Participant mirrored to Supabase cluster.');
+              } catch (e) {
+                console.warn('[DB Router] Supabase participant mirror warning:', e);
+              }
+            })();
           }
 
           // ─── LATE JOINER & ROOM LOCK ENFORCEMENT ───

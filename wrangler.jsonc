@@ -1,0 +1,22 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "ple-cc-practice-web-page",
+  "compatibility_date": "2026-10-06",
+  "assets": {
+    "directory": ".",
+    "exclude": [
+      ".git/**",
+      ".github/**",
+      ".cache/**",
+      "_archive_assets/**",
+      "docs/**",
+      "scripts/**",
+      "ChangeLogs/**",
+      "apps_script_deploy/**",
+      "*.bat",
+      "*.py",
+      "*.md",
+      "requirements.txt"
+    ]
+  }
+}

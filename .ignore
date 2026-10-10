@@ -1,0 +1,20 @@
+# Cloudflare Pages / Workers Ignore
+.git/
+.github/
+.cache/
+_archive_assets/
+docs/
+scripts/
+ChangeLogs/
+apps_script_deploy/
+*.bat
+*.py
+*.md
+requirements.txt
+appsscript.json
+.clasp.json
+.claspignore
+.vercel/
+.vercelignore
+validate_roster.js
+Code.gs

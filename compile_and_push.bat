@@ -14,8 +14,8 @@ cd /d "%~dp0"
 :: 1. Setup Git Identity
 echo [1/4] Configuring Git Identity (Auto)...
 cd /d "%~dp0Website\PLE CC Webpage"
-git config user.name "thanadolnar-png"
-git config user.email "thanadol.nar@gmail.com"
+git config user.name "pharmacistlicenserxcu"
+git config user.email "pharmacistlicense.rxcu@gmail.com"
 git config credential.helper manager
 cd /d "%~dp0"
 

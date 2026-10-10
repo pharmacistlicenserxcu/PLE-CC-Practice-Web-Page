@@ -15,8 +15,8 @@ set "WEB_DIR=C:\Users\thana\Desktop\PLE-CC\Website\PLE CC Webpage"
 :: 1. Setup Git Identity
 echo [1/3] Setting Git Identity...
 cd /d "%WEB_DIR%"
-git config user.name "thanadolnar-png"
-git config user.email "thanadol.nar@gmail.com"
+git config user.name "pharmacistlicenserxcu"
+git config user.email "pharmacistlicense.rxcu@gmail.com"
 git config credential.helper manager
 echo       Done.
 

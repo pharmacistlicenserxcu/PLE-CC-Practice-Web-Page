@@ -1524,6 +1524,38 @@
     const _fbApp = firebase.initializeApp(FIREBASE_CONFIG);
     const _fbDb = firebase.database();
     let _fbRoomRef = null;  // will be set when joining a room
+
+    // ─── Silent Midnight Auto-Cleanup Routine (ลบห้องเก่าที่เกิน 24 ชม. อัตโนมัติเบื้องหลัง) ───
+    (function initMidnightAutoCleanup() {
+      if (typeof _fbDb === 'undefined' || !_fbDb) return;
+      const pruneOldRooms = async () => {
+        try {
+          const oneDayAgo = Date.now() - (24 * 60 * 60 * 1000);
+          const snap = await _fbDb.ref('rooms').once('value');
+          if (!snap.exists()) return;
+          const rooms = snap.val();
+          const updates = {};
+          let count = 0;
+          Object.keys(rooms).forEach(rId => {
+            const r = rooms[rId];
+            if (!r || (r.createdAt && r.createdAt < oneDayAgo) || r.status === 'dissolved') {
+              updates[`rooms/${rId}`] = null;
+              count++;
+            }
+          });
+          if (count > 0) {
+            await _fbDb.ref().update(updates);
+            console.log(`[Firebase Auto-Prune] Cleaned up ${count} expired rooms.`);
+          }
+        } catch (e) {
+          // Silent catch to prevent interruption
+        }
+      };
+      // Run once on load after 4s delay
+      setTimeout(pruneOldRooms, 4000);
+      // Check periodically every 1 hour
+      setInterval(pruneOldRooms, 60 * 60 * 1000);
+    })();
   </script>
 </head>
 <body>

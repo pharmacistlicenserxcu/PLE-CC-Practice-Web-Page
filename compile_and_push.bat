@@ -93,9 +93,8 @@ if exist "%~dp0Website\PLE CC Webpage" (
 ) else (
     cd /d "%~dp0"
 )
-git add -u
-git add *.html *.js *.css assets/ .gitignore .vercelignore
-git commit -m "Auto sync offline DB [!MODE!: !QUERY!] [%DATE% %TIME%]"
+git add case-data-offline.js case-details-offline.js
+git commit -m "Auto sync offline DB cases [!MODE!: !QUERY!] [%DATE% %TIME%]"
 echo.
 echo [INFO] Syncing with GitHub (Pull & Rebase)...
 git pull --rebase origin main

@@ -31,7 +31,8 @@ echo       Done.
 echo.
 echo [3/3] Git add, commit, and push to GitHub...
 cd /d "%WEB_DIR%"
-git add -A
+git add -u
+git add *.html *.js *.css assets/ .gitignore .vercelignore
 git commit -m "Quick website update [%DATE% %TIME%]"
 echo.
 echo [INFO] Syncing with GitHub (Pull & Rebase)...

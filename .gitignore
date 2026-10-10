@@ -1,0 +1,17 @@
+# Dependencies & OS
+.cache/
+__pycache__/
+*.pyc
+.DS_Store
+Thumbs.db
+
+# Archive Assets (heavy unreferenced GIFs)
+_archive_assets/
+
+# Local credentials & configs
+.clasp.json
+.vercel/
+
+# Temporary / Log files
+*.log
+tmp_*.txt

@@ -1,0 +1,18 @@
+# Files not needed for production deployment
+.git/
+.github/
+.cache/
+_archive_assets/
+docs/
+scripts/
+ChangeLogs/
+apps_script_deploy/
+*.bat
+*.py
+*.md
+requirements.txt
+appsscript.json
+.clasp.json
+.claspignore
+validate_roster.js
+Code.gs

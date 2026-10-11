@@ -6399,6 +6399,11 @@ sub,
   background: rgba(239, 68, 68, 0.05);
 }
 
+.interactive-blank-wrapper.is-submitted {
+  border-color: #3b82f6;
+  background: rgba(59, 130, 246, 0.05);
+}
+
 .interactive-blank-input {
   border: none;
   background: transparent;
@@ -6469,6 +6474,19 @@ sub,
   color: #92400e;
   background: #fef3c7;
   border: 1px solid #fde68a;
+}
+
+.blank-status-badge.is-submitted {
+  color: #1e40af;
+  background: #eff6ff;
+  border: 1px solid #bfdbfe;
+}
+
+[data-theme="dark"] .blank-status-badge.is-submitted,
+body.dark-mode .blank-status-badge.is-submitted {
+  color: #93c5fd;
+  background: rgba(59, 130, 246, 0.18);
+  border: 1px solid rgba(59, 130, 246, 0.35);
 }
 
 .interactive-blank-examiner-badge {

@@ -3910,8 +3910,8 @@ function renderInteractiveBlanks(htmlOrText, options = {}) {
                spellcheck="false" 
                onkeydown="if(event.key === 'Enter'){ checkSingleInteractiveBlank(this.parentElement); }"
                oninput="handleInteractiveBlankInput(this)" />
-        <button type="button" class="btn-check-blank" onclick="checkSingleInteractiveBlank(this.parentElement)" title="กดเพื่อตรวจคำตอบ">
-          🔍 ตรวจ
+        <button type="button" class="btn-check-blank" onclick="checkSingleInteractiveBlank(this.parentElement)" title="กดเพื่อส่งคำตอบ">
+          📨 ส่งคำตอบ
         </button>
         <span class="blank-status-badge"></span>
       </span>
@@ -3959,7 +3959,7 @@ function handleInteractiveBlankInput(inputEl) {
   inputEl.style.width = `${Math.min(newCols, 45)}ch`;
 
   // Reset previous check status when user edits
-  wrapper.classList.remove('is-correct', 'is-wrong');
+  wrapper.classList.remove('is-correct', 'is-wrong', 'is-submitted');
   const badge = wrapper.querySelector('.blank-status-badge');
   if (badge) {
     badge.textContent = '';
@@ -3997,7 +3997,7 @@ function checkSingleInteractiveBlank(wrapper) {
   const score = parseFloat(wrapper.getAttribute('data-score')) || 1.0;
 
   if (!rawUserVal) {
-    wrapper.classList.remove('is-correct', 'is-wrong');
+    wrapper.classList.remove('is-correct', 'is-wrong', 'is-submitted');
     if (badge) {
       badge.textContent = 'กรุณาพิมพ์คำตอบ';
       badge.className = 'blank-status-badge is-empty';
@@ -4017,29 +4017,44 @@ function checkSingleInteractiveBlank(wrapper) {
     return normUserVal === normAns;
   });
 
-  if (isMatch) {
-    wrapper.classList.remove('is-wrong');
-    wrapper.classList.add('is-correct');
-    if (badge) {
-      badge.textContent = `✅ ถูกต้อง! (+${score} คะแนน)`;
-      badge.className = 'blank-status-badge is-correct';
-      badge.style.display = 'inline-flex';
-    }
+  // Always perform Autochecklist behind the scenes for scoring and live grading
+  if (tag) {
+    autoCheckLinkedChecklistItem(tag, isMatch);
+  }
 
-    // Auto-tick linked checklist item if exists
-    if (tag) {
-      autoCheckLinkedChecklistItem(tag, true);
+  // Determine if the current viewer is an examiner
+  const isExaminer = (typeof currentRole !== 'undefined' && currentRole === 'examiner') ||
+                     (typeof SimState !== 'undefined' && SimState.role === 'examiner');
+
+  if (isExaminer) {
+    // Show evaluation badge only to examiners
+    wrapper.classList.remove('is-submitted');
+    if (isMatch) {
+      wrapper.classList.remove('is-wrong');
+      wrapper.classList.add('is-correct');
+      if (badge) {
+        badge.textContent = `✅ ถูกต้อง! (+${score} คะแนน)`;
+        badge.className = 'blank-status-badge is-correct';
+        badge.style.display = 'inline-flex';
+      }
+    } else {
+      wrapper.classList.remove('is-correct');
+      wrapper.classList.add('is-wrong');
+      if (badge) {
+        badge.textContent = '❌ ยังไม่ถูกต้อง';
+        badge.className = 'blank-status-badge is-wrong';
+        badge.style.display = 'inline-flex';
+      }
     }
   } else {
-    wrapper.classList.remove('is-correct');
-    wrapper.classList.add('is-wrong');
+    // For examinees / candidates: DO NOT disclose right or wrong!
+    // Show clean, neutral submission confirmation badge only
+    wrapper.classList.remove('is-correct', 'is-wrong');
+    wrapper.classList.add('is-submitted');
     if (badge) {
-      badge.textContent = '❌ ยังไม่ถูกต้อง';
-      badge.className = 'blank-status-badge is-wrong';
+      badge.textContent = '✓ ส่งคำตอบแล้ว';
+      badge.className = 'blank-status-badge is-submitted';
       badge.style.display = 'inline-flex';
-    }
-    if (tag) {
-      autoCheckLinkedChecklistItem(tag, false);
     }
   }
 

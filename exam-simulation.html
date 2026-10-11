@@ -9286,6 +9286,17 @@
         const inp = document.querySelector(`.interactive-blank-wrapper[data-tag="${tag}"] .interactive-blank-input`);
         if (inp && !inp.value) {
           inp.value = val;
+          const wrap = inp.closest('.interactive-blank-wrapper');
+          if (wrap && val.trim()) {
+            wrap.classList.remove('is-correct', 'is-wrong');
+            wrap.classList.add('is-submitted');
+            const badge = wrap.querySelector('.blank-status-badge');
+            if (badge) {
+              badge.textContent = '✓ ส่งคำตอบแล้ว';
+              badge.className = 'blank-status-badge is-submitted';
+              badge.style.display = 'inline-flex';
+            }
+          }
         }
       });
 
@@ -9442,9 +9453,9 @@
           let statusTag = `<span class="badge" style="background:var(--bg-secondary);color:var(--text-muted);font-size:0.75rem;">รอกรอก</span>`;
           if (userVal) {
             if (isMatch) {
-              statusTag = `<span class="badge" style="background:rgba(16,185,129,0.15);color:var(--success);font-size:0.75rem;font-weight:700;">✅ Correct (+${b.score})</span>`;
+              statusTag = `<span class="badge" style="background:rgba(16,185,129,0.15);color:var(--success);font-size:0.75rem;font-weight:700;">✅ ถูกต้อง (+${b.score} คะแนน)</span>`;
             } else {
-              statusTag = `<span class="badge" style="background:rgba(239,68,68,0.12);color:var(--danger);font-size:0.75rem;font-weight:600;">❌ Wrong</span>`;
+              statusTag = `<span class="badge" style="background:rgba(239,68,68,0.12);color:var(--danger);font-size:0.75rem;font-weight:600;">❌ ยังไม่ถูกต้อง</span>`;
             }
           }
 

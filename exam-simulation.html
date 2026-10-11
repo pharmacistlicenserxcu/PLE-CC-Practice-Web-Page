@@ -4494,6 +4494,8 @@
         showGlobalLoader(true);
         SimState.role = 'solo';
         SimState.isLobby = false;
+        SimState.isFinishingExam = false;
+        SimState.isExamFinished = false;
         SimState.alarmSound = session.alarmSound || 'school-bell';
         SimState.timeoutTransitionMode = session.timeoutTransitionMode || 'auto';
         SimState.examGenMode = session.examGenMode || 'standard';
@@ -6394,6 +6396,8 @@
             }
           }
         } else if (room.status === 'running' || room.status === 'countdown') {
+          SimState.isFinishingExam = false;
+          SimState.isExamFinished = false;
           document.getElementById('lobby-waiting-screen').style.display = 'none';
           
           // Build stations if not exist, or if room/examSet has changed
@@ -7507,6 +7511,8 @@
       try {
         SimState.role = 'solo';
         SimState.isLobby = false;
+        SimState.isFinishingExam = false;
+        SimState.isExamFinished = false;
         const soloTimeoutMode = document.querySelector('input[name="global-timeout-behavior"]:checked')?.value || SimState.timeoutTransitionMode || 'auto';
         SimState.timeoutTransitionMode = soloTimeoutMode;
         const soloAlarm = document.getElementById('solo-alarm-sound-select')?.value || SimState.alarmSound || localStorage.getItem('ple_ospe_alarm_sound') || 'school-bell';
@@ -7666,6 +7672,8 @@
     }
 
     function launchSoloExamWithCountdown(initialIdx = 0) {
+      SimState.isFinishingExam = false;
+      SimState.isExamFinished = false;
       showGlobalLoader(false);
       document.getElementById('exam-setup-view').style.display = 'none';
       document.getElementById('exam-running-view').style.display = 'block';
@@ -9215,6 +9223,8 @@
     function nextStation() {
       if (SimState.currentIdx < SimState.stations.length - 1) {
         jumpToStation(SimState.currentIdx + 1);
+      } else {
+        finishExamSimulation();
       }
     }
 
@@ -12369,12 +12379,16 @@ ${caseContext || '(ยังไม่มีข้อมูลเคส)'}
         });
         if (!opt) return;
         if (typeof clearSoloSession === 'function') clearSoloSession();
+        SimState.isFinishingExam = false;
+        SimState.isExamFinished = false;
         resetExamToSetup();
       }
     }
 
     function resetExamToSetup() {
       if (typeof clearSoloSession === 'function') clearSoloSession();
+      SimState.isFinishingExam = false;
+      SimState.isExamFinished = false;
       stopTimeoutAlarmSound();
       if (typeof closeManualTimeoutOverlay === 'function') closeManualTimeoutOverlay();
       if (window.Scratchpad) Scratchpad.close();
@@ -12425,572 +12439,619 @@ ${caseContext || '(ยังไม่มีข้อมูลเคส)'}
 
     // ─── Finish exam ──────────────────────────────────────────
     async function finishExamSimulation() {
-      if (SimState.isFinishingExam || SimState.isExamFinished) return;
+      if (SimState.isFinishingExam) {
+        if (typeof showPleToast === 'function') {
+          showPleToast('กำลังประมวลผลสรุปคะแนนการสอบ กรุณารอสักครู่...', 'info');
+        }
+        return;
+      }
+      if (SimState.isExamFinished) {
+        const runningView = document.getElementById('exam-running-view');
+        if (runningView) runningView.style.display = 'none';
+        const resultsView = document.getElementById('exam-results-view');
+        if (resultsView) resultsView.style.display = 'block';
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+        return;
+      }
+
       SimState.isFinishingExam = true;
-      if (typeof clearSoloSession === 'function') clearSoloSession();
-
-      stopTimeoutAlarmSound();
-      if (typeof closeManualTimeoutOverlay === 'function') closeManualTimeoutOverlay();
-      if (window.Scratchpad) Scratchpad.close();
-      if (SimState.timerInterval) clearInterval(SimState.timerInterval);
-      if (SimState.timerSyncInterval) clearInterval(SimState.timerSyncInterval);
-      if (SimState.lobbyPollInterval) clearInterval(SimState.lobbyPollInterval);
-      
-      // Cleanup Station Chat & Unified Tools
-      if (typeof StationChatController !== 'undefined') {
-        StationChatController.cleanupListeners();
-        const triggerBtn = document.getElementById('btn-unified-exam-tools') || document.getElementById('btn-toggle-station-chat');
-        if (triggerBtn) triggerBtn.style.display = 'none';
-        const menu = document.getElementById('unified-exam-tools-menu');
-        if (menu) menu.style.display = 'none';
-        const drawer = document.getElementById('station-chat-drawer');
-        if (drawer) {
-          drawer.style.display = 'none';
-          drawer.classList.remove('maximized', 'dragging', 'resizing');
-        }
-        StationChatController.isOpen = false;
+      if (typeof showPleToast === 'function') {
+        showPleToast('กำลังประมวลผลและสรุปคะแนนการสอบ...', 'info');
       }
 
-      showGlobalLoader(true, 'กำลังสรุปผลคะแนนการสอบร่วมกัน...');
-      
-      // Detach old Firebase listener early to eliminate re-entrant event loops
-      if (typeof _fbRoomRef !== 'undefined' && _fbRoomRef) {
-        try { _fbRoomRef.off(); } catch (e) {}
-        _fbRoomRef = null;
-      }
+      const withTimeout = (promise, ms = 3000) => {
+        return Promise.race([
+          promise,
+          new Promise((_, reject) => setTimeout(() => reject(new Error('Firebase operation timed out')), ms))
+        ]);
+      };
 
-      let latestRoom = null;
-      if (typeof _fbDb !== 'undefined' && _fbDb && SimState.isLobby && SimState.roomId) {
-        try {
-          if (SimState.isHost || SimState.role === 'examiner') {
-            const finishPayload = { status: 'results' };
-            if (!SimState.cachedRoom?.isSuperHost && SimState.examMode === 'standard' && SimState.role === 'examiner') {
-              finishPayload.scoresByStation = JSON.stringify(SimState.studentScores);
-            }
-            await _fbDb.ref('rooms/' + SimState.roomId).update(finishPayload);
-          }
-          // Fetch the definitive shared scores from Firebase so everyone has 100% matching results
-          const snap = await _fbDb.ref('rooms/' + SimState.roomId).get();
-          if (snap.exists()) {
-            latestRoom = snap.val();
-            
-            // 1. Breakout Table mode scores
-            if (latestRoom.examMode === 'cohort_breakout') {
-              let myTable = null;
-              if (SimState.myBreakoutTableId && latestRoom.breakouts?.[SimState.myBreakoutTableId]) {
-                myTable = latestRoom.breakouts[SimState.myBreakoutTableId];
-              } else if (latestRoom.breakouts) {
-                myTable = Object.values(latestRoom.breakouts).find(b => 
-                  b.participantId === SimState.myPlayerId || 
-                  b.examinerId === SimState.myPlayerId || 
-                  (b.participantName && b.participantName === SimState.lobbyPlayerName) ||
-                  (b.examinerName && b.examinerName === SimState.lobbyPlayerName)
-                );
-              }
-              if (myTable && myTable.scores) {
-                Object.keys(myTable.scores).forEach(stNum => {
-                  const s = myTable.scores[stNum];
-                  if (s && s.checkedProgress) {
-                    SimState.studentScores[stNum] = s.checkedProgress;
-                  } else if (s && s.checkedIds) {
-                    SimState.studentScores[stNum] = s.checkedIds;
-                  } else if (Array.isArray(s)) {
-                    SimState.studentScores[stNum] = s;
-                  }
-                });
-              }
-            } else if (latestRoom.examMode === 'carousel_rotation') {
-              // 2. Carousel mode scores
-              let myStScores = null;
-              if (latestRoom.participantScores) {
-                if (latestRoom.participantScores[SimState.myPlayerId]) {
-                  myStScores = latestRoom.participantScores[SimState.myPlayerId].stations;
-                } else {
-                  const pEntry = Object.values(latestRoom.participantScores).find(ps => ps.participantName === SimState.lobbyPlayerName);
-                  if (pEntry) myStScores = pEntry.stations;
-                }
-              }
-              if (myStScores) {
-                Object.keys(myStScores).forEach(stNum => {
-                  const s = myStScores[stNum];
-                  if (s && s.checkedProgress) {
-                    SimState.studentScores[stNum] = s.checkedProgress;
-                  } else if (Array.isArray(s)) {
-                    SimState.studentScores[stNum] = s;
-                  }
-                });
-              }
-            } else {
-              // 3. Standard room scores
-              if (latestRoom.scoresByStation) {
-                const parsed = typeof latestRoom.scoresByStation === 'string' ? JSON.parse(latestRoom.scoresByStation) : latestRoom.scoresByStation;
-                if (parsed && typeof parsed === 'object') {
-                  SimState.studentScores = Object.assign({}, SimState.studentScores, parsed);
-                }
-              }
-            }
-          }
-        } catch (e) {
-          console.warn('Firebase finish/sync error:', e);
-        }
-      }
-      
-      // Detach Firebase listener
-      if (typeof _fbRoomRef !== 'undefined' && _fbRoomRef) {
-        try { _fbRoomRef.off(); } catch (e) {}
-        _fbRoomRef = null;
-      }
-
-      if (!SimState.stationFeedbacks) {
-        try {
-          SimState.stationFeedbacks = JSON.parse(sessionStorage.getItem('ospe_stationFeedbacks') || '{}');
-        } catch (e) {
-          SimState.stationFeedbacks = {};
-        }
-      }
-
-      // If multiplayer room, sync and listen for debrief feedbacks
-      if (SimState.roomId && typeof _fbDb !== 'undefined' && _fbDb) {
-        try {
-          const fbFeedbacksRef = _fbDb.ref('rooms/' + SimState.roomId + '/stationFeedbacks');
-          fbFeedbacksRef.once('value').then(snap => {
-            const val = snap.val();
-            if (val && typeof val === 'object') {
-              if (!SimState.stationFeedbacks) SimState.stationFeedbacks = {};
-              Object.assign(SimState.stationFeedbacks, val);
-              Object.keys(val).forEach(sNum => {
-                const inputEl = document.getElementById(`station-feedback-input-${sNum}`);
-                if (inputEl && document.activeElement !== inputEl) {
-                  inputEl.value = val[sNum] || '';
-                }
-              });
-            }
-          }).catch(e => console.warn('Error fetching stationFeedbacks from Firebase:', e));
-
-          fbFeedbacksRef.on('child_changed', snap => {
-            const sNum = snap.key;
-            const text = snap.val();
-            if (!SimState.stationFeedbacks) SimState.stationFeedbacks = {};
-            SimState.stationFeedbacks[sNum] = text;
-            const inputEl = document.getElementById(`station-feedback-input-${sNum}`);
-            if (inputEl && document.activeElement !== inputEl) {
-              inputEl.value = text || '';
-            }
-          });
-        } catch (e) {
-          console.warn('Firebase feedbacks attach error:', e);
-        }
-      }
-      
       try {
+        if (typeof clearSoloSession === 'function') {
+          try { clearSoloSession(); } catch (e) {}
+        }
+
+        try { stopTimeoutAlarmSound(); } catch (e) {}
+        if (typeof closeManualTimeoutOverlay === 'function') {
+          try { closeManualTimeoutOverlay(); } catch (e) {}
+        }
+        if (window.Scratchpad && typeof window.Scratchpad.close === 'function') {
+          try { Scratchpad.close(); } catch (e) {}
+        }
+        if (SimState.timerInterval) clearInterval(SimState.timerInterval);
+        if (SimState.timerSyncInterval) clearInterval(SimState.timerSyncInterval);
+        if (SimState.lobbyPollInterval) clearInterval(SimState.lobbyPollInterval);
+        SimState.timerInterval = null;
+        SimState.timerSyncInterval = null;
+        SimState.lobbyPollInterval = null;
+        SimState.timerRunning = false;
+
+        // Cleanup Station Chat & Unified Tools
+        if (typeof StationChatController !== 'undefined') {
+          try {
+            StationChatController.cleanupListeners();
+            const triggerBtn = document.getElementById('btn-unified-exam-tools') || document.getElementById('btn-toggle-station-chat');
+            if (triggerBtn) triggerBtn.style.display = 'none';
+            const menu = document.getElementById('unified-exam-tools-menu');
+            if (menu) menu.style.display = 'none';
+            const drawer = document.getElementById('station-chat-drawer');
+            if (drawer) {
+              drawer.style.display = 'none';
+              drawer.classList.remove('maximized', 'dragging', 'resizing');
+            }
+            StationChatController.isOpen = false;
+          } catch (e) {}
+        }
+
+        showGlobalLoader(true, SimState.isLobby ? 'กำลังสรุปผลคะแนนการสอบร่วมกัน...' : 'กำลังสรุปผลคะแนนและจัดทำรายงานผลสอบ...');
+
+        // Detach old Firebase listener early to eliminate re-entrant event loops
+        if (typeof _fbRoomRef !== 'undefined' && _fbRoomRef) {
+          try { _fbRoomRef.off(); } catch (e) {}
+          _fbRoomRef = null;
+        }
+
+        let latestRoom = null;
+        if (typeof _fbDb !== 'undefined' && _fbDb && SimState.isLobby && SimState.roomId) {
+          try {
+            if (SimState.isHost || SimState.role === 'examiner') {
+              const finishPayload = { status: 'results' };
+              if (!SimState.cachedRoom?.isSuperHost && SimState.examMode === 'standard' && SimState.role === 'examiner') {
+                finishPayload.scoresByStation = JSON.stringify(SimState.studentScores || {});
+              }
+              await withTimeout(_fbDb.ref('rooms/' + SimState.roomId).update(finishPayload), 2500).catch(e => console.warn('Firebase status:results update timeout/warn:', e));
+            }
+            // Fetch the definitive shared scores from Firebase so everyone has 100% matching results
+            const snap = await withTimeout(_fbDb.ref('rooms/' + SimState.roomId).get(), 3000).catch(e => {
+              console.warn('Firebase scores get timeout/warn:', e);
+              return null;
+            });
+            if (snap && typeof snap.exists === 'function' && snap.exists()) {
+              latestRoom = snap.val();
+
+              // 1. Breakout Table mode scores
+              if (latestRoom.examMode === 'cohort_breakout') {
+                let myTable = null;
+                if (SimState.myBreakoutTableId && latestRoom.breakouts?.[SimState.myBreakoutTableId]) {
+                  myTable = latestRoom.breakouts[SimState.myBreakoutTableId];
+                } else if (latestRoom.breakouts) {
+                  myTable = Object.values(latestRoom.breakouts).find(b => 
+                    b.participantId === SimState.myPlayerId || 
+                    b.examinerId === SimState.myPlayerId || 
+                    (b.participantName && b.participantName === SimState.lobbyPlayerName) ||
+                    (b.examinerName && b.examinerName === SimState.lobbyPlayerName)
+                  );
+                }
+                if (myTable && myTable.scores) {
+                  if (!SimState.studentScores) SimState.studentScores = {};
+                  Object.keys(myTable.scores).forEach(stNum => {
+                    const s = myTable.scores[stNum];
+                    if (s && s.checkedProgress) {
+                      SimState.studentScores[stNum] = s.checkedProgress;
+                    } else if (s && s.checkedIds) {
+                      SimState.studentScores[stNum] = s.checkedIds;
+                    } else if (Array.isArray(s)) {
+                      SimState.studentScores[stNum] = s;
+                    }
+                  });
+                }
+              } else if (latestRoom.examMode === 'carousel_rotation') {
+                // 2. Carousel mode scores
+                let myStScores = null;
+                if (latestRoom.participantScores) {
+                  if (latestRoom.participantScores[SimState.myPlayerId]) {
+                    myStScores = latestRoom.participantScores[SimState.myPlayerId].stations;
+                  } else {
+                    const pEntry = Object.values(latestRoom.participantScores).find(ps => ps.participantName === SimState.lobbyPlayerName);
+                    if (pEntry) myStScores = pEntry.stations;
+                  }
+                }
+                if (myStScores) {
+                  if (!SimState.studentScores) SimState.studentScores = {};
+                  Object.keys(myStScores).forEach(stNum => {
+                    const s = myStScores[stNum];
+                    if (s && s.checkedProgress) {
+                      SimState.studentScores[stNum] = s.checkedProgress;
+                    } else if (Array.isArray(s)) {
+                      SimState.studentScores[stNum] = s;
+                    }
+                  });
+                }
+              } else {
+                // 3. Standard room scores
+                if (latestRoom.scoresByStation) {
+                  const parsed = typeof latestRoom.scoresByStation === 'string' ? JSON.parse(latestRoom.scoresByStation) : latestRoom.scoresByStation;
+                  if (parsed && typeof parsed === 'object') {
+                    SimState.studentScores = Object.assign({}, SimState.studentScores, parsed);
+                  }
+                }
+              }
+            }
+          } catch (e) {
+            console.warn('Firebase finish/sync error:', e);
+          }
+        }
+
+        // Detach Firebase listener
+        if (typeof _fbRoomRef !== 'undefined' && _fbRoomRef) {
+          try { _fbRoomRef.off(); } catch (e) {}
+          _fbRoomRef = null;
+        }
+
+        if (!SimState.stationFeedbacks) {
+          try {
+            SimState.stationFeedbacks = JSON.parse(sessionStorage.getItem('ospe_stationFeedbacks') || '{}');
+          } catch (e) {
+            SimState.stationFeedbacks = {};
+          }
+        }
+
+        // If multiplayer room, sync and listen for debrief feedbacks
+        if (SimState.roomId && typeof _fbDb !== 'undefined' && _fbDb) {
+          try {
+            const fbFeedbacksRef = _fbDb.ref('rooms/' + SimState.roomId + '/stationFeedbacks');
+            fbFeedbacksRef.once('value').then(snap => {
+              const val = snap.val();
+              if (val && typeof val === 'object') {
+                if (!SimState.stationFeedbacks) SimState.stationFeedbacks = {};
+                Object.assign(SimState.stationFeedbacks, val);
+                Object.keys(val).forEach(sNum => {
+                  const inputEl = document.getElementById('station-feedback-input-' + sNum);
+                  if (inputEl && document.activeElement !== inputEl) {
+                    inputEl.value = val[sNum] || '';
+                  }
+                });
+              }
+            }).catch(e => console.warn('Error fetching stationFeedbacks from Firebase:', e));
+
+            fbFeedbacksRef.on('child_changed', snap => {
+              const sNum = snap.key;
+              const text = snap.val();
+              if (!SimState.stationFeedbacks) SimState.stationFeedbacks = {};
+              SimState.stationFeedbacks[sNum] = text;
+              const inputEl = document.getElementById('station-feedback-input-' + sNum);
+              if (inputEl && document.activeElement !== inputEl) {
+                inputEl.value = text || '';
+              }
+            });
+          } catch (e) {
+            console.warn('Firebase feedbacks attach error:', e);
+          }
+        }
+
         let passedStations = 0, totalMaxScore = 0, totalEarnedScore = 0;
         let sumStationPct = 0, activeStationCount = 0;
         const tbody = document.getElementById('results-stations-tbody');
         if (tbody) tbody.innerHTML = '';
-        
+
         const stationsList = SimState.stations || [];
         const totalStationsCount = stationsList.length || SimState.totalStations || 0;
-        
-        const formatScore = safeFormatScore;
-        
-        stationsList.forEach(st => {
-          const c = st.case || {};
-          const checked = SimState.studentScores[st.stationNumber] || SimState.studentScores[String(st.stationNumber)] || [];
-          const checklist = Array.isArray(c.checklist) ? c.checklist : [];
-          const { currentScore: earned, totalScore: max } = calculateStationScore(checklist, checked);
-          
-          const detailRowId = `res-chk-detail-${st.stationNumber}`;
-          
-          totalMaxScore += max;
-          totalEarnedScore += earned;
-          const isRest = st.isRest || ((c.category || '').toUpperCase() === 'REST');
-          const pct = max > 0 ? Math.round((earned / max) * 100) : 0;
-          if (!isRest && max > 0) {
-            sumStationPct += pct;
-            activeStationCount++;
-          }
-          const isPassed = isRest ? true : (pct >= 80);
-          if (isPassed) passedStations++;
-          
-          if (tbody) {
-            const tr = document.createElement('tr');
-            const statusHtml = isRest 
-              ? `<strong style="color: var(--text-secondary);">ผ่าน (พัก)</strong>` 
-              : `<strong style="color: ${isPassed ? 'var(--success)' : 'var(--danger)'};">${isPassed ? 'ผ่าน' : 'ตก'}</strong>`;
-            const titleText = escapeHtml(c.title || ('สถานี ' + st.stationNumber));
-            const caseIdText = c.caseId ? escapeHtml(c.caseId) : '';
-            const catText = c.category || (isRest ? 'REST' : 'CLINIC');
-            // Check if station has blanks and answers
-            const rawScenarioContent = (c.scenario || '') + ' ' + (c.contentHtml || '') + ' ' + (c.scenarioHtml || '');
-            const hasBlanks = rawScenarioContent.includes('[BLANK:');
-            const stationWrittenAnswers = (SimState.writtenAnswers && SimState.writtenAnswers[st.stationNumber]) || {};
 
-            let blanksReviewHtml = '';
-            if (hasBlanks) {
-              const blankRegex = /\[BLANK:\s*([^|\]]+)(?:\s*\|\s*([^|\]]+))?(?:\s*\|\s*([^|\]]+))?(?:\s*\|\s*([^\]]+))?\]/gi;
-              let bMatch;
-              let bCount = 0;
-              const blankEntries = [];
-              const seenTags = new Set();
-              while ((bMatch = blankRegex.exec(rawScenarioContent)) !== null) {
-                bCount++;
-                const answers = (bMatch[1] || '').split(/[,/]/).map(a => a.trim()).filter(Boolean);
-                const rawParts = [bMatch[2], bMatch[3], bMatch[4]].filter(Boolean);
-                let score = 1.0;
-                let tag = '';
-                rawParts.forEach(p => {
-                  const t = p.trim();
-                  if (/^\d+(\.\d+)?$/.test(t)) score = parseFloat(t);
-                  else if (!/^len:/i.test(t)) tag = t.replace(/^#/, '').trim();
-                });
-                if (!tag) tag = `ข้อ ${bCount}`;
-                const cleanDisplayTag = tag.startsWith('ข้อ') ? tag : `ข้อ ${tag}`;
-                const cleanDataTag = tag.replace(/^ข้อ\s*/, '').trim();
-                if (!seenTags.has(cleanDataTag)) {
-                  seenTags.add(cleanDataTag);
-                  blankEntries.push({ tag: cleanDataTag, displayTag: cleanDisplayTag, answers, score });
+        const formatScore = (typeof safeFormatScore === 'function') ? safeFormatScore : (n => (typeof n === 'number' ? (Number.isInteger(n) ? n.toString() : n.toFixed(1)) : (n || '0')));
+
+        stationsList.forEach(st => {
+          try {
+            const c = st.case || {};
+            const checked = (SimState.studentScores && (SimState.studentScores[st.stationNumber] || SimState.studentScores[String(st.stationNumber)])) || [];
+            const checklist = Array.isArray(c.checklist) ? c.checklist : [];
+            const { currentScore: earned, totalScore: max } = (typeof calculateStationScore === 'function')
+              ? calculateStationScore(checklist, checked)
+              : { currentScore: 0, totalScore: checklist.length };
+
+            const detailRowId = `res-chk-detail-${st.stationNumber}`;
+
+            totalMaxScore += max;
+            totalEarnedScore += earned;
+            const isRest = st.isRest || ((c.category || '').toUpperCase() === 'REST');
+            const pct = max > 0 ? Math.round((earned / max) * 100) : 0;
+            if (!isRest && max > 0) {
+              sumStationPct += pct;
+              activeStationCount++;
+            }
+            const isPassed = isRest ? true : (pct >= 80);
+            if (isPassed) passedStations++;
+
+            if (tbody) {
+              const tr = document.createElement('tr');
+              const statusHtml = isRest 
+                ? `<strong style="color: var(--text-secondary);">ผ่าน (พัก)</strong>` 
+                : `<strong style="color: ${isPassed ? 'var(--success)' : 'var(--danger)'};">${isPassed ? 'ผ่าน' : 'ตก'}</strong>`;
+              const titleText = escapeHtml(c.title || ('สถานี ' + st.stationNumber));
+              const caseIdText = c.caseId ? escapeHtml(c.caseId) : '';
+              const catText = c.category || (isRest ? 'REST' : 'CLINIC');
+              // Check if station has blanks and answers
+              const rawScenarioContent = (c.scenario || '') + ' ' + (c.contentHtml || '') + ' ' + (c.scenarioHtml || '');
+              const hasBlanks = rawScenarioContent.includes('[BLANK:');
+              const stationWrittenAnswers = (SimState.writtenAnswers && SimState.writtenAnswers[st.stationNumber]) || {};
+
+              let blanksReviewHtml = '';
+              if (hasBlanks) {
+                const blankRegex = /\[BLANK:\s*([^|\]]+)(?:\s*\|\s*([^|\]]+))?(?:\s*\|\s*([^|\]]+))?(?:\s*\|\s*([^\]]+))?\]/gi;
+                let bMatch;
+                let bCount = 0;
+                const blankEntries = [];
+                const seenTags = new Set();
+                while ((bMatch = blankRegex.exec(rawScenarioContent)) !== null) {
+                  bCount++;
+                  const answers = (bMatch[1] || '').split(/[,/]/).map(a => a.trim()).filter(Boolean);
+                  const rawParts = [bMatch[2], bMatch[3], bMatch[4]].filter(Boolean);
+                  let score = 1.0;
+                  let tag = '';
+                  rawParts.forEach(p => {
+                    const t = p.trim();
+                    if (/^\d+(\.\d+)?$/.test(t)) score = parseFloat(t);
+                    else if (!/^len:/i.test(t)) tag = t.replace(/^#/, '').trim();
+                  });
+                  if (!tag) tag = `ข้อ ${bCount}`;
+                  const cleanDisplayTag = tag.startsWith('ข้อ') ? tag : `ข้อ ${tag}`;
+                  const cleanDataTag = tag.replace(/^ข้อ\s*/, '').trim();
+                  if (!seenTags.has(cleanDataTag)) {
+                    seenTags.add(cleanDataTag);
+                    blankEntries.push({ tag: cleanDataTag, displayTag: cleanDisplayTag, answers, score });
+                  }
+                }
+
+                if (blankEntries.length > 0) {
+                  const blankCards = blankEntries.map((b, bIdx) => {
+                    const userVal = (stationWrittenAnswers[b.tag] || '').trim();
+                    const normVal = (typeof normalizeAnswerText === 'function') ? normalizeAnswerText(userVal) : userVal.toLowerCase().trim();
+                    let isMatch = false;
+                    if (normVal) {
+                      isMatch = b.answers.some(ans => {
+                        const nAns = (typeof normalizeAnswerText === 'function') ? normalizeAnswerText(ans) : ans.toLowerCase().trim();
+                        return normVal === nAns;
+                      });
+                    }
+
+                    const badgeHtml = userVal
+                      ? (isMatch 
+                          ? `<span style="color:#15803d;font-weight:700;background:#dcfce7;border:1px solid #86efac;border-radius:4px;padding:2px 7px;font-size:0.76rem;">✅ ถูกต้อง (+${b.score})</span>`
+                          : `<span style="color:#b91c1c;font-weight:700;background:#fee2e2;border:1px solid #fca5a5;border-radius:4px;padding:2px 7px;font-size:0.76rem;">❌ ยังไม่ถูก</span>`)
+                      : `<span style="color:var(--text-muted);font-weight:600;background:var(--bg-secondary);border:1px solid var(--border);border-radius:4px;padding:2px 7px;font-size:0.76rem;">ไม่ได้พิมพ์ตอบ</span>`;
+
+                    return `
+                      <div style="background:var(--bg); border:1px solid var(--border); border-radius:6px; padding:0.55rem 0.75rem; margin-bottom:0.35rem; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:0.5rem;">
+                        <div style="flex:1; min-width:180px; font-size:0.85rem;">
+                          <span style="font-weight:700; color:var(--text-primary); margin-right:4px;">${escapeHtml(b.displayTag)}:</span>
+                          <span style="font-family:var(--font-mono, monospace); font-weight:600; color:${userVal ? 'var(--primary)' : 'var(--text-muted)'};">
+                            ${escapeHtml(userVal || '(ไม่ได้พิมพ์ตอบ)')}
+                          </span>
+                          <div style="font-size:0.78rem; color:var(--text-muted); margin-top:2px;">
+                            เฉลย: <strong>${escapeHtml(b.answers.join(' / '))}</strong>
+                          </div>
+                        </div>
+                        <div>${badgeHtml}</div>
+                      </div>
+                    `;
+                  }).join('');
+
+                  blanksReviewHtml = `
+                    <div style="margin-bottom: 0.85rem; padding-bottom: 0.65rem; border-bottom: 1px dashed var(--border);">
+                      <div style="font-size: 0.84rem; font-weight: 700; color: var(--primary); margin-bottom: 0.4rem; display: flex; align-items: center; gap: 4px;">
+                        <span>📝 คำตอบที่พิมพ์ในสถานีนี้ (Your Submitted Answers)</span>
+                      </div>
+                      <div style="display: flex; flex-direction: column; gap: 2px;">
+                        ${blankCards}
+                      </div>
+                    </div>
+                  `;
                 }
               }
 
-              if (blankEntries.length > 0) {
-                const blankCards = blankEntries.map((b, bIdx) => {
-                  const userVal = (stationWrittenAnswers[b.tag] || '').trim();
-                  const normVal = (typeof normalizeAnswerText === 'function') ? normalizeAnswerText(userVal) : userVal.toLowerCase().trim();
-                  let isMatch = false;
-                  if (normVal) {
-                    isMatch = b.answers.some(ans => {
-                      const nAns = (typeof normalizeAnswerText === 'function') ? normalizeAnswerText(ans) : ans.toLowerCase().trim();
-                      return normVal === nAns;
-                    });
-                  }
+              const canViewDetail = (!isRest && (checklist.length > 0 || hasBlanks));
+              const detailBtnHtml = canViewDetail
+                ? `<button type="button" class="btn btn-outline btn-sm" onclick="toggleResultChecklistDetail('${detailRowId}')" style="padding: 0.25rem 0.55rem; font-size: 0.78rem; font-weight: 600; border-radius: var(--radius-sm); display: inline-flex; align-items: center; gap: 4px;">
+                     🔍 <span>Checklist</span>
+                   </button>`
+                : `<span style="color: var(--text-muted); font-size: 0.78rem;">-</span>`;
 
-                  const badgeHtml = userVal
-                    ? (isMatch 
-                        ? `<span style="color:#15803d;font-weight:700;background:#dcfce7;border:1px solid #86efac;border-radius:4px;padding:2px 7px;font-size:0.76rem;">✅ ถูกต้อง (+${b.score})</span>`
-                        : `<span style="color:#b91c1c;font-weight:700;background:#fee2e2;border:1px solid #fca5a5;border-radius:4px;padding:2px 7px;font-size:0.76rem;">❌ ยังไม่ถูก</span>`)
-                    : `<span style="color:var(--text-muted);font-weight:600;background:var(--bg-secondary);border:1px solid var(--border);border-radius:4px;padding:2px 7px;font-size:0.76rem;">ไม่ได้พิมพ์ตอบ</span>`;
+              tr.innerHTML = `
+                <td>สถานี ${st.stationNumber}</td>
+                <td>
+                  <span role="button" tabindex="0" onclick="toggleResultChecklistDetail('${detailRowId}')" onkeydown="if(event.key==='Enter')toggleResultChecklistDetail('${detailRowId}')" style="color:var(--primary);font-weight:700;cursor:pointer;text-decoration:underline;display:inline-flex;align-items:center;gap:4px;" title="คลิกเพื่อดูผลคะแนนและเฉลยของสถานีนี้">
+                    <span>${titleText}</span>
+                    <span style="font-size:0.75rem;">🔍</span>
+                  </span>
+                </td>
+                <td><span class="badge badge-${catText.toLowerCase()}">${catText}</span></td>
+                <td>${isRest ? '-' : formatScore(earned) + ' / ' + formatScore(max)}</td>
+                <td>${isRest ? '-' : pct + '%'}</td>
+                <td>${statusHtml}</td>
+                <td>${detailBtnHtml}</td>
+              `;
+              tbody.appendChild(tr);
 
-                  return `
-                    <div style="background:var(--bg); border:1px solid var(--border); border-radius:6px; padding:0.55rem 0.75rem; margin-bottom:0.35rem; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:0.5rem;">
-                      <div style="flex:1; min-width:180px; font-size:0.85rem;">
-                        <span style="font-weight:700; color:var(--text-primary); margin-right:4px;">${escapeHtml(b.displayTag)}:</span>
-                        <span style="font-family:var(--font-mono, monospace); font-weight:600; color:${userVal ? 'var(--primary)' : 'var(--text-muted)'};">
-                          ${escapeHtml(userVal || '(ไม่ได้พิมพ์ตอบ)')}
-                        </span>
-                        <div style="font-size:0.78rem; color:var(--text-muted); margin-top:2px;">
-                          เฉลย: <strong>${escapeHtml(b.answers.join(' / '))}</strong>
-                        </div>
-                      </div>
-                      <div>${badgeHtml}</div>
+              // Add Accordion Detail Row (Initially Hidden)
+              if (canViewDetail) {
+                const detailTr = document.createElement('tr');
+                detailTr.id = detailRowId;
+                detailTr.style.display = 'none';
+                detailTr.className = 'results-checklist-detail-row';
+
+                const checkedSet = new Set(Array.isArray(checked) ? checked : []);
+
+                // จัดกลุ่มรายการ Checklist ตามหมวดหมู่ (item.group)
+                const groupMap = new Map();
+                checklist.forEach((item, cIdx) => {
+                  const gName = (item.group || 'ทั่วไป').trim();
+                  if (!groupMap.has(gName)) groupMap.set(gName, []);
+                  groupMap.get(gName).push({ item, cIdx });
+                });
+
+                let itemsHtml = '';
+                let parentCounter = 0;
+                for (const [gName, gItems] of groupMap.entries()) {
+                  // วิเคราะห์ parent/rubric structure ภายในกลุ่มหมวดหมู่นี้
+                  const rubricBlocks = [];
+                  let curBlock = null;
+
+                  gItems.forEach(({ item, cIdx }) => {
+                    const isSub = Boolean(item.isSubset);
+                    if (!isSub) {
+                      if (curBlock) rubricBlocks.push(curBlock);
+                      curBlock = { parent: { item, cIdx }, children: [] };
+                    } else {
+                      if (curBlock) {
+                        curBlock.children.push({ item, cIdx });
+                      } else {
+                        rubricBlocks.push({ parent: { item, cIdx }, children: [] });
+                      }
+                    }
+                  });
+                  if (curBlock) rubricBlocks.push(curBlock);
+
+                  let gEarned = 0;
+                  let gMax = 0;
+
+                  // คำนวณคะแนนรวมหมวดตาม rubric / additive logic
+                  rubricBlocks.forEach(block => {
+                    const pItem = block.parent.item;
+                    const pIdx = block.parent.cIdx;
+                    const pScore = pItem.score !== undefined ? parseFloat(pItem.score) : 1.0;
+                    const isPChecked = checkedSet.has(pItem.id) || checkedSet.has(String(pItem.id)) || checkedSet.has(pIdx) || checkedSet.has(String(pIdx));
+                    
+                    if (block.children.length === 0) {
+                      gMax += pScore;
+                      if (isPChecked) gEarned += pScore;
+                    } else {
+                      const gType = typeof getSubsetGroupType === 'function'
+                        ? getSubsetGroupType(pItem, block.children.map(c => c.item))
+                        : 'additive';
+
+                      gMax += pScore;
+                      if (gType === 'rubric') {
+                        const checkedSubs = block.children.filter(c => 
+                          checkedSet.has(c.item.id) || checkedSet.has(String(c.item.id)) || checkedSet.has(c.cIdx) || checkedSet.has(String(c.cIdx))
+                        );
+                        if (checkedSubs.length > 0) {
+                          const maxSub = Math.max(...checkedSubs.map(c => parseFloat(c.item.score) || 0));
+                          gEarned += Math.min(maxSub, pScore);
+                        } else if (isPChecked) {
+                          gEarned += pScore;
+                        }
+                      } else {
+                        if (isPChecked) {
+                          gEarned += pScore;
+                        } else {
+                          const checkedSubs = block.children.filter(c => 
+                            checkedSet.has(c.item.id) || checkedSet.has(String(c.item.id)) || checkedSet.has(c.cIdx) || checkedSet.has(String(c.cIdx))
+                          );
+                          const subTotal = checkedSubs.reduce((sum, c) => sum + (parseFloat(c.item.score) || 0), 0);
+                          gEarned += Math.min(subTotal, pScore);
+                        }
+                      }
+                    }
+                  });
+
+                  itemsHtml += `
+                    <div style="margin-top: 0.65rem; margin-bottom: 0.35rem; padding: 0.35rem 0.65rem; background: var(--bg-secondary); border-left: 3.5px solid var(--primary); border-radius: 4px; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 0.5rem;">
+                      <span style="font-size: 0.84rem; font-weight: 700; color: var(--text-primary); font-family: var(--font-title);">📂 หมวด: ${escapeHtml(gName)}</span>
+                      <span style="font-size: 0.76rem; font-weight: 600; color: var(--text-secondary); background: var(--surface); padding: 1px 6px; border-radius: 4px; border: 1px solid var(--border);">ทำได้ ${safeFormatScore(gEarned)} / ${safeFormatScore(gMax)} คะแนน</span>
                     </div>
                   `;
-                }).join('');
 
-                blanksReviewHtml = `
-                  <div style="margin-bottom: 0.85rem; padding-bottom: 0.65rem; border-bottom: 1px dashed var(--border);">
-                    <div style="font-size: 0.84rem; font-weight: 700; color: var(--primary); margin-bottom: 0.4rem; display: flex; align-items: center; gap: 4px;">
-                      <span>📝 คำตอบที่พิมพ์ในสถานีนี้ (Your Submitted Answers)</span>
-                    </div>
-                    <div style="display: flex; flex-direction: column; gap: 2px;">
-                      ${blankCards}
-                    </div>
-                  </div>
-                `;
-              }
-            }
+                  // เรนเดอร์แต่ละบล็อก
+                  rubricBlocks.forEach(block => {
+                    parentCounter++;
+                    const displayParentNum = parentCounter;
+                    const pItem = block.parent.item;
+                    const pIdx = block.parent.cIdx;
+                    const pScoreNum = parseFloat(pItem.score !== undefined ? pItem.score : 1.0) || 0;
+                    const isPChecked = checkedSet.has(pItem.id) || checkedSet.has(String(pItem.id)) || checkedSet.has(pIdx) || checkedSet.has(String(pIdx));
+                    const pText = (pItem.textHtml || pItem.text || pItem.title || '').trim();
 
-            const canViewDetail = (!isRest && (checklist.length > 0 || hasBlanks));
-            const detailBtnHtml = canViewDetail
-              ? `<button type="button" class="btn btn-outline btn-sm" onclick="toggleResultChecklistDetail('${detailRowId}')" style="padding: 0.25rem 0.55rem; font-size: 0.78rem; font-weight: 600; border-radius: var(--radius-sm); display: inline-flex; align-items: center; gap: 4px;">
-                   🔍 <span>Checklist</span>
-                 </button>`
-              : `<span style="color: var(--text-muted); font-size: 0.78rem;">-</span>`;
-
-            tr.innerHTML = `
-              <td>สถานี ${st.stationNumber}</td>
-              <td>
-                <span role="button" tabindex="0" onclick="toggleResultChecklistDetail('${detailRowId}')" onkeydown="if(event.key==='Enter')toggleResultChecklistDetail('${detailRowId}')" style="color:var(--primary);font-weight:700;cursor:pointer;text-decoration:underline;display:inline-flex;align-items:center;gap:4px;" title="คลิกเพื่อดูผลคะแนนและเฉลยของสถานีนี้">
-                  <span>${titleText}</span>
-                  <span style="font-size:0.75rem;">🔍</span>
-                </span>
-              </td>
-              <td><span class="badge badge-${catText.toLowerCase()}">${catText}</span></td>
-              <td>${isRest ? '-' : formatScore(earned) + ' / ' + formatScore(max)}</td>
-              <td>${isRest ? '-' : pct + '%'}</td>
-              <td>${statusHtml}</td>
-              <td>${detailBtnHtml}</td>
-            `;
-            tbody.appendChild(tr);
-
-            // Add Accordion Detail Row (Initially Hidden)
-            if (canViewDetail) {
-              const detailTr = document.createElement('tr');
-              detailTr.id = detailRowId;
-              detailTr.style.display = 'none';
-              detailTr.className = 'results-checklist-detail-row';
-
-              const checkedSet = new Set(Array.isArray(checked) ? checked : []);
-
-              // จัดกลุ่มรายการ Checklist ตามหมวดหมู่ (item.group)
-              const groupMap = new Map();
-              checklist.forEach((item, cIdx) => {
-                const gName = (item.group || 'ทั่วไป').trim();
-                if (!groupMap.has(gName)) groupMap.set(gName, []);
-                groupMap.get(gName).push({ item, cIdx });
-              });
-
-              let itemsHtml = '';
-              let parentCounter = 0;
-              for (const [gName, gItems] of groupMap.entries()) {
-                // วิเคราะห์ parent/rubric structure ภายในกลุ่มหมวดหมู่นี้
-                // ก้อนย่อยที่มี parent ตามด้วย subsets
-                const rubricBlocks = [];
-                let curBlock = null;
-
-                gItems.forEach(({ item, cIdx }) => {
-                  const isSub = Boolean(item.isSubset);
-                  if (!isSub) {
-                    if (curBlock) rubricBlocks.push(curBlock);
-                    curBlock = { parent: { item, cIdx }, children: [] };
-                  } else {
-                    if (curBlock) {
-                      curBlock.children.push({ item, cIdx });
-                    } else {
-                      rubricBlocks.push({ parent: { item, cIdx }, children: [] });
-                    }
-                  }
-                });
-                if (curBlock) rubricBlocks.push(curBlock);
-
-                let gEarned = 0;
-                let gMax = 0;
-
-                // คำนวณคะแนนรวมหมวดตาม rubric / additive logic
-                rubricBlocks.forEach(block => {
-                  const pItem = block.parent.item;
-                  const pIdx = block.parent.cIdx;
-                  const pScore = pItem.score !== undefined ? parseFloat(pItem.score) : 1.0;
-                  const isPChecked = checkedSet.has(pItem.id) || checkedSet.has(String(pItem.id)) || checkedSet.has(pIdx) || checkedSet.has(String(pIdx));
-                  
-                  if (block.children.length === 0) {
-                    gMax += pScore;
-                    if (isPChecked) gEarned += pScore;
-                  } else {
-                    const gType = typeof getSubsetGroupType === 'function'
+                    const hasChildren = block.children.length > 0;
+                    const gType = hasChildren && (typeof getSubsetGroupType === 'function')
                       ? getSubsetGroupType(pItem, block.children.map(c => c.item))
                       : 'additive';
 
-                    gMax += pScore;
-                    if (gType === 'rubric') {
+                    const blockMax = pScoreNum;
+                    let blockEarned = 0;
+
+                    if (!hasChildren) {
+                      blockEarned = isPChecked ? blockMax : 0;
+                    } else if (gType === 'rubric') {
                       const checkedSubs = block.children.filter(c => 
                         checkedSet.has(c.item.id) || checkedSet.has(String(c.item.id)) || checkedSet.has(c.cIdx) || checkedSet.has(String(c.cIdx))
                       );
                       if (checkedSubs.length > 0) {
                         const maxSub = Math.max(...checkedSubs.map(c => parseFloat(c.item.score) || 0));
-                        gEarned += Math.min(maxSub, pScore);
+                        blockEarned = Math.min(maxSub, blockMax);
                       } else if (isPChecked) {
-                        gEarned += pScore;
+                        blockEarned = blockMax;
                       }
                     } else {
                       if (isPChecked) {
-                        gEarned += pScore;
+                        blockEarned = blockMax;
                       } else {
                         const checkedSubs = block.children.filter(c => 
                           checkedSet.has(c.item.id) || checkedSet.has(String(c.item.id)) || checkedSet.has(c.cIdx) || checkedSet.has(String(c.cIdx))
                         );
                         const subTotal = checkedSubs.reduce((sum, c) => sum + (parseFloat(c.item.score) || 0), 0);
-                        gEarned += Math.min(subTotal, pScore);
+                        blockEarned = Math.min(subTotal, blockMax);
                       }
                     }
-                  }
-                });
 
-                itemsHtml += `
-                  <div style="margin-top: 0.65rem; margin-bottom: 0.35rem; padding: 0.35rem 0.65rem; background: var(--bg-secondary); border-left: 3.5px solid var(--primary); border-radius: 4px; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 0.5rem;">
-                    <span style="font-size: 0.84rem; font-weight: 700; color: var(--text-primary); font-family: var(--font-title);">📂 หมวด: ${escapeHtml(gName)}</span>
-                    <span style="font-size: 0.76rem; font-weight: 600; color: var(--text-secondary); background: var(--surface); padding: 1px 6px; border-radius: 4px; border: 1px solid var(--border);">ทำได้ ${safeFormatScore(gEarned)} / ${safeFormatScore(gMax)} คะแนน</span>
-                  </div>
-                `;
+                    let pBadge = '';
+                    let pBorder = '';
+                    let pBg = '';
+                    let pIcon = '';
 
-                // เรนเดอร์แต่ละบล็อก
-                rubricBlocks.forEach(block => {
-                  parentCounter++;
-                  const displayParentNum = parentCounter;
-                  const pItem = block.parent.item;
-                  const pIdx = block.parent.cIdx;
-                  const pScoreNum = parseFloat(pItem.score !== undefined ? pItem.score : 1.0) || 0;
-                  const isPChecked = checkedSet.has(pItem.id) || checkedSet.has(String(pItem.id)) || checkedSet.has(pIdx) || checkedSet.has(String(pIdx));
-                  const pText = (pItem.textHtml || pItem.text || pItem.title || '').trim();
+                    const earnedStr = safeFormatScore(blockEarned);
+                    const maxStr = safeFormatScore(blockMax);
 
-                  const hasChildren = block.children.length > 0;
-                  const gType = hasChildren && (typeof getSubsetGroupType === 'function')
-                    ? getSubsetGroupType(pItem, block.children.map(c => c.item))
-                    : 'additive';
-
-                  const blockMax = pScoreNum;
-                  let blockEarned = 0;
-
-                  if (!hasChildren) {
-                    blockEarned = isPChecked ? blockMax : 0;
-                  } else if (gType === 'rubric') {
-                    const checkedSubs = block.children.filter(c => 
-                      checkedSet.has(c.item.id) || checkedSet.has(String(c.item.id)) || checkedSet.has(c.cIdx) || checkedSet.has(String(c.cIdx))
-                    );
-                    if (checkedSubs.length > 0) {
-                      const maxSub = Math.max(...checkedSubs.map(c => parseFloat(c.item.score) || 0));
-                      blockEarned = Math.min(maxSub, blockMax);
-                    } else if (isPChecked) {
-                      blockEarned = blockMax;
-                    }
-                  } else {
-                    if (isPChecked) {
-                      blockEarned = blockMax;
+                    if (blockEarned >= blockMax && blockMax > 0) {
+                      pIcon = '✅';
+                      pBadge = `<span style="display: inline-flex; align-items: center; gap: 3px; color: #15803d; font-weight: 700; background: #dcfce7; border: 1px solid #86efac; border-radius: 4px; padding: 2px 7px; font-size: 0.76rem; flex-shrink: 0;">✓ ได้เต็ม (${earnedStr} / ${maxStr} คะแนน)</span>`;
+                      pBorder = 'border-left: 3.5px solid #22c55e;';
+                      pBg = 'background: rgba(34, 197, 94, 0.04);';
+                    } else if (blockEarned > 0 && blockEarned < blockMax) {
+                      pIcon = '⚠️';
+                      pBadge = `<span style="display: inline-flex; align-items: center; gap: 3px; color: #b45309; font-weight: 700; background: #fef3c7; border: 1px solid #fcd34d; border-radius: 4px; padding: 2px 7px; font-size: 0.76rem; flex-shrink: 0;">⚠️ ได้บางส่วน (${earnedStr} / ${maxStr} คะแนน)</span>`;
+                      pBorder = 'border-left: 3.5px solid #f59e0b;';
+                      pBg = 'background: rgba(245, 158, 11, 0.05);';
                     } else {
-                      const checkedSubs = block.children.filter(c => 
-                        checkedSet.has(c.item.id) || checkedSet.has(String(c.item.id)) || checkedSet.has(c.cIdx) || checkedSet.has(String(c.cIdx))
-                      );
-                      const subTotal = checkedSubs.reduce((sum, c) => sum + (parseFloat(c.item.score) || 0), 0);
-                      blockEarned = Math.min(subTotal, blockMax);
-                    }
-                  }
-
-                  let pBadge = '';
-                  let pBorder = '';
-                  let pBg = '';
-                  let pIcon = '';
-
-                  const earnedStr = safeFormatScore(blockEarned);
-                  const maxStr = safeFormatScore(blockMax);
-
-                  if (blockEarned >= blockMax && blockMax > 0) {
-                    pIcon = '✅';
-                    pBadge = `<span style="display: inline-flex; align-items: center; gap: 3px; color: #15803d; font-weight: 700; background: #dcfce7; border: 1px solid #86efac; border-radius: 4px; padding: 2px 7px; font-size: 0.76rem; flex-shrink: 0;">✓ ได้เต็ม (${earnedStr} / ${maxStr} คะแนน)</span>`;
-                    pBorder = 'border-left: 3.5px solid #22c55e;';
-                    pBg = 'background: rgba(34, 197, 94, 0.04);';
-                  } else if (blockEarned > 0 && blockEarned < blockMax) {
-                    pIcon = '⚠️';
-                    pBadge = `<span style="display: inline-flex; align-items: center; gap: 3px; color: #b45309; font-weight: 700; background: #fef3c7; border: 1px solid #fcd34d; border-radius: 4px; padding: 2px 7px; font-size: 0.76rem; flex-shrink: 0;">⚠️ ได้บางส่วน (${earnedStr} / ${maxStr} คะแนน)</span>`;
-                    pBorder = 'border-left: 3.5px solid #f59e0b;';
-                    pBg = 'background: rgba(245, 158, 11, 0.05);';
-                  } else {
-                    pIcon = '❌';
-                    pBadge = `<span style="display: inline-flex; align-items: center; gap: 3px; color: #b91c1c; font-weight: 700; background: #fee2e2; border: 1px solid #fca5a5; border-radius: 4px; padding: 2px 7px; font-size: 0.76rem; flex-shrink: 0;">❌ ไม่ได้คะแนน (${earnedStr} / ${maxStr} คะแนน)</span>`;
-                    pBorder = 'border-left: 3.5px solid #ef4444;';
-                    pBg = 'background: rgba(239, 68, 68, 0.04);';
-                  }
-
-                  itemsHtml += `
-                    <div class="results-checklist-item-wrap" style="${pBorder} ${pBg}">
-                      <div class="results-checklist-text">
-                        <strong style="margin-right: 4px;">${pIcon} ข้อ ${displayParentNum}:</strong> ${pText}
-                      </div>
-                      <div style="flex-shrink: 0;">
-                        ${pBadge}
-                      </div>
-                    </div>
-                  `;
-
-                  // เรนเดอร์ Children (ลำดับ 1.1, 1.2 เป็นต้น)
-                  block.children.forEach(({ item: cItem, cIdx: subIdx }, childIdx) => {
-                    const isCChecked = checkedSet.has(cItem.id) || checkedSet.has(String(cItem.id)) || checkedSet.has(subIdx) || checkedSet.has(String(subIdx));
-                    const cScoreNum = parseFloat(cItem.score !== undefined ? cItem.score : 1.0) || 0;
-                    const cScoreStr = safeFormatScore(cScoreNum);
-                    const cText = (cItem.textHtml || cItem.text || cItem.title || '').trim();
-
-                    let cBadge = '';
-                    let cIcon = '';
-                    let cStyle = '';
-
-                    if (isCChecked) {
-                      if (cScoreNum <= 0) {
-                        cIcon = '❌';
-                        cBadge = `<span style="display: inline-flex; align-items: center; gap: 3px; color: #b91c1c; font-weight: 700; background: #fee2e2; border: 1px solid #fca5a5; border-radius: 4px; padding: 2px 7px; font-size: 0.76rem; flex-shrink: 0;">❌ เลือกข้อนี้ (${cScoreStr} คะแนน)</span>`;
-                        cStyle = 'margin-left: 1.25rem; border-left: 2.5px solid #ef4444; background: rgba(239, 68, 68, 0.05);';
-                      } else if (cScoreNum < blockMax) {
-                        cIcon = '⚠️';
-                        cBadge = `<span style="display: inline-flex; align-items: center; gap: 3px; color: #b45309; font-weight: 700; background: #fef3c7; border: 1px solid #fcd34d; border-radius: 4px; padding: 2px 7px; font-size: 0.76rem; flex-shrink: 0;">⚠️ เลือกข้อนี้ (${cScoreStr} คะแนน)</span>`;
-                        cStyle = 'margin-left: 1.25rem; border-left: 2.5px solid #f59e0b; background: rgba(245, 158, 11, 0.05);';
-                      } else {
-                        cIcon = '✅';
-                        cBadge = `<span style="display: inline-flex; align-items: center; gap: 3px; color: #15803d; font-weight: 700; background: #dcfce7; border: 1px solid #86efac; border-radius: 4px; padding: 2px 7px; font-size: 0.76rem; flex-shrink: 0;">✓ เลือกข้อนี้ (${cScoreStr} คะแนน)</span>`;
-                        cStyle = 'margin-left: 1.25rem; border-left: 2.5px solid #22c55e; background: rgba(34, 197, 94, 0.05);';
-                      }
-                    } else {
-                      cIcon = '⚪';
-                      cBadge = `<span style="display: inline-flex; align-items: center; gap: 3px; color: var(--text-muted); font-weight: 500; background: var(--bg-secondary); border: 1px solid var(--border); border-radius: 4px; padding: 2px 7px; font-size: 0.74rem; flex-shrink: 0;">(ไม่ได้เลือก)</span>`;
-                      cStyle = 'margin-left: 1.25rem; border-left: 2px dashed #94a3b8; background: transparent; opacity: 0.85;';
+                      pIcon = '❌';
+                      pBadge = `<span style="display: inline-flex; align-items: center; gap: 3px; color: #b91c1c; font-weight: 700; background: #fee2e2; border: 1px solid #fca5a5; border-radius: 4px; padding: 2px 7px; font-size: 0.76rem; flex-shrink: 0;">❌ ไม่ได้คะแนน (${earnedStr} / ${maxStr} คะแนน)</span>`;
+                      pBorder = 'border-left: 3.5px solid #ef4444;';
+                      pBg = 'background: rgba(239, 68, 68, 0.04);';
                     }
 
                     itemsHtml += `
-                      <div class="results-checklist-item-wrap" style="${cStyle}">
+                      <div class="results-checklist-item-wrap" style="${pBorder} ${pBg}">
                         <div class="results-checklist-text">
-                          <strong style="margin-right: 4px;">${cIcon} ↳ ${displayParentNum}.${childIdx + 1}:</strong> ${cText}
+                          <strong style="margin-right: 4px;">${pIcon} ข้อ ${displayParentNum}:</strong> ${pText}
                         </div>
                         <div style="flex-shrink: 0;">
-                          ${cBadge}
+                          ${pBadge}
                         </div>
                       </div>
                     `;
+
+                    // เรนเดอร์ Children (ลำดับ 1.1, 1.2 เป็นต้น)
+                    block.children.forEach(({ item: cItem, cIdx: subIdx }, childIdx) => {
+                      const isCChecked = checkedSet.has(cItem.id) || checkedSet.has(String(cItem.id)) || checkedSet.has(subIdx) || checkedSet.has(String(subIdx));
+                      const cScoreNum = parseFloat(cItem.score !== undefined ? cItem.score : 1.0) || 0;
+                      const cScoreStr = safeFormatScore(cScoreNum);
+                      const cText = (cItem.textHtml || cItem.text || cItem.title || '').trim();
+
+                      let cBadge = '';
+                      let cIcon = '';
+                      let cStyle = '';
+
+                      if (isCChecked) {
+                        if (cScoreNum <= 0) {
+                          cIcon = '❌';
+                          cBadge = `<span style="display: inline-flex; align-items: center; gap: 3px; color: #b91c1c; font-weight: 700; background: #fee2e2; border: 1px solid #fca5a5; border-radius: 4px; padding: 2px 7px; font-size: 0.76rem; flex-shrink: 0;">❌ เลือกข้อนี้ (${cScoreStr} คะแนน)</span>`;
+                          cStyle = 'margin-left: 1.25rem; border-left: 2.5px solid #ef4444; background: rgba(239, 68, 68, 0.05);';
+                        } else if (cScoreNum < blockMax) {
+                          cIcon = '⚠️';
+                          cBadge = `<span style="display: inline-flex; align-items: center; gap: 3px; color: #b45309; font-weight: 700; background: #fef3c7; border: 1px solid #fcd34d; border-radius: 4px; padding: 2px 7px; font-size: 0.76rem; flex-shrink: 0;">⚠️ เลือกข้อนี้ (${cScoreStr} คะแนน)</span>`;
+                          cStyle = 'margin-left: 1.25rem; border-left: 2.5px solid #f59e0b; background: rgba(245, 158, 11, 0.05);';
+                        } else {
+                          cIcon = '✅';
+                          cBadge = `<span style="display: inline-flex; align-items: center; gap: 3px; color: #15803d; font-weight: 700; background: #dcfce7; border: 1px solid #86efac; border-radius: 4px; padding: 2px 7px; font-size: 0.76rem; flex-shrink: 0;">✓ เลือกข้อนี้ (${cScoreStr} คะแนน)</span>`;
+                          cStyle = 'margin-left: 1.25rem; border-left: 2.5px solid #22c55e; background: rgba(34, 197, 94, 0.05);';
+                        }
+                      } else {
+                        cIcon = '⚪';
+                        cBadge = `<span style="display: inline-flex; align-items: center; gap: 3px; color: var(--text-muted); font-weight: 500; background: var(--bg-secondary); border: 1px solid var(--border); border-radius: 4px; padding: 2px 7px; font-size: 0.74rem; flex-shrink: 0;">(ไม่ได้เลือก)</span>`;
+                        cStyle = 'margin-left: 1.25rem; border-left: 2px dashed #94a3b8; background: transparent; opacity: 0.85;';
+                      }
+
+                      itemsHtml += `
+                        <div class="results-checklist-item-wrap" style="${cStyle}">
+                          <div class="results-checklist-text">
+                            <strong style="margin-right: 4px;">${cIcon} ↳ ${displayParentNum}.${childIdx + 1}:</strong> ${cText}
+                          </div>
+                          <div style="flex-shrink: 0;">
+                            ${cBadge}
+                          </div>
+                        </div>
+                      `;
+                    });
                   });
-                });
-              }
+                }
 
-              const initFeedback = (SimState.stationFeedbacks && (SimState.stationFeedbacks[st.stationNumber] || SimState.stationFeedbacks[String(st.stationNumber)])) || '';
+                const initFeedback = (SimState.stationFeedbacks && (SimState.stationFeedbacks[st.stationNumber] || SimState.stationFeedbacks[String(st.stationNumber)])) || '';
 
-              detailTr.innerHTML = `
-                <td colspan="7" style="padding: 0.75rem 1rem; background: var(--bg-secondary); border-bottom: 1.5px solid var(--border);">
-                  <div style="background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-md); padding: 0.9rem 1rem;">
-                    <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.65rem; border-bottom: 1px dashed var(--border); padding-bottom: 0.4rem;">
-                      <strong style="font-size: 0.88rem; color: var(--text-primary); font-family: var(--font-title); display: flex; align-items: center; gap: 4px;">
-                        <span>📋 เฉลยและรายงานคะแนน Checklist สถานีที่ ${st.stationNumber}</span>
-                      </strong>
-                      <span style="font-size: 0.8rem; color: var(--text-secondary);">
-                        ทำได้ <strong>${formatScore(earned)}</strong> จาก <strong>${formatScore(max)}</strong> คะแนน
-                      </span>
-                    </div>
-                    ${blanksReviewHtml}
-                    <div style="display: flex; flex-direction: column; gap: 2px;">
-                      ${itemsHtml}
-                    </div>
-                    <div style="margin-top: 1rem; padding: 0.85rem 1rem; background: var(--bg-secondary); border: 1.5px solid var(--border); border-radius: var(--radius-md);">
-                      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.45rem;">
-                        <label style="font-size: 0.86rem; font-weight: 700; color: var(--text-primary); font-family: var(--font-title); display: flex; align-items: center; gap: 6px; margin: 0;">
-                          <span>💬 Comment and Feedback (สถานีที่ ${st.stationNumber}):</span>
-                        </label>
-                        <span style="font-size: 0.74rem; color: var(--text-muted);">รายงานท้ายข้อสถานีนี้ · บันทึกอัตโนมัติ</span>
+                detailTr.innerHTML = `
+                  <td colspan="7" style="padding: 0.75rem 1rem; background: var(--bg-secondary); border-bottom: 1.5px solid var(--border);">
+                    <div style="background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-md); padding: 0.9rem 1rem;">
+                      <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.65rem; border-bottom: 1px dashed var(--border); padding-bottom: 0.4rem;">
+                        <strong style="font-size: 0.88rem; color: var(--text-primary); font-family: var(--font-title); display: flex; align-items: center; gap: 4px;">
+                          <span>📋 เฉลยและรายงานคะแนน Checklist สถานีที่ ${st.stationNumber}</span>
+                        </strong>
+                        <span style="font-size: 0.8rem; color: var(--text-secondary);">
+                          ทำได้ <strong>${formatScore(earned)}</strong> จาก <strong>${formatScore(max)}</strong> คะแนน
+                        </span>
                       </div>
-                      <textarea 
-                        class="select-filter" 
-                        id="station-feedback-input-${st.stationNumber}"
-                        rows="3" 
-                        style="width: 100%; min-height: 80px; resize: vertical; font-size: 0.86rem; line-height: 1.5; padding: 0.55rem 0.75rem; border-radius: var(--radius-sm); border: 1px solid var(--border); background: var(--bg); color: var(--text-primary); font-family: inherit;" 
-                        placeholder="พิมพ์คำแนะนำ หรือสิ่งที่เพื่อน/ผู้เข้าสอบทำขาดตกบกพร่องในสถานีนี้ (สามารถพิมพ์ยาวๆ เป็นย่อหน้าได้ โดยข้อมูลจะแสดงในรายงานพิมพ์ PDF)..." 
-                        oninput="handleStationFeedbackInput(${st.stationNumber}, this.value)"
-                      >${escapeHtml(initFeedback)}</textarea>
+                      ${blanksReviewHtml}
+                      <div style="display: flex; flex-direction: column; gap: 2px;">
+                        ${itemsHtml}
+                      </div>
+                      <div style="margin-top: 1rem; padding: 0.85rem 1rem; background: var(--bg-secondary); border: 1.5px solid var(--border); border-radius: var(--radius-md);">
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.45rem;">
+                          <label style="font-size: 0.86rem; font-weight: 700; color: var(--text-primary); font-family: var(--font-title); display: flex; align-items: center; gap: 6px; margin: 0;">
+                            <span>💬 Comment and Feedback (สถานีที่ ${st.stationNumber}):</span>
+                          </label>
+                          <span style="font-size: 0.74rem; color: var(--text-muted);">รายงานท้ายข้อสถานีนี้ · บันทึกอัตโนมัติ</span>
+                        </div>
+                        <textarea 
+                          class="select-filter" 
+                          id="station-feedback-input-${st.stationNumber}"
+                          rows="3" 
+                          style="width: 100%; min-height: 80px; resize: vertical; font-size: 0.86rem; line-height: 1.5; padding: 0.55rem 0.75rem; border-radius: var(--radius-sm); border: 1px solid var(--border); background: var(--bg); color: var(--text-primary); font-family: inherit;" 
+                          placeholder="พิมพ์คำแนะนำ หรือสิ่งที่เพื่อน/ผู้เข้าสอบทำขาดตกบกพร่องในสถานีนี้ (สามารถพิมพ์ยาวๆ เป็นย่อหน้าได้ โดยข้อมูลจะแสดงในรายงานพิมพ์ PDF)..." 
+                          oninput="handleStationFeedbackInput(${st.stationNumber}, this.value)"
+                        >${escapeHtml(initFeedback)}</textarea>
+                      </div>
                     </div>
-                  </div>
-                </td>
-              `;
-              tbody.appendChild(detailTr);
+                  </td>
+                `;
+                tbody.appendChild(detailTr);
+              }
             }
+          } catch (stErr) {
+            console.warn('Error calculating station results for station ' + st.stationNumber + ':', stErr);
           }
         });
-        
+
         const scoreValEl = document.getElementById('results-score-val');
         if (scoreValEl) scoreValEl.textContent = `${formatScore(totalEarnedScore)}/${formatScore(totalMaxScore)}`;
-        
+
         // Equal-weight average percentage across active stations
         const totalPct = activeStationCount > 0 ? Math.round(sumStationPct / activeStationCount) : (totalMaxScore > 0 ? Math.round((totalEarnedScore / totalMaxScore) * 100) : 0);
         const scorePctEl = document.getElementById('results-score-pct');
         if (scorePctEl) scorePctEl.textContent = `${totalPct}%`;
-        
+
         const statusText = document.getElementById('results-status-text');
         if (statusText) {
           const allPassed = totalPct >= 80;
           statusText.textContent = allPassed ? 'PASSED' : 'FAILED';
           statusText.style.color = allPassed ? 'var(--success)' : 'var(--danger)';
         }
-        
+
         const summaryDescEl = document.getElementById('results-summary-desc');
         if (summaryDescEl) {
           summaryDescEl.textContent = `คะแนนเฉลี่ยถ่วงน้ำหนักทุกสถานี: ${totalPct}% · ทำได้ ${formatScore(totalEarnedScore)} จาก ${formatScore(totalMaxScore)} คะแนนดิบสะสม (คิดสัดส่วนน้ำหนักแต่ละสถานีเท่ากัน • เกณฑ์ผ่านร้อยละ 80)`;
@@ -13011,9 +13072,11 @@ ${caseContext || '(ยังไม่มีข้อมูลเคส)'}
           if (podiumSection) podiumSection.style.display = 'block';
           if (hostBanner) hostBanner.style.display = 'block';
 
-          const leaderboard = computeLeaderboard(roomData);
-          renderPodiumLeaderboard(leaderboard);
-          renderHostSummaryBanner(leaderboard);
+          if (typeof computeLeaderboard === 'function') {
+            const leaderboard = computeLeaderboard(roomData);
+            if (typeof renderPodiumLeaderboard === 'function') renderPodiumLeaderboard(leaderboard);
+            if (typeof renderHostSummaryBanner === 'function') renderHostSummaryBanner(leaderboard);
+          }
         } else {
           // SOLO PRACTICE, CANDIDATE, or STANDARD 1-ON-1 EXAMINER: Show personal scorecard
           if (personalScoreSection) personalScoreSection.style.display = 'block';
@@ -13021,9 +13084,11 @@ ${caseContext || '(ยังไม่มีข้อมูลเคส)'}
 
           if (isMultiplayer && podiumSection) {
             podiumSection.style.display = 'block';
-            const leaderboard = computeLeaderboard(roomData);
-            renderPodiumLeaderboard(leaderboard);
-            if (isHost) renderHostSummaryBanner(leaderboard);
+            if (typeof computeLeaderboard === 'function') {
+              const leaderboard = computeLeaderboard(roomData);
+              if (typeof renderPodiumLeaderboard === 'function') renderPodiumLeaderboard(leaderboard);
+              if (isHost && typeof renderHostSummaryBanner === 'function') renderHostSummaryBanner(leaderboard);
+            }
           } else {
             if (podiumSection) podiumSection.style.display = 'none';
           }
@@ -13037,9 +13102,11 @@ ${caseContext || '(ยังไม่มีข้อมูลเคส)'}
             if (!snap.exists()) return;
             const liveRoom = snap.val();
             SimState.cachedRoom = liveRoom;
-            const freshLb = computeLeaderboard(liveRoom);
-            renderPodiumLeaderboard(freshLb);
-            if (isHost) renderHostSummaryBanner(freshLb);
+            if (typeof computeLeaderboard === 'function') {
+              const freshLb = computeLeaderboard(liveRoom);
+              if (typeof renderPodiumLeaderboard === 'function') renderPodiumLeaderboard(freshLb);
+              if (isHost && typeof renderHostSummaryBanner === 'function') renderHostSummaryBanner(freshLb);
+            }
           });
         }
 
@@ -13050,11 +13117,11 @@ ${caseContext || '(ยังไม่มีข้อมูลเคส)'}
         const rosterExaminees = document.getElementById('results-participants-examinees');
         const rosterExaminers = document.getElementById('results-participants-examiners');
         const roomTag = document.getElementById('results-room-id-tag');
-        
+
         if (SimState.isLobby) {
           if (rosterBar) rosterBar.style.display = 'block';
           if (roomTag) roomTag.textContent = 'ห้องสอบ: ' + SimState.roomId;
-          
+
           let pList = [];
           if (latestRoom && latestRoom.players) {
             pList = Object.values(latestRoom.players);
@@ -13062,9 +13129,9 @@ ${caseContext || '(ยังไม่มีข้อมูลเคส)'}
           if (pList.length === 0 && SimState.cachedPlayersList) {
             pList = SimState.cachedPlayersList;
           }
-          
+
           if (rosterCount) rosterCount.textContent = pList.length;
-          
+
           const makeChip = (p, showMeBadge) => {
             const chip = document.createElement('span');
             const isMe = p.id === SimState.myPlayerId || p.name === SimState.lobbyPlayerName;
@@ -13091,21 +13158,25 @@ ${caseContext || '(ยังไม่มีข้อมูลเคส)'}
           if (rosterBar) rosterBar.style.display = 'none';
         }
       } catch (err) {
-        console.error('Error generating exam results:', err);
+        console.error('Critical error generating exam results:', err);
       } finally {
         showGlobalLoader(false);
         const globalLoaderEl = document.getElementById('global-loader');
         if (globalLoaderEl) globalLoaderEl.style.display = 'none';
-        
+
         const runningView = document.getElementById('exam-running-view');
         if (runningView) runningView.style.display = 'none';
-        
+
         const resultsView = document.getElementById('exam-results-view');
         if (resultsView) resultsView.style.display = 'block';
-        
+
         window.scrollTo({ top: 0, behavior: 'smooth' });
         SimState.isExamFinished = true;
         SimState.isFinishingExam = false;
+
+        if (typeof showPleToast === 'function') {
+          showPleToast('สรุปผลการสอบเรียบร้อยแล้ว 🏁', 'success');
+        }
       }
     }
 

@@ -93,10 +93,10 @@ if exist "%~dp0Website\PLE CC Webpage" (
 ) else (
     cd /d "%~dp0"
 )
-git add case-data-offline.js case-details-offline.js
+git add -A
 git commit -m "Auto sync offline DB cases [!MODE!: !QUERY!] [%DATE% %TIME%]"
 echo.
-echo [INFO] Syncing with GitHub (Pull & Rebase)...
+echo [INFO] Syncing with GitHub (Pull and Rebase)...
 git pull --rebase origin main
 echo.
 echo [INFO] Pushing to GitHub...

@@ -900,55 +900,34 @@ def get_case_content_from_doc(doc_data, target_case_id, doc_equations=None):
                         current_group = re.sub(r"^#+\s*", "", text_strip).replace('*', '').strip()
                     continue
 
-                # STRICT HEADING RULE:
-                # Must be an explicit Heading (## or HEADING style or colon label ending with : or exact section name)
-                is_exact_label = clean_sec_header in ['สถานการณ์', 'โจทย์', 'ข้อมูลผู้ป่วย', 'ประวัติผู้ป่วย', 'สิ่งที่มีให้', 'สิ่งที่มีให้ในสถานี', 'อุปกรณ์', 'อุปกรณ์ในสถานี', 'Checklist', 'เกณฑ์ประเมิน', 'เกณฑ์การให้คะแนน', 'ข้อมูลผู้ตรวจ', 'เฉลย', 'หมายเหตุ', 'บทบาทผู้ป่วยจำลอง']
-                is_pure_colon_label = bool(re.match(r"^(?:สถานการณ์|โจทย์|ข้อมูลผู้ป่วย|ประวัติผู้ป่วย|สิ่งที่มีให้|สิ่งที่มีให้ในสถานี|อุปกรณ์|อุปกรณ์ในสถานี|Checklist|เกณฑ์ประเมิน|เกณฑ์การให้คะแนน|ข้อมูลผู้ตรวจ|เฉลย|หมายเหตุ|บทบาทผู้ป่วยจำลอง)\s*:\s*$", clean_sec_header, re.IGNORECASE))
-                is_inline_colon_label = bool(re.match(r"^(?:สถานการณ์|โจทย์|ข้อมูลผู้ป่วย|ประวัติผู้ป่วย|สิ่งที่มีให้|สิ่งที่มีให้ในสถานี|อุปกรณ์|อุปกรณ์ในสถานี|Checklist|เกณฑ์ประเมิน|เกณฑ์การให้คะแนน|ข้อมูลผู้ตรวจ|เฉลย|หมายเหตุ|บทบาทผู้ป่วยจำลอง)\s*:", clean_sec_header, re.IGNORECASE))
-
-                if current_section == 'SCENARIO' and not is_markdown_header and not is_heading_style:
-                    # If already inside SCENARIO and this is not an explicit markdown/named heading:
-                    # 'โจทย์', 'คำสั่ง', 'Rx' are part of the scenario content, not a section exit!
-                    if lower_h.startswith('โจทย์') or lower_h.startswith('คำสั่ง') or lower_h.startswith('rx'):
-                        pass
-                    elif is_exact_label or is_pure_colon_label or is_inline_colon_label:
-                        if any(lower_h.startswith(x) or lower_h == x for x in ['ข้อมูลผู้ป่วย', 'ประวัติผู้ป่วย', 'ข้อมูลคนไข้', 'patient info']):
-                            current_section = 'PATIENT_INFO'
-                            if is_exact_label or is_pure_colon_label:
-                                continue
-                        elif any(lower_h.startswith(x) or lower_h == x for x in ['สิ่งที่มีให้ในสถานี', 'สิ่งที่มีให้', 'อุปกรณ์ในสถานี', 'อุปกรณ์', 'equipment']):
-                            current_section = 'EQUIPMENT'
-                            if is_exact_label or is_pure_colon_label:
-                                continue
-                        elif any(lower_h.startswith(x) or lower_h == x for x in ['checklist', 'เกณฑ์ประเมิน', 'เกณฑ์การให้คะแนน', 'สมรรถนะ']):
-                            current_section = 'CHECKLIST'
-                            if is_exact_label or is_pure_colon_label:
-                                continue
-                        elif any(lower_h.startswith(x) or lower_h == x for x in ['ข้อมูลผู้ตรวจ', 'เฉลย', 'หมายเหตุ', 'บทบาทผู้ป่วยจำลอง', 'notes', 'key']):
-                            current_section = 'NOTE'
-                            if is_exact_label or is_pure_colon_label:
-                                continue
-                else:
-                    is_valid_header = is_markdown_header or is_heading_style or is_exact_label or is_pure_colon_label or is_inline_colon_label
-                    new_section = None
-                    if is_valid_header:
-                        if any(lower_h.startswith(x) or lower_h == x for x in ['สถานการณ์', 'โจทย์', 'scenario']):
-                            new_section = 'SCENARIO'
-                        elif any(lower_h.startswith(x) or lower_h == x for x in ['ข้อมูลผู้ป่วย', 'ประวัติผู้ป่วย', 'ข้อมูลคนไข้', 'patient info']):
-                            new_section = 'PATIENT_INFO'
-                        elif any(lower_h.startswith(x) or lower_h == x for x in ['สิ่งที่มีให้ในสถานี', 'สิ่งที่มีให้', 'อุปกรณ์ในสถานี', 'อุปกรณ์', 'equipment']):
-                            new_section = 'EQUIPMENT'
-                        elif any(lower_h.startswith(x) or lower_h == x for x in ['checklist', 'เกณฑ์ประเมิน', 'เกณฑ์การให้คะแนน', 'สมรรถนะ']):
-                            new_section = 'CHECKLIST'
-                        elif any(lower_h.startswith(x) or lower_h == x for x in ['ข้อมูลผู้ตรวจ', 'เฉลย', 'หมายเหตุ', 'บทบาทผู้ป่วยจำลอง', 'notes', 'key']):
-                            new_section = 'NOTE'
-                        elif lower_h.startswith('ข้อมูลเคส') or lower_h.startswith('metadata'):
-                            new_section = 'METADATA'
-                        
+                # STRICT HEADING RULE (Approved by President):
+                # Must be an explicit Heading Style in Google Docs (named style starts with 'HEADING')
+                # OR start with Markdown hashes: #, ##, or ###
+                is_valid_header = is_heading_style or is_markdown_header
+                
+                new_section = None
+                if is_valid_header:
+                    clean_sec_header = re.sub(r"^[*_#\s\x0b]+", "", text_strip).strip()
+                    clean_sec_header = re.sub(r"\s*:\s*$", "", clean_sec_header).strip()
+                    lower_h = clean_sec_header.lower()
+                    
+                    # Strictly match ONLY the 5 official sections (no loose alternatives):
+                    if clean_sec_header == 'สถานการณ์':
+                        new_section = 'SCENARIO'
+                    elif clean_sec_header == 'ข้อมูลผู้ป่วย':
+                        new_section = 'PATIENT_INFO'
+                    elif clean_sec_header == 'สิ่งที่มีให้ในสถานี':
+                        new_section = 'EQUIPMENT'
+                    elif lower_h == 'checklist':
+                        new_section = 'CHECKLIST'
+                    elif clean_sec_header in ['ข้อมูลผู้ตรวจ', 'ข้อมูลผุ้ตรวจ']:
+                        new_section = 'NOTE'
+                    elif clean_sec_header in ['ข้อมูลเคส', 'metadata']:
+                        new_section = 'METADATA'
+                    
                     if new_section:
                         current_section = new_section
-                        if is_markdown_header or is_heading_style or is_exact_label or is_pure_colon_label:
-                            continue
+                        continue
 
                 if current_section == 'METADATA':
                     if 'แหล่งที่มา' in text_strip:

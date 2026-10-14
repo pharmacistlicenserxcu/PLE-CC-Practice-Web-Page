@@ -2,10 +2,8 @@
 <html lang="th" data-theme="light">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>ห้อง 7 ดาว — CLINIC OSPE Booking System</title>
-  <meta name="description" content="ระบบจองห้องซ้อมสอบ CLINIC OSPE ห้อง 7 ดาว สำหรับนิสิตเภสัชฯ จุฬาฯ">
-  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>💊</text></svg>">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Bai+Jamjuree:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700;800&display=swap" rel="stylesheet">
@@ -270,19 +268,22 @@
 <body>
 
 <nav class="navbar">
-  <a href="index.html" class="nb-brand" style="text-decoration: none; color: inherit;" title="กลับสู่หน้าแรก">
+  <div class="nb-brand">
     <div class="nb-beacon"></div>
     <div>
-      <div class="nb-title">🏠 ห้อง 7 ดาว <span class="nb-tag">OSPE</span></div>
-      <div class="nb-sub">คณะเภสัชศาสตร์ จุฬาฯ (กลับหน้าแรก)</div>
+      <div class="nb-title">ห้อง 7 ดาว <span class="nb-tag">OSPE</span></div>
+      <div class="nb-sub">คณะเภสัชศาสตร์ จุฬาฯ</div>
     </div>
-  </a>
+  </div>
   <div class="nb-right">
     <div class="nb-status">
       <div class="leg"><div class="dot dot-g"></div>ว่าง (สีเขียว)</div>
       <div class="leg"><div class="dot dot-o"></div>รอยืนยัน (สีส้ม)</div>
       <div class="leg"><div class="dot dot-r"></div>จองแล้ว (สีแดง)</div>
     </div>
+    <button class="btn-theme" style="background:rgba(99,102,241,.12);border-color:rgba(99,102,241,.3);color:var(--in)" onclick="openMockModal()" title="จองห้องส่วนกลาง / สอบ Mock Exam (หลายชั่วโมง)">
+      <span>🏛️</span><span>จอง Mock Exam</span>
+    </button>
     <button class="btn-theme btn-quickbook" onclick="openQuickBook()" title="ค้นหาและจองห้องโดยตรงโดยระบุวัน-เวลา">
       <span>📅</span><span>ระบุวัน-เวลา</span>
     </button>
@@ -431,6 +432,76 @@
     <div class="btn-row">
       <button class="btn btn-s" onclick="closeQuickBook()">ยกเลิก</button>
       <button class="btn btn-p" id="btnQbSubmit" onclick="submitQuickBook()">✓ ยืนยันการสำรองเวลา</button>
+    </div>
+  </div>
+</div>
+
+<!-- MOCK EXAM / CENTRAL BOOKING MODAL -->
+<div class="modal-ov" id="mockMod">
+  <div class="modal" role="dialog" aria-modal="true">
+    <div class="modal-hdr">
+      <div>
+        <div class="modal-title">🏛️ จองส่วนกลาง / สอบ Mock Exam</div>
+        <div class="modal-sub">จองต่อเนื่องหลายชั่วโมง เหมาทั้งห้อง และยืนยันทันที</div>
+      </div>
+      <button class="btn-x" onclick="closeMockModal()">✕</button>
+    </div>
+
+    <!-- Date -->
+    <div class="fg">
+      <label class="fl">วันที่จัดสอบ / กิจกรรม <span>*</span></label>
+      <input type="date" class="fc" id="mockDate">
+      <div class="fe" id="eMockDate">กรุณาเลือกวันที่</div>
+    </div>
+
+    <!-- Time Range (Multiple Hours) -->
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px">
+      <div>
+        <label class="fl">ตั้งแต่เวลา <span>*</span></label>
+        <select class="fc" id="mockStartSlot"></select>
+      </div>
+      <div>
+        <label class="fl">ถึงเวลา <span>*</span></label>
+        <select class="fc" id="mockEndSlot"></select>
+      </div>
+    </div>
+    <div class="fe" id="eMockTime" style="margin-top:-8px;margin-bottom:12px">เวลาสิ้นสุดต้องมากกว่าเวลาเริ่มต้น</div>
+
+    <!-- Table Selection -->
+    <div class="fg">
+      <label class="fl">พื้นที่การใช้งาน <span>*</span></label>
+      <select class="fc" id="mockTType">
+        <option value="both">🏢 เหมาทั้งห้อง (โต๊ะกลมนอก 5 ที่ + โต๊ะในห้อง 7 ที่)</option>
+        <option value="outside">🟡 เฉพาะโต๊ะกลมด้านนอก (5 ที่)</option>
+        <option value="inside">🟢 เฉพาะโต๊ะในห้อง (7 ที่)</option>
+      </select>
+    </div>
+
+    <!-- Title / Purpose -->
+    <div class="fg">
+      <label class="fl">ชื่องาน / วัตถุประสงค์การจอง <span>*</span></label>
+      <input type="text" class="fc" id="mockTitle" placeholder="เช่น สอบ Mock Exam OSPE Clinic ครั้งที่ 1" value="สอบ Mock Exam OSPE">
+      <div class="fe" id="eMockTitle">กรุณาระบุชื่องานหรือวัตถุประสงค์</div>
+    </div>
+
+    <!-- Coordinator -->
+    <div class="fg">
+      <label class="fl">ผู้ประสานงาน / ฝ่ายที่รับผิดชอบ <span>*</span></label>
+      <input type="text" class="fc" id="mockCoord" placeholder="เช่น แม็กนั่ม (ประธานชั้นปี) / ฝ่ายจัดสอบ" value="คณะทำงานเตรียมสอบ PLE-CC">
+      <div class="fe" id="eMockCoord">กรุณาระบุชื่อผู้ประสานงาน</div>
+    </div>
+
+    <!-- Admin PIN -->
+    <div class="fg">
+      <label class="fl">รหัส Admin PIN <span>*</span></label>
+      <input type="password" class="fc" id="mockPin" placeholder="รหัสผ่านส่วนกลาง (เช่น rxcu)" style="font-family:'JetBrains Mono',monospace;letter-spacing:3px;font-size:1.05rem;font-weight:700">
+      <div class="fh">🔒 สำหรับกรรมการ/ฝ่ายจัดสอบเท่านั้น (ปลดล็อค Quota 2 ชม./วัน และไม่ต้องกดยืนยัน 5 นาที)</div>
+      <div class="fe" id="eMockPin">รหัสผ่านไม่ถูกต้อง (เช่น rxcu)</div>
+    </div>
+
+    <div class="btn-row">
+      <button class="btn btn-s" onclick="closeMockModal()">ยกเลิก</button>
+      <button class="btn btn-p" id="btnMockSubmit" style="background:var(--in)" onclick="submitMockBooking()">🏛️ ยืนยันการจองส่วนกลาง</button>
     </div>
   </div>
 </div>
@@ -1193,6 +1264,107 @@ function submitQuickBook() {
   }
 }
 
+// ── MOCK EXAM / CENTRAL BOOKING CONTROLLER ────────────────────────────
+function openMockModal() {
+  var now = new Date();
+  var todayStr = dStr(now);
+  var mDateInp = document.getElementById('mockDate');
+  if (mDateInp) {
+    mDateInp.value = todayStr;
+  }
+
+  var sSel = document.getElementById('mockStartSlot');
+  var eSel = document.getElementById('mockEndSlot');
+  if (sSel && eSel) {
+    var sHtml = '';
+    var eHtml = '';
+    for (var i = 0; i < SLOTS.length; i++) {
+      var h = parseInt(SLOTS[i], 10);
+      var hStr = SLOTS[i];
+      var nextHStr = ('0' + (h + 1)).slice(-2) + ':00';
+      sHtml += '<option value="' + h + '">' + hStr + ' น.</option>';
+      eHtml += '<option value="' + (h + 1) + '">' + nextHStr + ' น.</option>';
+    }
+    sSel.innerHTML = sHtml;
+    eSel.innerHTML = eHtml;
+    sSel.value = '8';
+    eSel.value = '17';
+  }
+
+  ['eMockDate','eMockTime','eMockTitle','eMockCoord','eMockPin'].forEach(function(id) {
+    var el = document.getElementById(id);
+    if (el) el.classList.remove('vis');
+  });
+
+  document.getElementById('mockPin').value = '';
+  document.getElementById('btnMockSubmit').disabled = false;
+  document.getElementById('mockMod').classList.add('active');
+}
+
+function closeMockModal() {
+  document.getElementById('mockMod').classList.remove('active');
+}
+
+function submitMockBooking() {
+  var date  = document.getElementById('mockDate').value;
+  var sH    = parseInt(document.getElementById('mockStartSlot').value, 10);
+  var eH    = parseInt(document.getElementById('mockEndSlot').value, 10);
+  var tType = document.getElementById('mockTType').value;
+  var title = document.getElementById('mockTitle').value.trim();
+  var coord = document.getElementById('mockCoord').value.trim();
+  var pin   = document.getElementById('mockPin').value.trim();
+  var ok    = true;
+
+  document.getElementById('eMockDate').classList.toggle('vis', !date); if (!date) ok = false;
+  var timeValid = !isNaN(sH) && !isNaN(eH) && sH < eH;
+  document.getElementById('eMockTime').classList.toggle('vis', !timeValid); if (!timeValid) ok = false;
+  document.getElementById('eMockTitle').classList.toggle('vis', !title); if (!title) ok = false;
+  document.getElementById('eMockCoord').classList.toggle('vis', !coord); if (!coord) ok = false;
+
+  var pinValid = (pin === 'rxcu' || pin === 'ple2569' || pin === '1234');
+  document.getElementById('eMockPin').classList.toggle('vis', !pinValid); if (!pinValid) ok = false;
+
+  if (!ok) return;
+
+  var btn = document.getElementById('btnMockSubmit');
+  btn.disabled = true; btn.textContent = 'กำลังบันทึกส่วนกลาง…';
+
+  var payload = {
+    date: date,
+    startHour: sH,
+    endHour: eH,
+    tableType: tType,
+    title: title,
+    coordinator: coord,
+    pin: pin
+  };
+
+  if (typeof google !== 'undefined' && google.script && google.script.run) {
+    google.script.run
+      .withSuccessHandler(function(res) {
+        btn.disabled = false; btn.textContent = '🏛️ ยืนยันการจองส่วนกลาง';
+        if (res.success) {
+          closeMockModal();
+          toast('✅ จองส่วนกลาง/Mock Exam สำเร็จ (' + res.count + ' Slots)!', 'success');
+          loadData();
+        } else {
+          toast(res.error || 'เกิดข้อผิดพลาดในการจองส่วนกลาง', 'error');
+        }
+      })
+      .withFailureHandler(function(e) {
+        btn.disabled = false; btn.textContent = '🏛️ ยืนยันการจองส่วนกลาง';
+        toast('ข้อผิดพลาด: ' + (e.message || e), 'error');
+      })
+      .createMockCentralBooking(payload);
+  } else {
+    setTimeout(function() {
+      btn.disabled = false; btn.textContent = '🏛️ ยืนยันการจองส่วนกลาง';
+      closeMockModal();
+      toast('จองส่วนกลางจำลองสำเร็จ (Local Mode)', 'success');
+    }, 400);
+  }
+}
+
 // ── Standard Calendar Booking Modal (2 Students + PIN + StudentData) ──
 function openBookModal(ds, sl, dayD, preselectedType) {
   selSlot = { ds: ds, sl: sl };
@@ -1630,8 +1802,9 @@ function toast(msg, type) {
 
 // ── Keyboard & Close on backdrop ──────────────────────────────────────
 document.addEventListener('keydown', function(e) {
-  if (e.key === 'Escape') { closeBook(); closeQuickBook(); closeMyBookings(); closePinCancel(); closeCi(); }
+  if (e.key === 'Escape') { closeBook(); closeQuickBook(); closeMockModal(); closeMyBookings(); closePinCancel(); closeCi(); }
 });
+document.getElementById('mockMod').addEventListener('click', function(e) { if (e.target===this) closeMockModal(); });
 document.getElementById('quickBookMod').addEventListener('click', function(e) { if (e.target===this) closeQuickBook(); });
 document.getElementById('bookMod').addEventListener('click', function(e) { if (e.target===this) closeBook(); });
 document.getElementById('myBookingsMod').addEventListener('click', function(e) { if (e.target===this) closeMyBookings(); });

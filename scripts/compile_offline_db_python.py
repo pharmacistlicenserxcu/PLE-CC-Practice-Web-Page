@@ -1170,7 +1170,7 @@ def main():
     linked_from_idx = get_col_idx(["linkedFromCase", "เคสก่อนหน้า", "linkedFrom"])
     source_idx = get_col_idx(["source", "แหล่งที่มา", "ที่มา"])
 
-    active_cases = []
+    all_cases = []
     all_case_map = {}
     
     for r in values[header_row_idx + 1:]:
@@ -1180,48 +1180,51 @@ def main():
             case_id = r[case_id_idx].strip()
             if not case_id:
                 continue
-            is_active = r[is_active_idx].strip() if (is_active_idx != -1 and len(r) > is_active_idx) else "TRUE"
+            is_active_raw = r[is_active_idx].strip() if (is_active_idx != -1 and len(r) > is_active_idx) else "TRUE"
+            is_active_bool = (is_active_raw.upper() == "TRUE")
             
-            if is_active.upper() == "TRUE":
-                difficulty_val = 2
-                if difficulty_idx != -1 and len(r) > difficulty_idx:
-                    try:
-                        difficulty_val = int(r[difficulty_idx])
-                    except:
-                        pass
-                    
-                raw_source = r[source_idx].strip() if (source_idx != -1 and len(r) > source_idx) else ""
-                linked_next = r[linked_next_idx].strip() if (linked_next_idx != -1 and len(r) > linked_next_idx) else ""
-                linked_from = r[linked_from_idx].strip() if (linked_from_idx != -1 and len(r) > linked_from_idx) else ""
-                case_meta = {
-                    "caseId": case_id,
-                    "title": r[title_idx].strip() if (title_idx != -1 and len(r) > title_idx) else "",
-                    "category": r[category_idx].strip() if (category_idx != -1 and len(r) > category_idx) else "",
-                    "mainGroup": r[main_group_idx].strip() if (main_group_idx != -1 and len(r) > main_group_idx) else "",
-                    "subTopic": r[sub_topic_idx].strip() if (sub_topic_idx != -1 and len(r) > sub_topic_idx) else "",
-                    "disease": r[disease_idx].strip() if (disease_idx != -1 and len(r) > disease_idx) else "",
-                    "difficulty": difficulty_val,
-                    "docId": r[doc_id_idx].strip() if (doc_id_idx != -1 and len(r) > doc_id_idx) else "",
-                    "author": r[author_idx].strip() if (author_idx != -1 and len(r) > author_idx) else "",
-                    "createdDate": r[created_date_idx].strip() if (created_date_idx != -1 and len(r) > created_date_idx) else "",
-                    "source": format_source_name(case_id, raw_source),
-                    "isActive": True,
-                    "linkedNextCase": linked_next,
-                    "linkedFromCase": linked_from
-                }
-                active_cases.append(case_meta)
-                all_case_map[case_id.lower()] = case_meta
+            difficulty_val = 2
+            if difficulty_idx != -1 and len(r) > difficulty_idx:
+                try:
+                    difficulty_val = int(r[difficulty_idx])
+                except:
+                    pass
+                
+            raw_source = r[source_idx].strip() if (source_idx != -1 and len(r) > source_idx) else ""
+            linked_next = r[linked_next_idx].strip() if (linked_next_idx != -1 and len(r) > linked_next_idx) else ""
+            linked_from = r[linked_from_idx].strip() if (linked_from_idx != -1 and len(r) > linked_from_idx) else ""
+            case_meta = {
+                "caseId": case_id,
+                "title": r[title_idx].strip() if (title_idx != -1 and len(r) > title_idx) else "",
+                "category": r[category_idx].strip() if (category_idx != -1 and len(r) > category_idx) else "",
+                "mainGroup": r[main_group_idx].strip() if (main_group_idx != -1 and len(r) > main_group_idx) else "",
+                "subTopic": r[sub_topic_idx].strip() if (sub_topic_idx != -1 and len(r) > sub_topic_idx) else "",
+                "disease": r[disease_idx].strip() if (disease_idx != -1 and len(r) > disease_idx) else "",
+                "difficulty": difficulty_val,
+                "docId": r[doc_id_idx].strip() if (doc_id_idx != -1 and len(r) > doc_id_idx) else "",
+                "author": r[author_idx].strip() if (author_idx != -1 and len(r) > author_idx) else "",
+                "createdDate": r[created_date_idx].strip() if (created_date_idx != -1 and len(r) > created_date_idx) else "",
+                "source": format_source_name(case_id, raw_source),
+                "isActive": is_active_bool,
+                "caseStatus": "Active" if is_active_bool else "Unactive",
+                "linkedNextCase": linked_next,
+                "linkedFromCase": linked_from
+            }
+            all_cases.append(case_meta)
+            all_case_map[case_id.lower()] = case_meta
 
-    print(f"Total active cases registered in Sheet: {len(active_cases)}")
+    active_count = sum(1 for c in all_cases if c["isActive"])
+    inactive_count = len(all_cases) - active_count
+    print(f"Total cases registered in Sheet: {len(all_cases)} (Active: {active_count}, Inactive: {inactive_count})")
 
     # Determine Target Cases to Compile based on mode & query
     target_cases = []
     if mode == "all" or not query:
-        target_cases = active_cases
-        print(f"Mode [ALL]: Compiling all {len(target_cases)} cases...")
+        target_cases = all_cases
+        print(f"Mode [ALL]: Compiling all {len(target_cases)} cases (including {inactive_count} inactive cases)...")
     elif mode == "cases":
         requested_ids = [k.strip().lower() for k in re.split(r"[,;\s]+", query) if k.strip()]
-        for c in active_cases:
+        for c in all_cases:
             cid = c.get("caseId", "").lower()
             cid_raw = cid.replace("ospe-", "")
             if cid in requested_ids or cid_raw in requested_ids or any(req in cid for req in requested_ids):
@@ -1229,20 +1232,20 @@ def main():
         print(f"Mode [CASES]: Matched {len(target_cases)} cases for query '{query}': {[c['caseId'] for c in target_cases]}")
     elif mode == "keyword":
         q_norm = query.lower()
-        for c in active_cases:
+        for c in all_cases:
             haystack = f"{c.get('caseId', '')} {c.get('title', '')} {c.get('disease', '')} {c.get('mainGroup', '')} {c.get('subTopic', '')} {c.get('source', '')}".lower()
             if q_norm in haystack:
                 target_cases.append(c)
         print(f"Mode [KEYWORD]: Matched {len(target_cases)} cases for keyword '{query}': {[c['caseId'] for c in target_cases]}")
     elif mode == "category":
         q_norm = query.lower()
-        for c in active_cases:
+        for c in all_cases:
             if q_norm in c.get("category", "").lower():
                 target_cases.append(c)
         print(f"Mode [CATEGORY]: Matched {len(target_cases)} cases for category '{query}'")
     elif mode == "source":
         q_norm = query.lower()
-        for c in active_cases:
+        for c in all_cases:
             if q_norm in c.get("source", "").lower():
                 target_cases.append(c)
         print(f"Mode [SOURCE]: Matched {len(target_cases)} cases for source '{query}': {[c['caseId'] for c in target_cases]}")
@@ -1272,7 +1275,7 @@ def main():
                     "_isNewCase": True
                 }
                 target_cases.append(dummy_meta)
-                active_cases.append(dummy_meta)
+                all_cases.append(dummy_meta)
         else:
             print(f"❌ No matching cases found for mode '{mode}' with query '{query}'! Aborting.")
             return
@@ -1333,8 +1336,8 @@ def main():
             try:
                 c_details = get_case_content_from_doc(doc_data, case_id, doc_equations)
                 if c_details:
-                    # Find metadata from active_cases
-                    meta = next((c for c in active_cases if c.get('caseId') == case_id), {})
+                    # Find metadata from all_cases
+                    meta = next((c for c in all_cases if c.get('caseId') == case_id), {})
                     doc_src = c_details.get('source', '')
                     final_source = format_source_name(case_id, doc_src or meta.get('source', ''))
                     
@@ -1351,12 +1354,11 @@ def main():
                     c_details['linkedNextCase'] = meta.get('linkedNextCase', '')
                     c_details['linkedFromCase'] = meta.get('linkedFromCase', '')
                     
-                    meta_status = c_details.get('caseStatus') or 'Active'
+                    # Keep Google Sheet as the 100% Single Source of Truth for isActive
+                    c_details['isActive'] = meta.get('isActive', True)
+                    meta_status = "Active" if c_details['isActive'] else "Unactive"
                     c_details['caseStatus'] = meta_status
                     meta['caseStatus'] = meta_status
-                    if meta_status == 'Unactive':
-                        meta['isActive'] = False
-                        c_details['isActive'] = False
 
                     if c_details.get('durationMin'):
                         meta['durationMin'] = c_details['durationMin']
@@ -1438,14 +1440,17 @@ def main():
     print(f"=======================================================")
 
     # 4. Write metadata database (case-data-offline.js)
-    filtered_cases = [c for c in active_cases if c.get('isActive') and c.get('caseStatus') != 'Unactive']
-    print(f"Total active cases after Case status filtering: {len(filtered_cases)} (excluded {len(active_cases) - len(filtered_cases)} unactive)")
+    # Write ALL cases to case-data-offline.js so the offline database has all registered cases!
+    # Each case preserves its exact isActive flag (true for active, false for inactive)
+    active_count = sum(1 for c in all_cases if c.get('isActive'))
+    inactive_count = len(all_cases) - active_count
+    print(f"Total cases in offline metadata: {len(all_cases)} (Active: {active_count}, Inactive: {inactive_count})")
 
     offline_metadata = {
         "version": build_version,
         "generatedAt": build_time,
-        "totalCases": len(filtered_cases),
-        "cases": filtered_cases
+        "totalCases": len(all_cases),
+        "cases": all_cases
     }
     metadata_path = os.path.join(web_dir, "case-data-offline.js")
     print(f"Writing metadata to {metadata_path}...")

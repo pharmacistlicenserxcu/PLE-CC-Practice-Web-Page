@@ -1,13 +1,13 @@
 /**
  * PLE-CC2 OSPE Practice System — Offline Case List Metadata (Auto-Generated)
- * Version: v_20261015_032509
- * Generated on 2026-10-15 03:25:09
+ * Version: v_20261015_033246
+ * Generated on 2026-10-15 03:32:46
  */
 
 const OFFLINE_DATA = {
-  "version": "v_20261015_032509",
-  "generatedAt": "2026-10-15 03:25:09",
-  "totalCases": 367,
+  "version": "v_20261015_033246",
+  "generatedAt": "2026-10-15 03:32:46",
+  "totalCases": 405,
   "cases": [
     {
       "caseId": "OSPE-CL4801",
@@ -22,6 +22,7 @@ const OFFLINE_DATA = {
       "createdDate": "01/08/2026",
       "source": "ข้อสอบจริง ปี 2548",
       "isActive": true,
+      "caseStatus": "Active",
       "linkedNextCase": "",
       "linkedFromCase": ""
     },
@@ -38,6 +39,7 @@ const OFFLINE_DATA = {
       "createdDate": "01/08/2026",
       "source": "ข้อสอบจริง ปี 2548",
       "isActive": true,
+      "caseStatus": "Active",
       "linkedNextCase": "",
       "linkedFromCase": ""
     },
@@ -54,6 +56,7 @@ const OFFLINE_DATA = {
       "createdDate": "01/08/2026",
       "source": "ข้อสอบจริง ปี 2548",
       "isActive": true,
+      "caseStatus": "Active",
       "linkedNextCase": "",
       "linkedFromCase": ""
     },
@@ -70,6 +73,7 @@ const OFFLINE_DATA = {
       "createdDate": "01/08/2026",
       "source": "ข้อสอบจริง ปี 2548",
       "isActive": true,
+      "caseStatus": "Active",
       "linkedNextCase": "",
       "linkedFromCase": ""
     },
@@ -86,6 +90,7 @@ const OFFLINE_DATA = {
       "createdDate": "01/08/2026",
       "source": "ข้อสอบจริง ปี 2548",
       "isActive": true,
+      "caseStatus": "Active",
       "linkedNextCase": "",
       "linkedFromCase": ""
     },
@@ -102,6 +107,7 @@ const OFFLINE_DATA = {
       "createdDate": "01/08/2026",
       "source": "ข้อสอบจริง ปี 2548",
       "isActive": true,
+      "caseStatus": "Active",
       "linkedNextCase": "",
       "linkedFromCase": ""
     },
@@ -118,6 +124,7 @@ const OFFLINE_DATA = {
       "createdDate": "01/08/2026",
       "source": "ข้อสอบจริง ปี 2548",
       "isActive": true,
+      "caseStatus": "Active",
       "linkedNextCase": "",
       "linkedFromCase": ""
     },
@@ -134,6 +141,7 @@ const OFFLINE_DATA = {
       "createdDate": "01/08/2026",
       "source": "ข้อสอบจริง ปี 2548",
       "isActive": true,
+      "caseStatus": "Active",
       "linkedNextCase": "",
       "linkedFromCase": ""
     },
@@ -150,6 +158,7 @@ const OFFLINE_DATA = {
       "createdDate": "01/08/2026",
       "source": "ข้อสอบจริง ปี 2552",
       "isActive": true,
+      "caseStatus": "Active",
       "linkedNextCase": "",
       "linkedFromCase": ""
     },
@@ -166,6 +175,7 @@ const OFFLINE_DATA = {
       "createdDate": "01/08/2026",
       "source": "ข้อสอบจริง ปี 2552",
       "isActive": true,
+      "caseStatus": "Active",
       "linkedNextCase": "",
       "linkedFromCase": ""
     },
@@ -182,6 +192,7 @@ const OFFLINE_DATA = {
       "createdDate": "01/08/2026",
       "source": "ข้อสอบจริง ปี 2552",
       "isActive": true,
+      "caseStatus": "Active",
       "linkedNextCase": "",
       "linkedFromCase": ""
     },
@@ -198,6 +209,7 @@ const OFFLINE_DATA = {
       "createdDate": "01/08/2026",
       "source": "ข้อสอบจริง ปี 2552",
       "isActive": true,
+      "caseStatus": "Active",
       "linkedNextCase": "",
       "linkedFromCase": ""
     },
@@ -214,6 +226,7 @@ const OFFLINE_DATA = {
       "createdDate": "01/08/2026",
       "source": "ข้อสอบจริง ปี 2552",
       "isActive": true,
+      "caseStatus": "Active",
       "linkedNextCase": "",
       "linkedFromCase": ""
     },
@@ -230,6 +243,7 @@ const OFFLINE_DATA = {
       "createdDate": "01/08/2026",
       "source": "ข้อสอบจริง ปี 2552",
       "isActive": true,
+      "caseStatus": "Active",
       "linkedNextCase": "",
       "linkedFromCase": ""
     },
@@ -246,6 +260,7 @@ const OFFLINE_DATA = {
       "createdDate": "01/08/2026",
       "source": "ข้อสอบจริง ปี 2552",
       "isActive": true,
+      "caseStatus": "Active",
       "linkedNextCase": "",
       "linkedFromCase": ""
     },
@@ -262,6 +277,7 @@ const OFFLINE_DATA = {
       "createdDate": "01/08/2026",
       "source": "ข้อสอบจริง ปี 2552",
       "isActive": true,
+      "caseStatus": "Active",
       "linkedNextCase": "",
       "linkedFromCase": ""
     },
@@ -278,6 +294,7 @@ const OFFLINE_DATA = {
       "createdDate": "02/08/2026",
       "source": "ข้อสอบจริง ปี 2552",
       "isActive": true,
+      "caseStatus": "Active",
       "linkedNextCase": "",
       "linkedFromCase": ""
     },
@@ -294,6 +311,7 @@ const OFFLINE_DATA = {
       "createdDate": "02/08/2026",
       "source": "ข้อสอบจริง ปี 2552",
       "isActive": true,
+      "caseStatus": "Active",
       "linkedNextCase": "",
       "linkedFromCase": ""
     },
@@ -310,6 +328,7 @@ const OFFLINE_DATA = {
       "createdDate": "02/08/2026",
       "source": "ข้อสอบจริง ปี 2552",
       "isActive": true,
+      "caseStatus": "Active",
       "linkedNextCase": "",
       "linkedFromCase": ""
     },
@@ -326,6 +345,7 @@ const OFFLINE_DATA = {
       "createdDate": "02/08/2026",
       "source": "ข้อสอบจริง ปี 2552",
       "isActive": true,
+      "caseStatus": "Active",
       "linkedNextCase": "",
       "linkedFromCase": ""
     },
@@ -342,6 +362,7 @@ const OFFLINE_DATA = {
       "createdDate": "29/07/2026",
       "source": "ข้อสอบจริง ปี 2553",
       "isActive": true,
+      "caseStatus": "Active",
       "linkedNextCase": "",
       "linkedFromCase": ""
     },
@@ -358,6 +379,7 @@ const OFFLINE_DATA = {
       "createdDate": "29/07/2026",
       "source": "ข้อสอบจริง ปี 2553",
       "isActive": true,
+      "caseStatus": "Active",
       "linkedNextCase": "",
       "linkedFromCase": ""
     },
@@ -374,6 +396,7 @@ const OFFLINE_DATA = {
       "createdDate": "29/07/2026",
       "source": "ข้อสอบจริง ปี 2553",
       "isActive": true,
+      "caseStatus": "Active",
       "linkedNextCase": "",
       "linkedFromCase": ""
     },
@@ -390,6 +413,7 @@ const OFFLINE_DATA = {
       "createdDate": "29/07/2026",
       "source": "ข้อสอบจริง ปี 2553",
       "isActive": true,
+      "caseStatus": "Active",
       "linkedNextCase": "",
       "linkedFromCase": ""
     },
@@ -406,6 +430,7 @@ const OFFLINE_DATA = {
       "createdDate": "29/07/2026",
       "source": "ข้อสอบจริง ปี 2553",
       "isActive": true,
+      "caseStatus": "Active",
       "linkedNextCase": "",
       "linkedFromCase": ""
     },
@@ -422,6 +447,7 @@ const OFFLINE_DATA = {
       "createdDate": "29/07/2026",
       "source": "ข้อสอบจริง ปี 2553",
       "isActive": true,
+      "caseStatus": "Active",
       "linkedNextCase": "",
       "linkedFromCase": ""
     },
@@ -438,6 +464,7 @@ const OFFLINE_DATA = {
       "createdDate": "29/07/2026",
       "source": "ข้อสอบจริง ปี 2553",
       "isActive": true,
+      "caseStatus": "Active",
       "linkedNextCase": "",
       "linkedFromCase": ""
     },
@@ -454,6 +481,7 @@ const OFFLINE_DATA = {
       "createdDate": "29/07/2026",
       "source": "ข้อสอบจริง ปี 2553",
       "isActive": true,
+      "caseStatus": "Active",
       "linkedNextCase": "",
       "linkedFromCase": ""
     },
@@ -470,6 +498,7 @@ const OFFLINE_DATA = {
       "createdDate": "29/07/2026",
       "source": "ข้อสอบจริง ปี 2553",
       "isActive": true,
+      "caseStatus": "Active",
       "linkedNextCase": "",
       "linkedFromCase": ""
     },
@@ -486,6 +515,7 @@ const OFFLINE_DATA = {
       "createdDate": "29/07/2026",
       "source": "ข้อสอบจริง ปี 2553",
       "isActive": true,
+      "caseStatus": "Active",
       "linkedNextCase": "",
       "linkedFromCase": ""
     },
@@ -502,6 +532,24 @@ const OFFLINE_DATA = {
       "createdDate": "29/07/2026",
       "source": "ข้อสอบจริง ปี 2553",
       "isActive": true,
+      "caseStatus": "Active",
+      "linkedNextCase": "",
+      "linkedFromCase": ""
+    },
+    {
+      "caseId": "OSPE-CL5402",
+      "title": "การนับเม็ดยาและเขียนฉลากยา Hypertension",
+      "category": "Clinic",
+      "mainGroup": "การนับเม็ดยาและเขียนฉลากยา",
+      "subTopic": "",
+      "disease": "Hypertension",
+      "difficulty": 2,
+      "docId": "1ZNKvEBVAUeVcJ2GSH4gGKujA8whv7zY0fH4pXVEJa4g",
+      "author": "เมย์",
+      "createdDate": "26/07/2026",
+      "source": "ข้อสอบจริง ปี 2554",
+      "isActive": false,
+      "caseStatus": "Unactive",
       "linkedNextCase": "",
       "linkedFromCase": ""
     },
@@ -518,6 +566,7 @@ const OFFLINE_DATA = {
       "createdDate": "26/07/2026",
       "source": "ข้อสอบจริง ปี 2554",
       "isActive": true,
+      "caseStatus": "Active",
       "linkedNextCase": "",
       "linkedFromCase": ""
     },
@@ -534,6 +583,7 @@ const OFFLINE_DATA = {
       "createdDate": "26/07/2026",
       "source": "ข้อสอบจริง ปี 2554",
       "isActive": true,
+      "caseStatus": "Active",
       "linkedNextCase": "",
       "linkedFromCase": ""
     },
@@ -550,6 +600,7 @@ const OFFLINE_DATA = {
       "createdDate": "26/07/2026",
       "source": "ข้อสอบจริง ปี 2554",
       "isActive": true,
+      "caseStatus": "Active",
       "linkedNextCase": "",
       "linkedFromCase": ""
     },
@@ -566,6 +617,7 @@ const OFFLINE_DATA = {
       "createdDate": "26/07/2026",
       "source": "ข้อสอบจริง ปี 2554",
       "isActive": true,
+      "caseStatus": "Active",
       "linkedNextCase": "",
       "linkedFromCase": ""
     },
@@ -582,6 +634,7 @@ const OFFLINE_DATA = {
       "createdDate": "26/07/2026",
       "source": "ข้อสอบจริง ปี 2554",
       "isActive": true,
+      "caseStatus": "Active",
       "linkedNextCase": "",
       "linkedFromCase": ""
     },
@@ -598,6 +651,7 @@ const OFFLINE_DATA = {
       "createdDate": "26/07/2026",
       "source": "ข้อสอบจริง ปี 2554",
       "isActive": true,
+      "caseStatus": "Active",
       "linkedNextCase": "",
       "linkedFromCase": ""
     },
@@ -614,6 +668,7 @@ const OFFLINE_DATA = {
       "createdDate": "26/07/2026",
       "source": "ข้อสอบจริง ปี 2554",
       "isActive": true,
+      "caseStatus": "Active",
       "linkedNextCase": "",
       "linkedFromCase": ""
     },
@@ -630,6 +685,7 @@ const OFFLINE_DATA = {
       "createdDate": "26/07/2026",
       "source": "ข้อสอบจริง ปี 2554",
       "isActive": true,
+      "caseStatus": "Active",
       "linkedNextCase": "",
       "linkedFromCase": ""
     },
@@ -646,6 +702,7 @@ const OFFLINE_DATA = {
       "createdDate": "26/07/2026",
       "source": "ข้อสอบจริง ปี 2554",
       "isActive": true,
+      "caseStatus": "Active",
       "linkedNextCase": "",
       "linkedFromCase": ""
     },
@@ -662,6 +719,7 @@ const OFFLINE_DATA = {
       "createdDate": "26/07/2026",
       "source": "ข้อสอบจริง ปี 2554",
       "isActive": true,
+      "caseStatus": "Active",
       "linkedNextCase": "",
       "linkedFromCase": ""
     },
@@ -678,6 +736,7 @@ const OFFLINE_DATA = {
       "createdDate": "26/07/2026",
       "source": "ข้อสอบจริง ปี 2554",
       "isActive": true,
+      "caseStatus": "Active",
       "linkedNextCase": "",
       "linkedFromCase": ""
     },
@@ -694,6 +753,7 @@ const OFFLINE_DATA = {
       "createdDate": "03/08/2026",
       "source": "ข้อสอบจริง ปี 2555",
       "isActive": true,
+      "caseStatus": "Active",
       "linkedNextCase": "",
       "linkedFromCase": ""
     },
@@ -710,6 +770,7 @@ const OFFLINE_DATA = {
       "createdDate": "03/08/2026",
       "source": "ข้อสอบจริง ปี 2555",
       "isActive": true,
+      "caseStatus": "Active",
       "linkedNextCase": "",
       "linkedFromCase": ""
     },
@@ -726,6 +787,7 @@ const OFFLINE_DATA = {
       "createdDate": "03/08/2026",
       "source": "ข้อสอบจริง ปี 2555",
       "isActive": true,
+      "caseStatus": "Active",
       "linkedNextCase": "",
       "linkedFromCase": ""
     },
@@ -742,6 +804,7 @@ const OFFLINE_DATA = {
       "createdDate": "03/08/2026",
       "source": "ข้อสอบจริง ปี 2555",
       "isActive": true,
+      "caseStatus": "Active",
       "linkedNextCase": "",
       "linkedFromCase": ""
     },
@@ -758,6 +821,7 @@ const OFFLINE_DATA = {
       "createdDate": "03/08/2026",
       "source": "ข้อสอบจริง ปี 2555",
       "isActive": true,
+      "caseStatus": "Active",
       "linkedNextCase": "",
       "linkedFromCase": ""
     },
@@ -774,6 +838,7 @@ const OFFLINE_DATA = {
       "createdDate": "03/08/2026",
       "source": "ข้อสอบจริง ปี 2555",
       "isActive": true,
+      "caseStatus": "Active",
       "linkedNextCase": "",
       "linkedFromCase": ""
     },
@@ -790,6 +855,7 @@ const OFFLINE_DATA = {
       "createdDate": "03/08/2026",
       "source": "ข้อสอบจริง ปี 2555",
       "isActive": true,
+      "caseStatus": "Active",
       "linkedNextCase": "",
       "linkedFromCase": ""
     },
@@ -806,6 +872,7 @@ const OFFLINE_DATA = {
       "createdDate": "03/08/2026",
       "source": "ข้อสอบจริง ปี 2555",
       "isActive": true,
+      "caseStatus": "Active",
       "linkedNextCase": "",
       "linkedFromCase": ""
     },
@@ -822,6 +889,7 @@ const OFFLINE_DATA = {
       "createdDate": "03/08/2026",
       "source": "ข้อสอบจริง ปี 2555",
       "isActive": true,
+      "caseStatus": "Active",
       "linkedNextCase": "",
       "linkedFromCase": ""
     },
@@ -838,6 +906,7 @@ const OFFLINE_DATA = {
       "createdDate": "03/08/2026",
       "source": "ข้อสอบจริง ปี 2555",
       "isActive": true,
+      "caseStatus": "Active",
       "linkedNextCase": "",
       "linkedFromCase": ""
     },
@@ -854,6 +923,24 @@ const OFFLINE_DATA = {
       "createdDate": "03/08/2026",
       "source": "ข้อสอบจริง ปี 2555",
       "isActive": true,
+      "caseStatus": "Active",
+      "linkedNextCase": "",
+      "linkedFromCase": ""
+    },
+    {
+      "caseId": "OSPE-CL5525",
+      "title": "Drug interaction",
+      "category": "Clinic",
+      "mainGroup": "การค้นข้อมูลและประสานงาน",
+      "subTopic": "",
+      "disease": "Drug interaction",
+      "difficulty": 2,
+      "docId": "1ZNKvEBVAUeVcJ2GSH4gGKujA8whv7zY0fH4pXVEJa4g",
+      "author": "ฟ้าใส",
+      "createdDate": "03/08/2026",
+      "source": "ข้อสอบจริง ปี 2555",
+      "isActive": false,
+      "caseStatus": "Unactive",
       "linkedNextCase": "",
       "linkedFromCase": ""
     },
@@ -870,6 +957,7 @@ const OFFLINE_DATA = {
       "createdDate": "02/08/2026",
       "source": "ข้อสอบจริง ปี 2555",
       "isActive": true,
+      "caseStatus": "Active",
       "linkedNextCase": "",
       "linkedFromCase": ""
     },
@@ -886,6 +974,7 @@ const OFFLINE_DATA = {
       "createdDate": "02/08/2026",
       "source": "ข้อสอบจริง ปี 2555",
       "isActive": true,
+      "caseStatus": "Active",
       "linkedNextCase": "",
       "linkedFromCase": ""
     },
@@ -902,6 +991,7 @@ const OFFLINE_DATA = {
       "createdDate": "03/08/2026",
       "source": "ข้อสอบจริง ปี 2555",
       "isActive": true,
+      "caseStatus": "Active",
       "linkedNextCase": "",
       "linkedFromCase": ""
     },
@@ -918,6 +1008,7 @@ const OFFLINE_DATA = {
       "createdDate": "02/08/2026",
       "source": "ข้อสอบจริง ปี 2556",
       "isActive": true,
+      "caseStatus": "Active",
       "linkedNextCase": "",
       "linkedFromCase": ""
     },
@@ -934,6 +1025,7 @@ const OFFLINE_DATA = {
       "createdDate": "02/08/2026",
       "source": "ข้อสอบจริง ปี 2556",
       "isActive": true,
+      "caseStatus": "Active",
       "linkedNextCase": "",
       "linkedFromCase": ""
     },
@@ -950,6 +1042,7 @@ const OFFLINE_DATA = {
       "createdDate": "02/08/2026",
       "source": "ข้อสอบจริง ปี 2556",
       "isActive": true,
+      "caseStatus": "Active",
       "linkedNextCase": "",
       "linkedFromCase": ""
     },
@@ -966,6 +1059,7 @@ const OFFLINE_DATA = {
       "createdDate": "02/08/2026",
       "source": "ข้อสอบจริง ปี 2556",
       "isActive": true,
+      "caseStatus": "Active",
       "linkedNextCase": "",
       "linkedFromCase": ""
     },
@@ -982,6 +1076,7 @@ const OFFLINE_DATA = {
       "createdDate": "02/08/2026",
       "source": "ข้อสอบจริง ปี 2556",
       "isActive": true,
+      "caseStatus": "Active",
       "linkedNextCase": "",
       "linkedFromCase": ""
     },
@@ -998,6 +1093,7 @@ const OFFLINE_DATA = {
       "createdDate": "02/08/2026",
       "source": "ข้อสอบจริง ปี 2556",
       "isActive": true,
+      "caseStatus": "Active",
       "linkedNextCase": "",
       "linkedFromCase": ""
     },
@@ -1014,6 +1110,7 @@ const OFFLINE_DATA = {
       "createdDate": "02/08/2026",
       "source": "ข้อสอบจริง ปี 2556",
       "isActive": true,
+      "caseStatus": "Active",
       "linkedNextCase": "",
       "linkedFromCase": ""
     },
@@ -1030,6 +1127,7 @@ const OFFLINE_DATA = {
       "createdDate": "03/08/2026",
       "source": "ข้อสอบจริง ปี 2556",
       "isActive": true,
+      "caseStatus": "Active",
       "linkedNextCase": "",
       "linkedFromCase": ""
     },
@@ -1046,6 +1144,7 @@ const OFFLINE_DATA = {
       "createdDate": "02/08/2026",
       "source": "ข้อสอบจริง ปี 2556",
       "isActive": true,
+      "caseStatus": "Active",
       "linkedNextCase": "",
       "linkedFromCase": ""
     },
@@ -1062,6 +1161,7 @@ const OFFLINE_DATA = {
       "createdDate": "02/08/2026",
       "source": "ข้อสอบจริง ปี 2556",
       "isActive": true,
+      "caseStatus": "Active",
       "linkedNextCase": "",
       "linkedFromCase": ""
     },
@@ -1078,6 +1178,7 @@ const OFFLINE_DATA = {
       "createdDate": "02/08/2026",
       "source": "ข้อสอบจริง ปี 2557",
       "isActive": true,
+      "caseStatus": "Active",
       "linkedNextCase": "",
       "linkedFromCase": ""
     },
@@ -1094,6 +1195,7 @@ const OFFLINE_DATA = {
       "createdDate": "02/08/2026",
       "source": "ข้อสอบจริง ปี 2557",
       "isActive": true,
+      "caseStatus": "Active",
       "linkedNextCase": "",
       "linkedFromCase": ""
     },
@@ -1110,6 +1212,7 @@ const OFFLINE_DATA = {
       "createdDate": "03/08/2026",
       "source": "ข้อสอบจริง ปี 2557",
       "isActive": true,
+      "caseStatus": "Active",
       "linkedNextCase": "",
       "linkedFromCase": ""
     },
@@ -1126,6 +1229,7 @@ const OFFLINE_DATA = {
       "createdDate": "03/08/2026",
       "source": "ข้อสอบจริง ปี 2557",
       "isActive": true,
+      "caseStatus": "Active",
       "linkedNextCase": "",
       "linkedFromCase": ""
     },
@@ -1142,6 +1246,7 @@ const OFFLINE_DATA = {
       "createdDate": "04/07/2026",
       "source": "ข้อสอบจริง ปี 2557",
       "isActive": true,
+      "caseStatus": "Active",
       "linkedNextCase": "",
       "linkedFromCase": ""
     },
@@ -1158,6 +1263,7 @@ const OFFLINE_DATA = {
       "createdDate": "03/08/2026",
       "source": "ข้อสอบจริง ปี 2557",
       "isActive": true,
+      "caseStatus": "Active",
       "linkedNextCase": "",
       "linkedFromCase": ""
     },
@@ -1174,6 +1280,7 @@ const OFFLINE_DATA = {
       "createdDate": "03/08/2026",
       "source": "ข้อสอบจริง ปี 2557",
       "isActive": true,
+      "caseStatus": "Active",
       "linkedNextCase": "",
       "linkedFromCase": ""
     },
@@ -1190,6 +1297,7 @@ const OFFLINE_DATA = {
       "createdDate": "03/08/2026",
       "source": "ข้อสอบจริง ปี 2557",
       "isActive": true,
+      "caseStatus": "Active",
       "linkedNextCase": "",
       "linkedFromCase": ""
     },
@@ -1206,6 +1314,7 @@ const OFFLINE_DATA = {
       "createdDate": "03/08/2026",
       "source": "ข้อสอบจริง ปี 2557",
       "isActive": true,
+      "caseStatus": "Active",
       "linkedNextCase": "",
       "linkedFromCase": ""
     },
@@ -1222,6 +1331,7 @@ const OFFLINE_DATA = {
       "createdDate": "03/08/2026",
       "source": "ข้อสอบจริง ปี 2557",
       "isActive": true,
+      "caseStatus": "Active",
       "linkedNextCase": "",
       "linkedFromCase": ""
     },
@@ -1238,6 +1348,7 @@ const OFFLINE_DATA = {
       "createdDate": "03/08/2026",
       "source": "ข้อสอบจริง ปี 2557",
       "isActive": true,
+      "caseStatus": "Active",
       "linkedNextCase": "",
       "linkedFromCase": ""
     },
@@ -1254,6 +1365,7 @@ const OFFLINE_DATA = {
       "createdDate": "03/08/2026",
       "source": "ข้อสอบจริง ปี 2557",
       "isActive": true,
+      "caseStatus": "Active",
       "linkedNextCase": "",
       "linkedFromCase": ""
     },
@@ -1270,6 +1382,7 @@ const OFFLINE_DATA = {
       "createdDate": "03/08/2026",
       "source": "ข้อสอบจริง ปี 2557",
       "isActive": true,
+      "caseStatus": "Active",
       "linkedNextCase": "",
       "linkedFromCase": ""
     },
@@ -1286,6 +1399,7 @@ const OFFLINE_DATA = {
       "createdDate": "02/08/2026",
       "source": "ข้อสอบจริง ปี 2558",
       "isActive": true,
+      "caseStatus": "Active",
       "linkedNextCase": "",
       "linkedFromCase": ""
     },
@@ -1302,6 +1416,7 @@ const OFFLINE_DATA = {
       "createdDate": "02/08/2026",
       "source": "ข้อสอบจริง ปี 2558",
       "isActive": true,
+      "caseStatus": "Active",
       "linkedNextCase": "",
       "linkedFromCase": ""
     },
@@ -1318,6 +1433,7 @@ const OFFLINE_DATA = {
       "createdDate": "02/08/2026",
       "source": "ข้อสอบจริง ปี 2558",
       "isActive": true,
+      "caseStatus": "Active",
       "linkedNextCase": "",
       "linkedFromCase": ""
     },
@@ -1334,6 +1450,7 @@ const OFFLINE_DATA = {
       "createdDate": "03/08/2026",
       "source": "ข้อสอบจริง ปี 2558",
       "isActive": true,
+      "caseStatus": "Active",
       "linkedNextCase": "",
       "linkedFromCase": ""
     },
@@ -1350,6 +1467,7 @@ const OFFLINE_DATA = {
       "createdDate": "03/08/2026",
       "source": "ข้อสอบจริง ปี 2558",
       "isActive": true,
+      "caseStatus": "Active",
       "linkedNextCase": "",
       "linkedFromCase": ""
     },
@@ -1366,6 +1484,7 @@ const OFFLINE_DATA = {
       "createdDate": "03/08/2026",
       "source": "ข้อสอบจริง ปี 2558",
       "isActive": true,
+      "caseStatus": "Active",
       "linkedNextCase": "",
       "linkedFromCase": ""
     },
@@ -1382,6 +1501,7 @@ const OFFLINE_DATA = {
       "createdDate": "15/10/2569",
       "source": "ข้อสอบจริง ปี 2559",
       "isActive": true,
+      "caseStatus": "Active",
       "linkedNextCase": "",
       "linkedFromCase": ""
     },
@@ -1398,6 +1518,7 @@ const OFFLINE_DATA = {
       "createdDate": "15/10/2569",
       "source": "ข้อสอบจริง ปี 2559",
       "isActive": true,
+      "caseStatus": "Active",
       "linkedNextCase": "",
       "linkedFromCase": ""
     },
@@ -1414,6 +1535,7 @@ const OFFLINE_DATA = {
       "createdDate": "01/08/2026",
       "source": "ข้อสอบจริง ปี 2559",
       "isActive": true,
+      "caseStatus": "Active",
       "linkedNextCase": "",
       "linkedFromCase": ""
     },
@@ -1430,6 +1552,7 @@ const OFFLINE_DATA = {
       "createdDate": "15/10/2569",
       "source": "ข้อสอบจริง ปี 2559",
       "isActive": true,
+      "caseStatus": "Active",
       "linkedNextCase": "",
       "linkedFromCase": ""
     },
@@ -1446,6 +1569,7 @@ const OFFLINE_DATA = {
       "createdDate": "01/08/2026",
       "source": "ข้อสอบจริง ปี 2559",
       "isActive": true,
+      "caseStatus": "Active",
       "linkedNextCase": "",
       "linkedFromCase": ""
     },
@@ -1462,6 +1586,24 @@ const OFFLINE_DATA = {
       "createdDate": "13/07/2026",
       "source": "ข้อสอบจริง ปี 2560",
       "isActive": true,
+      "caseStatus": "Active",
+      "linkedNextCase": "",
+      "linkedFromCase": ""
+    },
+    {
+      "caseId": "OSPE-CL6005",
+      "title": "ซักประวัติและจ่ายยาในร้านยา",
+      "category": "Clinic",
+      "mainGroup": "การซักประวัติและจ่ายยา",
+      "subTopic": "",
+      "disease": "ตรวจสอบความถูกต้องของยากับใบสั่งยา",
+      "difficulty": 2,
+      "docId": "1ZNKvEBVAUeVcJ2GSH4gGKujA8whv7zY0fH4pXVEJa4g",
+      "author": "มีน",
+      "createdDate": "16/07/2026 (วันที่เขียน)",
+      "source": "ข้อสอบจริง ปี 2560",
+      "isActive": false,
+      "caseStatus": "Unactive",
       "linkedNextCase": "",
       "linkedFromCase": ""
     },
@@ -1478,6 +1620,7 @@ const OFFLINE_DATA = {
       "createdDate": "16/07/2026",
       "source": "ข้อสอบจริง ปี 2560",
       "isActive": true,
+      "caseStatus": "Active",
       "linkedNextCase": "",
       "linkedFromCase": ""
     },
@@ -1494,6 +1637,7 @@ const OFFLINE_DATA = {
       "createdDate": "16/07/2026",
       "source": "ข้อสอบจริง ปี 2560",
       "isActive": true,
+      "caseStatus": "Active",
       "linkedNextCase": "",
       "linkedFromCase": ""
     },
@@ -1510,6 +1654,7 @@ const OFFLINE_DATA = {
       "createdDate": "15/10/2569",
       "source": "ข้อสอบจริง ปี 2560",
       "isActive": true,
+      "caseStatus": "Active",
       "linkedNextCase": "",
       "linkedFromCase": ""
     },
@@ -1526,6 +1671,7 @@ const OFFLINE_DATA = {
       "createdDate": "16/07/2026",
       "source": "ข้อสอบจริง ปี 2560",
       "isActive": true,
+      "caseStatus": "Active",
       "linkedNextCase": "",
       "linkedFromCase": ""
     },
@@ -1542,6 +1688,7 @@ const OFFLINE_DATA = {
       "createdDate": "16/07/2026",
       "source": "ข้อสอบจริง ปี 2560",
       "isActive": true,
+      "caseStatus": "Active",
       "linkedNextCase": "",
       "linkedFromCase": ""
     },
@@ -1558,6 +1705,7 @@ const OFFLINE_DATA = {
       "createdDate": "02/08/2026",
       "source": "ข้อสอบจริง ปี 2561",
       "isActive": true,
+      "caseStatus": "Active",
       "linkedNextCase": "",
       "linkedFromCase": ""
     },
@@ -1574,6 +1722,7 @@ const OFFLINE_DATA = {
       "createdDate": "02/08/2026",
       "source": "ข้อสอบจริง ปี 2561",
       "isActive": true,
+      "caseStatus": "Active",
       "linkedNextCase": "",
       "linkedFromCase": ""
     },
@@ -1590,6 +1739,7 @@ const OFFLINE_DATA = {
       "createdDate": "02/08/2026",
       "source": "ข้อสอบจริง ปี 2561",
       "isActive": true,
+      "caseStatus": "Active",
       "linkedNextCase": "",
       "linkedFromCase": ""
     },
@@ -1606,6 +1756,7 @@ const OFFLINE_DATA = {
       "createdDate": "02/08/2026",
       "source": "ข้อสอบจริง ปี 2561",
       "isActive": true,
+      "caseStatus": "Active",
       "linkedNextCase": "",
       "linkedFromCase": ""
     },
@@ -1622,6 +1773,7 @@ const OFFLINE_DATA = {
       "createdDate": "02/08/2026",
       "source": "ข้อสอบจริง ปี 2561",
       "isActive": true,
+      "caseStatus": "Active",
       "linkedNextCase": "",
       "linkedFromCase": ""
     },
@@ -1638,6 +1790,7 @@ const OFFLINE_DATA = {
       "createdDate": "02/08/2026",
       "source": "ข้อสอบจริง ปี 2561",
       "isActive": true,
+      "caseStatus": "Active",
       "linkedNextCase": "",
       "linkedFromCase": ""
     },
@@ -1654,6 +1807,7 @@ const OFFLINE_DATA = {
       "createdDate": "02/08/2026",
       "source": "ข้อสอบจริง ปี 2561",
       "isActive": true,
+      "caseStatus": "Active",
       "linkedNextCase": "",
       "linkedFromCase": ""
     },
@@ -1670,6 +1824,7 @@ const OFFLINE_DATA = {
       "createdDate": "02/08/2026",
       "source": "ข้อสอบจริง ปี 2561",
       "isActive": true,
+      "caseStatus": "Active",
       "linkedNextCase": "",
       "linkedFromCase": ""
     },
@@ -1686,6 +1841,41 @@ const OFFLINE_DATA = {
       "createdDate": "02/08/2026",
       "source": "ข้อสอบจริง ปี 2561",
       "isActive": true,
+      "caseStatus": "Active",
+      "linkedNextCase": "",
+      "linkedFromCase": ""
+    },
+    {
+      "caseId": "OSPE-CL61205",
+      "title": "จับผิดใบสั่งยา (Prescription Screening)",
+      "category": "Clinic",
+      "mainGroup": "การตรวจสอบใบสั่งยา",
+      "subTopic": "",
+      "disease": "จับผิดใบสั่งยา",
+      "difficulty": 2,
+      "docId": "1ZNKvEBVAUeVcJ2GSH4gGKujA8whv7zY0fH4pXVEJa4g",
+      "author": "กุ๊กกุ๊ก",
+      "createdDate": "02/08/2026",
+      "source": "ข้อสอบจริง ปี 2561",
+      "isActive": false,
+      "caseStatus": "Unactive",
+      "linkedNextCase": "",
+      "linkedFromCase": ""
+    },
+    {
+      "caseId": "OSPE-CL61209",
+      "title": "แปลผล Lab ทางห้องปฏิบัติการ (Total CO2)",
+      "category": "Clinic",
+      "mainGroup": "การค้นข้อมูลและประสานงาน",
+      "subTopic": "",
+      "disease": "",
+      "difficulty": 2,
+      "docId": "1ZNKvEBVAUeVcJ2GSH4gGKujA8whv7zY0fH4pXVEJa4g",
+      "author": "กุ๊กกุ๊ก",
+      "createdDate": "02/08/2026",
+      "source": "ข้อสอบจริง ปี 2561",
+      "isActive": false,
+      "caseStatus": "Unactive",
       "linkedNextCase": "",
       "linkedFromCase": ""
     },
@@ -1702,6 +1892,7 @@ const OFFLINE_DATA = {
       "createdDate": "02/08/2026",
       "source": "ข้อสอบจริง ปี 2561",
       "isActive": true,
+      "caseStatus": "Active",
       "linkedNextCase": "",
       "linkedFromCase": ""
     },
@@ -1718,6 +1909,7 @@ const OFFLINE_DATA = {
       "createdDate": "02/08/2026",
       "source": "ข้อสอบจริง ปี 2561",
       "isActive": true,
+      "caseStatus": "Active",
       "linkedNextCase": "",
       "linkedFromCase": ""
     },
@@ -1734,6 +1926,7 @@ const OFFLINE_DATA = {
       "createdDate": "02/08/2026",
       "source": "ข้อสอบจริง ปี 2561",
       "isActive": true,
+      "caseStatus": "Active",
       "linkedNextCase": "",
       "linkedFromCase": ""
     },
@@ -1750,6 +1943,7 @@ const OFFLINE_DATA = {
       "createdDate": "13/07/2026",
       "source": "ข้อสอบจริง ปี 2562",
       "isActive": true,
+      "caseStatus": "Active",
       "linkedNextCase": "",
       "linkedFromCase": ""
     },
@@ -1766,6 +1960,7 @@ const OFFLINE_DATA = {
       "createdDate": "02/08/2026",
       "source": "ข้อสอบจริง ปี 2562",
       "isActive": true,
+      "caseStatus": "Active",
       "linkedNextCase": "",
       "linkedFromCase": ""
     },
@@ -1782,6 +1977,7 @@ const OFFLINE_DATA = {
       "createdDate": "02/08/2026",
       "source": "ข้อสอบจริง ปี 2562",
       "isActive": true,
+      "caseStatus": "Active",
       "linkedNextCase": "",
       "linkedFromCase": ""
     },
@@ -1798,6 +1994,7 @@ const OFFLINE_DATA = {
       "createdDate": "02/08/2026",
       "source": "ข้อสอบจริง ปี 2562",
       "isActive": true,
+      "caseStatus": "Active",
       "linkedNextCase": "",
       "linkedFromCase": ""
     },
@@ -1814,6 +2011,7 @@ const OFFLINE_DATA = {
       "createdDate": "02/08/2026",
       "source": "ข้อสอบจริง ปี 2562",
       "isActive": true,
+      "caseStatus": "Active",
       "linkedNextCase": "",
       "linkedFromCase": ""
     },
@@ -1830,6 +2028,58 @@ const OFFLINE_DATA = {
       "createdDate": "3/8/69",
       "source": "ข้อสอบจริง ปี 2566",
       "isActive": true,
+      "caseStatus": "Active",
+      "linkedNextCase": "",
+      "linkedFromCase": ""
+    },
+    {
+      "caseId": "OSPE-CL6605",
+      "title": "จ่ายยาและอธิบายวิธีการใช้ยา",
+      "category": "Clinic",
+      "mainGroup": "การให้คำแนะนำด้านยา",
+      "subTopic": "",
+      "disease": "Metrotrexate",
+      "difficulty": 2,
+      "docId": "1ZNKvEBVAUeVcJ2GSH4gGKujA8whv7zY0fH4pXVEJa4g",
+      "author": "ฟ้า เร้กเก้",
+      "createdDate": "3/8/69",
+      "source": "ข้อสอบจริง ปี 2566",
+      "isActive": false,
+      "caseStatus": "Unactive",
+      "linkedNextCase": "",
+      "linkedFromCase": ""
+    },
+    {
+      "caseId": "OSPE-CL6607",
+      "title": "ซักประวัติ",
+      "category": "Clinic",
+      "mainGroup": "การซักประวัติและจ่ายยา",
+      "subTopic": "",
+      "disease": "เชื้อราในช่องปากจากการใช้สเตียรอยด์พ่นคอ",
+      "difficulty": 2,
+      "docId": "1ZNKvEBVAUeVcJ2GSH4gGKujA8whv7zY0fH4pXVEJa4g",
+      "author": "ฟ้า เร้กเก้",
+      "createdDate": "3/8/69",
+      "source": "ข้อสอบจริง ปี 2566",
+      "isActive": false,
+      "caseStatus": "Unactive",
+      "linkedNextCase": "",
+      "linkedFromCase": ""
+    },
+    {
+      "caseId": "OSPE-CL6608",
+      "title": "อธิบายวิธีการใช้ยาคุมกำเนิด",
+      "category": "Clinic",
+      "mainGroup": "การให้คำแนะนำด้านยา",
+      "subTopic": "",
+      "disease": "ยาคุมกำเนิด",
+      "difficulty": 2,
+      "docId": "1ZNKvEBVAUeVcJ2GSH4gGKujA8whv7zY0fH4pXVEJa4g",
+      "author": "ฟ้า เร้กเก้",
+      "createdDate": "3/8/69",
+      "source": "ข้อสอบจริง ปี 2566",
+      "isActive": false,
+      "caseStatus": "Unactive",
       "linkedNextCase": "",
       "linkedFromCase": ""
     },
@@ -1846,6 +2096,7 @@ const OFFLINE_DATA = {
       "createdDate": "3/8/69",
       "source": "ข้อสอบจริง ปี 2566",
       "isActive": true,
+      "caseStatus": "Active",
       "linkedNextCase": "",
       "linkedFromCase": ""
     },
@@ -1862,6 +2113,7 @@ const OFFLINE_DATA = {
       "createdDate": "02/08/2026",
       "source": "ข้อสอบจริง ปี 2566",
       "isActive": true,
+      "caseStatus": "Active",
       "linkedNextCase": "",
       "linkedFromCase": ""
     },
@@ -1878,6 +2130,7 @@ const OFFLINE_DATA = {
       "createdDate": "3/8/69",
       "source": "ข้อสอบจริง ปี 2566",
       "isActive": true,
+      "caseStatus": "Active",
       "linkedNextCase": "",
       "linkedFromCase": ""
     },
@@ -1894,6 +2147,7 @@ const OFFLINE_DATA = {
       "createdDate": "3/8/69",
       "source": "ข้อสอบจริง ปี 2566",
       "isActive": true,
+      "caseStatus": "Active",
       "linkedNextCase": "",
       "linkedFromCase": ""
     },
@@ -1910,6 +2164,7 @@ const OFFLINE_DATA = {
       "createdDate": "3/8/1969",
       "source": "ข้อสอบจริง ปี 2568",
       "isActive": true,
+      "caseStatus": "Active",
       "linkedNextCase": "",
       "linkedFromCase": ""
     },
@@ -1926,6 +2181,41 @@ const OFFLINE_DATA = {
       "createdDate": "3/8/69",
       "source": "ข้อสอบจริง ปี 2568",
       "isActive": true,
+      "caseStatus": "Active",
+      "linkedNextCase": "",
+      "linkedFromCase": ""
+    },
+    {
+      "caseId": "OSPE-CL6807",
+      "title": "ซักประวัติและจ่ายยาในร้านยา",
+      "category": "Clinic",
+      "mainGroup": "การซักประวัติและจ่ายยา",
+      "subTopic": "",
+      "disease": "ADR",
+      "difficulty": 2,
+      "docId": "1ZNKvEBVAUeVcJ2GSH4gGKujA8whv7zY0fH4pXVEJa4g",
+      "author": "ฟ้า เร้กเก้",
+      "createdDate": "3/8/69",
+      "source": "ข้อสอบจริง ปี 2568",
+      "isActive": false,
+      "caseStatus": "Unactive",
+      "linkedNextCase": "",
+      "linkedFromCase": ""
+    },
+    {
+      "caseId": "OSPE-CL6808",
+      "title": "จ่ายยาตามใบสั่งยาและสอนยาเทคนิคพิเศษ",
+      "category": "Clinic",
+      "mainGroup": "การใช้ยาเทคนิคพิเศษ",
+      "subTopic": "",
+      "disease": "จ่ายยาเทคนิคพิเศษและสอนยาเทคนิคพิเศษ",
+      "difficulty": 2,
+      "docId": "1ZNKvEBVAUeVcJ2GSH4gGKujA8whv7zY0fH4pXVEJa4g",
+      "author": "ฟ้า เร้กเก้",
+      "createdDate": "3/8/69",
+      "source": "ข้อสอบจริง ปี 2568",
+      "isActive": false,
+      "caseStatus": "Unactive",
       "linkedNextCase": "",
       "linkedFromCase": ""
     },
@@ -1942,6 +2232,24 @@ const OFFLINE_DATA = {
       "createdDate": "3/8/69",
       "source": "ข้อสอบจริง ปี 2568",
       "isActive": true,
+      "caseStatus": "Active",
+      "linkedNextCase": "",
+      "linkedFromCase": ""
+    },
+    {
+      "caseId": "OSPE-CL6816",
+      "title": "ซักประวัติและจ่ายยา",
+      "category": "Clinic",
+      "mainGroup": "การซักประวัติและจ่ายยา",
+      "subTopic": "",
+      "disease": "แผลในปาก",
+      "difficulty": 2,
+      "docId": "1ZNKvEBVAUeVcJ2GSH4gGKujA8whv7zY0fH4pXVEJa4g",
+      "author": "ฟ้า เร้กเก้",
+      "createdDate": "3/8/69",
+      "source": "ข้อสอบจริง ปี 2568",
+      "isActive": false,
+      "caseStatus": "Unactive",
       "linkedNextCase": "",
       "linkedFromCase": ""
     },
@@ -1958,6 +2266,7 @@ const OFFLINE_DATA = {
       "createdDate": "30/09/2026",
       "source": "Mock RxCU83 Clinic ครั้งที่ 1",
       "isActive": true,
+      "caseStatus": "Active",
       "linkedNextCase": "",
       "linkedFromCase": ""
     },
@@ -1974,6 +2283,7 @@ const OFFLINE_DATA = {
       "createdDate": "30/09/2026",
       "source": "Mock RxCU83 Clinic ครั้งที่ 1",
       "isActive": true,
+      "caseStatus": "Active",
       "linkedNextCase": "",
       "linkedFromCase": ""
     },
@@ -1990,6 +2300,7 @@ const OFFLINE_DATA = {
       "createdDate": "30/09/2026",
       "source": "Mock RxCU83 Clinic ครั้งที่ 1",
       "isActive": true,
+      "caseStatus": "Active",
       "linkedNextCase": "",
       "linkedFromCase": ""
     },
@@ -2006,6 +2317,7 @@ const OFFLINE_DATA = {
       "createdDate": "30/09/2026",
       "source": "Mock RxCU83 Clinic ครั้งที่ 1",
       "isActive": true,
+      "caseStatus": "Active",
       "linkedNextCase": "",
       "linkedFromCase": ""
     },
@@ -2022,6 +2334,7 @@ const OFFLINE_DATA = {
       "createdDate": "30/09/2026",
       "source": "Mock RxCU83 Clinic ครั้งที่ 1",
       "isActive": true,
+      "caseStatus": "Active",
       "linkedNextCase": "",
       "linkedFromCase": ""
     },
@@ -2038,6 +2351,7 @@ const OFFLINE_DATA = {
       "createdDate": "30/09/2026",
       "source": "Mock RxCU83 Clinic ครั้งที่ 1",
       "isActive": true,
+      "caseStatus": "Active",
       "linkedNextCase": "",
       "linkedFromCase": ""
     },
@@ -2054,8 +2368,10 @@ const OFFLINE_DATA = {
       "createdDate": "30/09/2026",
       "source": "Mock RxCU83 Clinic ครั้งที่ 1",
       "isActive": true,
+      "caseStatus": "Active",
       "linkedNextCase": "",
-      "linkedFromCase": ""
+      "linkedFromCase": "",
+      "durationMin": 4
     },
     {
       "caseId": "OSPE-CL83M109",
@@ -2070,6 +2386,7 @@ const OFFLINE_DATA = {
       "createdDate": "30/09/2026",
       "source": "Mock RxCU83 Clinic ครั้งที่ 1",
       "isActive": true,
+      "caseStatus": "Active",
       "linkedNextCase": "",
       "linkedFromCase": ""
     },
@@ -2086,6 +2403,7 @@ const OFFLINE_DATA = {
       "createdDate": "30/09/2026",
       "source": "Mock RxCU83 Clinic ครั้งที่ 1",
       "isActive": true,
+      "caseStatus": "Active",
       "linkedNextCase": "",
       "linkedFromCase": ""
     },
@@ -2102,6 +2420,7 @@ const OFFLINE_DATA = {
       "createdDate": "30/09/2026",
       "source": "Mock RxCU83 Clinic ครั้งที่ 1",
       "isActive": true,
+      "caseStatus": "Active",
       "linkedNextCase": "",
       "linkedFromCase": ""
     },
@@ -2118,6 +2437,7 @@ const OFFLINE_DATA = {
       "createdDate": "30/09/2026",
       "source": "Mock RxCU83 Clinic ครั้งที่ 1",
       "isActive": true,
+      "caseStatus": "Active",
       "linkedNextCase": "",
       "linkedFromCase": ""
     },
@@ -2134,6 +2454,7 @@ const OFFLINE_DATA = {
       "createdDate": "30/09/2026",
       "source": "Mock RxCU83 Clinic ครั้งที่ 2",
       "isActive": true,
+      "caseStatus": "Active",
       "linkedNextCase": "",
       "linkedFromCase": ""
     },
@@ -2150,6 +2471,7 @@ const OFFLINE_DATA = {
       "createdDate": "30/09/2026",
       "source": "Mock RxCU83 Clinic ครั้งที่ 2",
       "isActive": true,
+      "caseStatus": "Active",
       "linkedNextCase": "",
       "linkedFromCase": ""
     },
@@ -2166,6 +2488,7 @@ const OFFLINE_DATA = {
       "createdDate": "30/09/2026",
       "source": "Mock RxCU83 Clinic ครั้งที่ 2",
       "isActive": true,
+      "caseStatus": "Active",
       "linkedNextCase": "",
       "linkedFromCase": ""
     },
@@ -2182,6 +2505,7 @@ const OFFLINE_DATA = {
       "createdDate": "30/09/2026",
       "source": "Mock RxCU83 Clinic ครั้งที่ 2",
       "isActive": true,
+      "caseStatus": "Active",
       "linkedNextCase": "",
       "linkedFromCase": ""
     },
@@ -2198,6 +2522,7 @@ const OFFLINE_DATA = {
       "createdDate": "30/09/2026",
       "source": "Mock RxCU83 Clinic ครั้งที่ 2",
       "isActive": true,
+      "caseStatus": "Active",
       "linkedNextCase": "",
       "linkedFromCase": ""
     },
@@ -2214,6 +2539,7 @@ const OFFLINE_DATA = {
       "createdDate": "30/09/2026",
       "source": "Mock RxCU83 Clinic ครั้งที่ 2",
       "isActive": true,
+      "caseStatus": "Active",
       "linkedNextCase": "",
       "linkedFromCase": ""
     },
@@ -2230,6 +2556,7 @@ const OFFLINE_DATA = {
       "createdDate": "30/09/2026",
       "source": "Mock RxCU83 Clinic ครั้งที่ 2",
       "isActive": true,
+      "caseStatus": "Active",
       "linkedNextCase": "",
       "linkedFromCase": ""
     },
@@ -2246,6 +2573,7 @@ const OFFLINE_DATA = {
       "createdDate": "30/09/2026",
       "source": "Mock RxCU83 Clinic ครั้งที่ 2",
       "isActive": true,
+      "caseStatus": "Active",
       "linkedNextCase": "",
       "linkedFromCase": ""
     },
@@ -2262,6 +2590,7 @@ const OFFLINE_DATA = {
       "createdDate": "30/09/2026",
       "source": "Mock RxCU83 Clinic ครั้งที่ 2",
       "isActive": true,
+      "caseStatus": "Active",
       "linkedNextCase": "",
       "linkedFromCase": ""
     },
@@ -2278,6 +2607,7 @@ const OFFLINE_DATA = {
       "createdDate": "30/09/2026",
       "source": "Mock RxCU83 Clinic ครั้งที่ 2",
       "isActive": true,
+      "caseStatus": "Active",
       "linkedNextCase": "",
       "linkedFromCase": ""
     },
@@ -2294,6 +2624,7 @@ const OFFLINE_DATA = {
       "createdDate": "30/09/2026",
       "source": "Mock RxCU83 Clinic ครั้งที่ 2",
       "isActive": true,
+      "caseStatus": "Active",
       "linkedNextCase": "",
       "linkedFromCase": ""
     },
@@ -2310,6 +2641,7 @@ const OFFLINE_DATA = {
       "createdDate": "30/09/2026",
       "source": "Mock RxCU83 Clinic ครั้งที่ 2",
       "isActive": true,
+      "caseStatus": "Active",
       "linkedNextCase": "",
       "linkedFromCase": ""
     },
@@ -2326,9 +2658,9 @@ const OFFLINE_DATA = {
       "createdDate": "30/09/2026",
       "source": "Practice RxCU84 Clinic ครั้งที่ 1",
       "isActive": true,
+      "caseStatus": "Active",
       "linkedNextCase": "",
-      "linkedFromCase": "",
-      "caseStatus": "Active"
+      "linkedFromCase": ""
     },
     {
       "caseId": "OSPE-CL84DM02",
@@ -2343,9 +2675,9 @@ const OFFLINE_DATA = {
       "createdDate": "30/09/2026",
       "source": "Practice RxCU84 Clinic ครั้งที่ 1",
       "isActive": true,
+      "caseStatus": "Active",
       "linkedNextCase": "",
-      "linkedFromCase": "",
-      "caseStatus": "Active"
+      "linkedFromCase": ""
     },
     {
       "caseId": "OSPE-CL84DM03",
@@ -2360,9 +2692,9 @@ const OFFLINE_DATA = {
       "createdDate": "30/09/2026",
       "source": "Practice RxCU84 Clinic ครั้งที่ 1",
       "isActive": true,
+      "caseStatus": "Active",
       "linkedNextCase": "",
-      "linkedFromCase": "",
-      "caseStatus": "Active"
+      "linkedFromCase": ""
     },
     {
       "caseId": "OSPE-CL84DM04",
@@ -2377,9 +2709,9 @@ const OFFLINE_DATA = {
       "createdDate": "30/09/2026",
       "source": "Practice RxCU84 Clinic ครั้งที่ 1",
       "isActive": true,
+      "caseStatus": "Active",
       "linkedNextCase": "",
-      "linkedFromCase": "",
-      "caseStatus": "Active"
+      "linkedFromCase": ""
     },
     {
       "caseId": "OSPE-CL84DM05",
@@ -2394,9 +2726,9 @@ const OFFLINE_DATA = {
       "createdDate": "30/09/2026",
       "source": "Practice RxCU84 Clinic ครั้งที่ 1",
       "isActive": true,
+      "caseStatus": "Active",
       "linkedNextCase": "",
-      "linkedFromCase": "",
-      "caseStatus": "Active"
+      "linkedFromCase": ""
     },
     {
       "caseId": "OSPE-CL84DM06",
@@ -2411,9 +2743,9 @@ const OFFLINE_DATA = {
       "createdDate": "30/09/2026",
       "source": "Practice RxCU84 Clinic ครั้งที่ 1",
       "isActive": true,
+      "caseStatus": "Active",
       "linkedNextCase": "",
-      "linkedFromCase": "",
-      "caseStatus": "Active"
+      "linkedFromCase": ""
     },
     {
       "caseId": "OSPE-CL84EE01",
@@ -2428,9 +2760,9 @@ const OFFLINE_DATA = {
       "createdDate": "30/09/2026",
       "source": "Practice RxCU84 Clinic ครั้งที่ 1",
       "isActive": true,
+      "caseStatus": "Active",
       "linkedNextCase": "",
-      "linkedFromCase": "",
-      "caseStatus": "Active"
+      "linkedFromCase": ""
     },
     {
       "caseId": "OSPE-CL84EE02",
@@ -2445,9 +2777,9 @@ const OFFLINE_DATA = {
       "createdDate": "30/09/2026",
       "source": "Practice RxCU84 Clinic ครั้งที่ 1",
       "isActive": true,
+      "caseStatus": "Active",
       "linkedNextCase": "",
-      "linkedFromCase": "",
-      "caseStatus": "Active"
+      "linkedFromCase": ""
     },
     {
       "caseId": "OSPE-CL84EE03",
@@ -2462,9 +2794,9 @@ const OFFLINE_DATA = {
       "createdDate": "30/09/2026",
       "source": "Practice RxCU84 Clinic ครั้งที่ 1",
       "isActive": true,
+      "caseStatus": "Active",
       "linkedNextCase": "",
-      "linkedFromCase": "",
-      "caseStatus": "Active"
+      "linkedFromCase": ""
     },
     {
       "caseId": "OSPE-CL84EE04",
@@ -2479,9 +2811,9 @@ const OFFLINE_DATA = {
       "createdDate": "30/09/2026",
       "source": "Practice RxCU84 Clinic ครั้งที่ 1",
       "isActive": true,
+      "caseStatus": "Active",
       "linkedNextCase": "",
-      "linkedFromCase": "",
-      "caseStatus": "Active"
+      "linkedFromCase": ""
     },
     {
       "caseId": "OSPE-CL84EE05",
@@ -2496,9 +2828,9 @@ const OFFLINE_DATA = {
       "createdDate": "30/09/2026",
       "source": "Practice RxCU84 Clinic ครั้งที่ 1",
       "isActive": true,
+      "caseStatus": "Active",
       "linkedNextCase": "",
-      "linkedFromCase": "",
-      "caseStatus": "Active"
+      "linkedFromCase": ""
     },
     {
       "caseId": "OSPE-CL84EE06",
@@ -2513,9 +2845,9 @@ const OFFLINE_DATA = {
       "createdDate": "30/09/2026",
       "source": "Practice RxCU84 Clinic ครั้งที่ 1",
       "isActive": true,
+      "caseStatus": "Active",
       "linkedNextCase": "",
-      "linkedFromCase": "",
-      "caseStatus": "Active"
+      "linkedFromCase": ""
     },
     {
       "caseId": "OSPE-CL84ENT01",
@@ -2530,9 +2862,9 @@ const OFFLINE_DATA = {
       "createdDate": "30/09/2026",
       "source": "Practice RxCU84 Clinic ครั้งที่ 1",
       "isActive": true,
+      "caseStatus": "Active",
       "linkedNextCase": "",
-      "linkedFromCase": "",
-      "caseStatus": "Active"
+      "linkedFromCase": ""
     },
     {
       "caseId": "OSPE-CL84ENT02",
@@ -2547,9 +2879,9 @@ const OFFLINE_DATA = {
       "createdDate": "30/09/2026",
       "source": "Practice RxCU84 Clinic ครั้งที่ 1",
       "isActive": true,
+      "caseStatus": "Active",
       "linkedNextCase": "",
-      "linkedFromCase": "",
-      "caseStatus": "Active"
+      "linkedFromCase": ""
     },
     {
       "caseId": "OSPE-CL84ENT03",
@@ -2564,9 +2896,9 @@ const OFFLINE_DATA = {
       "createdDate": "30/09/2026",
       "source": "Practice RxCU84 Clinic ครั้งที่ 1",
       "isActive": true,
+      "caseStatus": "Active",
       "linkedNextCase": "",
-      "linkedFromCase": "",
-      "caseStatus": "Active"
+      "linkedFromCase": ""
     },
     {
       "caseId": "OSPE-CL84ENT04",
@@ -2581,9 +2913,9 @@ const OFFLINE_DATA = {
       "createdDate": "30/09/2026",
       "source": "Practice RxCU84 Clinic ครั้งที่ 1",
       "isActive": true,
+      "caseStatus": "Active",
       "linkedNextCase": "",
-      "linkedFromCase": "",
-      "caseStatus": "Active"
+      "linkedFromCase": ""
     },
     {
       "caseId": "OSPE-CL84ENT05",
@@ -2598,9 +2930,9 @@ const OFFLINE_DATA = {
       "createdDate": "30/09/2026",
       "source": "Practice RxCU84 Clinic ครั้งที่ 1",
       "isActive": true,
+      "caseStatus": "Active",
       "linkedNextCase": "",
-      "linkedFromCase": "",
-      "caseStatus": "Active"
+      "linkedFromCase": ""
     },
     {
       "caseId": "OSPE-CL84ENT06",
@@ -2615,9 +2947,9 @@ const OFFLINE_DATA = {
       "createdDate": "30/09/2026",
       "source": "Practice RxCU84 Clinic ครั้งที่ 1",
       "isActive": true,
+      "caseStatus": "Active",
       "linkedNextCase": "",
-      "linkedFromCase": "",
-      "caseStatus": "Active"
+      "linkedFromCase": ""
     },
     {
       "caseId": "OSPE-CL84GI01",
@@ -2632,9 +2964,9 @@ const OFFLINE_DATA = {
       "createdDate": "30/09/2026",
       "source": "Practice RxCU84 Clinic ครั้งที่ 1",
       "isActive": true,
+      "caseStatus": "Active",
       "linkedNextCase": "",
-      "linkedFromCase": "",
-      "caseStatus": "Active"
+      "linkedFromCase": ""
     },
     {
       "caseId": "OSPE-CL84GI02",
@@ -2649,9 +2981,9 @@ const OFFLINE_DATA = {
       "createdDate": "30/09/2026",
       "source": "Practice RxCU84 Clinic ครั้งที่ 1",
       "isActive": true,
+      "caseStatus": "Active",
       "linkedNextCase": "",
-      "linkedFromCase": "",
-      "caseStatus": "Active"
+      "linkedFromCase": ""
     },
     {
       "caseId": "OSPE-CL84GI03",
@@ -2666,9 +2998,9 @@ const OFFLINE_DATA = {
       "createdDate": "30/09/2026",
       "source": "Practice RxCU84 Clinic ครั้งที่ 1",
       "isActive": true,
+      "caseStatus": "Active",
       "linkedNextCase": "",
-      "linkedFromCase": "",
-      "caseStatus": "Active"
+      "linkedFromCase": ""
     },
     {
       "caseId": "OSPE-CL84GI04",
@@ -2683,9 +3015,9 @@ const OFFLINE_DATA = {
       "createdDate": "30/09/2026",
       "source": "Practice RxCU84 Clinic ครั้งที่ 1",
       "isActive": true,
+      "caseStatus": "Active",
       "linkedNextCase": "",
-      "linkedFromCase": "",
-      "caseStatus": "Active"
+      "linkedFromCase": ""
     },
     {
       "caseId": "OSPE-CL84GI05",
@@ -2700,9 +3032,9 @@ const OFFLINE_DATA = {
       "createdDate": "30/09/2026",
       "source": "Practice RxCU84 Clinic ครั้งที่ 1",
       "isActive": true,
+      "caseStatus": "Active",
       "linkedNextCase": "",
-      "linkedFromCase": "",
-      "caseStatus": "Active"
+      "linkedFromCase": ""
     },
     {
       "caseId": "OSPE-CL84GI06",
@@ -2717,9 +3049,9 @@ const OFFLINE_DATA = {
       "createdDate": "30/09/2026",
       "source": "Practice RxCU84 Clinic ครั้งที่ 1",
       "isActive": true,
+      "caseStatus": "Active",
       "linkedNextCase": "",
-      "linkedFromCase": "",
-      "caseStatus": "Active"
+      "linkedFromCase": ""
     },
     {
       "caseId": "OSPE-CL84GI07",
@@ -2734,9 +3066,9 @@ const OFFLINE_DATA = {
       "createdDate": "30/09/2026",
       "source": "Practice RxCU84 Clinic ครั้งที่ 1",
       "isActive": true,
+      "caseStatus": "Active",
       "linkedNextCase": "",
-      "linkedFromCase": "",
-      "caseStatus": "Active"
+      "linkedFromCase": ""
     },
     {
       "caseId": "OSPE-CL84GY01",
@@ -2751,9 +3083,9 @@ const OFFLINE_DATA = {
       "createdDate": "30/09/2026",
       "source": "Practice RxCU84 Clinic ครั้งที่ 1",
       "isActive": true,
+      "caseStatus": "Active",
       "linkedNextCase": "",
-      "linkedFromCase": "",
-      "caseStatus": "Active"
+      "linkedFromCase": ""
     },
     {
       "caseId": "OSPE-CL84GY02",
@@ -2768,9 +3100,9 @@ const OFFLINE_DATA = {
       "createdDate": "30/09/2026",
       "source": "Practice RxCU84 Clinic ครั้งที่ 1",
       "isActive": true,
+      "caseStatus": "Active",
       "linkedNextCase": "",
-      "linkedFromCase": "",
-      "caseStatus": "Active"
+      "linkedFromCase": ""
     },
     {
       "caseId": "OSPE-CL84GY03",
@@ -2785,9 +3117,9 @@ const OFFLINE_DATA = {
       "createdDate": "30/09/2026",
       "source": "Practice RxCU84 Clinic ครั้งที่ 1",
       "isActive": true,
+      "caseStatus": "Active",
       "linkedNextCase": "",
-      "linkedFromCase": "",
-      "caseStatus": "Active"
+      "linkedFromCase": ""
     },
     {
       "caseId": "OSPE-CL84GY04",
@@ -2802,9 +3134,9 @@ const OFFLINE_DATA = {
       "createdDate": "30/09/2026",
       "source": "Practice RxCU84 Clinic ครั้งที่ 1",
       "isActive": true,
+      "caseStatus": "Active",
       "linkedNextCase": "",
-      "linkedFromCase": "",
-      "caseStatus": "Active"
+      "linkedFromCase": ""
     },
     {
       "caseId": "OSPE-CL84GY05",
@@ -2819,9 +3151,9 @@ const OFFLINE_DATA = {
       "createdDate": "30/09/2026",
       "source": "Practice RxCU84 Clinic ครั้งที่ 1",
       "isActive": true,
+      "caseStatus": "Active",
       "linkedNextCase": "",
-      "linkedFromCase": "",
-      "caseStatus": "Active"
+      "linkedFromCase": ""
     },
     {
       "caseId": "OSPE-CL84GY06",
@@ -2836,9 +3168,26 @@ const OFFLINE_DATA = {
       "createdDate": "30/09/2026",
       "source": "Practice RxCU84 Clinic ครั้งที่ 1",
       "isActive": true,
+      "caseStatus": "Active",
       "linkedNextCase": "",
-      "linkedFromCase": "",
-      "caseStatus": "Active"
+      "linkedFromCase": ""
+    },
+    {
+      "caseId": "OSPE-CL84OT01",
+      "title": "การให้คำปรึกษาและเลือกผลิตภัณฑ์ช่วยเลิกบุหรี่ด้วยเทคนิค Chew and Park",
+      "category": "Clinic",
+      "mainGroup": "การซักประวัติและจ่ายยา",
+      "subTopic": "",
+      "disease": "การเลิกบุหรี่ (Smoking Cessation), นิโคตินทดแทน (Nicotine Gum), เทคนิค Chew and Park, การประเมินระดับการติดนิโคติน (Fagerström Test)",
+      "difficulty": 2,
+      "docId": "1ZNKvEBVAUeVcJ2GSH4gGKujA8whv7zY0fH4pXVEJa4g",
+      "author": "คณะทำงานคลังข้อสอบร่วมสมรรถนะเภสัชกรรม (ระบบกลาง)",
+      "createdDate": "30/09/2026",
+      "source": "Practice RxCU84 Clinic ครั้งที่ 1",
+      "isActive": false,
+      "caseStatus": "Unactive",
+      "linkedNextCase": "",
+      "linkedFromCase": ""
     },
     {
       "caseId": "OSPE-CL84PN01",
@@ -2853,9 +3202,9 @@ const OFFLINE_DATA = {
       "createdDate": "30/09/2026",
       "source": "Practice RxCU84 Clinic ครั้งที่ 1",
       "isActive": true,
+      "caseStatus": "Active",
       "linkedNextCase": "",
-      "linkedFromCase": "",
-      "caseStatus": "Active"
+      "linkedFromCase": ""
     },
     {
       "caseId": "OSPE-CL84PN02",
@@ -2870,9 +3219,9 @@ const OFFLINE_DATA = {
       "createdDate": "30/09/2026",
       "source": "Practice RxCU84 Clinic ครั้งที่ 1",
       "isActive": true,
+      "caseStatus": "Active",
       "linkedNextCase": "",
-      "linkedFromCase": "",
-      "caseStatus": "Active"
+      "linkedFromCase": ""
     },
     {
       "caseId": "OSPE-CL84PN03",
@@ -2887,9 +3236,9 @@ const OFFLINE_DATA = {
       "createdDate": "30/09/2026",
       "source": "Practice RxCU84 Clinic ครั้งที่ 1",
       "isActive": true,
+      "caseStatus": "Active",
       "linkedNextCase": "",
-      "linkedFromCase": "",
-      "caseStatus": "Active"
+      "linkedFromCase": ""
     },
     {
       "caseId": "OSPE-CL84PN04",
@@ -2904,9 +3253,9 @@ const OFFLINE_DATA = {
       "createdDate": "30/09/2026",
       "source": "Practice RxCU84 Clinic ครั้งที่ 1",
       "isActive": true,
+      "caseStatus": "Active",
       "linkedNextCase": "",
-      "linkedFromCase": "",
-      "caseStatus": "Active"
+      "linkedFromCase": ""
     },
     {
       "caseId": "OSPE-CL84PN05",
@@ -2921,9 +3270,9 @@ const OFFLINE_DATA = {
       "createdDate": "30/09/2026",
       "source": "Practice RxCU84 Clinic ครั้งที่ 1",
       "isActive": true,
+      "caseStatus": "Active",
       "linkedNextCase": "",
-      "linkedFromCase": "",
-      "caseStatus": "Active"
+      "linkedFromCase": ""
     },
     {
       "caseId": "OSPE-CL84PN06",
@@ -2938,9 +3287,43 @@ const OFFLINE_DATA = {
       "createdDate": "30/09/2026",
       "source": "Practice RxCU84 Clinic ครั้งที่ 1",
       "isActive": true,
+      "caseStatus": "Active",
       "linkedNextCase": "",
-      "linkedFromCase": "",
-      "caseStatus": "Active"
+      "linkedFromCase": ""
+    },
+    {
+      "caseId": "OSPE-CL84PR01",
+      "title": "การประเมินและเลือกจ่ายยาในโรคหิดและการจัดการครอบครัว",
+      "category": "Clinic",
+      "mainGroup": "การซักประวัติและจ่ายยา",
+      "subTopic": "",
+      "disease": "หิด (Scabies), Sarcoptes scabiei, 5% Permethrin Cream, การรักษาบุคคลในครอบครัวพร้อมกัน",
+      "difficulty": 2,
+      "docId": "1ZNKvEBVAUeVcJ2GSH4gGKujA8whv7zY0fH4pXVEJa4g",
+      "author": "คณะทำงานคลังข้อสอบร่วมสมรรถนะเภสัชกรรม (ระบบกลาง)",
+      "createdDate": "30/09/2026",
+      "source": "Practice RxCU84 Clinic ครั้งที่ 1",
+      "isActive": false,
+      "caseStatus": "Unactive",
+      "linkedNextCase": "",
+      "linkedFromCase": ""
+    },
+    {
+      "caseId": "OSPE-CL84PR02",
+      "title": "การประเมินและเลือกจ่ายยาในโรคเหาและการปฏิบัติสุขอนามัย",
+      "category": "Clinic",
+      "mainGroup": "การซักประวัติและจ่ายยา",
+      "subTopic": "",
+      "disease": "เหา (Head Lice / Pediculosis capitis), Pediculus humanus capitis, 1% Permethrin Lotion, การใช้หวีเสนียด",
+      "difficulty": 2,
+      "docId": "1ZNKvEBVAUeVcJ2GSH4gGKujA8whv7zY0fH4pXVEJa4g",
+      "author": "คณะทำงานคลังข้อสอบร่วมสมรรถนะเภสัชกรรม (ระบบกลาง)",
+      "createdDate": "30/09/2026",
+      "source": "Practice RxCU84 Clinic ครั้งที่ 1",
+      "isActive": false,
+      "caseStatus": "Unactive",
+      "linkedNextCase": "",
+      "linkedFromCase": ""
     },
     {
       "caseId": "OSPE-CL84PR03",
@@ -2955,41 +3338,49 @@ const OFFLINE_DATA = {
       "createdDate": "30/09/2026",
       "source": "Practice RxCU84 Clinic ครั้งที่ 1",
       "isActive": true,
+      "caseStatus": "Active",
       "linkedNextCase": "",
-      "linkedFromCase": "",
-      "caseStatus": "Active"
+      "linkedFromCase": ""
     },
     {
       "caseId": "OSPE-CLM101",
-      "title": "Untitled Case",
+      "title": "OSPE-CLM101",
       "category": "Clinic",
-      "mainGroup": "",
-      "subTopic": "",
-      "disease": "",
+      "mainGroup": "Mock Exam 2569",
+      "subTopic": "🔒 ข้อสอบลับ (ต้องใช้รหัสผ่าน)",
+      "disease": "🔒 ล็อกด้วยรหัสผ่าน (Secret Mock)",
       "difficulty": 2,
       "docId": "1ZNKvEBVAUeVcJ2GSH4gGKujA8whv7zY0fH4pXVEJa4g",
       "author": "",
       "createdDate": "15/10/2569",
       "source": "Mock Clinic RxCU84 Set A",
       "isActive": true,
+      "caseStatus": "Active",
       "linkedNextCase": "",
-      "linkedFromCase": ""
+      "linkedFromCase": "",
+      "durationMin": 4,
+      "isProtected": true,
+      "hasPassword": true
     },
     {
       "caseId": "OSPE-CLM102",
-      "title": "Untitled Case",
+      "title": "OSPE-CLM102",
       "category": "Clinic",
-      "mainGroup": "",
-      "subTopic": "",
-      "disease": "",
+      "mainGroup": "Mock Exam 2569",
+      "subTopic": "🔒 ข้อสอบลับ (ต้องใช้รหัสผ่าน)",
+      "disease": "🔒 ล็อกด้วยรหัสผ่าน (Secret Mock)",
       "difficulty": 2,
       "docId": "1ZNKvEBVAUeVcJ2GSH4gGKujA8whv7zY0fH4pXVEJa4g",
       "author": "",
       "createdDate": "15/10/2569",
       "source": "Mock Clinic RxCU84 Set A",
       "isActive": true,
+      "caseStatus": "Active",
       "linkedNextCase": "",
-      "linkedFromCase": ""
+      "linkedFromCase": "",
+      "durationMin": 4,
+      "isProtected": true,
+      "hasPassword": true
     },
     {
       "caseId": "OSPE-CLSD01",
@@ -3004,9 +3395,9 @@ const OFFLINE_DATA = {
       "createdDate": "30/09/2026",
       "source": "Practice RxCU84 Clinic ครั้งที่ 1",
       "isActive": true,
+      "caseStatus": "Active",
       "linkedNextCase": "",
-      "linkedFromCase": "",
-      "caseStatus": "Active"
+      "linkedFromCase": ""
     },
     {
       "caseId": "OSPE-CLSD02",
@@ -3021,9 +3412,9 @@ const OFFLINE_DATA = {
       "createdDate": "30/09/2026",
       "source": "Practice RxCU84 Clinic ครั้งที่ 1",
       "isActive": true,
+      "caseStatus": "Active",
       "linkedNextCase": "",
-      "linkedFromCase": "",
-      "caseStatus": "Active"
+      "linkedFromCase": ""
     },
     {
       "caseId": "OSPE-CLSD03",
@@ -3038,9 +3429,9 @@ const OFFLINE_DATA = {
       "createdDate": "30/09/2026",
       "source": "Practice RxCU84 Clinic ครั้งที่ 1",
       "isActive": true,
+      "caseStatus": "Active",
       "linkedNextCase": "",
-      "linkedFromCase": "",
-      "caseStatus": "Active"
+      "linkedFromCase": ""
     },
     {
       "caseId": "OSPE-CLSD04",
@@ -3055,9 +3446,9 @@ const OFFLINE_DATA = {
       "createdDate": "30/09/2026",
       "source": "Practice RxCU84 Clinic ครั้งที่ 1",
       "isActive": true,
+      "caseStatus": "Active",
       "linkedNextCase": "",
-      "linkedFromCase": "",
-      "caseStatus": "Active"
+      "linkedFromCase": ""
     },
     {
       "caseId": "OSPE-CLSD05",
@@ -3072,9 +3463,9 @@ const OFFLINE_DATA = {
       "createdDate": "30/09/2026",
       "source": "Practice RxCU84 Clinic ครั้งที่ 1",
       "isActive": true,
+      "caseStatus": "Active",
       "linkedNextCase": "",
-      "linkedFromCase": "",
-      "caseStatus": "Active"
+      "linkedFromCase": ""
     },
     {
       "caseId": "OSPE-CLSD06",
@@ -3089,9 +3480,9 @@ const OFFLINE_DATA = {
       "createdDate": "30/09/2026",
       "source": "Practice RxCU84 Clinic ครั้งที่ 1",
       "isActive": true,
+      "caseStatus": "Active",
       "linkedNextCase": "",
-      "linkedFromCase": "",
-      "caseStatus": "Active"
+      "linkedFromCase": ""
     },
     {
       "caseId": "OSPE-CLSD07",
@@ -3106,9 +3497,9 @@ const OFFLINE_DATA = {
       "createdDate": "30/09/2026",
       "source": "Practice RxCU84 Clinic ครั้งที่ 1",
       "isActive": true,
+      "caseStatus": "Active",
       "linkedNextCase": "",
-      "linkedFromCase": "",
-      "caseStatus": "Active"
+      "linkedFromCase": ""
     },
     {
       "caseId": "OSPE-CLSD08",
@@ -3123,329 +3514,817 @@ const OFFLINE_DATA = {
       "createdDate": "15/10/2026",
       "source": "Practice RxCU84 Clinic ครั้งที่ 1",
       "isActive": true,
+      "caseStatus": "Active",
       "linkedNextCase": "",
-      "linkedFromCase": "",
-      "caseStatus": "Active"
+      "linkedFromCase": ""
+    },
+    {
+      "caseId": "OSPE-CLSD09",
+      "title": "การแนะนำการใช้ยาพ่นจมูก (Nasal Spray)",
+      "category": "Clinic",
+      "mainGroup": "การใช้ยาเทคนิคพิเศษ",
+      "subTopic": "",
+      "disease": "โรคจมูกอักเสบจากภูมิแพ้ (Allergic Rhinitis), Fluticasone furoate (Avamys Nasal Spray), เทคนิคการก้มหน้าและเล็งปลายออกจากผนังกั้นช่องจมูก",
+      "difficulty": 2,
+      "docId": "1ZNKvEBVAUeVcJ2GSH4gGKujA8whv7zY0fH4pXVEJa4g",
+      "author": "คณะทำงานคลังข้อสอบร่วมสมรรถนะเภสัชกรรม (ระบบกลาง)",
+      "createdDate": "30/09/2026",
+      "source": "Practice RxCU84 Clinic ครั้งที่ 1",
+      "isActive": false,
+      "caseStatus": "Unactive",
+      "linkedNextCase": "",
+      "linkedFromCase": ""
+    },
+    {
+      "caseId": "OSPE-CLSD10",
+      "title": "การแนะนำการใช้ยาหยอดจมูก (Nasal Drops)",
+      "category": "Clinic",
+      "mainGroup": "การใช้ยาเทคนิคพิเศษ",
+      "subTopic": "",
+      "disease": "ภาวะคัดจมูกรุนแรง (Nasal Congestion), ยาหยอดจมูกลดคัดจมูก (Oxymetazoline Nasal Drops), ท่าทางการนอนหงายศีรษะพ้นขอบเตียง และคำเตือน Rhinitis Medicamentosa",
+      "difficulty": 2,
+      "docId": "1ZNKvEBVAUeVcJ2GSH4gGKujA8whv7zY0fH4pXVEJa4g",
+      "author": "คณะทำงานคลังข้อสอบร่วมสมรรถนะเภสัชกรรม (ระบบกลาง)",
+      "createdDate": "30/09/2026",
+      "source": "Practice RxCU84 Clinic ครั้งที่ 1",
+      "isActive": false,
+      "caseStatus": "Unactive",
+      "linkedNextCase": "",
+      "linkedFromCase": ""
+    },
+    {
+      "caseId": "OSPE-CLSD11",
+      "title": "การแนะนำการล้างจมูกด้วยน้ำเกลือ (0.9% Normal Saline Nasal Irrigation)",
+      "category": "Clinic",
+      "mainGroup": "การใช้ยาเทคนิคพิเศษ",
+      "subTopic": "",
+      "disease": "โรคไซนัสอักเสบและภูมิแพ้ (Allergic Rhinitis / Sinusitis), การล้างโพรงจมูกด้วย 0.9% Normal Saline Solution, เทคนิคก้มหน้า อ้าปาก และออกเสียง \"อา...\" ป้องกันการสำลัก",
+      "difficulty": 2,
+      "docId": "1ZNKvEBVAUeVcJ2GSH4gGKujA8whv7zY0fH4pXVEJa4g",
+      "author": "คณะทำงานคลังข้อสอบร่วมสมรรถนะเภสัชกรรม (ระบบกลาง)",
+      "createdDate": "30/09/2026",
+      "source": "Practice RxCU84 Clinic ครั้งที่ 1",
+      "isActive": false,
+      "caseStatus": "Unactive",
+      "linkedNextCase": "",
+      "linkedFromCase": ""
+    },
+    {
+      "caseId": "OSPE-CLSD12",
+      "title": "การแนะนำการใช้ยาหยอดหู (Ear Drops)",
+      "category": "Clinic",
+      "mainGroup": "การใช้ยาเทคนิคพิเศษ",
+      "subTopic": "",
+      "disease": "โรคหูชั้นนอกอักเสบ (Otitis Externa), ยาหยอดหูปฏิชีวนะ (Ofloxacin Ear Drops), เทคนิคการอุ่นขวดยาในอุ้งมือ และการดึงใบหูในผู้ใหญ่ vs เด็ก",
+      "difficulty": 2,
+      "docId": "1ZNKvEBVAUeVcJ2GSH4gGKujA8whv7zY0fH4pXVEJa4g",
+      "author": "คณะทำงานคลังข้อสอบร่วมสมรรถนะเภสัชกรรม (ระบบกลาง)",
+      "createdDate": "30/09/2026",
+      "source": "Practice RxCU84 Clinic ครั้งที่ 1",
+      "isActive": false,
+      "caseStatus": "Unactive",
+      "linkedNextCase": "",
+      "linkedFromCase": ""
+    },
+    {
+      "caseId": "OSPE-CLSD13",
+      "title": "การแนะนำการใช้ยาหยอดตา (Eye Drops)",
+      "category": "Clinic",
+      "mainGroup": "การใช้ยาเทคนิคพิเศษ",
+      "subTopic": "",
+      "disease": "โรคเยื่อบุตาอักเสบจากแบคทีเรีย (Bacterial Conjunctivitis), ยาหยอดตา Poly-Oph® eye drops, การวางฝาหงาย, เทคนิคการหยอดเข้ากระพุ้งตาล่าง, และเทคนิคกดหัวตา (Nasolacrimal Occlusion: NLO)",
+      "difficulty": 2,
+      "docId": "1ZNKvEBVAUeVcJ2GSH4gGKujA8whv7zY0fH4pXVEJa4g",
+      "author": "คณะทำงานคลังข้อสอบร่วมสมรรถนะเภสัชกรรม (ระบบกลาง)",
+      "createdDate": "30/09/2026",
+      "source": "Practice RxCU84 Clinic ครั้งที่ 1",
+      "isActive": false,
+      "caseStatus": "Unactive",
+      "linkedNextCase": "",
+      "linkedFromCase": ""
+    },
+    {
+      "caseId": "OSPE-CLSD14",
+      "title": "การแนะนำการใช้ยาป้ายตา (Eye Ointments)",
+      "category": "Clinic",
+      "mainGroup": "การใช้ยาเทคนิคพิเศษ",
+      "subTopic": "",
+      "disease": "การรักษาการติดเชื้อที่ตาด้วยยาป้ายตา, ยาป้ายตา Terramycin® ophthalmic ointment, เทคนิคการป้ายยา 1 เซนติเมตร, ข้อควรระวังเรื่องตาพร่ามัว, และระยะเวลาเว้นห่างเมื่อใช้ร่วมกับยาหยอดตา",
+      "difficulty": 2,
+      "docId": "1ZNKvEBVAUeVcJ2GSH4gGKujA8whv7zY0fH4pXVEJa4g",
+      "author": "คณะทำงานคลังข้อสอบร่วมสมรรถนะเภสัชกรรม (ระบบกลาง)",
+      "createdDate": "30/09/2026",
+      "source": "Practice RxCU84 Clinic ครั้งที่ 1",
+      "isActive": false,
+      "caseStatus": "Unactive",
+      "linkedNextCase": "",
+      "linkedFromCase": ""
+    },
+    {
+      "caseId": "OSPE-CLSD15",
+      "title": "การแนะนำการใช้ยาอมใต้ลิ้นบรรเทาอาการเจ็บเค้นอก (Sublingual Nitrate Tablets)",
+      "category": "Clinic",
+      "mainGroup": "การใช้ยาเทคนิคพิเศษ",
+      "subTopic": "",
+      "disease": "ภาวะหัวใจขาดเลือดและเจ็บเค้นอกเฉียบพลัน (Angina Pectoris), ยาอมใต้ลิ้น Glyceryl Trinitrate / Isosorbide Dinitrate, กฎการอมซ้ำทุก 5 นาที และข้อห้ามใช้ร่วมกับ PDE-5 Inhibitors",
+      "difficulty": 2,
+      "docId": "1ZNKvEBVAUeVcJ2GSH4gGKujA8whv7zY0fH4pXVEJa4g",
+      "author": "คณะทำงานคลังข้อสอบร่วมสมรรถนะเภสัชกรรม (ระบบกลาง)",
+      "createdDate": "30/09/2026",
+      "source": "Practice RxCU84 Clinic ครั้งที่ 1",
+      "isActive": false,
+      "caseStatus": "Unactive",
+      "linkedNextCase": "",
+      "linkedFromCase": ""
+    },
+    {
+      "caseId": "OSPE-CLSD16",
+      "title": "การแนะนำการใช้ยาเหน็บทวารหนักและยาสวนทวารหนัก (Rectal Suppositories & Enema)",
+      "category": "Clinic",
+      "mainGroup": "การใช้ยาเทคนิคพิเศษ",
+      "subTopic": "",
+      "disease": "ภาวะท้องผูกรุนแรง (Severe Constipation), ยาเหน็บทวารหนัก Bisacodyl Suppository, ยาสวนทวารหนัก Sodium Phosphate Enema, ท่านอนตะแคงงอเข่า และระยะเวลาการกักยา",
+      "difficulty": 2,
+      "docId": "1ZNKvEBVAUeVcJ2GSH4gGKujA8whv7zY0fH4pXVEJa4g",
+      "author": "คณะทำงานคลังข้อสอบร่วมสมรรถนะเภสัชกรรม (ระบบกลาง)",
+      "createdDate": "30/09/2026",
+      "source": "Practice RxCU84 Clinic ครั้งที่ 1",
+      "isActive": false,
+      "caseStatus": "Unactive",
+      "linkedNextCase": "",
+      "linkedFromCase": ""
+    },
+    {
+      "caseId": "OSPE-CLSD17",
+      "title": "การแนะนำการใช้ยาเหน็บช่องคลอดและอุปกรณ์ช่วยสอด (Vaginal Suppositories & Tablets with Applicator)",
+      "category": "Clinic",
+      "mainGroup": "การใช้ยาเทคนิคพิเศษ",
+      "subTopic": "",
+      "disease": "โรคเชื้อราในช่องคลอด (Vulvovaginal Candidiasis), ยาเหน็บช่องคลอด Clotrimazole Vaginal Tablet, เทคนิคจุ่มน้ำ 1–2 วินาที, ท่าชันเข่า และการใช้อุปกรณ์ช่วยสอด (Applicator)",
+      "difficulty": 2,
+      "docId": "1ZNKvEBVAUeVcJ2GSH4gGKujA8whv7zY0fH4pXVEJa4g",
+      "author": "คณะทำงานคลังข้อสอบร่วมสมรรถนะเภสัชกรรม (ระบบกลาง)",
+      "createdDate": "30/09/2026",
+      "source": "Practice RxCU84 Clinic ครั้งที่ 1",
+      "isActive": false,
+      "caseStatus": "Unactive",
+      "linkedNextCase": "",
+      "linkedFromCase": ""
+    },
+    {
+      "caseId": "OSPE-CLSD18",
+      "title": "การแนะนำการใช้ยาฉีดอินซูลินชนิดปากกาและกระบอกฉีดยา (Insulin Pen & Syringe Administration)",
+      "category": "Clinic",
+      "mainGroup": "การใช้ยาเทคนิคพิเศษ",
+      "subTopic": "",
+      "disease": "โรคเบาหวานชนิดที่ 2 (Type 2 Diabetes Mellitus), ปากกาฉีดอินซูลินชนิดผสมสำเร็จ (Premixed Insulin Pen: Mixtard 30 FlexPen), เทคนิคการผสมยาขุ่น (Roll & Invert), การทดสอบการไหล (Air Shot / Prime 2 Units) และกฎค้างเข็ม 10 วินาที",
+      "difficulty": 2,
+      "docId": "1ZNKvEBVAUeVcJ2GSH4gGKujA8whv7zY0fH4pXVEJa4g",
+      "author": "คณะทำงานคลังข้อสอบร่วมสมรรถนะเภสัชกรรม (ระบบกลาง)",
+      "createdDate": "30/09/2026",
+      "source": "Practice RxCU84 Clinic ครั้งที่ 1",
+      "isActive": false,
+      "caseStatus": "Unactive",
+      "linkedNextCase": "",
+      "linkedFromCase": ""
+    },
+    {
+      "caseId": "OSPE-CLSD19",
+      "title": "การดูดผสมยาฉีดอินซูลินชนิดน้ำใสและน้ำขุ่นด้วยกระบอกฉีดยา (Insulin Vial & Syringe: Clear before Cloudy)",
+      "category": "Clinic",
+      "mainGroup": "การใช้ยาเทคนิคพิเศษ",
+      "subTopic": "",
+      "disease": "โรคเบาหวานชนิดที่ 1/2 (Diabetes Mellitus), การบริหาร Regular Insulin (RI) ร่วมกับ NPH Insulin, กฎเหล็กการดูดยาใสก่อนยาขุ่น (Clear before Cloudy)",
+      "difficulty": 2,
+      "docId": "1ZNKvEBVAUeVcJ2GSH4gGKujA8whv7zY0fH4pXVEJa4g",
+      "author": "คณะทำงานคลังข้อสอบร่วมสมรรถนะเภสัชกรรม (ระบบกลาง)",
+      "createdDate": "30/09/2026",
+      "source": "Practice RxCU84 Clinic ครั้งที่ 1",
+      "isActive": false,
+      "caseStatus": "Unactive",
+      "linkedNextCase": "",
+      "linkedFromCase": ""
+    },
+    {
+      "caseId": "OSPE-CLSD20",
+      "title": "การแนะนำการใช้แผ่นแปะนิโคตินและหมากฝรั่งนิโคตินช่วยเลิกบุหรี่ (Nicotine Transdermal Patch & Nicotine Gum)",
+      "category": "Clinic",
+      "mainGroup": "การใช้ยาเทคนิคพิเศษ",
+      "subTopic": "",
+      "disease": "การบำบัดผู้ติดบุหรี่ (Smoking Cessation), นิโคตินทดแทน (Nicotine Replacement Therapy: NRT), เทคนิค Chew and Park และข้อปฏิบัติของ Nicotine Transdermal Patch",
+      "difficulty": 2,
+      "docId": "1ZNKvEBVAUeVcJ2GSH4gGKujA8whv7zY0fH4pXVEJa4g",
+      "author": "คณะทำงานคลังข้อสอบร่วมสมรรถนะเภสัชกรรม (ระบบกลาง)",
+      "createdDate": "30/09/2026",
+      "source": "Practice RxCU84 Clinic ครั้งที่ 1",
+      "isActive": false,
+      "caseStatus": "Unactive",
+      "linkedNextCase": "",
+      "linkedFromCase": ""
+    },
+    {
+      "caseId": "OSPE-CLSD21",
+      "title": "การผสมยาน้ำเชื่อมชนิดผงแห้งและการใช้กระบอกฉีดยาป้อนยาเด็กเล็ก (Dry Syrup Reconstitution & Oral Syringe Administration)",
+      "category": "Clinic",
+      "mainGroup": "การใช้ยาเทคนิคพิเศษ",
+      "subTopic": "",
+      "disease": "การเตรียมยาน้ำเชื่อมชนิดผงแห้ง (Dry Syrup Reconstitution), ยาปฏิชีวนะ Amoxicillin Dry Syrup, การใช้กระบอกฉีดยา (Oral Syringe) ป้อนยาเด็กเล็กเข้ากระพุ้งแก้ม",
+      "difficulty": 2,
+      "docId": "1ZNKvEBVAUeVcJ2GSH4gGKujA8whv7zY0fH4pXVEJa4g",
+      "author": "คณะทำงานคลังข้อสอบร่วมสมรรถนะเภสัชกรรม (ระบบกลาง)",
+      "createdDate": "30/09/2026",
+      "source": "Practice RxCU84 Clinic ครั้งที่ 1",
+      "isActive": false,
+      "caseStatus": "Unactive",
+      "linkedNextCase": "",
+      "linkedFromCase": ""
+    },
+    {
+      "caseId": "OSPE-CLSD22",
+      "title": "การแนะนำการใช้ยาเม็ดคุมกำเนิดและการจัดการกรณีลืมรับประทานยา (Oral Contraceptive Pills & Missed Pill Rules)",
+      "category": "Clinic",
+      "mainGroup": "การใช้ยาเทคนิคพิเศษ",
+      "subTopic": "",
+      "disease": "ยาเม็ดคุมกำเนิดชนิดฮอร์โมนรวม (Combined Oral Contraceptive Pills: COCs), แผง 21 เม็ด vs 28 เม็ด, กฎการลืมรับประทานยาตามแนวทาง CDC 2018 Guidelines",
+      "difficulty": 2,
+      "docId": "1ZNKvEBVAUeVcJ2GSH4gGKujA8whv7zY0fH4pXVEJa4g",
+      "author": "คณะทำงานคลังข้อสอบร่วมสมรรถนะเภสัชกรรม (ระบบกลาง)",
+      "createdDate": "30/09/2026",
+      "source": "Practice RxCU84 Clinic ครั้งที่ 1",
+      "isActive": false,
+      "caseStatus": "Unactive",
+      "linkedNextCase": "",
+      "linkedFromCase": ""
+    },
+    {
+      "caseId": "OSPE-CLSP01",
+      "title": "การแนะนำการใช้ยาต้านการแข็งตัวของเลือด Warfarin",
+      "category": "Clinic",
+      "mainGroup": "คำแนะนำสำหรับยาที่ต้องระมัดระวังในการใช้เป็นพิเศษ (ภาคผนวก ข)",
+      "subTopic": "",
+      "disease": "ภาวะหัวใจห้องบนสั่นพลิ้ว (Atrial Fibrillation), การใช้ยาต้านการแข็งตัวของเลือด Warfarin, การติดตามค่า INR, การสังเกตอาการเลือดออกผิดปกติ และอันตรกิริยากับอาหาร/ยา",
+      "difficulty": 2,
+      "docId": "1ZNKvEBVAUeVcJ2GSH4gGKujA8whv7zY0fH4pXVEJa4g",
+      "author": "คณะทำงานคลังข้อสอบร่วมสมรรถนะเภสัชกรรม (ระบบกลาง)",
+      "createdDate": "30/09/2026",
+      "source": "Practice RxCU84 Clinic ครั้งที่ 1",
+      "isActive": false,
+      "caseStatus": "Unactive",
+      "linkedNextCase": "",
+      "linkedFromCase": ""
+    },
+    {
+      "caseId": "OSPE-CLSP02",
+      "title": "การแนะนำการใช้ยากระตุ้นการบีบตัวของหัวใจ Digoxin",
+      "category": "Clinic",
+      "mainGroup": "คำแนะนำสำหรับยาที่ต้องระมัดระวังในการใช้เป็นพิเศษ (ภาคผนวก ข)",
+      "subTopic": "",
+      "disease": "Heart Failure (NYHA Class III) ร่วมกับ Atrial Fibrillation",
+      "difficulty": 2,
+      "docId": "1ZNKvEBVAUeVcJ2GSH4gGKujA8whv7zY0fH4pXVEJa4g",
+      "author": "คณะทำงานคลังข้อสอบร่วมสมรรถนะเภสัชกรรม (ระบบกลาง)",
+      "createdDate": "30/09/2026",
+      "source": "Practice RxCU84 Clinic ครั้งที่ 1",
+      "isActive": false,
+      "caseStatus": "Unactive",
+      "linkedNextCase": "",
+      "linkedFromCase": ""
+    },
+    {
+      "caseId": "OSPE-CLSP03",
+      "title": "การแนะนำการใช้ยากดภูมิคุ้มกัน Methotrexate ชนิดรับประทาน",
+      "category": "Clinic",
+      "mainGroup": "คำแนะนำสำหรับยาที่ต้องระมัดระวังในการใช้เป็นพิเศษ (ภาคผนวก ข)",
+      "subTopic": "",
+      "disease": "วัณโรคปอด (Pulmonary Tuberculosis), สูตรยามาตรฐาน 2HRZE (Isoniazid, Rifampicin, Pyrazinamide, Ethambutol), อาการไม่พึงประสงค์เฉพาะตัวของยาแต่ละชนิด และความร่วมมือในการใช้ยา (Adherence)",
+      "difficulty": 2,
+      "docId": "1ZNKvEBVAUeVcJ2GSH4gGKujA8whv7zY0fH4pXVEJa4g",
+      "author": "คณะทำงานคลังข้อสอบร่วมสมรรถนะเภสัชกรรม (ระบบกลาง)",
+      "createdDate": "30/09/2026",
+      "source": "Practice RxCU84 Clinic ครั้งที่ 1",
+      "isActive": false,
+      "caseStatus": "Unactive",
+      "linkedNextCase": "",
+      "linkedFromCase": ""
+    },
+    {
+      "caseId": "OSPE-CLSP05",
+      "title": "การแนะนำการใช้ยากันชัก Phenytoin",
+      "category": "Clinic",
+      "mainGroup": "คำแนะนำสำหรับยาที่ต้องระมัดระวังในการใช้เป็นพิเศษ (ภาคผนวก ข)",
+      "subTopic": "",
+      "disease": "โรคลมชัก (Epilepsy), ยากันชัก Phenytoin sodium, เภสัชจลนศาสตร์ไม่เป็นเส้นตรง, อาการพิษจากยา (Toxicity), ภาวะเหงือกบวมหนา (Gingival Hyperplasia)",
+      "difficulty": 2,
+      "docId": "1ZNKvEBVAUeVcJ2GSH4gGKujA8whv7zY0fH4pXVEJa4g",
+      "author": "คณะทำงานคลังข้อสอบร่วมสมรรถนะเภสัชกรรม (ระบบกลาง)",
+      "createdDate": "30/09/2026",
+      "source": "Practice RxCU84 Clinic ครั้งที่ 1",
+      "isActive": false,
+      "caseStatus": "Unactive",
+      "linkedNextCase": "",
+      "linkedFromCase": ""
+    },
+    {
+      "caseId": "OSPE-CLSP06",
+      "title": "การแนะนำการใช้ยาขยายหลอดลม Theophylline",
+      "category": "Clinic",
+      "mainGroup": "คำแนะนำสำหรับยาที่ต้องระมัดระวังในการใช้เป็นพิเศษ (ภาคผนวก ข)",
+      "subTopic": "",
+      "disease": "โรคปอดอุดกั้นเรื้อรัง (COPD), ยาขยายหลอดลม Theophylline (Sustained Release), ช่วงการรักษาแคบ (NTID), อาการพิษทางระบบหัวใจและทางเดินอาหาร",
+      "difficulty": 2,
+      "docId": "1ZNKvEBVAUeVcJ2GSH4gGKujA8whv7zY0fH4pXVEJa4g",
+      "author": "คณะทำงานคลังข้อสอบร่วมสมรรถนะเภสัชกรรม (ระบบกลาง)",
+      "createdDate": "30/09/2026",
+      "source": "Practice RxCU84 Clinic ครั้งที่ 1",
+      "isActive": false,
+      "caseStatus": "Unactive",
+      "linkedNextCase": "",
+      "linkedFromCase": ""
+    },
+    {
+      "caseId": "OSPE-CLSP07",
+      "title": "การแนะนำการใช้ยาต้านมะเร็งและยากดภูมิคุ้มกัน Cyclophosphamide ชนิดรับประทาน",
+      "category": "Clinic",
+      "mainGroup": "คำแนะนำสำหรับยาที่ต้องระมัดระวังในการใช้เป็นพิเศษ (ภาคผนวก ข)",
+      "subTopic": "",
+      "disease": "โรคไตอักเสบลูปัส (Lupus Nephritis / SLE), ยากดภูมิคุ้มกัน Cyclophosphamide ชนิดรับประทาน, การป้องกันภาวะกระเพาะปัสสาวะอักเสบเป็นเลือด (Hemorrhagic Cystitis)",
+      "difficulty": 2,
+      "docId": "1ZNKvEBVAUeVcJ2GSH4gGKujA8whv7zY0fH4pXVEJa4g",
+      "author": "คณะทำงานคลังข้อสอบร่วมสมรรถนะเภสัชกรรม (ระบบกลาง)",
+      "createdDate": "30/09/2026",
+      "source": "Practice RxCU84 Clinic ครั้งที่ 1",
+      "isActive": false,
+      "caseStatus": "Unactive",
+      "linkedNextCase": "",
+      "linkedFromCase": ""
+    },
+    {
+      "caseId": "OSPE-CLSP08",
+      "title": "การแนะนำการใช้ยารักษาโรคกระดูกพรุนกลุ่ม Bisphosphonates (Alendronate)",
+      "category": "Clinic",
+      "mainGroup": "คำแนะนำสำหรับยาที่ต้องระมัดระวังในการใช้เป็นพิเศษ (ภาคผนวก ข)",
+      "subTopic": "",
+      "disease": "โรคกระดูกพรุน (Osteoporosis), ยาบิสฟอสโฟเนต Alendronate sodium (Fosamax® Once-Weekly), เทคนิคการป้องกันหลอดอาหารอักเสบเป็นแผลรุนแรง (Chemical Esophagitis)",
+      "difficulty": 2,
+      "docId": "1ZNKvEBVAUeVcJ2GSH4gGKujA8whv7zY0fH4pXVEJa4g",
+      "author": "คณะทำงานคลังข้อสอบร่วมสมรรถนะเภสัชกรรม (ระบบกลาง)",
+      "createdDate": "30/09/2026",
+      "source": "Practice RxCU84 Clinic ครั้งที่ 1",
+      "isActive": false,
+      "caseStatus": "Unactive",
+      "linkedNextCase": "",
+      "linkedFromCase": ""
+    },
+    {
+      "caseId": "OSPE-CLSP09",
+      "title": "การบริหารยาและความปลอดภัยของยาฉีด Dopamine และ Dobutamine (Inotropic Agents)",
+      "category": "Clinic",
+      "mainGroup": "คำแนะนำสำหรับยาที่ต้องระมัดระวังในการใช้เป็นพิเศษ (ภาคผนวก ข)",
+      "subTopic": "",
+      "disease": "",
+      "difficulty": 2,
+      "docId": "1ZNKvEBVAUeVcJ2GSH4gGKujA8whv7zY0fH4pXVEJa4g",
+      "author": "คณะทำงานคลังข้อสอบร่วมสมรรถนะเภสัชกรรม (ระบบกลาง)",
+      "createdDate": "30/09/2026",
+      "source": "Practice RxCU84 Clinic ครั้งที่ 1",
+      "isActive": false,
+      "caseStatus": "Unactive",
+      "linkedNextCase": "",
+      "linkedFromCase": ""
+    },
+    {
+      "caseId": "OSPE-CLSP10",
+      "title": "การบริหารยาและความปลอดภัยของยาฉีด Heparin (Anticoagulant High-Alert Drug)",
+      "category": "Clinic",
+      "mainGroup": "คำแนะนำสำหรับยาที่ต้องระมัดระวังในการใช้เป็นพิเศษ (ภาคผนวก ข)",
+      "subTopic": "",
+      "disease": "",
+      "difficulty": 2,
+      "docId": "1ZNKvEBVAUeVcJ2GSH4gGKujA8whv7zY0fH4pXVEJa4g",
+      "author": "คณะทำงานคลังข้อสอบร่วมสมรรถนะเภสัชกรรม (ระบบกลาง)",
+      "createdDate": "30/09/2026",
+      "source": "Practice RxCU84 Clinic ครั้งที่ 1",
+      "isActive": false,
+      "caseStatus": "Unactive",
+      "linkedNextCase": "",
+      "linkedFromCase": ""
+    },
+    {
+      "caseId": "OSPE-CLSP11",
+      "title": "การบริหารยาและความปลอดภัยของยาฉีด Potassium Chloride ชนิดเข้มข้น (ข้อควรระวังเพิ่มเติมและการเตรียมทางคลินิก) - ทางเลือกเสริมวิกฤต",
+      "category": "Clinic",
+      "mainGroup": "คำแนะนำสำหรับยาที่ต้องระมัดระวังในการใช้เป็นพิเศษ (ภาคผนวก ข)",
+      "subTopic": "",
+      "disease": "ภาวะโพแทสเซียมในเลือดต่ำวิกฤต, กฎเหล็กการผสมยาห้ามตั้งทิ้งไว้โดยไม่เขย่า, และข้อจำกัดความเข้มข้นสูงสุดทาง Peripheral Line",
+      "difficulty": 2,
+      "docId": "1ZNKvEBVAUeVcJ2GSH4gGKujA8whv7zY0fH4pXVEJa4g",
+      "author": "คณะทำงานคลังข้อสอบร่วมสมรรถนะเภสัชกรรม (ระบบกลาง)",
+      "createdDate": "30/09/2026",
+      "source": "Practice RxCU84 Clinic ครั้งที่ 1",
+      "isActive": false,
+      "caseStatus": "Unactive",
+      "linkedNextCase": "",
+      "linkedFromCase": ""
     },
     {
       "caseId": "OSPE-CLW1M01",
-      "title": "การตรวจสอบใบสั่งยา Mock RxCU84 Clinic Week 1",
+      "title": "OSPE-CLW1M01",
       "category": "Clinic",
-      "mainGroup": "การตรวจสอบใบสั่งยา",
-      "subTopic": "",
-      "disease": "",
+      "mainGroup": "Mock Exam 2569",
+      "subTopic": "🔒 ข้อสอบลับ (ต้องใช้รหัสผ่าน)",
+      "disease": "🔒 ล็อกด้วยรหัสผ่าน (Secret Mock)",
       "difficulty": 2,
       "docId": "1ZNKvEBVAUeVcJ2GSH4gGKujA8whv7zY0fH4pXVEJa4g",
       "author": "",
       "createdDate": "15/10/2569",
       "source": "Mock RxCU84 Clinic Week 1",
       "isActive": true,
+      "caseStatus": "Active",
       "linkedNextCase": "",
-      "linkedFromCase": ""
+      "linkedFromCase": "",
+      "durationMin": 4,
+      "isProtected": true,
+      "hasPassword": true
     },
     {
       "caseId": "OSPE-CLW1M02",
-      "title": "การนับเม็ดยาและเขียนฉลากยา Mock RxCU84 Clinic Week 1",
+      "title": "OSPE-CLW1M02",
       "category": "Clinic",
-      "mainGroup": "การนับเม็ดยาและเขียนฉลากยา",
-      "subTopic": "",
-      "disease": "Cafegot",
+      "mainGroup": "Mock Exam 2569",
+      "subTopic": "🔒 ข้อสอบลับ (ต้องใช้รหัสผ่าน)",
+      "disease": "🔒 ล็อกด้วยรหัสผ่าน (Secret Mock)",
       "difficulty": 2,
       "docId": "1ZNKvEBVAUeVcJ2GSH4gGKujA8whv7zY0fH4pXVEJa4g",
       "author": "",
       "createdDate": "15/10/2569",
       "source": "Mock RxCU84 Clinic Week 1",
       "isActive": true,
+      "caseStatus": "Active",
       "linkedNextCase": "",
-      "linkedFromCase": ""
+      "linkedFromCase": "",
+      "durationMin": 4,
+      "isProtected": true,
+      "hasPassword": true
     },
     {
       "caseId": "OSPE-CLW1M03",
-      "title": "Special precaution Mock RxCU84 Clinic Week 1",
+      "title": "OSPE-CLW1M03",
       "category": "Clinic",
-      "mainGroup": "Special precaution",
-      "subTopic": "",
-      "disease": "ยา Warfarin",
+      "mainGroup": "Mock Exam 2569",
+      "subTopic": "🔒 ข้อสอบลับ (ต้องใช้รหัสผ่าน)",
+      "disease": "🔒 ล็อกด้วยรหัสผ่าน (Secret Mock)",
       "difficulty": 2,
       "docId": "1ZNKvEBVAUeVcJ2GSH4gGKujA8whv7zY0fH4pXVEJa4g",
       "author": "",
       "createdDate": "15/10/2569",
       "source": "Mock RxCU84 Clinic Week 1",
       "isActive": true,
+      "caseStatus": "Active",
       "linkedNextCase": "",
-      "linkedFromCase": ""
+      "linkedFromCase": "",
+      "durationMin": 4,
+      "isProtected": true,
+      "hasPassword": true
     },
     {
       "caseId": "OSPE-CLW1M04",
-      "title": "ข้อสอบผลิตภัณฑ์ Mock RxCU84 Clinic Week 1",
+      "title": "OSPE-CLW1M04",
       "category": "Product",
-      "mainGroup": "",
-      "subTopic": "",
-      "disease": "",
+      "mainGroup": "Mock Exam 2569",
+      "subTopic": "🔒 ข้อสอบลับ (ต้องใช้รหัสผ่าน)",
+      "disease": "🔒 ล็อกด้วยรหัสผ่าน (Secret Mock)",
       "difficulty": 2,
       "docId": "1ZNKvEBVAUeVcJ2GSH4gGKujA8whv7zY0fH4pXVEJa4g",
       "author": "",
       "createdDate": "15/10/2569",
       "source": "Mock RxCU84 Clinic Week 1",
       "isActive": true,
+      "caseStatus": "Active",
       "linkedNextCase": "",
-      "linkedFromCase": ""
+      "linkedFromCase": "",
+      "durationMin": 4,
+      "isProtected": true,
+      "hasPassword": true
     },
     {
       "caseId": "OSPE-CLW1M05",
-      "title": "ข้อสอบกฎหมาย Mock RxCU84 Clinic Week 1",
+      "title": "OSPE-CLW1M05",
       "category": "SAP",
-      "mainGroup": "",
-      "subTopic": "",
-      "disease": "",
+      "mainGroup": "Mock Exam 2569",
+      "subTopic": "🔒 ข้อสอบลับ (ต้องใช้รหัสผ่าน)",
+      "disease": "🔒 ล็อกด้วยรหัสผ่าน (Secret Mock)",
       "difficulty": 2,
       "docId": "1ZNKvEBVAUeVcJ2GSH4gGKujA8whv7zY0fH4pXVEJa4g",
       "author": "",
       "createdDate": "15/10/2569",
       "source": "Mock RxCU84 Clinic Week 1",
       "isActive": true,
+      "caseStatus": "Active",
       "linkedNextCase": "",
-      "linkedFromCase": ""
+      "linkedFromCase": "",
+      "durationMin": 4,
+      "isProtected": true,
+      "hasPassword": true
     },
     {
       "caseId": "OSPE-CLW2M01",
-      "title": "การตรวจสอบใบสั่งยา Mock RxCU84 Clinic Week 2",
+      "title": "OSPE-CLW2M01",
       "category": "Clinic",
-      "mainGroup": "การตรวจสอบใบสั่งยา",
-      "subTopic": "",
-      "disease": "",
+      "mainGroup": "Mock Exam 2569",
+      "subTopic": "🔒 ข้อสอบลับ (ต้องใช้รหัสผ่าน)",
+      "disease": "🔒 ล็อกด้วยรหัสผ่าน (Secret Mock)",
       "difficulty": 2,
       "docId": "1ZNKvEBVAUeVcJ2GSH4gGKujA8whv7zY0fH4pXVEJa4g",
       "author": "",
       "createdDate": "15/10/2569",
       "source": "Mock RxCU84 Clinic Week 2",
       "isActive": true,
+      "caseStatus": "Active",
       "linkedNextCase": "",
-      "linkedFromCase": ""
+      "linkedFromCase": "",
+      "durationMin": 4,
+      "isProtected": true,
+      "hasPassword": true
     },
     {
       "caseId": "OSPE-CLW2M02",
-      "title": "การนับเม็ดยาและเขียนฉลากยา Mock RxCU84 Clinic Week 2",
+      "title": "OSPE-CLW2M02",
       "category": "Clinic",
-      "mainGroup": "การนับเม็ดยาและเขียนฉลากยา",
-      "subTopic": "",
-      "disease": "",
+      "mainGroup": "Mock Exam 2569",
+      "subTopic": "🔒 ข้อสอบลับ (ต้องใช้รหัสผ่าน)",
+      "disease": "🔒 ล็อกด้วยรหัสผ่าน (Secret Mock)",
       "difficulty": 2,
       "docId": "1ZNKvEBVAUeVcJ2GSH4gGKujA8whv7zY0fH4pXVEJa4g",
       "author": "",
       "createdDate": "15/10/2569",
       "source": "Mock RxCU84 Clinic Week 2",
       "isActive": true,
+      "caseStatus": "Active",
       "linkedNextCase": "",
-      "linkedFromCase": ""
+      "linkedFromCase": "",
+      "durationMin": 4,
+      "isProtected": true,
+      "hasPassword": true
     },
     {
       "caseId": "OSPE-CLW2M03",
-      "title": "เปิดหนังสือ Mock RxCU84 Clinic Week 2",
+      "title": "OSPE-CLW2M03",
       "category": "Clinic",
-      "mainGroup": "การค้นข้อมูลและประสานงาน",
-      "subTopic": "",
-      "disease": "",
+      "mainGroup": "Mock Exam 2569",
+      "subTopic": "🔒 ข้อสอบลับ (ต้องใช้รหัสผ่าน)",
+      "disease": "🔒 ล็อกด้วยรหัสผ่าน (Secret Mock)",
       "difficulty": 2,
       "docId": "1ZNKvEBVAUeVcJ2GSH4gGKujA8whv7zY0fH4pXVEJa4g",
       "author": "",
       "createdDate": "15/10/2569",
       "source": "Mock RxCU84 Clinic Week 2",
       "isActive": true,
+      "caseStatus": "Active",
       "linkedNextCase": "",
-      "linkedFromCase": ""
+      "linkedFromCase": "",
+      "durationMin": 4,
+      "isProtected": true,
+      "hasPassword": true
     },
     {
       "caseId": "OSPE-CLW2M04",
-      "title": "ข้อสอบผลิตภัณฑ์ Mock RxCU84 Clinic Week 2",
+      "title": "OSPE-CLW2M04",
       "category": "Product",
-      "mainGroup": "",
-      "subTopic": "",
-      "disease": "Special precaution",
+      "mainGroup": "Mock Exam 2569",
+      "subTopic": "🔒 ข้อสอบลับ (ต้องใช้รหัสผ่าน)",
+      "disease": "🔒 ล็อกด้วยรหัสผ่าน (Secret Mock)",
       "difficulty": 2,
       "docId": "1ZNKvEBVAUeVcJ2GSH4gGKujA8whv7zY0fH4pXVEJa4g",
       "author": "",
       "createdDate": "15/10/2569",
       "source": "Mock RxCU84 Clinic Week 2",
       "isActive": true,
+      "caseStatus": "Active",
       "linkedNextCase": "",
-      "linkedFromCase": ""
+      "linkedFromCase": "",
+      "durationMin": 4,
+      "isProtected": true,
+      "hasPassword": true
     },
     {
       "caseId": "OSPE-CLW2M05",
-      "title": "ข้อสอบกฎหมาย Mock RxCU84 Clinic Week 2",
+      "title": "OSPE-CLW2M05",
       "category": "SAP",
-      "mainGroup": "",
-      "subTopic": "",
-      "disease": "",
+      "mainGroup": "Mock Exam 2569",
+      "subTopic": "🔒 ข้อสอบลับ (ต้องใช้รหัสผ่าน)",
+      "disease": "🔒 ล็อกด้วยรหัสผ่าน (Secret Mock)",
       "difficulty": 2,
       "docId": "1ZNKvEBVAUeVcJ2GSH4gGKujA8whv7zY0fH4pXVEJa4g",
       "author": "",
       "createdDate": "15/10/2569",
       "source": "Mock RxCU84 Clinic Week 2",
       "isActive": true,
+      "caseStatus": "Active",
       "linkedNextCase": "",
-      "linkedFromCase": ""
+      "linkedFromCase": "",
+      "durationMin": 4,
+      "isProtected": true,
+      "hasPassword": true
     },
     {
       "caseId": "OSPE-CLW3M01",
-      "title": "การตรวจสอบใบสั่งยา Mock RxCU84 Clinic Week 3",
+      "title": "OSPE-CLW3M01",
       "category": "Clinic",
-      "mainGroup": "การตรวจสอบใบสั่งยา",
-      "subTopic": "",
-      "disease": "",
+      "mainGroup": "Mock Exam 2569",
+      "subTopic": "🔒 ข้อสอบลับ (ต้องใช้รหัสผ่าน)",
+      "disease": "🔒 ล็อกด้วยรหัสผ่าน (Secret Mock)",
       "difficulty": 2,
       "docId": "1ZNKvEBVAUeVcJ2GSH4gGKujA8whv7zY0fH4pXVEJa4g",
       "author": "",
       "createdDate": "15/10/2569",
       "source": "Mock RxCU84 Clinic Week 3",
       "isActive": true,
+      "caseStatus": "Active",
       "linkedNextCase": "",
-      "linkedFromCase": ""
+      "linkedFromCase": "",
+      "durationMin": 4,
+      "isProtected": true,
+      "hasPassword": true
     },
     {
       "caseId": "OSPE-CLW3M02",
-      "title": "การนับเม็ดยาและเขียนฉลากยา Mock RxCU84 Clinic Week 3",
+      "title": "OSPE-CLW3M02",
       "category": "Clinic",
-      "mainGroup": "การนับเม็ดยาและเขียนฉลากยา",
-      "subTopic": "",
-      "disease": "",
+      "mainGroup": "Mock Exam 2569",
+      "subTopic": "🔒 ข้อสอบลับ (ต้องใช้รหัสผ่าน)",
+      "disease": "🔒 ล็อกด้วยรหัสผ่าน (Secret Mock)",
       "difficulty": 2,
       "docId": "1ZNKvEBVAUeVcJ2GSH4gGKujA8whv7zY0fH4pXVEJa4g",
       "author": "",
       "createdDate": "15/10/2569",
       "source": "Mock RxCU84 Clinic Week 3",
       "isActive": true,
+      "caseStatus": "Active",
       "linkedNextCase": "",
-      "linkedFromCase": ""
+      "linkedFromCase": "",
+      "durationMin": 4,
+      "isProtected": true,
+      "hasPassword": true
     },
     {
       "caseId": "OSPE-CLW3M03",
-      "title": "เปิดหนังสือ Mock RxCU84 Clinic Week 3",
+      "title": "OSPE-CLW3M03",
       "category": "Clinic",
-      "mainGroup": "การค้นข้อมูลและประสานงาน",
-      "subTopic": "",
-      "disease": "",
+      "mainGroup": "Mock Exam 2569",
+      "subTopic": "🔒 ข้อสอบลับ (ต้องใช้รหัสผ่าน)",
+      "disease": "🔒 ล็อกด้วยรหัสผ่าน (Secret Mock)",
       "difficulty": 2,
       "docId": "1ZNKvEBVAUeVcJ2GSH4gGKujA8whv7zY0fH4pXVEJa4g",
       "author": "",
       "createdDate": "15/10/2569",
       "source": "Mock RxCU84 Clinic Week 3",
       "isActive": true,
+      "caseStatus": "Active",
       "linkedNextCase": "",
-      "linkedFromCase": ""
+      "linkedFromCase": "",
+      "durationMin": 4,
+      "isProtected": true,
+      "hasPassword": true
     },
     {
       "caseId": "OSPE-CLW3M04",
-      "title": "ข้อสอบผลิตภัณฑ์ Mock RxCU84 Clinic Week 3",
+      "title": "OSPE-CLW3M04",
       "category": "Product",
-      "mainGroup": "Special precaution",
-      "subTopic": "",
-      "disease": "",
+      "mainGroup": "Mock Exam 2569",
+      "subTopic": "🔒 ข้อสอบลับ (ต้องใช้รหัสผ่าน)",
+      "disease": "🔒 ล็อกด้วยรหัสผ่าน (Secret Mock)",
       "difficulty": 2,
       "docId": "1ZNKvEBVAUeVcJ2GSH4gGKujA8whv7zY0fH4pXVEJa4g",
       "author": "",
       "createdDate": "15/10/2569",
       "source": "Mock RxCU84 Clinic Week 3",
       "isActive": true,
+      "caseStatus": "Active",
       "linkedNextCase": "",
-      "linkedFromCase": ""
+      "linkedFromCase": "",
+      "durationMin": 4,
+      "isProtected": true,
+      "hasPassword": true
     },
     {
       "caseId": "OSPE-CLW3M05",
-      "title": "ข้อสอบกฎหมาย Mock RxCU84 Clinic Week 3",
+      "title": "OSPE-CLW3M05",
       "category": "SAP",
-      "mainGroup": "",
-      "subTopic": "",
-      "disease": "",
+      "mainGroup": "Mock Exam 2569",
+      "subTopic": "🔒 ข้อสอบลับ (ต้องใช้รหัสผ่าน)",
+      "disease": "🔒 ล็อกด้วยรหัสผ่าน (Secret Mock)",
       "difficulty": 2,
       "docId": "1ZNKvEBVAUeVcJ2GSH4gGKujA8whv7zY0fH4pXVEJa4g",
       "author": "",
       "createdDate": "15/10/2569",
       "source": "Mock RxCU84 Clinic Week 3",
       "isActive": true,
+      "caseStatus": "Active",
       "linkedNextCase": "",
-      "linkedFromCase": ""
+      "linkedFromCase": "",
+      "durationMin": 4,
+      "isProtected": true,
+      "hasPassword": true
     },
     {
       "caseId": "OSPE-CLW4M01",
-      "title": "การตรวจสอบใบสั่งยา Mock RxCU84 Clinic Week 4",
+      "title": "OSPE-CLW4M01",
       "category": "Clinic",
-      "mainGroup": "การตรวจสอบใบสั่งยา",
-      "subTopic": "",
-      "disease": "",
+      "mainGroup": "Mock Exam 2569",
+      "subTopic": "🔒 ข้อสอบลับ (ต้องใช้รหัสผ่าน)",
+      "disease": "🔒 ล็อกด้วยรหัสผ่าน (Secret Mock)",
       "difficulty": 2,
       "docId": "1ZNKvEBVAUeVcJ2GSH4gGKujA8whv7zY0fH4pXVEJa4g",
       "author": "",
       "createdDate": "15/10/2569",
       "source": "Mock RxCU84 Clinic Week 4",
       "isActive": true,
+      "caseStatus": "Active",
       "linkedNextCase": "",
-      "linkedFromCase": ""
+      "linkedFromCase": "",
+      "durationMin": 4,
+      "isProtected": true,
+      "hasPassword": true
     },
     {
       "caseId": "OSPE-CLW4M02",
-      "title": "การนับเม็ดยาและเขียนฉลากยา Mock RxCU84 Clinic Week 4",
+      "title": "OSPE-CLW4M02",
       "category": "Clinic",
-      "mainGroup": "การนับเม็ดยาและเขียนฉลากยา",
-      "subTopic": "",
-      "disease": "",
+      "mainGroup": "Mock Exam 2569",
+      "subTopic": "🔒 ข้อสอบลับ (ต้องใช้รหัสผ่าน)",
+      "disease": "🔒 ล็อกด้วยรหัสผ่าน (Secret Mock)",
       "difficulty": 2,
       "docId": "1ZNKvEBVAUeVcJ2GSH4gGKujA8whv7zY0fH4pXVEJa4g",
       "author": "",
       "createdDate": "15/10/2569",
       "source": "Mock RxCU84 Clinic Week 4",
       "isActive": true,
+      "caseStatus": "Active",
       "linkedNextCase": "",
-      "linkedFromCase": ""
+      "linkedFromCase": "",
+      "durationMin": 4,
+      "isProtected": true,
+      "hasPassword": true
     },
     {
       "caseId": "OSPE-CLW4M03",
-      "title": "เปิดหนังสือ Mock RxCU84 Clinic Week 4",
+      "title": "OSPE-CLW4M03",
       "category": "Clinic",
-      "mainGroup": "การค้นข้อมูลและประสานงาน",
-      "subTopic": "",
-      "disease": "",
+      "mainGroup": "Mock Exam 2569",
+      "subTopic": "🔒 ข้อสอบลับ (ต้องใช้รหัสผ่าน)",
+      "disease": "🔒 ล็อกด้วยรหัสผ่าน (Secret Mock)",
       "difficulty": 2,
       "docId": "1ZNKvEBVAUeVcJ2GSH4gGKujA8whv7zY0fH4pXVEJa4g",
       "author": "",
       "createdDate": "15/10/2569",
       "source": "Mock RxCU84 Clinic Week 4",
       "isActive": true,
+      "caseStatus": "Active",
       "linkedNextCase": "",
-      "linkedFromCase": ""
+      "linkedFromCase": "",
+      "durationMin": 4,
+      "isProtected": true,
+      "hasPassword": true
     },
     {
       "caseId": "OSPE-CLW4M04",
-      "title": "ข้อสอบผลิตภัณฑ์ Mock RxCU84 Clinic Week 4",
+      "title": "OSPE-CLW4M04",
       "category": "Product",
-      "mainGroup": "Special precaution",
-      "subTopic": "",
-      "disease": "",
+      "mainGroup": "Mock Exam 2569",
+      "subTopic": "🔒 ข้อสอบลับ (ต้องใช้รหัสผ่าน)",
+      "disease": "🔒 ล็อกด้วยรหัสผ่าน (Secret Mock)",
       "difficulty": 2,
       "docId": "1ZNKvEBVAUeVcJ2GSH4gGKujA8whv7zY0fH4pXVEJa4g",
       "author": "",
       "createdDate": "15/10/2569",
       "source": "Mock RxCU84 Clinic Week 4",
       "isActive": true,
+      "caseStatus": "Active",
       "linkedNextCase": "",
-      "linkedFromCase": ""
+      "linkedFromCase": "",
+      "durationMin": 4,
+      "isProtected": true,
+      "hasPassword": true
     },
     {
       "caseId": "OSPE-CLW4M05",
-      "title": "ข้อสอบกฎหมาย Mock RxCU84 Clinic Week 4",
+      "title": "OSPE-CLW4M05",
       "category": "SAP",
-      "mainGroup": "",
-      "subTopic": "",
-      "disease": "",
+      "mainGroup": "Mock Exam 2569",
+      "subTopic": "🔒 ข้อสอบลับ (ต้องใช้รหัสผ่าน)",
+      "disease": "🔒 ล็อกด้วยรหัสผ่าน (Secret Mock)",
       "difficulty": 2,
       "docId": "1ZNKvEBVAUeVcJ2GSH4gGKujA8whv7zY0fH4pXVEJa4g",
       "author": "",
       "createdDate": "15/10/2569",
       "source": "Mock RxCU84 Clinic Week 4",
       "isActive": true,
+      "caseStatus": "Active",
       "linkedNextCase": "",
-      "linkedFromCase": ""
+      "linkedFromCase": "",
+      "durationMin": 4,
+      "isProtected": true,
+      "hasPassword": true
     },
     {
       "caseId": "OSPE-PD83M01",
@@ -3460,8 +4339,10 @@ const OFFLINE_DATA = {
       "createdDate": "30/09/2026",
       "source": "MOCK RxCU83 CC2 PRODUCT (7 NOV 2025)",
       "isActive": true,
+      "caseStatus": "Active",
       "linkedNextCase": "",
-      "linkedFromCase": ""
+      "linkedFromCase": "",
+      "durationMin": 8
     },
     {
       "caseId": "OSPE-PD83M02",
@@ -3476,6 +4357,7 @@ const OFFLINE_DATA = {
       "createdDate": "30/09/2026",
       "source": "MOCK RxCU83 CC2 PRODUCT (7 NOV 2025)",
       "isActive": true,
+      "caseStatus": "Active",
       "linkedNextCase": "",
       "linkedFromCase": ""
     },
@@ -3492,6 +4374,7 @@ const OFFLINE_DATA = {
       "createdDate": "30/09/2026",
       "source": "MOCK RxCU83 CC2 PRODUCT (7 NOV 2025)",
       "isActive": true,
+      "caseStatus": "Active",
       "linkedNextCase": "",
       "linkedFromCase": ""
     },
@@ -3508,6 +4391,7 @@ const OFFLINE_DATA = {
       "createdDate": "30/09/2026",
       "source": "MOCK RxCU83 CC2 PRODUCT (7 NOV 2025)",
       "isActive": true,
+      "caseStatus": "Active",
       "linkedNextCase": "",
       "linkedFromCase": ""
     },
@@ -3524,6 +4408,7 @@ const OFFLINE_DATA = {
       "createdDate": "30/09/2026",
       "source": "MOCK RxCU83 CC2 PRODUCT (7 NOV 2025)",
       "isActive": true,
+      "caseStatus": "Active",
       "linkedNextCase": "",
       "linkedFromCase": ""
     },
@@ -3540,6 +4425,7 @@ const OFFLINE_DATA = {
       "createdDate": "30/09/2026",
       "source": "MOCK RxCU83 CC2 PRODUCT (7 NOV 2025)",
       "isActive": true,
+      "caseStatus": "Active",
       "linkedNextCase": "",
       "linkedFromCase": ""
     },
@@ -3556,6 +4442,7 @@ const OFFLINE_DATA = {
       "createdDate": "30/09/2026",
       "source": "MOCK RxCU83 CC2 PRODUCT (7 NOV 2025)",
       "isActive": true,
+      "caseStatus": "Active",
       "linkedNextCase": "",
       "linkedFromCase": ""
     },
@@ -3572,6 +4459,7 @@ const OFFLINE_DATA = {
       "createdDate": "30/09/2026",
       "source": "MOCK RxCU83 CC2 PRODUCT (7 NOV 2025)",
       "isActive": true,
+      "caseStatus": "Active",
       "linkedNextCase": "",
       "linkedFromCase": ""
     },
@@ -3588,6 +4476,7 @@ const OFFLINE_DATA = {
       "createdDate": "30/09/2026",
       "source": "RxCU83 Practice Week 1",
       "isActive": true,
+      "caseStatus": "Active",
       "linkedNextCase": "",
       "linkedFromCase": ""
     },
@@ -3604,6 +4493,7 @@ const OFFLINE_DATA = {
       "createdDate": "30/09/2026",
       "source": "RxCU83 Practice Week 1",
       "isActive": true,
+      "caseStatus": "Active",
       "linkedNextCase": "",
       "linkedFromCase": ""
     },
@@ -3620,6 +4510,7 @@ const OFFLINE_DATA = {
       "createdDate": "30/09/2026",
       "source": "RxCU83 Practice Week 1",
       "isActive": true,
+      "caseStatus": "Active",
       "linkedNextCase": "",
       "linkedFromCase": ""
     },
@@ -3636,6 +4527,7 @@ const OFFLINE_DATA = {
       "createdDate": "30/09/2026",
       "source": "RxCU83 Practice Week 1",
       "isActive": true,
+      "caseStatus": "Active",
       "linkedNextCase": "",
       "linkedFromCase": ""
     },
@@ -3652,6 +4544,7 @@ const OFFLINE_DATA = {
       "createdDate": "30/09/2026",
       "source": "RxCU83 Practice Week 1",
       "isActive": true,
+      "caseStatus": "Active",
       "linkedNextCase": "",
       "linkedFromCase": ""
     },
@@ -3668,6 +4561,7 @@ const OFFLINE_DATA = {
       "createdDate": "30/09/2026",
       "source": "RxCU83 Practice Week 2",
       "isActive": true,
+      "caseStatus": "Active",
       "linkedNextCase": "",
       "linkedFromCase": ""
     },
@@ -3684,6 +4578,7 @@ const OFFLINE_DATA = {
       "createdDate": "30/09/2026",
       "source": "RxCU83 Practice Week 2",
       "isActive": true,
+      "caseStatus": "Active",
       "linkedNextCase": "",
       "linkedFromCase": ""
     },
@@ -3700,6 +4595,7 @@ const OFFLINE_DATA = {
       "createdDate": "30/09/2026",
       "source": "RxCU83 Practice Week 2",
       "isActive": true,
+      "caseStatus": "Active",
       "linkedNextCase": "",
       "linkedFromCase": ""
     },
@@ -3716,6 +4612,7 @@ const OFFLINE_DATA = {
       "createdDate": "30/09/2026",
       "source": "RxCU83 Practice Week 2",
       "isActive": true,
+      "caseStatus": "Active",
       "linkedNextCase": "",
       "linkedFromCase": ""
     },
@@ -3732,6 +4629,7 @@ const OFFLINE_DATA = {
       "createdDate": "30/09/2026",
       "source": "RxCU83 Practice Week 2",
       "isActive": true,
+      "caseStatus": "Active",
       "linkedNextCase": "",
       "linkedFromCase": ""
     },
@@ -3748,6 +4646,7 @@ const OFFLINE_DATA = {
       "createdDate": "30/09/2026",
       "source": "RxCU83 Practice Week 3",
       "isActive": true,
+      "caseStatus": "Active",
       "linkedNextCase": "",
       "linkedFromCase": ""
     },
@@ -3764,6 +4663,7 @@ const OFFLINE_DATA = {
       "createdDate": "30/09/2026",
       "source": "RxCU83 Practice Week 3",
       "isActive": true,
+      "caseStatus": "Active",
       "linkedNextCase": "",
       "linkedFromCase": ""
     },
@@ -3780,6 +4680,7 @@ const OFFLINE_DATA = {
       "createdDate": "30/09/2026",
       "source": "RxCU83 Practice Week 3",
       "isActive": true,
+      "caseStatus": "Active",
       "linkedNextCase": "",
       "linkedFromCase": ""
     },
@@ -3796,6 +4697,7 @@ const OFFLINE_DATA = {
       "createdDate": "30/09/2026",
       "source": "RxCU83 Practice Week 3",
       "isActive": true,
+      "caseStatus": "Active",
       "linkedNextCase": "",
       "linkedFromCase": ""
     },
@@ -3812,6 +4714,7 @@ const OFFLINE_DATA = {
       "createdDate": "30/09/2026",
       "source": "RxCU83 Practice Week 3",
       "isActive": true,
+      "caseStatus": "Active",
       "linkedNextCase": "",
       "linkedFromCase": ""
     },
@@ -3828,6 +4731,7 @@ const OFFLINE_DATA = {
       "createdDate": "30/09/2026",
       "source": "RxCU83 Practice Week 4",
       "isActive": true,
+      "caseStatus": "Active",
       "linkedNextCase": "",
       "linkedFromCase": ""
     },
@@ -3844,6 +4748,7 @@ const OFFLINE_DATA = {
       "createdDate": "30/09/2026",
       "source": "RxCU83 Practice Week 4",
       "isActive": true,
+      "caseStatus": "Active",
       "linkedNextCase": "",
       "linkedFromCase": ""
     },
@@ -3860,6 +4765,7 @@ const OFFLINE_DATA = {
       "createdDate": "30/09/2026",
       "source": "RxCU83 Practice Week 4",
       "isActive": true,
+      "caseStatus": "Active",
       "linkedNextCase": "",
       "linkedFromCase": ""
     },
@@ -3876,6 +4782,7 @@ const OFFLINE_DATA = {
       "createdDate": "30/09/2026",
       "source": "RxCU83 Practice Week 4",
       "isActive": true,
+      "caseStatus": "Active",
       "linkedNextCase": "",
       "linkedFromCase": ""
     },
@@ -3892,6 +4799,7 @@ const OFFLINE_DATA = {
       "createdDate": "30/09/2026",
       "source": "RxCU83 Practice Week 4",
       "isActive": true,
+      "caseStatus": "Active",
       "linkedNextCase": "",
       "linkedFromCase": ""
     },
@@ -3908,8 +4816,10 @@ const OFFLINE_DATA = {
       "createdDate": "15/10/2569",
       "source": "Mock Exam 2569 (Week 1) ชุด A",
       "isActive": true,
+      "caseStatus": "Active",
       "linkedNextCase": "",
-      "linkedFromCase": ""
+      "linkedFromCase": "",
+      "durationMin": 4
     },
     {
       "caseId": "OSPE-PD84M1W101B",
@@ -3924,6 +4834,7 @@ const OFFLINE_DATA = {
       "createdDate": "15/10/2569",
       "source": "Mock Exam 2569 (Week 1) ชุด B",
       "isActive": true,
+      "caseStatus": "Active",
       "linkedNextCase": "",
       "linkedFromCase": ""
     },
@@ -3940,6 +4851,7 @@ const OFFLINE_DATA = {
       "createdDate": "15/10/2569",
       "source": "Mock Exam 2569 (Week 1) ชุด A",
       "isActive": true,
+      "caseStatus": "Active",
       "linkedNextCase": "",
       "linkedFromCase": ""
     },
@@ -3956,6 +4868,7 @@ const OFFLINE_DATA = {
       "createdDate": "15/10/2569",
       "source": "Mock Exam 2569 (Week 1) ชุด B",
       "isActive": true,
+      "caseStatus": "Active",
       "linkedNextCase": "",
       "linkedFromCase": ""
     },
@@ -3972,8 +4885,10 @@ const OFFLINE_DATA = {
       "createdDate": "15/10/2569",
       "source": "Mock Exam 2569 (Week 1) ชุด A",
       "isActive": true,
+      "caseStatus": "Active",
       "linkedNextCase": "",
-      "linkedFromCase": ""
+      "linkedFromCase": "",
+      "durationMin": 8
     },
     {
       "caseId": "OSPE-PD84M1W103B",
@@ -3988,168 +4903,210 @@ const OFFLINE_DATA = {
       "createdDate": "15/10/2569",
       "source": "Mock Exam 2569 (Week 1) ชุด B",
       "isActive": true,
+      "caseStatus": "Active",
       "linkedNextCase": "",
-      "linkedFromCase": ""
+      "linkedFromCase": "",
+      "durationMin": 8
     },
     {
       "caseId": "OSPE-PD84M1W201A",
-      "title": "Pulverization by Intervention 1A",
+      "title": "OSPE-PD84M1W201A",
       "category": "Product",
-      "mainGroup": "เทคนิคพิเศษ",
-      "subTopic": "",
-      "disease": "Pulverization by Intervention",
+      "mainGroup": "Mock Exam 2569",
+      "subTopic": "🔒 ข้อสอบลับ (ต้องใช้รหัสผ่าน)",
+      "disease": "🔒 ล็อกด้วยรหัสผ่าน (Secret Mock)",
       "difficulty": 2,
       "docId": "1Bjdz8c6-Gr5GIHGllXIvt0FLPeWTAdZy586vtVDOr24",
       "author": "RxCU84",
       "createdDate": "15/10/2569",
       "source": "Mock Exam 2569 (Week 2) ชุด A",
       "isActive": true,
+      "caseStatus": "Active",
       "linkedNextCase": "",
-      "linkedFromCase": ""
+      "linkedFromCase": "",
+      "durationMin": 4,
+      "isProtected": true,
+      "hasPassword": true
     },
     {
       "caseId": "OSPE-PD84M1W201B",
-      "title": "Pulverization by Intervention 1B",
+      "title": "OSPE-PD84M1W201B",
       "category": "Product",
-      "mainGroup": "เทคนิคพิเศษ",
-      "subTopic": "",
-      "disease": "Pulverization by Intervention",
+      "mainGroup": "Mock Exam 2569",
+      "subTopic": "🔒 ข้อสอบลับ (ต้องใช้รหัสผ่าน)",
+      "disease": "🔒 ล็อกด้วยรหัสผ่าน (Secret Mock)",
       "difficulty": 2,
       "docId": "1Bjdz8c6-Gr5GIHGllXIvt0FLPeWTAdZy586vtVDOr24",
       "author": "RxCU84",
       "createdDate": "15/10/2569",
       "source": "Mock Exam 2569 (Week 2) ชุด B",
       "isActive": true,
+      "caseStatus": "Active",
       "linkedNextCase": "",
-      "linkedFromCase": ""
+      "linkedFromCase": "",
+      "durationMin": 4,
+      "isProtected": true,
+      "hasPassword": true
     },
     {
       "caseId": "OSPE-PD84M1W202A",
-      "title": "Ointment 2A",
+      "title": "OSPE-PD84M1W202A",
       "category": "Product",
-      "mainGroup": "เทคนิคพิเศษ",
-      "subTopic": "",
-      "disease": "Ointment & Weighing",
+      "mainGroup": "Mock Exam 2569",
+      "subTopic": "🔒 ข้อสอบลับ (ต้องใช้รหัสผ่าน)",
+      "disease": "🔒 ล็อกด้วยรหัสผ่าน (Secret Mock)",
       "difficulty": 2,
       "docId": "1Bjdz8c6-Gr5GIHGllXIvt0FLPeWTAdZy586vtVDOr24",
       "author": "RxCU84",
       "createdDate": "15/10/2569",
       "source": "Mock Exam 2569 (Week 2) ชุด A",
       "isActive": true,
+      "caseStatus": "Active",
       "linkedNextCase": "",
-      "linkedFromCase": ""
+      "linkedFromCase": "",
+      "durationMin": 4,
+      "isProtected": true,
+      "hasPassword": true
     },
     {
       "caseId": "OSPE-PD84M1W202B",
-      "title": "Ointment 2B",
+      "title": "OSPE-PD84M1W202B",
       "category": "Product",
-      "mainGroup": "เทคนิคพิเศษ",
-      "subTopic": "",
-      "disease": "Ointment & Weighing",
+      "mainGroup": "Mock Exam 2569",
+      "subTopic": "🔒 ข้อสอบลับ (ต้องใช้รหัสผ่าน)",
+      "disease": "🔒 ล็อกด้วยรหัสผ่าน (Secret Mock)",
       "difficulty": 2,
       "docId": "1Bjdz8c6-Gr5GIHGllXIvt0FLPeWTAdZy586vtVDOr24",
       "author": "RxCU84",
       "createdDate": "15/10/2569",
       "source": "Mock Exam 2569 (Week 2) ชุด B",
       "isActive": true,
+      "caseStatus": "Active",
       "linkedNextCase": "",
-      "linkedFromCase": ""
+      "linkedFromCase": "",
+      "durationMin": 4,
+      "isProtected": true,
+      "hasPassword": true
     },
     {
       "caseId": "OSPE-PD84M1W203A",
-      "title": "พัก 3A",
+      "title": "OSPE-PD84M1W203A",
       "category": "Product",
-      "mainGroup": "",
-      "subTopic": "",
-      "disease": "",
+      "mainGroup": "Mock Exam 2569",
+      "subTopic": "🔒 ข้อสอบลับ (ต้องใช้รหัสผ่าน)",
+      "disease": "🔒 ล็อกด้วยรหัสผ่าน (Secret Mock)",
       "difficulty": 2,
       "docId": "1Bjdz8c6-Gr5GIHGllXIvt0FLPeWTAdZy586vtVDOr24",
       "author": "RxCU84",
       "createdDate": "15/10/2569",
       "source": "Mock Exam 2569 (Week 2) ชุด A",
       "isActive": true,
+      "caseStatus": "Active",
       "linkedNextCase": "",
-      "linkedFromCase": ""
+      "linkedFromCase": "",
+      "durationMin": 8,
+      "isProtected": true,
+      "hasPassword": true
     },
     {
       "caseId": "OSPE-PD84M1W203B",
-      "title": "พัก 3B",
+      "title": "OSPE-PD84M1W203B",
       "category": "Product",
-      "mainGroup": "",
-      "subTopic": "",
-      "disease": "",
+      "mainGroup": "Mock Exam 2569",
+      "subTopic": "🔒 ข้อสอบลับ (ต้องใช้รหัสผ่าน)",
+      "disease": "🔒 ล็อกด้วยรหัสผ่าน (Secret Mock)",
       "difficulty": 2,
       "docId": "1Bjdz8c6-Gr5GIHGllXIvt0FLPeWTAdZy586vtVDOr24",
       "author": "RxCU84",
       "createdDate": "15/10/2569",
       "source": "Mock Exam 2569 (Week 2) ชุด B",
       "isActive": true,
+      "caseStatus": "Active",
       "linkedNextCase": "",
-      "linkedFromCase": ""
+      "linkedFromCase": "",
+      "durationMin": 8,
+      "isProtected": true,
+      "hasPassword": true
     },
     {
       "caseId": "OSPE-PD84M1W204A",
-      "title": "Trituration 4A",
+      "title": "OSPE-PD84M1W204A",
       "category": "Product",
-      "mainGroup": "Semisolid Dosage Form",
-      "subTopic": "",
-      "disease": "Trituration",
+      "mainGroup": "Mock Exam 2569",
+      "subTopic": "🔒 ข้อสอบลับ (ต้องใช้รหัสผ่าน)",
+      "disease": "🔒 ล็อกด้วยรหัสผ่าน (Secret Mock)",
       "difficulty": 2,
       "docId": "1Bjdz8c6-Gr5GIHGllXIvt0FLPeWTAdZy586vtVDOr24",
       "author": "RxCU84",
       "createdDate": "15/10/2569",
       "source": "Mock Exam 2569 (Week 2) ชุด A",
       "isActive": true,
+      "caseStatus": "Active",
       "linkedNextCase": "",
-      "linkedFromCase": ""
+      "linkedFromCase": "",
+      "durationMin": 4,
+      "isProtected": true,
+      "hasPassword": true
     },
     {
       "caseId": "OSPE-PD84M1W204B",
-      "title": "Trituration 4B",
+      "title": "OSPE-PD84M1W204B",
       "category": "Product",
-      "mainGroup": "Semisolid Dosage Form",
-      "subTopic": "",
-      "disease": "Trituration",
+      "mainGroup": "Mock Exam 2569",
+      "subTopic": "🔒 ข้อสอบลับ (ต้องใช้รหัสผ่าน)",
+      "disease": "🔒 ล็อกด้วยรหัสผ่าน (Secret Mock)",
       "difficulty": 2,
       "docId": "1Bjdz8c6-Gr5GIHGllXIvt0FLPeWTAdZy586vtVDOr24",
       "author": "RxCU84",
       "createdDate": "15/10/2569",
       "source": "Mock Exam 2569 (Week 2) ชุด B",
       "isActive": true,
+      "caseStatus": "Active",
       "linkedNextCase": "",
-      "linkedFromCase": ""
+      "linkedFromCase": "",
+      "durationMin": 4,
+      "isProtected": true,
+      "hasPassword": true
     },
     {
       "caseId": "OSPE-PD84M1W205A",
-      "title": "Ointment 5A",
+      "title": "OSPE-PD84M1W205A",
       "category": "Product",
-      "mainGroup": "Semisolid Dosage Form",
-      "subTopic": "",
-      "disease": "Ointment & Spatulation",
+      "mainGroup": "Mock Exam 2569",
+      "subTopic": "🔒 ข้อสอบลับ (ต้องใช้รหัสผ่าน)",
+      "disease": "🔒 ล็อกด้วยรหัสผ่าน (Secret Mock)",
       "difficulty": 2,
       "docId": "1Bjdz8c6-Gr5GIHGllXIvt0FLPeWTAdZy586vtVDOr24",
       "author": "RxCU84",
       "createdDate": "15/10/2569",
       "source": "Mock Exam 2569 (Week 2) ชุด A",
       "isActive": true,
+      "caseStatus": "Active",
       "linkedNextCase": "",
-      "linkedFromCase": ""
+      "linkedFromCase": "",
+      "durationMin": 4,
+      "isProtected": true,
+      "hasPassword": true
     },
     {
       "caseId": "OSPE-PD84M1W205B",
-      "title": "Ointment 5B",
+      "title": "OSPE-PD84M1W205B",
       "category": "Product",
-      "mainGroup": "Semisolid Dosage Form",
-      "subTopic": "",
-      "disease": "Ointment & Spatulation",
+      "mainGroup": "Mock Exam 2569",
+      "subTopic": "🔒 ข้อสอบลับ (ต้องใช้รหัสผ่าน)",
+      "disease": "🔒 ล็อกด้วยรหัสผ่าน (Secret Mock)",
       "difficulty": 2,
       "docId": "1Bjdz8c6-Gr5GIHGllXIvt0FLPeWTAdZy586vtVDOr24",
       "author": "RxCU84",
       "createdDate": "15/10/2569",
       "source": "Mock Exam 2569 (Week 2) ชุด B",
       "isActive": true,
+      "caseStatus": "Active",
       "linkedNextCase": "",
-      "linkedFromCase": ""
+      "linkedFromCase": "",
+      "durationMin": 4,
+      "isProtected": true,
+      "hasPassword": true
     },
     {
       "caseId": "OSPE-PD84W101",
@@ -4164,6 +5121,7 @@ const OFFLINE_DATA = {
       "createdDate": "02/10/2026",
       "source": "โจทย์ซ้อม Product Week 1 (RxCU84)",
       "isActive": true,
+      "caseStatus": "Active",
       "linkedNextCase": "",
       "linkedFromCase": ""
     },
@@ -4180,6 +5138,7 @@ const OFFLINE_DATA = {
       "createdDate": "02/10/2026",
       "source": "โจทย์ซ้อม Product Week 1 (RxCU84)",
       "isActive": true,
+      "caseStatus": "Active",
       "linkedNextCase": "",
       "linkedFromCase": ""
     },
@@ -4196,6 +5155,7 @@ const OFFLINE_DATA = {
       "createdDate": "02/10/2026",
       "source": "โจทย์ซ้อม Product Week 1 (RxCU84)",
       "isActive": true,
+      "caseStatus": "Active",
       "linkedNextCase": "",
       "linkedFromCase": ""
     },
@@ -4212,6 +5172,7 @@ const OFFLINE_DATA = {
       "createdDate": "02/10/2026",
       "source": "โจทย์ซ้อม Product Week 1 (RxCU84)",
       "isActive": true,
+      "caseStatus": "Active",
       "linkedNextCase": "",
       "linkedFromCase": ""
     },
@@ -4228,6 +5189,7 @@ const OFFLINE_DATA = {
       "createdDate": "09/10/2026",
       "source": "โจทย์ซ้อม Prodct Week 2 (RxCU84)",
       "isActive": true,
+      "caseStatus": "Active",
       "linkedNextCase": "",
       "linkedFromCase": ""
     },
@@ -4244,6 +5206,7 @@ const OFFLINE_DATA = {
       "createdDate": "09/10/2026",
       "source": "โจทย์ซ้อม Prodct Week 2 (RxCU84)",
       "isActive": true,
+      "caseStatus": "Active",
       "linkedNextCase": "OSPE-PD84W203",
       "linkedFromCase": ""
     },
@@ -4260,6 +5223,7 @@ const OFFLINE_DATA = {
       "createdDate": "09/10/2026",
       "source": "โจทย์ซ้อม Prodct Week 2 (RxCU84)",
       "isActive": true,
+      "caseStatus": "Active",
       "linkedNextCase": "OSPE-PD84W204",
       "linkedFromCase": "OSPE-PD84W202"
     },
@@ -4276,6 +5240,7 @@ const OFFLINE_DATA = {
       "createdDate": "09/10/2026",
       "source": "โจทย์ซ้อม Prodct Week 2 (RxCU84)",
       "isActive": true,
+      "caseStatus": "Active",
       "linkedNextCase": "",
       "linkedFromCase": "OSPE-PD84W203"
     },
@@ -4292,6 +5257,7 @@ const OFFLINE_DATA = {
       "createdDate": "15/10/2569",
       "source": "ไม่ระบุ",
       "isActive": true,
+      "caseStatus": "Active",
       "linkedNextCase": "",
       "linkedFromCase": ""
     },
@@ -4308,6 +5274,7 @@ const OFFLINE_DATA = {
       "createdDate": "15/10/2569",
       "source": "ไม่ระบุ",
       "isActive": true,
+      "caseStatus": "Active",
       "linkedNextCase": "",
       "linkedFromCase": ""
     },
@@ -4324,6 +5291,7 @@ const OFFLINE_DATA = {
       "createdDate": "15/10/2569",
       "source": "ไม่ระบุ",
       "isActive": true,
+      "caseStatus": "Active",
       "linkedNextCase": "",
       "linkedFromCase": ""
     },
@@ -4340,6 +5308,7 @@ const OFFLINE_DATA = {
       "createdDate": "15/10/2569",
       "source": "ไม่ระบุ",
       "isActive": true,
+      "caseStatus": "Active",
       "linkedNextCase": "",
       "linkedFromCase": ""
     },
@@ -4356,6 +5325,7 @@ const OFFLINE_DATA = {
       "createdDate": "15/10/2569",
       "source": "ไม่ระบุ",
       "isActive": true,
+      "caseStatus": "Active",
       "linkedNextCase": "",
       "linkedFromCase": ""
     },
@@ -4372,6 +5342,7 @@ const OFFLINE_DATA = {
       "createdDate": "15/10/2569",
       "source": "ไม่ระบุ",
       "isActive": true,
+      "caseStatus": "Active",
       "linkedNextCase": "",
       "linkedFromCase": ""
     },
@@ -4388,6 +5359,7 @@ const OFFLINE_DATA = {
       "createdDate": "15/10/2569",
       "source": "ไม่ระบุ",
       "isActive": true,
+      "caseStatus": "Active",
       "linkedNextCase": "",
       "linkedFromCase": ""
     },
@@ -4404,6 +5376,7 @@ const OFFLINE_DATA = {
       "createdDate": "15/10/2569",
       "source": "ไม่ระบุ",
       "isActive": true,
+      "caseStatus": "Active",
       "linkedNextCase": "",
       "linkedFromCase": ""
     },
@@ -4420,6 +5393,7 @@ const OFFLINE_DATA = {
       "createdDate": "15/10/2569",
       "source": "ไม่ระบุ",
       "isActive": true,
+      "caseStatus": "Active",
       "linkedNextCase": "",
       "linkedFromCase": ""
     },
@@ -4436,6 +5410,7 @@ const OFFLINE_DATA = {
       "createdDate": "15/10/2569",
       "source": "ไม่ระบุ",
       "isActive": true,
+      "caseStatus": "Active",
       "linkedNextCase": "",
       "linkedFromCase": ""
     },
@@ -4452,6 +5427,7 @@ const OFFLINE_DATA = {
       "createdDate": "15/10/2569",
       "source": "ไม่ระบุ",
       "isActive": true,
+      "caseStatus": "Active",
       "linkedNextCase": "",
       "linkedFromCase": ""
     },
@@ -4468,6 +5444,7 @@ const OFFLINE_DATA = {
       "createdDate": "15/10/2569",
       "source": "ไม่ระบุ",
       "isActive": true,
+      "caseStatus": "Active",
       "linkedNextCase": "",
       "linkedFromCase": ""
     },
@@ -4484,6 +5461,7 @@ const OFFLINE_DATA = {
       "createdDate": "15/10/2569",
       "source": "ไม่ระบุ",
       "isActive": true,
+      "caseStatus": "Active",
       "linkedNextCase": "",
       "linkedFromCase": ""
     },
@@ -4500,6 +5478,7 @@ const OFFLINE_DATA = {
       "createdDate": "15/10/2569",
       "source": "ไม่ระบุ",
       "isActive": true,
+      "caseStatus": "Active",
       "linkedNextCase": "",
       "linkedFromCase": ""
     },
@@ -4516,6 +5495,7 @@ const OFFLINE_DATA = {
       "createdDate": "15/10/2569",
       "source": "ไม่ระบุ",
       "isActive": true,
+      "caseStatus": "Active",
       "linkedNextCase": "",
       "linkedFromCase": ""
     },
@@ -4532,6 +5512,7 @@ const OFFLINE_DATA = {
       "createdDate": "15/10/2569",
       "source": "ไม่ระบุ",
       "isActive": true,
+      "caseStatus": "Active",
       "linkedNextCase": "OSPE-PDSS10",
       "linkedFromCase": ""
     },
@@ -4548,6 +5529,7 @@ const OFFLINE_DATA = {
       "createdDate": "15/10/2569",
       "source": "ไม่ระบุ",
       "isActive": true,
+      "caseStatus": "Active",
       "linkedNextCase": "",
       "linkedFromCase": "OSPE-PDSS09"
     },
@@ -4564,6 +5546,7 @@ const OFFLINE_DATA = {
       "createdDate": "15/10/2569",
       "source": "ไม่ระบุ",
       "isActive": true,
+      "caseStatus": "Active",
       "linkedNextCase": "",
       "linkedFromCase": ""
     },
@@ -4580,6 +5563,7 @@ const OFFLINE_DATA = {
       "createdDate": "15/10/2569",
       "source": "ไม่ระบุ",
       "isActive": true,
+      "caseStatus": "Active",
       "linkedNextCase": "",
       "linkedFromCase": ""
     },
@@ -4596,6 +5580,7 @@ const OFFLINE_DATA = {
       "createdDate": "15/10/2569",
       "source": "ไม่ระบุ",
       "isActive": true,
+      "caseStatus": "Active",
       "linkedNextCase": "OSPE-PDSS14",
       "linkedFromCase": ""
     },
@@ -4612,6 +5597,7 @@ const OFFLINE_DATA = {
       "createdDate": "15/10/2569",
       "source": "ไม่ระบุ",
       "isActive": true,
+      "caseStatus": "Active",
       "linkedNextCase": "",
       "linkedFromCase": "OSPE-PDSS13"
     },
@@ -4628,6 +5614,7 @@ const OFFLINE_DATA = {
       "createdDate": "15/10/2569",
       "source": "ไม่ระบุ",
       "isActive": true,
+      "caseStatus": "Active",
       "linkedNextCase": "",
       "linkedFromCase": ""
     },
@@ -4644,6 +5631,7 @@ const OFFLINE_DATA = {
       "createdDate": "15/10/2569",
       "source": "ไม่ระบุ",
       "isActive": true,
+      "caseStatus": "Active",
       "linkedNextCase": "",
       "linkedFromCase": ""
     },
@@ -4660,6 +5648,7 @@ const OFFLINE_DATA = {
       "createdDate": "15/10/2569",
       "source": "ไม่ระบุ",
       "isActive": true,
+      "caseStatus": "Active",
       "linkedNextCase": "OSPE-PDSS18",
       "linkedFromCase": ""
     },
@@ -4676,6 +5665,7 @@ const OFFLINE_DATA = {
       "createdDate": "15/10/2569",
       "source": "ไม่ระบุ",
       "isActive": true,
+      "caseStatus": "Active",
       "linkedNextCase": "",
       "linkedFromCase": "OSPE-PDSS17"
     },
@@ -4692,6 +5682,7 @@ const OFFLINE_DATA = {
       "createdDate": "15/10/2569",
       "source": "ไม่ระบุ",
       "isActive": true,
+      "caseStatus": "Active",
       "linkedNextCase": "OSPE-PDSS20",
       "linkedFromCase": ""
     },
@@ -4708,6 +5699,7 @@ const OFFLINE_DATA = {
       "createdDate": "15/10/2569",
       "source": "ไม่ระบุ",
       "isActive": true,
+      "caseStatus": "Active",
       "linkedNextCase": "",
       "linkedFromCase": "OSPE-PDSS19"
     },
@@ -4724,6 +5716,7 @@ const OFFLINE_DATA = {
       "createdDate": "15/10/2569",
       "source": "ไม่ระบุ",
       "isActive": true,
+      "caseStatus": "Active",
       "linkedNextCase": "OSPE-PDSS22",
       "linkedFromCase": ""
     },
@@ -4740,6 +5733,7 @@ const OFFLINE_DATA = {
       "createdDate": "15/10/2569",
       "source": "ไม่ระบุ",
       "isActive": true,
+      "caseStatus": "Active",
       "linkedNextCase": "",
       "linkedFromCase": "OSPE-PDSS21"
     },
@@ -4756,6 +5750,7 @@ const OFFLINE_DATA = {
       "createdDate": "15/10/2569",
       "source": "ไม่ระบุ",
       "isActive": true,
+      "caseStatus": "Active",
       "linkedNextCase": "",
       "linkedFromCase": ""
     },
@@ -4772,6 +5767,7 @@ const OFFLINE_DATA = {
       "createdDate": "15/10/2569",
       "source": "ไม่ระบุ",
       "isActive": true,
+      "caseStatus": "Active",
       "linkedNextCase": "",
       "linkedFromCase": ""
     },
@@ -4788,6 +5784,7 @@ const OFFLINE_DATA = {
       "createdDate": "15/10/2569",
       "source": "ไม่ระบุ",
       "isActive": true,
+      "caseStatus": "Active",
       "linkedNextCase": "",
       "linkedFromCase": ""
     },
@@ -4804,6 +5801,7 @@ const OFFLINE_DATA = {
       "createdDate": "15/10/2569",
       "source": "ไม่ระบุ",
       "isActive": true,
+      "caseStatus": "Active",
       "linkedNextCase": "",
       "linkedFromCase": ""
     },
@@ -4820,6 +5818,7 @@ const OFFLINE_DATA = {
       "createdDate": "15/10/2569",
       "source": "ไม่ระบุ",
       "isActive": true,
+      "caseStatus": "Active",
       "linkedNextCase": "",
       "linkedFromCase": ""
     },
@@ -4836,6 +5835,7 @@ const OFFLINE_DATA = {
       "createdDate": "15/10/2569",
       "source": "ไม่ระบุ",
       "isActive": true,
+      "caseStatus": "Active",
       "linkedNextCase": "",
       "linkedFromCase": ""
     },
@@ -4852,6 +5852,7 @@ const OFFLINE_DATA = {
       "createdDate": "15/10/2569",
       "source": "ไม่ระบุ",
       "isActive": true,
+      "caseStatus": "Active",
       "linkedNextCase": "",
       "linkedFromCase": ""
     },
@@ -4868,6 +5869,7 @@ const OFFLINE_DATA = {
       "createdDate": "15/10/2569",
       "source": "ไม่ระบุ",
       "isActive": true,
+      "caseStatus": "Active",
       "linkedNextCase": "",
       "linkedFromCase": ""
     },
@@ -4884,6 +5886,7 @@ const OFFLINE_DATA = {
       "createdDate": "15/10/2569",
       "source": "ไม่ระบุ",
       "isActive": true,
+      "caseStatus": "Active",
       "linkedNextCase": "",
       "linkedFromCase": ""
     },
@@ -4900,6 +5903,7 @@ const OFFLINE_DATA = {
       "createdDate": "15/10/2569",
       "source": "ไม่ระบุ",
       "isActive": true,
+      "caseStatus": "Active",
       "linkedNextCase": "",
       "linkedFromCase": ""
     },
@@ -4916,6 +5920,7 @@ const OFFLINE_DATA = {
       "createdDate": "15/10/2569",
       "source": "ไม่ระบุ",
       "isActive": true,
+      "caseStatus": "Active",
       "linkedNextCase": "",
       "linkedFromCase": ""
     },
@@ -4932,6 +5937,7 @@ const OFFLINE_DATA = {
       "createdDate": "15/10/2569",
       "source": "ไม่ระบุ",
       "isActive": true,
+      "caseStatus": "Active",
       "linkedNextCase": "",
       "linkedFromCase": ""
     },
@@ -4948,6 +5954,7 @@ const OFFLINE_DATA = {
       "createdDate": "15/10/2569",
       "source": "ไม่ระบุ",
       "isActive": true,
+      "caseStatus": "Active",
       "linkedNextCase": "",
       "linkedFromCase": ""
     },
@@ -4964,6 +5971,7 @@ const OFFLINE_DATA = {
       "createdDate": "15/10/2569",
       "source": "ไม่ระบุ",
       "isActive": true,
+      "caseStatus": "Active",
       "linkedNextCase": "",
       "linkedFromCase": ""
     },
@@ -4980,6 +5988,7 @@ const OFFLINE_DATA = {
       "createdDate": "15/10/2569",
       "source": "ไม่ระบุ",
       "isActive": true,
+      "caseStatus": "Active",
       "linkedNextCase": "",
       "linkedFromCase": ""
     },
@@ -4996,6 +6005,7 @@ const OFFLINE_DATA = {
       "createdDate": "15/10/2569",
       "source": "ไม่ระบุ",
       "isActive": true,
+      "caseStatus": "Active",
       "linkedNextCase": "",
       "linkedFromCase": ""
     },
@@ -5012,6 +6022,7 @@ const OFFLINE_DATA = {
       "createdDate": "15/10/2569",
       "source": "ไม่ระบุ",
       "isActive": true,
+      "caseStatus": "Active",
       "linkedNextCase": "",
       "linkedFromCase": ""
     },
@@ -5028,6 +6039,7 @@ const OFFLINE_DATA = {
       "createdDate": "15/10/2569",
       "source": "ไม่ระบุ",
       "isActive": true,
+      "caseStatus": "Active",
       "linkedNextCase": "",
       "linkedFromCase": ""
     },
@@ -5044,6 +6056,7 @@ const OFFLINE_DATA = {
       "createdDate": "15/10/2569",
       "source": "ไม่ระบุ",
       "isActive": true,
+      "caseStatus": "Active",
       "linkedNextCase": "",
       "linkedFromCase": ""
     },
@@ -5060,6 +6073,7 @@ const OFFLINE_DATA = {
       "createdDate": "15/10/2569",
       "source": "ไม่ระบุ",
       "isActive": true,
+      "caseStatus": "Active",
       "linkedNextCase": "",
       "linkedFromCase": ""
     },
@@ -5076,6 +6090,7 @@ const OFFLINE_DATA = {
       "createdDate": "15/10/2569",
       "source": "ไม่ระบุ",
       "isActive": true,
+      "caseStatus": "Active",
       "linkedNextCase": "",
       "linkedFromCase": ""
     },
@@ -5092,6 +6107,7 @@ const OFFLINE_DATA = {
       "createdDate": "15/10/2569",
       "source": "ไม่ระบุ",
       "isActive": true,
+      "caseStatus": "Active",
       "linkedNextCase": "",
       "linkedFromCase": ""
     },
@@ -5108,6 +6124,7 @@ const OFFLINE_DATA = {
       "createdDate": "15/10/2569",
       "source": "ไม่ระบุ",
       "isActive": true,
+      "caseStatus": "Active",
       "linkedNextCase": "",
       "linkedFromCase": ""
     },
@@ -5124,6 +6141,7 @@ const OFFLINE_DATA = {
       "createdDate": "15/10/2569",
       "source": "ไม่ระบุ",
       "isActive": true,
+      "caseStatus": "Active",
       "linkedNextCase": "",
       "linkedFromCase": ""
     },
@@ -5140,6 +6158,7 @@ const OFFLINE_DATA = {
       "createdDate": "15/10/2569",
       "source": "ไม่ระบุ",
       "isActive": true,
+      "caseStatus": "Active",
       "linkedNextCase": "",
       "linkedFromCase": ""
     },
@@ -5156,6 +6175,7 @@ const OFFLINE_DATA = {
       "createdDate": "15/10/2569",
       "source": "ไม่ระบุ",
       "isActive": true,
+      "caseStatus": "Active",
       "linkedNextCase": "",
       "linkedFromCase": ""
     },
@@ -5172,6 +6192,7 @@ const OFFLINE_DATA = {
       "createdDate": "15/10/2569",
       "source": "ไม่ระบุ",
       "isActive": true,
+      "caseStatus": "Active",
       "linkedNextCase": "",
       "linkedFromCase": ""
     },
@@ -5188,6 +6209,7 @@ const OFFLINE_DATA = {
       "createdDate": "30/09/2026",
       "source": "ข้อสอบจริง ปี 2548",
       "isActive": true,
+      "caseStatus": "Active",
       "linkedNextCase": "",
       "linkedFromCase": ""
     },
@@ -5204,6 +6226,7 @@ const OFFLINE_DATA = {
       "createdDate": "30/09/2026",
       "source": "ข้อสอบจริง ปี 2548",
       "isActive": true,
+      "caseStatus": "Active",
       "linkedNextCase": "",
       "linkedFromCase": ""
     },
@@ -5220,6 +6243,7 @@ const OFFLINE_DATA = {
       "createdDate": "30/09/2026",
       "source": "ข้อสอบจริง ปี 2549",
       "isActive": true,
+      "caseStatus": "Active",
       "linkedNextCase": "",
       "linkedFromCase": ""
     },
@@ -5236,6 +6260,7 @@ const OFFLINE_DATA = {
       "createdDate": "30/09/2026",
       "source": "ข้อสอบจริง ปี 2549",
       "isActive": true,
+      "caseStatus": "Active",
       "linkedNextCase": "",
       "linkedFromCase": ""
     },
@@ -5252,6 +6277,7 @@ const OFFLINE_DATA = {
       "createdDate": "30/09/2026",
       "source": "ข้อสอบจริง ปี 2549",
       "isActive": true,
+      "caseStatus": "Active",
       "linkedNextCase": "",
       "linkedFromCase": ""
     },
@@ -5268,6 +6294,7 @@ const OFFLINE_DATA = {
       "createdDate": "30/09/2026",
       "source": "ข้อสอบจริง ปี 2550",
       "isActive": true,
+      "caseStatus": "Active",
       "linkedNextCase": "",
       "linkedFromCase": ""
     },
@@ -5284,6 +6311,7 @@ const OFFLINE_DATA = {
       "createdDate": "30/09/2026",
       "source": "ข้อสอบจริง ปี 2550",
       "isActive": true,
+      "caseStatus": "Active",
       "linkedNextCase": "",
       "linkedFromCase": ""
     },
@@ -5300,6 +6328,7 @@ const OFFLINE_DATA = {
       "createdDate": "30/09/2026",
       "source": "ข้อสอบจริง ปี 2550",
       "isActive": true,
+      "caseStatus": "Active",
       "linkedNextCase": "",
       "linkedFromCase": ""
     },
@@ -5316,6 +6345,7 @@ const OFFLINE_DATA = {
       "createdDate": "30/09/2026",
       "source": "ข้อสอบจริง ปี 2550",
       "isActive": true,
+      "caseStatus": "Active",
       "linkedNextCase": "",
       "linkedFromCase": ""
     },
@@ -5332,6 +6362,7 @@ const OFFLINE_DATA = {
       "createdDate": "30/09/2026",
       "source": "ข้อสอบจริง ปี 2550",
       "isActive": true,
+      "caseStatus": "Active",
       "linkedNextCase": "",
       "linkedFromCase": ""
     },
@@ -5348,6 +6379,7 @@ const OFFLINE_DATA = {
       "createdDate": "30/09/2026",
       "source": "ข้อสอบจริง ปี 2551",
       "isActive": true,
+      "caseStatus": "Active",
       "linkedNextCase": "",
       "linkedFromCase": ""
     },
@@ -5364,6 +6396,7 @@ const OFFLINE_DATA = {
       "createdDate": "30/09/2026",
       "source": "ข้อสอบจริง ปี 2551",
       "isActive": true,
+      "caseStatus": "Active",
       "linkedNextCase": "",
       "linkedFromCase": ""
     },
@@ -5380,6 +6413,7 @@ const OFFLINE_DATA = {
       "createdDate": "30/09/2026",
       "source": "ข้อสอบจริง ปี 2552",
       "isActive": true,
+      "caseStatus": "Active",
       "linkedNextCase": "",
       "linkedFromCase": ""
     },
@@ -5396,6 +6430,7 @@ const OFFLINE_DATA = {
       "createdDate": "30/09/2026",
       "source": "ข้อสอบจริง ปี 2552",
       "isActive": true,
+      "caseStatus": "Active",
       "linkedNextCase": "",
       "linkedFromCase": ""
     },
@@ -5412,6 +6447,7 @@ const OFFLINE_DATA = {
       "createdDate": "30/09/2026",
       "source": "ข้อสอบจริง ปี 2552",
       "isActive": true,
+      "caseStatus": "Active",
       "linkedNextCase": "",
       "linkedFromCase": ""
     },
@@ -5428,6 +6464,7 @@ const OFFLINE_DATA = {
       "createdDate": "30/09/2026",
       "source": "ข้อสอบจริง ปี 2553",
       "isActive": true,
+      "caseStatus": "Active",
       "linkedNextCase": "",
       "linkedFromCase": ""
     },
@@ -5444,6 +6481,7 @@ const OFFLINE_DATA = {
       "createdDate": "30/09/2026",
       "source": "ข้อสอบจริง ปี 2553",
       "isActive": true,
+      "caseStatus": "Active",
       "linkedNextCase": "",
       "linkedFromCase": ""
     },
@@ -5460,6 +6498,7 @@ const OFFLINE_DATA = {
       "createdDate": "30/09/2026",
       "source": "ข้อสอบจริง ปี 2553",
       "isActive": true,
+      "caseStatus": "Active",
       "linkedNextCase": "",
       "linkedFromCase": ""
     },
@@ -5476,6 +6515,7 @@ const OFFLINE_DATA = {
       "createdDate": "30/09/2026",
       "source": "ข้อสอบจริง ปี 2553",
       "isActive": true,
+      "caseStatus": "Active",
       "linkedNextCase": "",
       "linkedFromCase": ""
     },
@@ -5492,6 +6532,7 @@ const OFFLINE_DATA = {
       "createdDate": "30/09/2026",
       "source": "ข้อสอบจริง ปี 2554",
       "isActive": true,
+      "caseStatus": "Active",
       "linkedNextCase": "",
       "linkedFromCase": ""
     },
@@ -5508,6 +6549,7 @@ const OFFLINE_DATA = {
       "createdDate": "30/09/2026",
       "source": "ข้อสอบจริง ปี 2554",
       "isActive": true,
+      "caseStatus": "Active",
       "linkedNextCase": "",
       "linkedFromCase": ""
     },
@@ -5524,6 +6566,7 @@ const OFFLINE_DATA = {
       "createdDate": "30/09/2026",
       "source": "ข้อสอบจริง ปี 2554",
       "isActive": true,
+      "caseStatus": "Active",
       "linkedNextCase": "",
       "linkedFromCase": ""
     },
@@ -5540,6 +6583,7 @@ const OFFLINE_DATA = {
       "createdDate": "30/09/2026",
       "source": "ข้อสอบจริง ปี 2555",
       "isActive": true,
+      "caseStatus": "Active",
       "linkedNextCase": "",
       "linkedFromCase": ""
     },
@@ -5556,6 +6600,7 @@ const OFFLINE_DATA = {
       "createdDate": "30/09/2026",
       "source": "ข้อสอบจริง ปี 2555",
       "isActive": true,
+      "caseStatus": "Active",
       "linkedNextCase": "",
       "linkedFromCase": ""
     },
@@ -5572,6 +6617,7 @@ const OFFLINE_DATA = {
       "createdDate": "30/09/2026",
       "source": "ข้อสอบจริง ปี 2555",
       "isActive": true,
+      "caseStatus": "Active",
       "linkedNextCase": "",
       "linkedFromCase": ""
     },
@@ -5588,6 +6634,7 @@ const OFFLINE_DATA = {
       "createdDate": "30/09/2026",
       "source": "ข้อสอบจริง ปี 2555",
       "isActive": true,
+      "caseStatus": "Active",
       "linkedNextCase": "",
       "linkedFromCase": ""
     },
@@ -5604,6 +6651,7 @@ const OFFLINE_DATA = {
       "createdDate": "30/09/2026",
       "source": "ข้อสอบจริง ปี 2556",
       "isActive": true,
+      "caseStatus": "Active",
       "linkedNextCase": "",
       "linkedFromCase": ""
     },
@@ -5620,6 +6668,7 @@ const OFFLINE_DATA = {
       "createdDate": "30/09/2026",
       "source": "ข้อสอบจริง ปี 2556",
       "isActive": true,
+      "caseStatus": "Active",
       "linkedNextCase": "",
       "linkedFromCase": ""
     },
@@ -5636,6 +6685,7 @@ const OFFLINE_DATA = {
       "createdDate": "30/09/2026",
       "source": "ข้อสอบจริง ปี 2556",
       "isActive": true,
+      "caseStatus": "Active",
       "linkedNextCase": "",
       "linkedFromCase": ""
     },
@@ -5652,6 +6702,7 @@ const OFFLINE_DATA = {
       "createdDate": "30/09/2026",
       "source": "ข้อสอบจริง ปี 2556",
       "isActive": true,
+      "caseStatus": "Active",
       "linkedNextCase": "",
       "linkedFromCase": ""
     },
@@ -5668,6 +6719,7 @@ const OFFLINE_DATA = {
       "createdDate": "30/09/2026",
       "source": "ข้อสอบจริง ปี 2557",
       "isActive": true,
+      "caseStatus": "Active",
       "linkedNextCase": "",
       "linkedFromCase": ""
     },
@@ -5684,6 +6736,7 @@ const OFFLINE_DATA = {
       "createdDate": "30/09/2026",
       "source": "ข้อสอบจริง ปี 2557",
       "isActive": true,
+      "caseStatus": "Active",
       "linkedNextCase": "",
       "linkedFromCase": ""
     },
@@ -5700,6 +6753,7 @@ const OFFLINE_DATA = {
       "createdDate": "30/09/2026",
       "source": "ข้อสอบจริง ปี 2557",
       "isActive": true,
+      "caseStatus": "Active",
       "linkedNextCase": "",
       "linkedFromCase": ""
     },
@@ -5716,6 +6770,7 @@ const OFFLINE_DATA = {
       "createdDate": "30/09/2026",
       "source": "ข้อสอบจริง ปี 2558",
       "isActive": true,
+      "caseStatus": "Active",
       "linkedNextCase": "",
       "linkedFromCase": ""
     },
@@ -5732,6 +6787,7 @@ const OFFLINE_DATA = {
       "createdDate": "30/09/2026",
       "source": "ข้อสอบจริง ปี 2558",
       "isActive": true,
+      "caseStatus": "Active",
       "linkedNextCase": "",
       "linkedFromCase": ""
     },
@@ -5748,6 +6804,7 @@ const OFFLINE_DATA = {
       "createdDate": "30/09/2026",
       "source": "ข้อสอบจริง ปี 2558",
       "isActive": true,
+      "caseStatus": "Active",
       "linkedNextCase": "",
       "linkedFromCase": ""
     },
@@ -5764,6 +6821,7 @@ const OFFLINE_DATA = {
       "createdDate": "30/09/2026",
       "source": "ข้อสอบจริง ปี 2558",
       "isActive": true,
+      "caseStatus": "Active",
       "linkedNextCase": "",
       "linkedFromCase": ""
     },
@@ -5780,6 +6838,7 @@ const OFFLINE_DATA = {
       "createdDate": "30/09/2026",
       "source": "ข้อสอบจริง ปี 2559",
       "isActive": true,
+      "caseStatus": "Active",
       "linkedNextCase": "",
       "linkedFromCase": ""
     },
@@ -5796,6 +6855,7 @@ const OFFLINE_DATA = {
       "createdDate": "01/10/2026",
       "source": "ข้อสอบจริง ปี 2560",
       "isActive": true,
+      "caseStatus": "Active",
       "linkedNextCase": "",
       "linkedFromCase": ""
     },
@@ -5812,6 +6872,7 @@ const OFFLINE_DATA = {
       "createdDate": "01/10/2026",
       "source": "ข้อสอบจริง ปี 2561",
       "isActive": true,
+      "caseStatus": "Active",
       "linkedNextCase": "",
       "linkedFromCase": ""
     },
@@ -5828,6 +6889,7 @@ const OFFLINE_DATA = {
       "createdDate": "01/10/2026",
       "source": "ข้อสอบจริง ปี 2562",
       "isActive": true,
+      "caseStatus": "Active",
       "linkedNextCase": "",
       "linkedFromCase": ""
     },
@@ -5844,6 +6906,7 @@ const OFFLINE_DATA = {
       "createdDate": "01/10/2026",
       "source": "ข้อสอบจริง ปี 2563",
       "isActive": true,
+      "caseStatus": "Active",
       "linkedNextCase": "",
       "linkedFromCase": ""
     },
@@ -5860,6 +6923,7 @@ const OFFLINE_DATA = {
       "createdDate": "01/10/2026",
       "source": "ข้อสอบจริง ปี 2564",
       "isActive": true,
+      "caseStatus": "Active",
       "linkedNextCase": "",
       "linkedFromCase": ""
     },
@@ -5876,6 +6940,7 @@ const OFFLINE_DATA = {
       "createdDate": "01/10/2026",
       "source": "ข้อสอบจริง ปี 2565",
       "isActive": true,
+      "caseStatus": "Active",
       "linkedNextCase": "",
       "linkedFromCase": ""
     },
@@ -5892,6 +6957,7 @@ const OFFLINE_DATA = {
       "createdDate": "01/10/2026",
       "source": "ข้อสอบจริง ปี 2566",
       "isActive": true,
+      "caseStatus": "Active",
       "linkedNextCase": "",
       "linkedFromCase": ""
     },
@@ -5908,6 +6974,7 @@ const OFFLINE_DATA = {
       "createdDate": "01/10/2026",
       "source": "ข้อสอบจริง ปี 2567",
       "isActive": true,
+      "caseStatus": "Active",
       "linkedNextCase": "",
       "linkedFromCase": ""
     },
@@ -5924,6 +6991,7 @@ const OFFLINE_DATA = {
       "createdDate": "01/10/2026",
       "source": "ข้อสอบจริง ปี 2568",
       "isActive": true,
+      "caseStatus": "Active",
       "linkedNextCase": "",
       "linkedFromCase": ""
     }

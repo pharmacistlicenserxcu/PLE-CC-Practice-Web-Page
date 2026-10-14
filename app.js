@@ -1543,7 +1543,7 @@ async function forceSyncDatabase() {
     if (AppState.cases && AppState.cases.length > 0) {
       showApiStatusBanner(true, `⚡ พร้อมใช้งาน (ฐานข้อมูลในเครื่อง ${AppState.cases.length} เคส 0ms)`);
     } else if (typeof OFFLINE_DATA !== 'undefined' && OFFLINE_DATA.cases) {
-      AppState.cases = OFFLINE_DATA.cases;
+      AppState.cases = OFFLINE_DATA.cases.filter(isCaseActive);
       showApiStatusBanner(true, `⚡ พร้อมใช้งาน (ฐานข้อมูลในเครื่อง ${AppState.cases.length} เคส 0ms)`);
       onCasesLoaded();
     } else {
@@ -2539,7 +2539,7 @@ if ('serviceWorker' in navigator && window.location.protocol !== 'file:') {
 const DB_NAME = 'RxCU_OSPE_DB';
 const DB_VERSION = 1;
 const STORE_NAME = 'case_details';
-const DB_VERSION_STR = 'v_20261015_032509'; // อัปเดตเวอร์ชันนี้เพื่อบังคับโหลดใหม่เมื่อมีเคสเพิ่มเติมในสคริปต์ออฟไลน์
+const DB_VERSION_STR = 'v_20261015_033246'; // อัปเดตเวอร์ชันนี้เพื่อบังคับโหลดใหม่เมื่อมีเคสเพิ่มเติมในสคริปต์ออฟไลน์
 
 function openIndexedDB() {
   return new Promise((resolve, reject) => {

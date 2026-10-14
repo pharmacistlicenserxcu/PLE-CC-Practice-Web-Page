@@ -1140,9 +1140,9 @@
   </div><!-- /.page-viewport -->
 </div><!-- /.app-shell -->
 
-  <script src="case-data-offline.js?v=v_20261015_032509"></script>
-  <script src="case-details-offline.js?v=v_20261015_032509"></script>
-  <script src="app.js?v=v_20261015_032509"></script>
+  <script src="case-data-offline.js?v=v_20261015_033246"></script>
+  <script src="case-details-offline.js?v=v_20261015_033246"></script>
+  <script src="app.js?v=v_20261015_033246"></script>
   <script src="scratchpad.js?v=20261004_234400"></script>
   <script src="station-chat.js?v=20261004_234400"></script>
 
@@ -1677,6 +1677,9 @@
         tList.forEach(t => {
           metaContainer.innerHTML += `<span class="badge tag-badge">#${t}</span>`;
         });
+      }
+      if (c.isActive === false || String(c.isActive).toUpperCase() === 'FALSE' || c.caseStatus === 'Unactive') {
+        metaContainer.innerHTML += `<span class="badge" style="background: #ffebee; color: #c62828; border: 1px solid #ef9a9a; font-weight: 600;">⚠️ Unactive (เคสอยู่ระหว่างปรับปรุง)</span>`;
       }
       if (c.linkedNextCase) {
         metaContainer.innerHTML += `<span class="badge tag-badge" style="background: var(--warning); color: var(--warning-dark);">🔗 มีสถานีต่อเนื่อง</span>`;

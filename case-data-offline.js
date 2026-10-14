@@ -1,12 +1,12 @@
 /**
  * PLE-CC2 OSPE Practice System — Offline Case List Metadata (Auto-Generated)
- * Version: v_20261012_115945
- * Generated on 2026-10-12 11:59:45
+ * Version: v_20261014_153610
+ * Generated on 2026-10-14 15:36:10
  */
 
 const OFFLINE_DATA = {
-  "version": "v_20261012_115945",
-  "generatedAt": "2026-10-12 11:59:45",
+  "version": "v_20261014_153610",
+  "generatedAt": "2026-10-14 15:36:10",
   "totalCases": 386,
   "cases": [
     {
@@ -4251,7 +4251,27 @@ const OFFLINE_DATA = {
     },
     {
       "caseId": "OSPE-PD84M1W201A",
-      "title": "Pulverization by Intervention 1A",
+      "title": "OSPE-PD84M1W201A",
+      "category": "Product",
+      "mainGroup": "Mock Exam 2569",
+      "subTopic": "🔒 ข้อสอบลับ (ต้องใช้รหัสผ่าน)",
+      "disease": "🔒 ล็อกด้วยรหัสผ่าน (Secret Mock)",
+      "difficulty": 2,
+      "docId": "1Bjdz8c6-Gr5GIHGllXIvt0FLPeWTAdZy586vtVDOr24",
+      "author": "RxCU84",
+      "createdDate": "10/10/2569",
+      "source": "Mock Exam 2569 (Week 2) ชุด A",
+      "isActive": true,
+      "linkedNextCase": "",
+      "linkedFromCase": "",
+      "caseStatus": "Active",
+      "durationMin": 4,
+      "isProtected": true,
+      "hasPassword": true
+    },
+    {
+      "caseId": "OSPE-PD84M1W201B",
+      "title": "Pulverization by Intervention 1B",
       "category": "Product",
       "mainGroup": "เทคนิคพิเศษ",
       "subTopic": "",
@@ -4260,14 +4280,14 @@ const OFFLINE_DATA = {
       "docId": "1Bjdz8c6-Gr5GIHGllXIvt0FLPeWTAdZy586vtVDOr24",
       "author": "RxCU84",
       "createdDate": "10/10/2569",
-      "source": "Mock Exam 2569 (Week 2) ชุด A",
+      "source": "Mock Exam 2569 (Week 2) ชุด B",
       "isActive": true,
       "linkedNextCase": "",
       "linkedFromCase": ""
     },
     {
-      "caseId": "OSPE-PD84M1W201B",
-      "title": "OSPE-PD84M1W201B",
+      "caseId": "OSPE-PD84M1W202A",
+      "title": "OSPE-PD84M1W202A",
       "category": "Product",
       "mainGroup": "Mock Exam 2569",
       "subTopic": "🔒 ข้อสอบลับ (ต้องใช้รหัสผ่าน)",
@@ -4276,7 +4296,7 @@ const OFFLINE_DATA = {
       "docId": "1Bjdz8c6-Gr5GIHGllXIvt0FLPeWTAdZy586vtVDOr24",
       "author": "RxCU84",
       "createdDate": "10/10/2569",
-      "source": "Mock Exam 2569 (Week 2) ชุด B",
+      "source": "Mock Exam 2569 (Week 2) ชุด A",
       "isActive": true,
       "linkedNextCase": "",
       "linkedFromCase": "",
@@ -4286,8 +4306,8 @@ const OFFLINE_DATA = {
       "hasPassword": true
     },
     {
-      "caseId": "OSPE-PD84M1W202A",
-      "title": "Ointment 2A",
+      "caseId": "OSPE-PD84M1W202B",
+      "title": "Ointment 2B",
       "category": "Product",
       "mainGroup": "เทคนิคพิเศษ",
       "subTopic": "",
@@ -4296,50 +4316,14 @@ const OFFLINE_DATA = {
       "docId": "1Bjdz8c6-Gr5GIHGllXIvt0FLPeWTAdZy586vtVDOr24",
       "author": "RxCU84",
       "createdDate": "10/10/2569",
-      "source": "Mock Exam 2569 (Week 2) ชุด A",
-      "isActive": true,
-      "linkedNextCase": "",
-      "linkedFromCase": ""
-    },
-    {
-      "caseId": "OSPE-PD84M1W202B",
-      "title": "OSPE-PD84M1W202B",
-      "category": "Product",
-      "mainGroup": "Mock Exam 2569",
-      "subTopic": "🔒 ข้อสอบลับ (ต้องใช้รหัสผ่าน)",
-      "disease": "🔒 ล็อกด้วยรหัสผ่าน (Secret Mock)",
-      "difficulty": 2,
-      "docId": "1Bjdz8c6-Gr5GIHGllXIvt0FLPeWTAdZy586vtVDOr24",
-      "author": "RxCU84",
-      "createdDate": "10/10/2569",
       "source": "Mock Exam 2569 (Week 2) ชุด B",
       "isActive": true,
       "linkedNextCase": "",
-      "linkedFromCase": "",
-      "caseStatus": "Active",
-      "durationMin": 4,
-      "isProtected": true,
-      "hasPassword": true
+      "linkedFromCase": ""
     },
     {
       "caseId": "OSPE-PD84M1W203A",
-      "title": "พัก 3A",
-      "category": "Product",
-      "mainGroup": "",
-      "subTopic": "",
-      "disease": "",
-      "difficulty": 2,
-      "docId": "1Bjdz8c6-Gr5GIHGllXIvt0FLPeWTAdZy586vtVDOr24",
-      "author": "RxCU84",
-      "createdDate": "10/10/2569",
-      "source": "Mock Exam 2569 (Week 2) ชุด A",
-      "isActive": true,
-      "linkedNextCase": "",
-      "linkedFromCase": ""
-    },
-    {
-      "caseId": "OSPE-PD84M1W203B",
-      "title": "OSPE-PD84M1W203B",
+      "title": "OSPE-PD84M1W203A",
       "category": "Product",
       "mainGroup": "Mock Exam 2569",
       "subTopic": "🔒 ข้อสอบลับ (ต้องใช้รหัสผ่าน)",
@@ -4348,7 +4332,7 @@ const OFFLINE_DATA = {
       "docId": "1Bjdz8c6-Gr5GIHGllXIvt0FLPeWTAdZy586vtVDOr24",
       "author": "RxCU84",
       "createdDate": "10/10/2569",
-      "source": "Mock Exam 2569 (Week 2) ชุด B",
+      "source": "Mock Exam 2569 (Week 2) ชุด A",
       "isActive": true,
       "linkedNextCase": "",
       "linkedFromCase": "",
@@ -4358,8 +4342,44 @@ const OFFLINE_DATA = {
       "hasPassword": true
     },
     {
+      "caseId": "OSPE-PD84M1W203B",
+      "title": "พัก 3B",
+      "category": "Product",
+      "mainGroup": "",
+      "subTopic": "",
+      "disease": "",
+      "difficulty": 2,
+      "docId": "1Bjdz8c6-Gr5GIHGllXIvt0FLPeWTAdZy586vtVDOr24",
+      "author": "RxCU84",
+      "createdDate": "10/10/2569",
+      "source": "Mock Exam 2569 (Week 2) ชุด B",
+      "isActive": true,
+      "linkedNextCase": "",
+      "linkedFromCase": ""
+    },
+    {
       "caseId": "OSPE-PD84M1W204A",
-      "title": "Trituration 4A",
+      "title": "OSPE-PD84M1W204A",
+      "category": "Product",
+      "mainGroup": "Mock Exam 2569",
+      "subTopic": "🔒 ข้อสอบลับ (ต้องใช้รหัสผ่าน)",
+      "disease": "🔒 ล็อกด้วยรหัสผ่าน (Secret Mock)",
+      "difficulty": 2,
+      "docId": "1Bjdz8c6-Gr5GIHGllXIvt0FLPeWTAdZy586vtVDOr24",
+      "author": "RxCU84",
+      "createdDate": "10/10/2569",
+      "source": "Mock Exam 2569 (Week 2) ชุด A",
+      "isActive": true,
+      "linkedNextCase": "",
+      "linkedFromCase": "",
+      "caseStatus": "Active",
+      "durationMin": 4,
+      "isProtected": true,
+      "hasPassword": true
+    },
+    {
+      "caseId": "OSPE-PD84M1W204B",
+      "title": "Trituration 4B",
       "category": "Product",
       "mainGroup": "Semisolid Dosage Form",
       "subTopic": "",
@@ -4368,14 +4388,14 @@ const OFFLINE_DATA = {
       "docId": "1Bjdz8c6-Gr5GIHGllXIvt0FLPeWTAdZy586vtVDOr24",
       "author": "RxCU84",
       "createdDate": "10/10/2569",
-      "source": "Mock Exam 2569 (Week 2) ชุด A",
+      "source": "Mock Exam 2569 (Week 2) ชุด B",
       "isActive": true,
       "linkedNextCase": "",
       "linkedFromCase": ""
     },
     {
-      "caseId": "OSPE-PD84M1W204B",
-      "title": "OSPE-PD84M1W204B",
+      "caseId": "OSPE-PD84M1W205A",
+      "title": "OSPE-PD84M1W205A",
       "category": "Product",
       "mainGroup": "Mock Exam 2569",
       "subTopic": "🔒 ข้อสอบลับ (ต้องใช้รหัสผ่าน)",
@@ -4384,7 +4404,7 @@ const OFFLINE_DATA = {
       "docId": "1Bjdz8c6-Gr5GIHGllXIvt0FLPeWTAdZy586vtVDOr24",
       "author": "RxCU84",
       "createdDate": "10/10/2569",
-      "source": "Mock Exam 2569 (Week 2) ชุด B",
+      "source": "Mock Exam 2569 (Week 2) ชุด A",
       "isActive": true,
       "linkedNextCase": "",
       "linkedFromCase": "",
@@ -4394,8 +4414,8 @@ const OFFLINE_DATA = {
       "hasPassword": true
     },
     {
-      "caseId": "OSPE-PD84M1W205A",
-      "title": "Ointment 5A",
+      "caseId": "OSPE-PD84M1W205B",
+      "title": "Ointment 5B",
       "category": "Product",
       "mainGroup": "Semisolid Dosage Form",
       "subTopic": "",
@@ -4404,30 +4424,10 @@ const OFFLINE_DATA = {
       "docId": "1Bjdz8c6-Gr5GIHGllXIvt0FLPeWTAdZy586vtVDOr24",
       "author": "RxCU84",
       "createdDate": "10/10/2569",
-      "source": "Mock Exam 2569 (Week 2) ชุด A",
-      "isActive": true,
-      "linkedNextCase": "",
-      "linkedFromCase": ""
-    },
-    {
-      "caseId": "OSPE-PD84M1W205B",
-      "title": "OSPE-PD84M1W205B",
-      "category": "Product",
-      "mainGroup": "Mock Exam 2569",
-      "subTopic": "🔒 ข้อสอบลับ (ต้องใช้รหัสผ่าน)",
-      "disease": "🔒 ล็อกด้วยรหัสผ่าน (Secret Mock)",
-      "difficulty": 2,
-      "docId": "1Bjdz8c6-Gr5GIHGllXIvt0FLPeWTAdZy586vtVDOr24",
-      "author": "RxCU84",
-      "createdDate": "10/10/2569",
       "source": "Mock Exam 2569 (Week 2) ชุด B",
       "isActive": true,
       "linkedNextCase": "",
-      "linkedFromCase": "",
-      "caseStatus": "Active",
-      "durationMin": 4,
-      "isProtected": true,
-      "hasPassword": true
+      "linkedFromCase": ""
     },
     {
       "caseId": "OSPE-PD84W101",

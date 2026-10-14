@@ -1177,7 +1177,13 @@ function getFormattedCasePatientHtml(c) {
   }
   if (!raw) return '';
   raw = stripSectionHeaders(raw);
-  return (raw.trim() && raw.replace(/<[^>]*>/g, '').trim().length > 0) ? raw : '';
+  const hasContent = Boolean(
+    raw.trim() && (
+      raw.replace(/<[^>]*>/g, '').trim().length > 0 ||
+      /<(?:img|svg|canvas|table|iframe|picture)\b/i.test(raw)
+    )
+  );
+  return hasContent ? raw : '';
 }
 window.getFormattedCasePatientHtml = getFormattedCasePatientHtml;
 

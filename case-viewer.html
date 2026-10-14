@@ -1728,7 +1728,12 @@
       const patientTitleEl = document.getElementById('patient-section-title');
       const patientContentEl = document.getElementById('case-patient-content');
       
-      const hasPatientInfo = Boolean(cleanPatient && cleanPatient.trim() && cleanPatient.replace(/<[^>]*>/g, '').trim().length > 0);
+      const hasPatientInfo = Boolean(
+        cleanPatient && cleanPatient.trim() && (
+          cleanPatient.replace(/<[^>]*>/g, '').trim().length > 0 ||
+          /<(?:img|svg|canvas|table|iframe|picture)\b/i.test(cleanPatient)
+        )
+      );
       if (hasPatientInfo) {
         if (patientTitleEl) patientTitleEl.style.display = 'block';
         if (patientContentEl) {

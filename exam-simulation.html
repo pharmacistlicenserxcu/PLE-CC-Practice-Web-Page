@@ -8344,8 +8344,12 @@
 
       // Render patientInfoHtml — convert inner ##Header markers to styled headings while stripping section tag
       const rawPatient = stripSectionHeaders(c.patientInfoHtml || '');
-      const patientAccordion = document.getElementById('exam-patient-accordion');
-      const hasPatientInfo = Boolean(rawPatient && rawPatient.trim() && rawPatient.replace(/<[^>]*>/g, '').trim().length > 0);
+      const hasPatientInfo = Boolean(
+        rawPatient && rawPatient.trim() && (
+          rawPatient.replace(/<[^>]*>/g, '').trim().length > 0 ||
+          /<(?:img|svg|canvas|table|iframe|picture)\b/i.test(rawPatient)
+        )
+      );
 
       if (hasPatientInfo) {
         if (patientAccordion) patientAccordion.style.display = 'block';
@@ -15578,7 +15582,12 @@ ${caseContext || '(ยังไม่มีข้อมูลเคส)'}
 
               // 2. ข้อมูลผู้ป่วย (Patient Info)
               const rawPatient = stripSecHeaders(currCase.patientInfoHtml || '');
-              const hasPatientInfo = Boolean(rawPatient && rawPatient.trim() && rawPatient.replace(/<[^>]*>/g, '').trim().length > 0);
+              const hasPatientInfo = Boolean(
+                rawPatient && rawPatient.trim() && (
+                  rawPatient.replace(/<[^>]*>/g, '').trim().length > 0 ||
+                  /<(?:img|svg|canvas|table|iframe|picture)\b/i.test(rawPatient)
+                )
+              );
               if (hasPatientInfo) {
                 const processedPatient = rawPatient.replace(
                   /<p[^>]*>##([^<]+)<\/p>/gi,

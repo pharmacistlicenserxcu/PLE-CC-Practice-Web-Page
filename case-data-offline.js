@@ -1,12 +1,12 @@
 /**
  * PLE-CC2 OSPE Practice System — Offline Case List Metadata (Auto-Generated)
- * Version: v_20261014_233719
- * Generated on 2026-10-14 23:37:19
+ * Version: v_20261015_002144
+ * Generated on 2026-10-15 00:21:44
  */
 
 const OFFLINE_DATA = {
-  "version": "v_20261014_233719",
-  "generatedAt": "2026-10-14 23:37:19",
+  "version": "v_20261015_002144",
+  "generatedAt": "2026-10-15 00:21:44",
   "totalCases": 386,
   "cases": [
     {
@@ -2327,7 +2327,8 @@ const OFFLINE_DATA = {
       "source": "Practice RxCU84 Clinic ครั้งที่ 1",
       "isActive": true,
       "linkedNextCase": "",
-      "linkedFromCase": ""
+      "linkedFromCase": "",
+      "caseStatus": "Active"
     },
     {
       "caseId": "OSPE-CL84DM02",
@@ -2343,7 +2344,8 @@ const OFFLINE_DATA = {
       "source": "Practice RxCU84 Clinic ครั้งที่ 1",
       "isActive": true,
       "linkedNextCase": "",
-      "linkedFromCase": ""
+      "linkedFromCase": "",
+      "caseStatus": "Active"
     },
     {
       "caseId": "OSPE-CL84DM03",
@@ -2359,7 +2361,8 @@ const OFFLINE_DATA = {
       "source": "Practice RxCU84 Clinic ครั้งที่ 1",
       "isActive": true,
       "linkedNextCase": "",
-      "linkedFromCase": ""
+      "linkedFromCase": "",
+      "caseStatus": "Active"
     },
     {
       "caseId": "OSPE-CL84DM04",
@@ -2375,7 +2378,8 @@ const OFFLINE_DATA = {
       "source": "Practice RxCU84 Clinic ครั้งที่ 1",
       "isActive": true,
       "linkedNextCase": "",
-      "linkedFromCase": ""
+      "linkedFromCase": "",
+      "caseStatus": "Active"
     },
     {
       "caseId": "OSPE-CL84DM05",
@@ -2391,7 +2395,8 @@ const OFFLINE_DATA = {
       "source": "Practice RxCU84 Clinic ครั้งที่ 1",
       "isActive": true,
       "linkedNextCase": "",
-      "linkedFromCase": ""
+      "linkedFromCase": "",
+      "caseStatus": "Active"
     },
     {
       "caseId": "OSPE-CL84DM06",
@@ -2407,7 +2412,8 @@ const OFFLINE_DATA = {
       "source": "Practice RxCU84 Clinic ครั้งที่ 1",
       "isActive": true,
       "linkedNextCase": "",
-      "linkedFromCase": ""
+      "linkedFromCase": "",
+      "caseStatus": "Active"
     },
     {
       "caseId": "OSPE-CL84EE01",
@@ -2423,7 +2429,8 @@ const OFFLINE_DATA = {
       "source": "Practice RxCU84 Clinic ครั้งที่ 1",
       "isActive": true,
       "linkedNextCase": "",
-      "linkedFromCase": ""
+      "linkedFromCase": "",
+      "caseStatus": "Active"
     },
     {
       "caseId": "OSPE-CL84EE02",
@@ -2439,7 +2446,8 @@ const OFFLINE_DATA = {
       "source": "Practice RxCU84 Clinic ครั้งที่ 1",
       "isActive": true,
       "linkedNextCase": "",
-      "linkedFromCase": ""
+      "linkedFromCase": "",
+      "caseStatus": "Active"
     },
     {
       "caseId": "OSPE-CL84EE03",
@@ -2455,7 +2463,8 @@ const OFFLINE_DATA = {
       "source": "Practice RxCU84 Clinic ครั้งที่ 1",
       "isActive": true,
       "linkedNextCase": "",
-      "linkedFromCase": ""
+      "linkedFromCase": "",
+      "caseStatus": "Active"
     },
     {
       "caseId": "OSPE-CL84EE04",
@@ -2471,7 +2480,8 @@ const OFFLINE_DATA = {
       "source": "Practice RxCU84 Clinic ครั้งที่ 1",
       "isActive": true,
       "linkedNextCase": "",
-      "linkedFromCase": ""
+      "linkedFromCase": "",
+      "caseStatus": "Active"
     },
     {
       "caseId": "OSPE-CL84EE05",
@@ -2487,7 +2497,8 @@ const OFFLINE_DATA = {
       "source": "Practice RxCU84 Clinic ครั้งที่ 1",
       "isActive": true,
       "linkedNextCase": "",
-      "linkedFromCase": ""
+      "linkedFromCase": "",
+      "caseStatus": "Active"
     },
     {
       "caseId": "OSPE-CL84EE06",
@@ -2503,7 +2514,8 @@ const OFFLINE_DATA = {
       "source": "Practice RxCU84 Clinic ครั้งที่ 1",
       "isActive": true,
       "linkedNextCase": "",
-      "linkedFromCase": ""
+      "linkedFromCase": "",
+      "caseStatus": "Active"
     },
     {
       "caseId": "OSPE-CL84ENT01",
@@ -2519,7 +2531,8 @@ const OFFLINE_DATA = {
       "source": "Practice RxCU84 Clinic ครั้งที่ 1",
       "isActive": true,
       "linkedNextCase": "",
-      "linkedFromCase": ""
+      "linkedFromCase": "",
+      "caseStatus": "Active"
     },
     {
       "caseId": "OSPE-CL84ENT02",
@@ -2535,7 +2548,8 @@ const OFFLINE_DATA = {
       "source": "Practice RxCU84 Clinic ครั้งที่ 1",
       "isActive": true,
       "linkedNextCase": "",
-      "linkedFromCase": ""
+      "linkedFromCase": "",
+      "caseStatus": "Active"
     },
     {
       "caseId": "OSPE-CL84ENT03",
@@ -2551,7 +2565,8 @@ const OFFLINE_DATA = {
       "source": "Practice RxCU84 Clinic ครั้งที่ 1",
       "isActive": true,
       "linkedNextCase": "",
-      "linkedFromCase": ""
+      "linkedFromCase": "",
+      "caseStatus": "Active"
     },
     {
       "caseId": "OSPE-CL84ENT04",
@@ -2567,7 +2582,8 @@ const OFFLINE_DATA = {
       "source": "Practice RxCU84 Clinic ครั้งที่ 1",
       "isActive": true,
       "linkedNextCase": "",
-      "linkedFromCase": ""
+      "linkedFromCase": "",
+      "caseStatus": "Active"
     },
     {
       "caseId": "OSPE-CL84ENT05",
@@ -2583,7 +2599,8 @@ const OFFLINE_DATA = {
       "source": "Practice RxCU84 Clinic ครั้งที่ 1",
       "isActive": true,
       "linkedNextCase": "",
-      "linkedFromCase": ""
+      "linkedFromCase": "",
+      "caseStatus": "Active"
     },
     {
       "caseId": "OSPE-CL84ENT06",
@@ -2599,7 +2616,8 @@ const OFFLINE_DATA = {
       "source": "Practice RxCU84 Clinic ครั้งที่ 1",
       "isActive": true,
       "linkedNextCase": "",
-      "linkedFromCase": ""
+      "linkedFromCase": "",
+      "caseStatus": "Active"
     },
     {
       "caseId": "OSPE-CL84GI01",
@@ -2615,7 +2633,8 @@ const OFFLINE_DATA = {
       "source": "Practice RxCU84 Clinic ครั้งที่ 1",
       "isActive": true,
       "linkedNextCase": "",
-      "linkedFromCase": ""
+      "linkedFromCase": "",
+      "caseStatus": "Active"
     },
     {
       "caseId": "OSPE-CL84GI02",
@@ -2631,7 +2650,8 @@ const OFFLINE_DATA = {
       "source": "Practice RxCU84 Clinic ครั้งที่ 1",
       "isActive": true,
       "linkedNextCase": "",
-      "linkedFromCase": ""
+      "linkedFromCase": "",
+      "caseStatus": "Active"
     },
     {
       "caseId": "OSPE-CL84GI03",
@@ -2647,7 +2667,8 @@ const OFFLINE_DATA = {
       "source": "Practice RxCU84 Clinic ครั้งที่ 1",
       "isActive": true,
       "linkedNextCase": "",
-      "linkedFromCase": ""
+      "linkedFromCase": "",
+      "caseStatus": "Active"
     },
     {
       "caseId": "OSPE-CL84GI04",
@@ -2663,7 +2684,8 @@ const OFFLINE_DATA = {
       "source": "Practice RxCU84 Clinic ครั้งที่ 1",
       "isActive": true,
       "linkedNextCase": "",
-      "linkedFromCase": ""
+      "linkedFromCase": "",
+      "caseStatus": "Active"
     },
     {
       "caseId": "OSPE-CL84GI05",
@@ -2679,7 +2701,8 @@ const OFFLINE_DATA = {
       "source": "Practice RxCU84 Clinic ครั้งที่ 1",
       "isActive": true,
       "linkedNextCase": "",
-      "linkedFromCase": ""
+      "linkedFromCase": "",
+      "caseStatus": "Active"
     },
     {
       "caseId": "OSPE-CL84GI06",
@@ -2695,7 +2718,8 @@ const OFFLINE_DATA = {
       "source": "Practice RxCU84 Clinic ครั้งที่ 1",
       "isActive": true,
       "linkedNextCase": "",
-      "linkedFromCase": ""
+      "linkedFromCase": "",
+      "caseStatus": "Active"
     },
     {
       "caseId": "OSPE-CL84GI07",
@@ -2711,7 +2735,8 @@ const OFFLINE_DATA = {
       "source": "Practice RxCU84 Clinic ครั้งที่ 1",
       "isActive": true,
       "linkedNextCase": "",
-      "linkedFromCase": ""
+      "linkedFromCase": "",
+      "caseStatus": "Active"
     },
     {
       "caseId": "OSPE-CL84GY01",
@@ -2727,7 +2752,8 @@ const OFFLINE_DATA = {
       "source": "Practice RxCU84 Clinic ครั้งที่ 1",
       "isActive": true,
       "linkedNextCase": "",
-      "linkedFromCase": ""
+      "linkedFromCase": "",
+      "caseStatus": "Active"
     },
     {
       "caseId": "OSPE-CL84GY02",
@@ -2743,7 +2769,8 @@ const OFFLINE_DATA = {
       "source": "Practice RxCU84 Clinic ครั้งที่ 1",
       "isActive": true,
       "linkedNextCase": "",
-      "linkedFromCase": ""
+      "linkedFromCase": "",
+      "caseStatus": "Active"
     },
     {
       "caseId": "OSPE-CL84GY03",
@@ -2759,7 +2786,8 @@ const OFFLINE_DATA = {
       "source": "Practice RxCU84 Clinic ครั้งที่ 1",
       "isActive": true,
       "linkedNextCase": "",
-      "linkedFromCase": ""
+      "linkedFromCase": "",
+      "caseStatus": "Active"
     },
     {
       "caseId": "OSPE-CL84GY04",
@@ -2775,7 +2803,8 @@ const OFFLINE_DATA = {
       "source": "Practice RxCU84 Clinic ครั้งที่ 1",
       "isActive": true,
       "linkedNextCase": "",
-      "linkedFromCase": ""
+      "linkedFromCase": "",
+      "caseStatus": "Active"
     },
     {
       "caseId": "OSPE-CL84GY05",
@@ -2791,7 +2820,8 @@ const OFFLINE_DATA = {
       "source": "Practice RxCU84 Clinic ครั้งที่ 1",
       "isActive": true,
       "linkedNextCase": "",
-      "linkedFromCase": ""
+      "linkedFromCase": "",
+      "caseStatus": "Active"
     },
     {
       "caseId": "OSPE-CL84GY06",
@@ -2807,7 +2837,8 @@ const OFFLINE_DATA = {
       "source": "Practice RxCU84 Clinic ครั้งที่ 1",
       "isActive": true,
       "linkedNextCase": "",
-      "linkedFromCase": ""
+      "linkedFromCase": "",
+      "caseStatus": "Active"
     },
     {
       "caseId": "OSPE-CL84PN01",
@@ -2823,7 +2854,8 @@ const OFFLINE_DATA = {
       "source": "Practice RxCU84 Clinic ครั้งที่ 1",
       "isActive": true,
       "linkedNextCase": "",
-      "linkedFromCase": ""
+      "linkedFromCase": "",
+      "caseStatus": "Active"
     },
     {
       "caseId": "OSPE-CL84PN02",
@@ -2839,7 +2871,8 @@ const OFFLINE_DATA = {
       "source": "Practice RxCU84 Clinic ครั้งที่ 1",
       "isActive": true,
       "linkedNextCase": "",
-      "linkedFromCase": ""
+      "linkedFromCase": "",
+      "caseStatus": "Active"
     },
     {
       "caseId": "OSPE-CL84PN03",
@@ -2855,7 +2888,8 @@ const OFFLINE_DATA = {
       "source": "Practice RxCU84 Clinic ครั้งที่ 1",
       "isActive": true,
       "linkedNextCase": "",
-      "linkedFromCase": ""
+      "linkedFromCase": "",
+      "caseStatus": "Active"
     },
     {
       "caseId": "OSPE-CL84PN04",
@@ -2871,7 +2905,8 @@ const OFFLINE_DATA = {
       "source": "Practice RxCU84 Clinic ครั้งที่ 1",
       "isActive": true,
       "linkedNextCase": "",
-      "linkedFromCase": ""
+      "linkedFromCase": "",
+      "caseStatus": "Active"
     },
     {
       "caseId": "OSPE-CL84PN05",
@@ -2887,7 +2922,8 @@ const OFFLINE_DATA = {
       "source": "Practice RxCU84 Clinic ครั้งที่ 1",
       "isActive": true,
       "linkedNextCase": "",
-      "linkedFromCase": ""
+      "linkedFromCase": "",
+      "caseStatus": "Active"
     },
     {
       "caseId": "OSPE-CL84PN06",
@@ -2903,7 +2939,8 @@ const OFFLINE_DATA = {
       "source": "Practice RxCU84 Clinic ครั้งที่ 1",
       "isActive": true,
       "linkedNextCase": "",
-      "linkedFromCase": ""
+      "linkedFromCase": "",
+      "caseStatus": "Active"
     },
     {
       "caseId": "OSPE-CL84PR03",
@@ -2919,7 +2956,8 @@ const OFFLINE_DATA = {
       "source": "Practice RxCU84 Clinic ครั้งที่ 1",
       "isActive": true,
       "linkedNextCase": "",
-      "linkedFromCase": ""
+      "linkedFromCase": "",
+      "caseStatus": "Active"
     },
     {
       "caseId": "OSPE-CLM101",
@@ -2984,7 +3022,8 @@ const OFFLINE_DATA = {
       "source": "Practice RxCU84 Clinic ครั้งที่ 1",
       "isActive": true,
       "linkedNextCase": "",
-      "linkedFromCase": ""
+      "linkedFromCase": "",
+      "caseStatus": "Active"
     },
     {
       "caseId": "OSPE-CLSD03",
@@ -3000,7 +3039,8 @@ const OFFLINE_DATA = {
       "source": "Practice RxCU84 Clinic ครั้งที่ 1",
       "isActive": true,
       "linkedNextCase": "",
-      "linkedFromCase": ""
+      "linkedFromCase": "",
+      "caseStatus": "Active"
     },
     {
       "caseId": "OSPE-CLSD04",
@@ -3016,7 +3056,8 @@ const OFFLINE_DATA = {
       "source": "Practice RxCU84 Clinic ครั้งที่ 1",
       "isActive": true,
       "linkedNextCase": "",
-      "linkedFromCase": ""
+      "linkedFromCase": "",
+      "caseStatus": "Active"
     },
     {
       "caseId": "OSPE-CLSD05",
@@ -3032,7 +3073,8 @@ const OFFLINE_DATA = {
       "source": "Practice RxCU84 Clinic ครั้งที่ 1",
       "isActive": true,
       "linkedNextCase": "",
-      "linkedFromCase": ""
+      "linkedFromCase": "",
+      "caseStatus": "Active"
     },
     {
       "caseId": "OSPE-CLSD06",
@@ -3048,7 +3090,8 @@ const OFFLINE_DATA = {
       "source": "Practice RxCU84 Clinic ครั้งที่ 1",
       "isActive": true,
       "linkedNextCase": "",
-      "linkedFromCase": ""
+      "linkedFromCase": "",
+      "caseStatus": "Active"
     },
     {
       "caseId": "OSPE-CLSD07",
@@ -3064,7 +3107,8 @@ const OFFLINE_DATA = {
       "source": "Practice RxCU84 Clinic ครั้งที่ 1",
       "isActive": true,
       "linkedNextCase": "",
-      "linkedFromCase": ""
+      "linkedFromCase": "",
+      "caseStatus": "Active"
     },
     {
       "caseId": "OSPE-CLSD08",
@@ -3080,7 +3124,8 @@ const OFFLINE_DATA = {
       "source": "Practice RxCU84 Clinic ครั้งที่ 1",
       "isActive": true,
       "linkedNextCase": "",
-      "linkedFromCase": ""
+      "linkedFromCase": "",
+      "caseStatus": "Active"
     },
     {
       "caseId": "OSPE-CLSD09",
@@ -3096,7 +3141,8 @@ const OFFLINE_DATA = {
       "source": "Practice RxCU84 Clinic ครั้งที่ 1",
       "isActive": true,
       "linkedNextCase": "",
-      "linkedFromCase": ""
+      "linkedFromCase": "",
+      "caseStatus": "Active"
     },
     {
       "caseId": "OSPE-CLSD10",
@@ -3112,7 +3158,8 @@ const OFFLINE_DATA = {
       "source": "Practice RxCU84 Clinic ครั้งที่ 1",
       "isActive": true,
       "linkedNextCase": "",
-      "linkedFromCase": ""
+      "linkedFromCase": "",
+      "caseStatus": "Active"
     },
     {
       "caseId": "OSPE-CLSD11",
@@ -3128,7 +3175,8 @@ const OFFLINE_DATA = {
       "source": "Practice RxCU84 Clinic ครั้งที่ 1",
       "isActive": true,
       "linkedNextCase": "",
-      "linkedFromCase": ""
+      "linkedFromCase": "",
+      "caseStatus": "Active"
     },
     {
       "caseId": "OSPE-CLSD12",
@@ -3160,7 +3208,8 @@ const OFFLINE_DATA = {
       "source": "Practice RxCU84 Clinic ครั้งที่ 1",
       "isActive": true,
       "linkedNextCase": "",
-      "linkedFromCase": ""
+      "linkedFromCase": "",
+      "caseStatus": "Active"
     },
     {
       "caseId": "OSPE-CLSD14",
@@ -3176,7 +3225,8 @@ const OFFLINE_DATA = {
       "source": "Practice RxCU84 Clinic ครั้งที่ 1",
       "isActive": true,
       "linkedNextCase": "",
-      "linkedFromCase": ""
+      "linkedFromCase": "",
+      "caseStatus": "Active"
     },
     {
       "caseId": "OSPE-CLSD15",
@@ -3192,7 +3242,8 @@ const OFFLINE_DATA = {
       "source": "Practice RxCU84 Clinic ครั้งที่ 1",
       "isActive": true,
       "linkedNextCase": "",
-      "linkedFromCase": ""
+      "linkedFromCase": "",
+      "caseStatus": "Active"
     },
     {
       "caseId": "OSPE-CLSD16",
@@ -3208,7 +3259,8 @@ const OFFLINE_DATA = {
       "source": "Practice RxCU84 Clinic ครั้งที่ 1",
       "isActive": true,
       "linkedNextCase": "",
-      "linkedFromCase": ""
+      "linkedFromCase": "",
+      "caseStatus": "Active"
     },
     {
       "caseId": "OSPE-CLSD17",
@@ -3224,7 +3276,8 @@ const OFFLINE_DATA = {
       "source": "Practice RxCU84 Clinic ครั้งที่ 1",
       "isActive": true,
       "linkedNextCase": "",
-      "linkedFromCase": ""
+      "linkedFromCase": "",
+      "caseStatus": "Active"
     },
     {
       "caseId": "OSPE-CLSD18",
@@ -3240,7 +3293,8 @@ const OFFLINE_DATA = {
       "source": "Practice RxCU84 Clinic ครั้งที่ 1",
       "isActive": true,
       "linkedNextCase": "",
-      "linkedFromCase": ""
+      "linkedFromCase": "",
+      "caseStatus": "Active"
     },
     {
       "caseId": "OSPE-CLSD19",
@@ -3256,7 +3310,8 @@ const OFFLINE_DATA = {
       "source": "Practice RxCU84 Clinic ครั้งที่ 1",
       "isActive": true,
       "linkedNextCase": "",
-      "linkedFromCase": ""
+      "linkedFromCase": "",
+      "caseStatus": "Active"
     },
     {
       "caseId": "OSPE-CLSD20",
@@ -3272,7 +3327,8 @@ const OFFLINE_DATA = {
       "source": "Practice RxCU84 Clinic ครั้งที่ 1",
       "isActive": true,
       "linkedNextCase": "",
-      "linkedFromCase": ""
+      "linkedFromCase": "",
+      "caseStatus": "Active"
     },
     {
       "caseId": "OSPE-CLSP01",
@@ -3288,7 +3344,8 @@ const OFFLINE_DATA = {
       "source": "Practice RxCU84 Clinic ครั้งที่ 1",
       "isActive": true,
       "linkedNextCase": "",
-      "linkedFromCase": ""
+      "linkedFromCase": "",
+      "caseStatus": "Active"
     },
     {
       "caseId": "OSPE-CLSP02",
@@ -3304,7 +3361,8 @@ const OFFLINE_DATA = {
       "source": "Practice RxCU84 Clinic ครั้งที่ 1",
       "isActive": true,
       "linkedNextCase": "",
-      "linkedFromCase": ""
+      "linkedFromCase": "",
+      "caseStatus": "Active"
     },
     {
       "caseId": "OSPE-CLSP03",
@@ -3320,7 +3378,8 @@ const OFFLINE_DATA = {
       "source": "Practice RxCU84 Clinic ครั้งที่ 1",
       "isActive": true,
       "linkedNextCase": "",
-      "linkedFromCase": ""
+      "linkedFromCase": "",
+      "caseStatus": "Active"
     },
     {
       "caseId": "OSPE-CLSP05",
@@ -3336,7 +3395,8 @@ const OFFLINE_DATA = {
       "source": "Practice RxCU84 Clinic ครั้งที่ 1",
       "isActive": true,
       "linkedNextCase": "",
-      "linkedFromCase": ""
+      "linkedFromCase": "",
+      "caseStatus": "Active"
     },
     {
       "caseId": "OSPE-CLSP06",
@@ -3352,7 +3412,8 @@ const OFFLINE_DATA = {
       "source": "Practice RxCU84 Clinic ครั้งที่ 1",
       "isActive": true,
       "linkedNextCase": "",
-      "linkedFromCase": ""
+      "linkedFromCase": "",
+      "caseStatus": "Active"
     },
     {
       "caseId": "OSPE-CLSP07",
@@ -3368,7 +3429,8 @@ const OFFLINE_DATA = {
       "source": "Practice RxCU84 Clinic ครั้งที่ 1",
       "isActive": true,
       "linkedNextCase": "",
-      "linkedFromCase": ""
+      "linkedFromCase": "",
+      "caseStatus": "Active"
     },
     {
       "caseId": "OSPE-CLSP08",
@@ -3384,7 +3446,8 @@ const OFFLINE_DATA = {
       "source": "Practice RxCU84 Clinic ครั้งที่ 1",
       "isActive": true,
       "linkedNextCase": "",
-      "linkedFromCase": ""
+      "linkedFromCase": "",
+      "caseStatus": "Active"
     },
     {
       "caseId": "OSPE-CLW1M01",

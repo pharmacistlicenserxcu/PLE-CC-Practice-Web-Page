@@ -34,7 +34,7 @@
   };
 
   const LAYOUT_STORAGE_KEY = 'ple_ospe_scratchpad_layout_v2';
-  const DRUG_LABEL_IMG_SRC = 'rxcu-drug-label-template.png?v=1791120874852';
+  const DRUG_LABEL_IMG_SRC = 'rxcu-drug-label-template.png?v=1791969057519';
 
   const Scratchpad = {
     initialized: false,
@@ -189,7 +189,7 @@
             <button type="button" class="sp-tab-btn" id="sp-tab-type" data-tab="type">
               พิมพ์โน้ต
             </button>
-            <button type="button" class="sp-tab-btn sp-tab-label-btn" id="sp-tab-label" data-tab="label" title="เขียนฉลากยาโรงพยาบาล RxCU">
+            <button type="button" class="sp-tab-btn sp-tab-label-btn" id="sp-tab-label" data-tab="label" title="เขียนฉลากยาร้านยา RxCU 84">
               🏷️ ฉลากยา
             </button>
           </div>

@@ -1266,7 +1266,7 @@
         
         // รับฟังการอัปเดตแคชใหม่ในพื้นหลัง หากเคสนี้เพิ่งอัปเดตเข้ามา
         window.addEventListener('offlineDetailsReady', () => {
-          if (!AppState.currentCase || !AppState.currentCase.scenario) {
+          if (!AppState.currentCase || (!AppState.currentCase.scenario && !AppState.currentCase.contentHtml)) {
             console.log('[Case Viewer] New offline database ready, re-checking case detail...');
             loadCaseDetail();
           }
@@ -1712,7 +1712,7 @@
       function stripSectionHeaders(str) {
         if (!str) return '';
         return str
-          .replace(/<p[^>]*>\s*#+\s*(?:สถานการณ์|โจทย์|ข้อมูลผู้ป่วย|สิ่งที่มีให้|อุปกรณ์|Checklist|เกณฑ์ประเมิน|ข้อมูลผู้ตรวจ|เฉลย|หมายเหตุ|ข้อมูลเคส)[^<]*<\/p>/gi, '')
+          .replace(/<p[^>]*>(?:\s*<[^>]+>)*\s*#+\s*(?:สถานการณ์|โจทย์|ข้อมูลผู้ป่วย|สิ่งที่มีให้|อุปกรณ์|Checklist|เกณฑ์ประเมิน|ข้อมูลผู้ตรวจ|เฉลย|หมายเหตุ|ข้อมูลเคส)[^<]*(?:<\/[^>]+>)*\s*<\/p>/gi, '')
           .replace(/^#+\s*(?:สถานการณ์|โจทย์|ข้อมูลผู้ป่วย|สิ่งที่มีให้|อุปกรณ์|Checklist|เกณฑ์ประเมิน|ข้อมูลผู้ตรวจ|เฉลย|หมายเหตุ|ข้อมูลเคส)[^\n]*\n?/gim, '');
       }
 
@@ -2242,12 +2242,12 @@
     // ─── Single Case Custom Print System ──────────────────────────────────
     async function openSingleCasePrintModal() {
       let c = AppState.currentCase;
-      if (c && (c.isEncrypted || c.isProtected || c.hasPassword) && (!c.scenario && !c.checklist)) {
+      if (c && (c.isEncrypted || c.isProtected || c.hasPassword) && (!c.scenario && !c.contentHtml && !c.checklist)) {
         const savedPasscode = sessionStorage.getItem('ple_saved_passcode');
         if (savedPasscode && typeof window.decryptCaseData === 'function') {
           try {
             const dec = await window.decryptCaseData(c, savedPasscode.trim());
-            if (dec && (dec.scenario || dec.checklist)) {
+            if (dec && (dec.scenario || dec.contentHtml || dec.checklist)) {
               const curVer = (typeof DB_VERSION_STR !== 'undefined' ? DB_VERSION_STR : '') || (typeof OFFLINE_DATA !== 'undefined' ? OFFLINE_DATA.version : '');
               const wrapped = Object.assign({}, dec, { _db_version: curVer });
               const cid = c.caseId || activeCaseId;
@@ -2259,7 +2259,7 @@
             }
           } catch(e) {}
         }
-        if (c && (c.isEncrypted || c.isProtected || c.hasPassword) && (!c.scenario && !c.checklist)) {
+        if (c && (c.isEncrypted || c.isProtected || c.hasPassword) && (!c.scenario && !c.contentHtml && !c.checklist)) {
           showCasePasscodeModal(c, c.caseId || activeCaseId);
           return;
         }

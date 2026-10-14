@@ -1030,7 +1030,12 @@ function getCaseContentViaDocsRestApi(docId, targetCaseId) {
         }
 
         const cleanHeader = text.replace(/^[*_#\s]+/, '').trim();
+        const lowerH = cleanHeader.toLowerCase();
         const isHeaderCandidate = isHeading_(para) || /^#+\s*/.test(text.trim()) || /^\*\*#+/.test(text.trim());
+        const isColonLabel = /^(?:สถานการณ์|โจทย์|ข้อมูลผู้ป่วย|ประวัติผู้ป่วย|สิ่งที่มีให้|อุปกรณ์|Checklist|เกณฑ์ประเมิน|ข้อมูลผู้ตรวจ|เฉลย|หมายเหตุ)\s*:/i.test(cleanHeader);
+        const exactLabels = ['สถานการณ์', 'โจทย์', 'ข้อมูลผู้ป่วย', 'ประวัติผู้ป่วย', 'สิ่งที่มีให้', 'สิ่งที่มีให้ในสถานี', 'อุปกรณ์', 'checklist', 'เกณฑ์ประเมิน', 'เกณฑ์การให้คะแนน', 'สมรรถนะ', 'ข้อมูลผู้ตรวจ', 'เฉลย', 'หมายเหตุ', 'บทบาทผู้ป่วยจำลอง', 'ข้อมูลเคส', 'metadata'];
+        const isExactLabel = exactLabels.indexOf(lowerH) !== -1;
+        const isValidHeader = isHeaderCandidate || isColonLabel || isExactLabel;
 
         const gm = text.match(/\(กลุ่ม:\s*([^)]+)\)/) || text.match(/กลุ่ม:\s*(.*)$/);
         if (gm && (text.startsWith('(กลุ่ม:') || text.startsWith('กลุ่ม:') || text.startsWith('**กลุ่ม:') || cleanHeader.startsWith('(กลุ่ม:') || cleanHeader.startsWith('กลุ่ม:') || text.startsWith('###') || currentSection === 'CHECKLIST')) {
@@ -1039,14 +1044,21 @@ function getCaseContentViaDocsRestApi(docId, targetCaseId) {
           continue;
         }
 
-        if (isHeaderCandidate && cleanHeader && !text.startsWith('(กลุ่ม:') && !text.startsWith('**กลุ่ม:') && !cleanHeader.startsWith('(กลุ่ม:')) {
+        if (isValidHeader && cleanHeader && !text.startsWith('(กลุ่ม:') && !text.startsWith('**กลุ่ม:') && !cleanHeader.startsWith('(กลุ่ม:')) {
           let matchedSec = null;
-          if (cleanHeader.includes('ข้อมูลเคส')) matchedSec = 'METADATA';
-          else if (cleanHeader.includes('โจทย์') || cleanHeader.includes('สถานการณ์')) matchedSec = 'SCENARIO';
-          else if (cleanHeader.includes('ข้อมูลผู้ป่วย')) matchedSec = 'PATIENT_INFO';
-          else if (cleanHeader.includes('สิ่งที่มีให้') || (cleanHeader.includes('อุปกรณ์') && !cleanHeader.includes('กลุ่ม') && !cleanHeader.includes('ทักษะ'))) matchedSec = 'EQUIPMENT';
-          else if (cleanHeader.toLowerCase().includes('checklist') || cleanHeader.includes('ทักษะ') || cleanHeader.includes('รายการ') || cleanHeader.includes('เกณฑ์') || cleanHeader.includes('ประเมิน') || cleanHeader.includes('สมรรถนะ')) matchedSec = 'CHECKLIST';
-          else if (cleanHeader.includes('หมายเหตุ') || cleanHeader.includes('เฉลย') || cleanHeader.includes('ข้อมูลผู้ตรวจ')) matchedSec = 'NOTE';
+          if (lowerH.startsWith('ข้อมูลเคส') || lowerH.startsWith('metadata')) {
+            matchedSec = 'METADATA';
+          } else if (['สถานการณ์', 'โจทย์', 'scenario'].some(function(x) { return lowerH.startsWith(x) || lowerH === x; })) {
+            matchedSec = 'SCENARIO';
+          } else if (['ข้อมูลผู้ป่วย', 'ประวัติผู้ป่วย', 'ข้อมูลคนไข้', 'patient info'].some(function(x) { return lowerH.startsWith(x) || lowerH === x; })) {
+            matchedSec = 'PATIENT_INFO';
+          } else if (['สิ่งที่มีให้ในสถานี', 'สิ่งที่มีให้', 'อุปกรณ์ในสถานี', 'อุปกรณ์', 'equipment'].some(function(x) { return lowerH.startsWith(x) || lowerH === x; })) {
+            matchedSec = 'EQUIPMENT';
+          } else if (['checklist', 'เกณฑ์ประเมิน', 'เกณฑ์การให้คะแนน', 'สมรรถนะ'].some(function(x) { return lowerH.startsWith(x) || lowerH === x; })) {
+            matchedSec = 'CHECKLIST';
+          } else if (['ข้อมูลผู้ตรวจ', 'เฉลย', 'หมายเหตุ', 'บทบาทผู้ป่วยจำลอง', 'notes', 'key'].some(function(x) { return lowerH.startsWith(x) || lowerH === x; })) {
+            matchedSec = 'NOTE';
+          }
 
           if (matchedSec) {
             currentSection = matchedSec;

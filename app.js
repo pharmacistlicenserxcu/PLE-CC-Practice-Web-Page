@@ -1148,7 +1148,7 @@ window.buildPrintChecklistTable = buildPrintChecklistTable;
 function stripSectionHeaders(str) {
   if (!str) return '';
   return str
-    .replace(/<p[^>]*>\s*#+\s*(?:สถานการณ์|โจทย์|ข้อมูลผู้ป่วย|สิ่งที่มีให้|อุปกรณ์|Checklist|เกณฑ์ประเมิน|ข้อมูลผู้ตรวจ|เฉลย|หมายเหตุ|ข้อมูลเคส)[^<]*<\/p>/gi, '')
+    .replace(/<p[^>]*>(?:\s*<[^>]+>)*\s*#+\s*(?:สถานการณ์|โจทย์|ข้อมูลผู้ป่วย|สิ่งที่มีให้|อุปกรณ์|Checklist|เกณฑ์ประเมิน|ข้อมูลผู้ตรวจ|เฉลย|หมายเหตุ|ข้อมูลเคส)[^<]*(?:<\/[^>]+>)*\s*<\/p>/gi, '')
     .replace(/^#+\s*(?:สถานการณ์|โจทย์|ข้อมูลผู้ป่วย|สิ่งที่มีให้|อุปกรณ์|Checklist|เกณฑ์ประเมิน|ข้อมูลผู้ตรวจ|เฉลย|หมายเหตุ|ข้อมูลเคส)[^\n]*\n?/gim, '');
 }
 window.stripSectionHeaders = stripSectionHeaders;
@@ -3139,17 +3139,17 @@ async function executeBatchPrint() {
         try {
           const parsed = JSON.parse(cachedRaw);
           const dec = (parsed && parsed._case_data) ? parsed._case_data : parsed;
-          if (dec && (dec.scenario || dec.checklist)) {
+          if (dec && (dec.scenario || dec.contentHtml || dec.checklist)) {
             details = Object.assign({}, details, dec);
           }
         } catch(e) {}
       }
 
       // 1. Try saved / previously entered passcode first (No prompt needed!)
-      if (details.isEncrypted && (!details.scenario && !details.checklist) && lastUsedPasscode && typeof window.decryptCaseData === 'function') {
+      if (details.isEncrypted && (!details.scenario && !details.contentHtml && !details.checklist) && lastUsedPasscode && typeof window.decryptCaseData === 'function') {
         try {
           const dec = await window.decryptCaseData(details, lastUsedPasscode.trim());
-          if (dec && (dec.scenario || dec.checklist)) {
+          if (dec && (dec.scenario || dec.contentHtml || dec.checklist)) {
             const curVer = (typeof DB_VERSION_STR !== 'undefined' ? DB_VERSION_STR : '');
             const wrapped = Object.assign({}, dec, { _db_version: curVer });
             sessionStorage.setItem('ple_unlocked_' + cid, JSON.stringify(wrapped));
@@ -3163,7 +3163,7 @@ async function executeBatchPrint() {
       }
 
       // 2. If still encrypted, prompt for passcode ONCE
-      if (details.isEncrypted && (!details.scenario && !details.checklist)) {
+      if (details.isEncrypted && (!details.scenario && !details.contentHtml && !details.checklist)) {
         showGlobalLoader(false);
         const pwd = prompt(`🔒 มีข้อสอบลับที่มีรหัสผ่าน (เช่น เคส ${cid})\nกรุณากรอกรหัสผ่านเพื่อปลดล็อกเนื้อหาสำหรับพิมพ์ (ระบบจะใช้รหัสนี้ปลดล็อกเคสอื่นในชุดเดียวกันอัตโนมัติ):`);
         if (pwd && typeof window.decryptCaseData === 'function') {
@@ -3172,7 +3172,7 @@ async function executeBatchPrint() {
           showGlobalLoader(true, `กำลังถอดรหัสเคส ${cid}...`);
           try {
             const dec = await window.decryptCaseData(details, lastUsedPasscode);
-            if (dec && (dec.scenario || dec.checklist)) {
+            if (dec && (dec.scenario || dec.contentHtml || dec.checklist)) {
               const curVer = (typeof DB_VERSION_STR !== 'undefined' ? DB_VERSION_STR : '');
               const wrapped = Object.assign({}, dec, { _db_version: curVer });
               sessionStorage.setItem('ple_unlocked_' + cid, JSON.stringify(wrapped));

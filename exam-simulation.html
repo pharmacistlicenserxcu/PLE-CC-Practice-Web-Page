@@ -6839,7 +6839,7 @@
       if (savedPasscode && typeof window.decryptCaseData === 'function') {
         for (const st of protectedStations) {
           const c = st.case;
-          if (c && (c.isEncrypted || ((c.isProtected || c.hasPassword) && !c.scenario && !(c.checklist && c.checklist.length > 0)))) {
+          if (c && (c.isEncrypted || ((c.isProtected || c.hasPassword) && !c.scenario && !c.contentHtml && !(c.checklist && c.checklist.length > 0)))) {
             const cleanId = (c.caseId || '').trim();
             let encObj = c;
             if (!encObj || !encObj.ciphertext) {
@@ -6865,7 +6865,7 @@
       // Check if any station is still encrypted / locked (i.e. lacks scenario/checklist)
       const stillLocked = protectedStations.filter(st => {
         const c = st.case;
-        return Boolean(c.isEncrypted || ((c.isProtected || c.hasPassword) && !c.scenario && !(c.checklist && c.checklist.length > 0)));
+        return Boolean(c.isEncrypted || ((c.isProtected || c.hasPassword) && !c.scenario && !c.contentHtml && !(c.checklist && c.checklist.length > 0)));
       });
 
       if (stillLocked.length === 0) {
@@ -8331,7 +8331,7 @@
       function stripSectionHeaders(str) {
         if (!str) return '';
         return str
-          .replace(/<p[^>]*>\s*#+\s*(?:สถานการณ์|โจทย์|ข้อมูลผู้ป่วย|สิ่งที่มีให้|อุปกรณ์|Checklist|เกณฑ์ประเมิน|ข้อมูลผู้ตรวจ|เฉลย|หมายเหตุ|ข้อมูลเคส)[^<]*<\/p>/gi, '')
+          .replace(/<p[^>]*>(?:\s*<[^>]+>)*\s*#+\s*(?:สถานการณ์|โจทย์|ข้อมูลผู้ป่วย|สิ่งที่มีให้|อุปกรณ์|Checklist|เกณฑ์ประเมิน|ข้อมูลผู้ตรวจ|เฉลย|หมายเหตุ|ข้อมูลเคส)[^<]*(?:<\/[^>]+>)*\s*<\/p>/gi, '')
           .replace(/^#+\s*(?:สถานการณ์|โจทย์|ข้อมูลผู้ป่วย|สิ่งที่มีให้|อุปกรณ์|Checklist|เกณฑ์ประเมิน|ข้อมูลผู้ตรวจ|เฉลย|หมายเหตุ|ข้อมูลเคส)[^\n]*\n?/gim, '');
       }
 
@@ -15485,7 +15485,7 @@ ${caseContext || '(ยังไม่มีข้อมูลเคส)'}
           function stripSecHeaders(str) {
             if (!str) return '';
             return str
-              .replace(/<p[^>]*>\s*#+\s*(?:สถานการณ์|โจทย์|ข้อมูลผู้ป่วย|สิ่งที่มีให้|อุปกรณ์|Checklist|เกณฑ์ประเมิน|ข้อมูลผู้ตรวจ|เฉลย|หมายเหตุ|ข้อมูลเคส)[^<]*<\/p>/gi, '')
+              .replace(/<p[^>]*>(?:\s*<[^>]+>)*\s*#+\s*(?:สถานการณ์|โจทย์|ข้อมูลผู้ป่วย|สิ่งที่มีให้|อุปกรณ์|Checklist|เกณฑ์ประเมิน|ข้อมูลผู้ตรวจ|เฉลย|หมายเหตุ|ข้อมูลเคส)[^<]*(?:<\/[^>]+>)*\s*<\/p>/gi, '')
               .replace(/^#+\s*(?:สถานการณ์|โจทย์|ข้อมูลผู้ป่วย|สิ่งที่มีให้|อุปกรณ์|Checklist|เกณฑ์ประเมิน|ข้อมูลผู้ตรวจ|เฉลย|หมายเหตุ|ข้อมูลเคส)[^\n]*\n?/gim, '');
           }
 
@@ -15964,12 +15964,12 @@ ${caseContext || '(ยังไม่มีข้อมูลเคส)'}
       // Check Password Protection
       const isProtected = Boolean(c.isProtected || c.hasPassword || (c.password && c.password.trim() !== ''));
       let isUnlocked = Boolean(
-        Boolean(caseObj && (caseObj.scenario || (caseObj.checklist && caseObj.checklist.length > 0))) ||
+        Boolean(caseObj && (caseObj.scenario || caseObj.contentHtml || (caseObj.checklist && caseObj.checklist.length > 0))) ||
         (SimState.unlockedCases && (SimState.unlockedCases[cleanId] || SimState.unlockedCases[rawId] || SimState.unlockedCases[ospeId])) ||
         (SimState.cachedRoom && SimState.cachedRoom.unlockedCaseDetails && (SimState.cachedRoom.unlockedCaseDetails[cleanId] || SimState.cachedRoom.unlockedCaseDetails[rawId] || SimState.cachedRoom.unlockedCaseDetails[ospeId])) ||
         sessionStorage.getItem('ple_unlocked_' + cleanId) || sessionStorage.getItem('ple_unlocked_' + upperId) || sessionStorage.getItem('ple_unlocked_' + lowerId) ||
         sessionStorage.getItem('sim_unlocked_' + cleanId) || sessionStorage.getItem('sim_unlocked_' + rawId) ||
-        (c.scenario || (c.checklist && c.checklist.length > 0)) ||
+        (c.scenario || c.contentHtml || (c.checklist && c.checklist.length > 0)) ||
         SimState.roomId
       );
 
@@ -16027,7 +16027,7 @@ ${caseContext || '(ยังไม่มีข้อมูลเคส)'}
       function stripSectionHeaders(str) {
         if (!str) return '';
         return str
-          .replace(/<p[^>]*>\s*#+\s*(?:สถานการณ์|โจทย์|ข้อมูลผู้ป่วย|สิ่งที่มีให้|อุปกรณ์|Checklist|เกณฑ์ประเมิน|ข้อมูลผู้ตรวจ|เฉลย|หมายเหตุ|ข้อมูลเคส)[^<]*<\/p>/gi, '')
+          .replace(/<p[^>]*>(?:\s*<[^>]+>)*\s*#+\s*(?:สถานการณ์|โจทย์|ข้อมูลผู้ป่วย|สิ่งที่มีให้|อุปกรณ์|Checklist|เกณฑ์ประเมิน|ข้อมูลผู้ตรวจ|เฉลย|หมายเหตุ|ข้อมูลเคส)[^<]*(?:<\/[^>]+>)*\s*<\/p>/gi, '')
           .replace(/^#+\s*(?:สถานการณ์|โจทย์|ข้อมูลผู้ป่วย|สิ่งที่มีให้|อุปกรณ์|Checklist|เกณฑ์ประเมิน|ข้อมูลผู้ตรวจ|เฉลย|หมายเหตุ|ข้อมูลเคส)[^\n]*\n?/gim, '');
       }
 

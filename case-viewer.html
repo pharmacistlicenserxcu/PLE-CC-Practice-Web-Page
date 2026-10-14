@@ -1140,9 +1140,9 @@
   </div><!-- /.page-viewport -->
 </div><!-- /.app-shell -->
 
-  <script src="case-data-offline.js?v=v_20261014_153623"></script>
-  <script src="case-details-offline.js?v=v_20261014_153623"></script>
-  <script src="app.js?v=v_20261014_153623"></script>
+  <script src="case-data-offline.js?v=v_20261014_155051"></script>
+  <script src="case-details-offline.js?v=v_20261014_155051"></script>
+  <script src="app.js?v=v_20261014_155051"></script>
   <script src="scratchpad.js?v=20261004_234400"></script>
   <script src="station-chat.js?v=20261004_234400"></script>
 
@@ -2376,25 +2376,7 @@
       paper.innerHTML = html;
     }
 
-    function executeSingleCasePrint() {
-      const mode = document.querySelector('input[name="single-print-mode"]:checked')?.value || 'full';
-      const orient = document.querySelector('input[name="single-print-orient"]:checked')?.value || 'portrait';
-      const scale = document.getElementById('single-print-scale')?.value || '100';
-      const hideTitle = document.getElementById('single-hide-title')?.checked || false;
-      const splitKey = document.getElementById('single-split-key')?.checked !== false;
-
-      // Apply dynamic print style for landscape/portrait
-      applyDynamicPrintStyle(orient);
-
-      let printArea = document.getElementById('single-case-print-execution-area');
-      if (!printArea) {
-        printArea = document.createElement('div');
-        printArea.id = 'single-case-print-execution-area';
-        printArea.className = 'print-only-block';
-        document.body.appendChild(printArea);
-      }
-      printArea.innerHTML = '';
-
+    function buildSingleCasePrintHtml(mode, hideTitle, splitKey) {
       const c = AppState.currentCase || {};
       const cat = (c.category || 'CLINIC').toUpperCase();
       const rawTitle = c.title || document.getElementById('case-title')?.textContent || 'ข้อสอบ OSPE';
@@ -2470,12 +2452,63 @@
       }
 
       html += `</div>`;
-      printArea.innerHTML = html;
+      return html;
+    }
+
+    function executeSingleCasePrint() {
+      const mode = document.querySelector('input[name="single-print-mode"]:checked')?.value || 'full';
+      const orient = document.querySelector('input[name="single-print-orient"]:checked')?.value || 'portrait';
+      const scale = document.getElementById('single-print-scale')?.value || '100';
+      const hideTitle = document.getElementById('single-hide-title')?.checked || false;
+      const splitKey = document.getElementById('single-split-key')?.checked !== false;
+
+      // Apply dynamic print style for landscape/portrait
+      applyDynamicPrintStyle(orient);
+
+      let printArea = document.getElementById('single-case-print-execution-area');
+      if (!printArea) {
+        printArea = document.createElement('div');
+        printArea.id = 'single-case-print-execution-area';
+        printArea.className = 'print-only-block';
+        document.body.appendChild(printArea);
+      }
+      printArea.innerHTML = buildSingleCasePrintHtml(mode, hideTitle, splitKey);
 
       closeSingleCasePrintModal();
 
       triggerNativePrint(orient, scale, mode, 'single-case-print-execution-area');
     }
+
+    // Auto-prepare print area on browser native print (Ctrl+P or Print menu)
+    window.addEventListener('beforeprint', function () {
+      let printArea = document.getElementById('single-case-print-execution-area');
+      if (!printArea) {
+        printArea = document.createElement('div');
+        printArea.id = 'single-case-print-execution-area';
+        printArea.className = 'print-only-block';
+        document.body.appendChild(printArea);
+      }
+      if (!printArea.innerHTML.trim()) {
+        const mode = document.querySelector('input[name="single-print-mode"]:checked')?.value || 'full';
+        const orient = document.querySelector('input[name="single-print-orient"]:checked')?.value || 'portrait';
+        const scale = document.getElementById('single-print-scale')?.value || '100';
+        const hideTitle = document.getElementById('single-hide-title')?.checked || false;
+        const splitKey = document.getElementById('single-split-key')?.checked !== false;
+
+        printArea.innerHTML = buildSingleCasePrintHtml(mode, hideTitle, splitKey);
+        applyDynamicPrintStyle(orient);
+        document.body.classList.add('is-printing', 'print-orientation-' + orient, 'print-scale-' + scale);
+      }
+    });
+
+    window.addEventListener('afterprint', function () {
+      document.body.classList.remove(
+        'is-printing',
+        'print-mode-question', 'print-mode-checklist',
+        'print-orientation-portrait', 'print-orientation-landscape',
+        'print-scale-80', 'print-scale-100', 'print-scale-120', 'print-scale-140', 'print-scale-160'
+      );
+    });
 
     // Toggle Scratchpad in Case Viewer
     function toggleViewerScratchpad(initialTab) {

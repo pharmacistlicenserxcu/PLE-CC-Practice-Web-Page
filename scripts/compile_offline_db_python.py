@@ -879,8 +879,8 @@ def get_case_content_from_doc(doc_data, target_case_id, doc_equations=None):
                     
                 named_style = para.get('paragraphStyle', {}).get('namedStyleType', '')
                 is_heading_style = named_style.startswith('HEADING')
-                is_markdown_header = text_strip.startswith('##') or text_strip.startswith('#') or text_strip.startswith('**#')
-                clean_sec_header = re.sub(r"^[*_#\s]+", "", text_strip).strip()
+                is_markdown_header = bool(re.match(r"^[*_]*#{1,4}\s*", text_strip))
+                clean_sec_header = re.sub(r"^[*_#\s\x0b\u00a0\u200b\u2003]+", "", text_strip).strip()
                 lower_h = clean_sec_header.lower()
                 
                 # Check for Checklist Group Header FIRST
@@ -907,8 +907,8 @@ def get_case_content_from_doc(doc_data, target_case_id, doc_equations=None):
                 
                 new_section = None
                 if is_valid_header:
-                    clean_sec_header = re.sub(r"^[*_#\s\x0b]+", "", text_strip).strip()
-                    clean_sec_header = re.sub(r"\s*:\s*$", "", clean_sec_header).strip()
+                    clean_sec_header = re.sub(r"^[*_#\s\x0b\u00a0\u200b\u2003]+", "", text_strip).strip()
+                    clean_sec_header = re.sub(r"[\s\x0b\u00a0\u200b\u2003]*:\s*$", "", clean_sec_header).strip()
                     lower_h = clean_sec_header.lower()
                     
                     # Strictly match ONLY the 5 official sections (no loose alternatives):

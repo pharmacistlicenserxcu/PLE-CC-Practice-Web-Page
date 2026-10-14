@@ -1,13 +1,13 @@
 /**
  * PLE-CC2 OSPE Practice System — Offline Case List Metadata (Auto-Generated)
- * Version: v_20261015_003031
- * Generated on 2026-10-15 00:30:31
+ * Version: v_20261015_003101
+ * Generated on 2026-10-15 00:31:01
  */
 
 const OFFLINE_DATA = {
-  "version": "v_20261015_003031",
-  "generatedAt": "2026-10-15 00:30:31",
-  "totalCases": 387,
+  "version": "v_20261015_003101",
+  "generatedAt": "2026-10-15 00:31:01",
+  "totalCases": 386,
   "cases": [
     {
       "caseId": "OSPE-CL4801",
@@ -2967,7 +2967,8 @@ const OFFLINE_DATA = {
       "source": "Practice RxCU84 Clinic ครั้งที่ 1",
       "isActive": true,
       "linkedNextCase": "",
-      "linkedFromCase": ""
+      "linkedFromCase": "",
+      "caseStatus": "Active"
     },
     {
       "caseId": "OSPE-CLSD02",
@@ -6184,23 +6185,6 @@ const OFFLINE_DATA = {
       "isActive": true,
       "linkedNextCase": "",
       "linkedFromCase": ""
-    },
-    {
-      "caseId": "OSPE-CLSD01]",
-      "title": "เคส CLSD01]",
-      "category": "Clinic",
-      "mainGroup": "",
-      "subTopic": "",
-      "disease": "",
-      "difficulty": 2,
-      "docId": "",
-      "author": "Auto-Discovered",
-      "createdDate": "2026-10-15",
-      "source": "ไม่ระบุ",
-      "isActive": true,
-      "linkedNextCase": "",
-      "linkedFromCase": "",
-      "_isNewCase": true
     }
   ]
 };

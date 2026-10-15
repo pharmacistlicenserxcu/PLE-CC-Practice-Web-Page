@@ -1,12 +1,12 @@
 /**
  * PLE-CC2 OSPE Practice System — Offline Case List Metadata (Auto-Generated)
- * Version: v_20261015_034211
- * Generated on 2026-10-15 03:42:11
+ * Version: v_20261015_124707
+ * Generated on 2026-10-15 12:47:07
  */
 
 const OFFLINE_DATA = {
-  "version": "v_20261015_034211",
-  "generatedAt": "2026-10-15 03:42:11",
+  "version": "v_20261015_124707",
+  "generatedAt": "2026-10-15 12:47:07",
   "totalCases": 405,
   "cases": [
     {
@@ -3386,7 +3386,7 @@ const OFFLINE_DATA = {
       "docId": "1ZNKvEBVAUeVcJ2GSH4gGKujA8whv7zY0fH4pXVEJa4g",
       "author": "คณะทำงานคลังข้อสอบร่วมสมรรถนะเภสัชกรรม (ระบบกลาง)",
       "createdDate": "30/09/2026",
-      "source": "Practice RxCU84 Clinic ครั้งที่ 1",
+      "source": "3",
       "isActive": true,
       "caseStatus": "Active",
       "linkedNextCase": "",

@@ -6843,8 +6843,9 @@
             const cleanId = (c.caseId || '').trim();
             let encObj = c;
             if (!encObj || !encObj.ciphertext) {
-              if (typeof OFFLINE_DETAILS !== 'undefined' && OFFLINE_DETAILS) {
-                encObj = OFFLINE_DETAILS[cleanId] || OFFLINE_DETAILS[cleanId.replace(/^OSPE-/i, '')] || OFFLINE_DETAILS['OSPE-' + cleanId];
+              const offDetails = (typeof OFFLINE_CASE_DETAILS !== 'undefined' && OFFLINE_CASE_DETAILS) ? OFFLINE_CASE_DETAILS : (window.OFFLINE_CASE_DETAILS || null);
+              if (offDetails) {
+                encObj = offDetails[cleanId] || offDetails[cleanId.replace(/^OSPE-/i, '')] || offDetails['OSPE-' + cleanId];
               }
             }
             if (encObj && encObj.ciphertext) {
@@ -6935,8 +6936,9 @@
               const cleanId = (st.case.caseId || '').trim();
               let encObj = st.case;
               if (!encObj || !encObj.ciphertext) {
-                if (typeof OFFLINE_DETAILS !== 'undefined' && OFFLINE_DETAILS) {
-                  encObj = OFFLINE_DETAILS[cleanId] || OFFLINE_DETAILS[cleanId.replace('OSPE-', '')] || OFFLINE_DETAILS['OSPE-' + cleanId];
+                const offDetails = (typeof OFFLINE_CASE_DETAILS !== 'undefined' && OFFLINE_CASE_DETAILS) ? OFFLINE_CASE_DETAILS : (window.OFFLINE_CASE_DETAILS || null);
+                if (offDetails) {
+                  encObj = offDetails[cleanId] || offDetails[cleanId.replace('OSPE-', '')] || offDetails['OSPE-' + cleanId];
                 }
               }
               if (!encObj || !encObj.ciphertext) continue;
@@ -6960,8 +6962,9 @@
               const cleanId = (st.case.caseId || '').trim();
               let encObj = st.case;
               if (!encObj || !encObj.ciphertext) {
-                if (typeof OFFLINE_DETAILS !== 'undefined' && OFFLINE_DETAILS) {
-                  encObj = OFFLINE_DETAILS[cleanId] || OFFLINE_DETAILS[cleanId.replace('OSPE-', '')] || OFFLINE_DETAILS['OSPE-' + cleanId];
+                const offDetails = (typeof OFFLINE_CASE_DETAILS !== 'undefined' && OFFLINE_CASE_DETAILS) ? OFFLINE_CASE_DETAILS : (window.OFFLINE_CASE_DETAILS || null);
+                if (offDetails) {
+                  encObj = offDetails[cleanId] || offDetails[cleanId.replace('OSPE-', '')] || offDetails['OSPE-' + cleanId];
                 }
               }
               if (encObj && encObj.ciphertext) {
@@ -8344,6 +8347,7 @@
 
       // Render patientInfoHtml — convert inner ##Header markers to styled headings while stripping section tag
       const rawPatient = stripSectionHeaders(c.patientInfoHtml || '');
+      const patientAccordion = document.getElementById('exam-patient-accordion');
       const hasPatientInfo = Boolean(
         rawPatient && rawPatient.trim() && (
           rawPatient.replace(/<[^>]*>/g, '').trim().length > 0 ||
@@ -15979,8 +15983,9 @@ ${caseContext || '(ยังไม่มีข้อมูลเคส)'}
         if (savedPasscode && typeof window.decryptCaseData === 'function') {
           let encObj = c;
           if (!encObj || !encObj.ciphertext) {
-            if (typeof OFFLINE_DETAILS !== 'undefined' && OFFLINE_DETAILS) {
-              encObj = OFFLINE_DETAILS[cleanId] || OFFLINE_DETAILS[rawId] || OFFLINE_DETAILS[ospeId];
+            const offDetails = (typeof OFFLINE_CASE_DETAILS !== 'undefined' && OFFLINE_CASE_DETAILS) ? OFFLINE_CASE_DETAILS : (window.OFFLINE_CASE_DETAILS || null);
+            if (offDetails) {
+              encObj = offDetails[cleanId] || offDetails[rawId] || offDetails[ospeId];
             }
           }
           if (encObj && encObj.ciphertext) {

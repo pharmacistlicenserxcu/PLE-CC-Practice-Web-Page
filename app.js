@@ -4085,10 +4085,10 @@ function autoCheckLinkedChecklistItem(tag, shouldCheck = true) {
   const items = document.querySelectorAll('.checklist-item');
   items.forEach(item => {
     const itemText = item.textContent || '';
-    const itemDataTag = item.getAttribute('data-tag') || '';
+    const itemDataTag = (item.getAttribute('data-tag') || '').trim();
     
     // Robust multi-format matching for e.g. (ข้อ 1.1), ข้อ 1.1, 1.1, [1.1], etc.
-    const hasTagMatch = (itemDataTag === numOnly || itemDataTag === fullTextTag) ||
+    const hasTagMatch = (itemDataTag && (itemDataTag === numOnly || itemDataTag === fullTextTag || itemDataTag.replace(/^ข้อ\s*/, '') === numOnly)) ||
                         itemText.includes(`(${fullTextTag})`) ||
                         itemText.includes(`(${numOnly})`) ||
                         itemText.includes(`(ข้อ ${numOnly})`) ||
@@ -4105,9 +4105,10 @@ function autoCheckLinkedChecklistItem(tag, shouldCheck = true) {
     if (hasTagMatch) {
       const isAlreadyChecked = item.classList.contains('checked');
       if (shouldCheck && !isAlreadyChecked) {
-        // Trigger click on item to auto-tick and update score
+        item.classList.add('auto-checked');
         item.click();
-      } else if (!shouldCheck && isAlreadyChecked) {
+      } else if (!shouldCheck && isAlreadyChecked && item.classList.contains('auto-checked')) {
+        item.classList.remove('auto-checked');
         item.click();
       }
     }

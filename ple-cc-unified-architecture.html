@@ -1,0 +1,947 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>PLE-CC Platform Architecture & System Conditions Hub (RxCU 2569)</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Bai+Jamjuree:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #0f172a;
+      --bg-card: #1e293b;
+      --bg-card-hover: #243447;
+      --border: #334155;
+      --text: #f8fafc;
+      --text-muted: #94a3b8;
+      --primary: #38bdf8;
+      --primary-dark: #0284c7;
+      --primary-light: rgba(56, 189, 248, 0.12);
+      --success: #34d399;
+      --success-light: rgba(52, 211, 153, 0.12);
+      --warning: #fbbf24;
+      --warning-light: rgba(251, 191, 36, 0.12);
+      --danger: #f87171;
+      --danger-light: rgba(248, 113, 113, 0.12);
+      --purple: #c084fc;
+      --purple-light: rgba(192, 132, 252, 0.12);
+      --radius: 12px;
+      --radius-sm: 8px;
+      --font-main: 'Bai Jamjuree', -apple-system, BlinkMacSystemFont, sans-serif;
+      --font-mono: 'JetBrains Mono', monospace;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      background-color: var(--bg);
+      color: var(--text);
+      font-family: var(--font-main);
+      line-height: 1.6;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    header {
+      background: rgba(30, 41, 59, 0.85);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--border);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      padding: 0.85rem 1.5rem;
+    }
+
+    .header-container {
+      max-width: 1400px;
+      margin: 0 auto;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1rem;
+      flex-wrap: wrap;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+
+    .brand-logo {
+      font-size: 1.8rem;
+    }
+
+    .brand-title {
+      font-size: 1.15rem;
+      font-weight: 700;
+      color: #fff;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .brand-badge {
+      background: var(--primary-light);
+      color: var(--primary);
+      border: 1px solid var(--primary);
+      font-size: 0.75rem;
+      padding: 0.15rem 0.5rem;
+      border-radius: 9999px;
+      font-weight: 600;
+    }
+
+    .brand-sub {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+    }
+
+    .nav-tabs {
+      display: flex;
+      gap: 0.4rem;
+      background: rgba(15, 23, 42, 0.6);
+      padding: 0.35rem;
+      border-radius: var(--radius);
+      border: 1px solid var(--border);
+      overflow-x: auto;
+    }
+
+    .tab-btn {
+      background: transparent;
+      border: none;
+      color: var(--text-muted);
+      font-family: var(--font-main);
+      font-size: 0.88rem;
+      font-weight: 600;
+      padding: 0.5rem 0.9rem;
+      border-radius: var(--radius-sm);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 0.45rem;
+      white-space: nowrap;
+      transition: all 0.2s ease;
+    }
+
+    .tab-btn:hover {
+      color: #fff;
+      background: rgba(255, 255, 255, 0.05);
+    }
+
+    .tab-btn.active {
+      color: #fff;
+      background: var(--primary-dark);
+      box-shadow: 0 2px 8px rgba(2, 132, 199, 0.35);
+    }
+
+    main {
+      flex: 1;
+      max-width: 1400px;
+      width: 100%;
+      margin: 0 auto;
+      padding: 1.25rem;
+    }
+
+    .tab-pane {
+      display: none;
+    }
+
+    .tab-pane.active {
+      display: block;
+      animation: fadeIn 0.25s ease-in-out;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(4px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .diagram-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      overflow: hidden;
+      margin-bottom: 1.5rem;
+      display: flex;
+      flex-direction: column;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.25);
+    }
+
+    .diagram-head {
+      padding: 0.85rem 1.25rem;
+      background: rgba(15, 23, 42, 0.7);
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1rem;
+      flex-wrap: wrap;
+    }
+
+    .diagram-title {
+      font-size: 1rem;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .diagram-desc {
+      font-size: 0.82rem;
+      color: var(--text-muted);
+    }
+
+    .diagram-actions {
+      display: flex;
+      gap: 0.5rem;
+    }
+
+    .btn-action {
+      background: var(--border);
+      color: var(--text);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      padding: 0.4rem 0.75rem;
+      border-radius: var(--radius-sm);
+      font-size: 0.8rem;
+      font-family: var(--font-main);
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.35rem;
+      text-decoration: none;
+      transition: all 0.2s;
+    }
+
+    .btn-action:hover {
+      background: var(--primary-dark);
+      color: #fff;
+    }
+
+    .iframe-container {
+      width: 100%;
+      height: 720px;
+      border: none;
+      background: #0b1120;
+    }
+
+    .conditions-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+      gap: 1rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .condition-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 1.15rem;
+      transition: transform 0.2s, border-color 0.2s;
+    }
+
+    .condition-card:hover {
+      border-color: var(--primary);
+      transform: translateY(-2px);
+    }
+
+    .condition-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 0.5rem;
+      margin-bottom: 0.75rem;
+      padding-bottom: 0.5rem;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .condition-badge {
+      font-size: 0.75rem;
+      font-weight: 700;
+      padding: 0.15rem 0.55rem;
+      border-radius: 9999px;
+    }
+
+    .badge-danger { background: var(--danger-light); color: var(--danger); border: 1px solid var(--danger); }
+    .badge-warning { background: var(--warning-light); color: var(--warning); border: 1px solid var(--warning); }
+    .badge-success { background: var(--success-light); color: var(--success); border: 1px solid var(--success); }
+    .badge-primary { background: var(--primary-light); color: var(--primary); border: 1px solid var(--primary); }
+    .badge-purple { background: var(--purple-light); color: var(--purple); border: 1px solid var(--purple); }
+
+    .condition-title {
+      font-size: 0.95rem;
+      font-weight: 700;
+      color: #fff;
+    }
+
+    .condition-item {
+      margin-bottom: 0.75rem;
+      font-size: 0.85rem;
+    }
+
+    .condition-item strong {
+      color: #e2e8f0;
+      display: block;
+      margin-bottom: 0.2rem;
+    }
+
+    .condition-code {
+      background: #0b1120;
+      border: 1px solid var(--border);
+      padding: 0.35rem 0.6rem;
+      border-radius: 6px;
+      font-family: var(--font-mono);
+      font-size: 0.78rem;
+      color: var(--primary);
+      margin-top: 0.25rem;
+      display: block;
+      word-break: break-all;
+    }
+
+    .table-container {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      overflow-x: auto;
+      margin-bottom: 1.5rem;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.86rem;
+      text-align: left;
+    }
+
+    th {
+      background: rgba(15, 23, 42, 0.8);
+      padding: 0.75rem 1rem;
+      border-bottom: 1px solid var(--border);
+      color: var(--text-muted);
+      font-weight: 700;
+      white-space: nowrap;
+    }
+
+    td {
+      padding: 0.75rem 1rem;
+      border-bottom: 1px solid var(--border);
+      vertical-align: top;
+    }
+
+    tr:last-child td {
+      border-bottom: none;
+    }
+
+    tr:hover td {
+      background: rgba(255, 255, 255, 0.02);
+    }
+
+    .search-bar {
+      margin-bottom: 1.25rem;
+      display: flex;
+      gap: 0.5rem;
+    }
+
+    .search-input {
+      flex: 1;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      padding: 0.65rem 1rem;
+      border-radius: var(--radius);
+      color: #fff;
+      font-family: var(--font-main);
+      font-size: 0.9rem;
+      outline: none;
+    }
+
+    .search-input:focus {
+      border-color: var(--primary);
+    }
+
+    footer {
+      background: rgba(15, 23, 42, 0.9);
+      border-top: 1px solid var(--border);
+      padding: 1rem;
+      text-align: center;
+      font-size: 0.8rem;
+      color: var(--text-muted);
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <div class="header-container">
+      <div class="brand">
+        <span class="brand-logo">🧠</span>
+        <div>
+          <div class="brand-title">
+            PLE-CC Architecture & Conditions Hub
+            <span class="brand-badge">RxCU 84/85</span>
+          </div>
+          <div class="brand-sub">ศูนย์รวมสถาปัตยกรรมระบบ ผังเวิร์กโฟลว์ และเงื่อนไขพิเศษการทำงานแบบเจาะลึก</div>
+        </div>
+      </div>
+
+      <nav class="nav-tabs" role="tablist">
+        <button class="tab-btn active" onclick="switchTab('tab-tree', this)">
+          🌳 โครงสร้างทั้งเว็บ (Tree)
+        </button>
+        <button class="tab-btn" onclick="switchTab('tab-workflow', this)">
+          🔄 เวิร์กโฟลว์ระบบ (Workflow)
+        </button>
+        <button class="tab-btn" onclick="switchTab('tab-cohort', this)">
+          ⏱️ Race Shield & Cohort
+        </button>
+        <button class="tab-btn" onclick="switchTab('tab-anti-skip', this)">
+          🛡️ Anti-Skip Shield (Archify)
+        </button>
+        <button class="tab-btn" onclick="switchTab('tab-conditions', this)">
+          📋 เงื่อนไขพิเศษละเอียด (Conditions)
+        </button>
+        <button class="tab-btn" onclick="switchTab('tab-matrix', this)">
+          📊 เปรียบเทียบ 4 โหมดสอบ
+        </button>
+        <button class="tab-btn" onclick="switchTab('tab-plan', this); loadPlanMarkdown();">
+          📑 แผนงานฉบับเต็ม (.md)
+        </button>
+        <a href="plan_full_platform_architecture_and_workflows.md" target="_blank" class="btn-action" style="background:var(--primary-dark); color:#fff; font-weight:600; margin-left:0.5rem;">
+          📥 เปิดไฟล์ .md
+        </a>
+      </nav>
+    </div>
+  </header>
+
+  <main>
+
+    <!-- TAB 1: PLATFORM SYSTEM TREE -->
+    <div id="tab-tree" class="tab-pane active">
+      <div class="diagram-card">
+        <div class="diagram-head">
+          <div>
+            <div class="diagram-title">🌳 แผนผังโครงสร้างระบบทั้งเว็บไซต์ (Platform System Hierarchy)</div>
+            <div class="diagram-desc">แสดงการแตกแขนง 5 เสาหลัก และ 28 โมดูลย่อยทั้งหมดของแพลตฟอร์ม PLE-CC Webpage</div>
+          </div>
+          <div class="diagram-actions">
+            <a href="ple-cc-platform-tree.html" target="_blank" class="btn-action">↗️ เปิดเต็มจอ</a>
+          </div>
+        </div>
+        <iframe src="ple-cc-platform-tree.html?embed=1" class="iframe-container" title="Platform Tree"></iframe>
+      </div>
+    </div>
+
+    <!-- TAB 2: END-TO-END WORKFLOW -->
+    <div id="tab-workflow" class="tab-pane">
+      <div class="diagram-card">
+        <div class="diagram-head">
+          <div>
+            <div class="diagram-title">🔄 แผนผังเวิร์กโฟลว์การทำงานทั้งระบบ (End-to-End System Workflow)</div>
+            <div class="diagram-desc">แสดงการเชื่อมต่อระหว่าง นิสิต, กรรมการ, Super Host, หน้าเว็บ SPA และคลาวด์ SSOT ตลอด 6 ขั้นตอน</div>
+          </div>
+          <div class="diagram-actions">
+            <a href="ple-cc-all-systems-workflow.html" target="_blank" class="btn-action">↗️ เปิดเต็มจอ</a>
+          </div>
+        </div>
+        <iframe src="ple-cc-all-systems-workflow.html?embed=1" class="iframe-container" title="All Systems Workflow"></iframe>
+      </div>
+    </div>
+
+    <!-- TAB 3: COHORT BREAKOUT & RACE SHIELD -->
+    <div id="tab-cohort" class="tab-pane">
+      <div class="diagram-card">
+        <div class="diagram-head">
+          <div>
+            <div class="diagram-title">⏱️ แผนผัง Race Condition Shield & Local Review Isolation</div>
+            <div class="diagram-desc">แสดงกลไกตัดวงจร Race Condition 4 จุด และการแยกระบบดูย้อนหลังไม่ให้กระทบห้องสอบ</div>
+          </div>
+          <div class="diagram-actions">
+            <a href="cohort-workflow.html" target="_blank" class="btn-action">↗️ เปิดเต็มจอ</a>
+          </div>
+        </div>
+        <iframe src="cohort-workflow.html?embed=1" class="iframe-container" title="Cohort Workflow"></iframe>
+      </div>
+    </div>
+
+    <!-- TAB 3.5: ANTI-SKIP SHIELD WORKFLOW -->
+    <div id="tab-anti-skip" class="tab-pane">
+      <div class="diagram-card">
+        <div class="diagram-head">
+          <div>
+            <div class="diagram-title">🛡️ แผนผังระบบป้องกันการข้ามสถานีและการหมุนเวียนแบบปรมาณู (Anti-Skip & Atomic Shield)</div>
+            <div class="diagram-desc">แสดงสถาปัตยกรรม Single Master Authority, Auto-Cleanup Timer Registry และ Atomic Index Validation จาก 8 Root Causes</div>
+          </div>
+          <div class="diagram-actions">
+            <a href="station-skip-workflow.html" target="_blank" class="btn-action">↗️ เปิดเต็มจอ</a>
+          </div>
+        </div>
+        <iframe src="station-skip-workflow.html?embed=1" class="iframe-container" title="Station Skip Workflow"></iframe>
+      </div>
+    </div>
+
+    <!-- TAB 4: COMPREHENSIVE SPECIAL CONDITIONS -->
+    <div id="tab-conditions" class="tab-pane">
+      <div class="search-bar">
+        <input type="text" id="condition-search" class="search-input" placeholder="🔍 ค้นหาเงื่อนไขพิเศษ เช่น timer, local review, score, snapshot, offline, audio..." onkeyup="filterConditions()">
+      </div>
+
+      <div class="conditions-grid" id="conditions-container">
+
+        <!-- Condition 1: Timer Hits Zero -->
+        <div class="condition-card" data-tags="timer zero timeout race countdown">
+          <div class="condition-head">
+            <span class="condition-title">1. เมื่อตัวจับเวลานับถอยหลังถึง 00:00</span>
+            <span class="condition-badge badge-danger">Fix Point 1</span>
+          </div>
+          <div class="condition-item">
+            <strong>เงื่อนไขเหตุการณ์:</strong>
+            เมื่อ SimState.timerValue ลดลงจนน้อยกว่าหรือเท่ากับ 0 ในฟังก์ชัน startLocalCountdown
+          </div>
+          <div class="condition-item">
+            <strong>พฤติกรรมเดิม (สาเหตุบั๊ก):</strong>
+            สั่ง clearInterval แต่ลืมตั้ง SimState.timerRunning = false ทำให้สถานะยังค้างว่าจับเวลาอยู่
+          </div>
+          <div class="condition-item">
+            <strong>พฤติกรรมที่ถูกต้อง (Fix 1):</strong>
+            ตั้งค่า SimState.timerRunning = false ทันที เพื่อป้องกันไม่ให้ applyRoomState สร้าง Timer ซ้ำเมื่อมี Snapshot ส่งเข้ามา
+            <span class="condition-code">clearInterval(SimState.timerInterval); SimState.timerRunning = false;</span>
+          </div>
+        </div>
+
+        <!-- Condition 2: Timeout Modal Overlay Debounce -->
+        <div class="condition-card" data-tags="modal popup overlay timeout debounce">
+          <div class="condition-head">
+            <span class="condition-title">2. หน้าต่างแจ้งหมดเวลา (3-Second Window)</span>
+            <span class="condition-badge badge-danger">Fix Point 2</span>
+          </div>
+          <div class="condition-item">
+            <strong>เงื่อนไขเหตุการณ์:</strong>
+            เมื่อเวลาแตะ 00:00 ฟังก์ชัน showTimeoutPopup ถูกเรียกเพื่อเปิด Modal นับถอยหลัง 3 วินาที
+          </div>
+          <div class="condition-item">
+            <strong>จุดเสี่ยง Race Condition:</strong>
+            หากมี Snapshot เข้ามาระหว่าง 3 วินาทีนี้ showTimeoutPopup อาจถูกเรียกซ้อน ส่งผลให้มี Callback เลื่อนสถานีทำงานพร้อมกัน 2 ตัว
+          </div>
+          <div class="condition-item">
+            <strong>มาตรการป้องกัน:</strong>
+            เพิ่มตัวแปรล็อกและตรวจสอบ ID หากมี overlay-timeout อยู่แล้ว จะไม่สร้างใหม่และยกเลิก callback ซ้ำ
+            <span class="condition-code">if (document.getElementById('auto-timeout-overlay')) return;</span>
+          </div>
+        </div>
+
+        <!-- Condition 3: Examiner Jump Guard -->
+        <div class="condition-card" data-tags="examiner cohort breakout jump permission">
+          <div class="condition-head">
+            <span class="condition-title">3. สิทธิ์การสั่งเปลี่ยนสถานีในโหมด Cohort</span>
+            <span class="condition-badge badge-warning">Fix Point 3</span>
+          </div>
+          <div class="condition-item">
+            <strong>เงื่อนไขเหตุการณ์:</strong>
+            เมื่อฟังก์ชัน jumpToStation ถูกสั่งทำงานในห้องสอบแบบ Cohort Breakout
+          </div>
+          <div class="condition-item">
+            <strong>กฎการควบคุม (Access Control):</strong>
+            เฉพาะ Super Host เท่านั้นที่มีสิทธิ์เขียน currentStationIdx ลง Firebase ส่วน Examiner ประจำโต๊ะห้ามแตะเด็ดขาด
+          </div>
+          <div class="condition-item">
+            <strong>โค้ดบังคับใช้:</strong>
+            <span class="condition-code">if (SimState.examMode === 'cohort_breakout' && SimState.isLobby && !SimState.isHost) return;</span>
+          </div>
+        </div>
+
+        <!-- Condition 4: Results Transition Lock -->
+        <div class="condition-card" data-tags="results finish exam lock async await">
+          <div class="condition-head">
+            <span class="condition-title">4. การปิดการสอบ (Results Transition Lock)</span>
+            <span class="condition-badge badge-warning">Fix Point 4</span>
+          </div>
+          <div class="condition-item">
+            <strong>เงื่อนไขเหตุการณ์:</strong>
+            เมื่อห้องสอบได้รับ status = 'results' จาก Firebase ใน applyRoomState
+          </div>
+          <div class="condition-item">
+            <strong>จุดเสี่ยงเดิม:</strong>
+            สั่ง await finishExamSimulation() โดยไม่ได้ล็อก isFinishingExam ไว้ล่วงหน้า ทำให้ Snapshot อื่นเรียกซ้อนได้
+          </div>
+          <div class="condition-item">
+            <strong>มาตรการป้องกัน:</strong>
+            ตั้งค่า SimState.isFinishingExam = true ก่อนเข้าสู่คำสั่ง async finishExamSimulation()
+            <span class="condition-code">SimState.isFinishingExam = true; await finishExamSimulation();</span>
+          </div>
+        </div>
+
+        <!-- Condition 5: Examiner Local Review Click -->
+        <div class="condition-card" data-tags="examiner local review prev button">
+          <div class="condition-head">
+            <span class="condition-title">5. กรรมการกดย้อนดูสถานีก่อนหน้า (Local View)</span>
+            <span class="condition-badge badge-primary">Feature Logic</span>
+          </div>
+          <div class="condition-item">
+            <strong>สิทธิ์การแสดงปุ่ม:</strong>
+            แสดงเฉพาะ Examiner ในโหมด Cohort Breakout เท่านั้น ส่วน Examinee และ Super Host จะไม่เห็นปุ่มนี้เลย
+          </div>
+          <div class="condition-item">
+            <strong>การแยกสถานะ (State Isolation):</strong>
+            เก็บค่าลงใน SimState._localReviewIdx โดยไม่เปลี่ยนสถานะของห้องสอบใน Firebase
+          </div>
+          <div class="condition-item">
+            <strong>การแสดงผลหน้าจอ:</strong>
+            แสดงแบนเนอร์เตือนสีส้ม "โหมดดูย้อนหลัง: คุณกำลังดูสถานีที่ X (ห้องสอบกำลังอยู่ที่สถานีที่ Y)" พร้อมปุ่มกดกลับสถานีปัจจุบัน
+          </div>
+        </div>
+
+        <!-- Condition 6: Scoring during Local Review -->
+        <div class="condition-card" data-tags="score grading checklist local review write">
+          <div class="condition-head">
+            <span class="condition-title">6. การติ๊กคะแนนขณะอยู่ในโหมดดูย้อนหลัง</span>
+            <span class="condition-badge badge-success">Data Integrity</span>
+          </div>
+          <div class="condition-item">
+            <strong>คำถามสำคัญ:</strong>
+            คะแนนจะถูกบันทึกไปทับสถานีปัจจุบันของห้องสอบหรือไม่?
+          </div>
+          <div class="condition-item">
+            <strong>คำตอบทางเทคนิค:</strong>
+            ไม่ทับแน่นอน เพราะฟังก์ชัน updateLobbyChecklistOnServer อิงหมายเลขสถานีตามเคสที่กำลังเปิดดูอยู่ (SimState.stations[currentIdx].stationNumber)
+          </div>
+          <div class="condition-item">
+            <strong>พาทข้อมูล Firebase:</strong>
+            <span class="condition-code">rooms/[roomId]/breakouts/[tableId]/scores/[viewedStationNumber]</span>
+          </div>
+        </div>
+
+        <!-- Condition 7: Auto Snapback on Host Advance -->
+        <div class="condition-card" data-tags="auto snapback advance super host cohort">
+          <div class="condition-head">
+            <span class="condition-title">7. การดึงกรรมการกลับอัตโนมัติ (Auto Snapback)</span>
+            <span class="condition-badge badge-success">UX Guard</span>
+          </div>
+          <div class="condition-item">
+            <strong>เงื่อนไขเหตุการณ์:</strong>
+            กรรมการกำลังย้อนดูสถานีที่ 2 แต่ Super Host กดสั่งเปลี่ยนจากสถานี 3 ไปยังสถานี 4
+          </div>
+          <div class="condition-item">
+            <strong>กลไกการทำงาน:</strong>
+            เมื่อ Firebase ส่ง Snapshot ที่มี targetIdx ใหม่เข้ามา ระบบจะตรวจพบว่า stationChanged เป็น true
+          </div>
+          <div class="condition-item">
+            <strong>ผลลัพธ์:</strong>
+            ระบบจะล้างค่า SimState._localReviewIdx = null และสั่ง renderStation(targetIdx) เพื่อพากรรมการกลับมาสถานีที่ 4 ทันที พร้อมแสดง Toast แจ้งเตือน
+          </div>
+        </div>
+
+        <!-- Condition 8: Examinee Screen Isolation -->
+        <div class="condition-card" data-tags="examinee isolation security screen student">
+          <div class="condition-head">
+            <span class="condition-title">8. การป้องกันหน้าจอผู้เข้าสอบ (Examinee Guard)</span>
+            <span class="condition-badge badge-purple">Isolation</span>
+          </div>
+          <div class="condition-item">
+            <strong>ข้อกำหนดเข้มงวด:</strong>
+            ผู้เข้าสอบต้องไม่ได้รับผลกระทบใดๆ เมื่อกรรมการกดย้อนดูสถานีเก่า
+          </div>
+          <div class="condition-item">
+            <strong>การควบคุม:</strong>
+            หน้าจอผู้เข้าสอบอิงตาม room.currentStationIdx จาก Firebase เสมอ ไม่รู้จักตัวแปร _localReviewIdx และไม่แสดงปุ่มย้อนดู
+          </div>
+          <div class="condition-item">
+            <strong>ความปลอดภัย:</strong>
+            ผู้เข้าสอบยังคงเห็นโจทย์และเวลาของสถานีปัจจุบันตามจริง 100%
+          </div>
+        </div>
+
+        <!-- Condition 9: Seamless Reconnection & Table Re-seat -->
+        <div class="condition-card" data-tags="reconnect session resume restore table seat breakout f5 refresh">
+          <div class="condition-head">
+            <span class="condition-title">9. หลุดจากหน้าจอแล้วกลับมาจอยห้องสอบเดิม</span>
+            <span class="condition-badge badge-success">Session Reconnect</span>
+          </div>
+          <div class="condition-item">
+            <strong>กลไกการจำสถานะ:</strong>
+            เมื่อผู้เข้าสอบหรือกรรมการหลุด ปิดแท็บ หรือกดรีเฟรช ระบบเก็บ ple_session_player_id และ ple_session_room_id ใน Session Storage
+          </div>
+          <div class="condition-item">
+            <strong>การคืนที่นั่งโต๊ะย่อย (Table Re-seat):</strong>
+            ฟังก์ชัน autoReconnectCohortSession ตรวจพบ existingById หรือ existingByName และคืนค่า SimState.myBreakoutTableId และบทบาทเดิม (examiner/examinee) ทันที
+          </div>
+          <div class="condition-item">
+            <strong>ข้ามจอนับถอยหลังทันที:</strong>
+            หากการสอบกำลังดำเนินอยู่ (room.status === 'running') ระบบจะบายพาสจอนับถอยหลัง 5-4-3-2-1 และพาเข้าสู่สถานีปัจจุบัน พร้อมกู้คืน Checklist ที่เคยตรวจค้างไว้ทั้งหมด 100%
+            <span class="condition-code">const isExistingMember = Boolean(existingById || existingByName);</span>
+          </div>
+        </div>
+
+        <!-- Condition 10: Host Room Lock -->
+        <div class="condition-card" data-tags="lock islocked host room security block modal access">
+          <div class="condition-head">
+            <span class="condition-title">10. ระบบล็อคห้องสอบ (Host Room Lock 🔒)</span>
+            <span class="condition-badge badge-danger">Security Barrier</span>
+          </div>
+          <div class="condition-item">
+            <strong>การสั่งงาน:</strong>
+            ผู้คุมสอบ (Host หรือ Super Host) กดปุ่มไอคอนกุญแจ 🔒 เพื่อสั่ง toggleRoomLock() ซึ่งจะส่ง isLocked: true ไปยัง Firebase RTDB
+          </div>
+          <div class="condition-item">
+            <strong>การบล็อกบุคคลภายนอก:</strong>
+            หากบุคคลใหม่พยายามเข้าห้องสอบ ระบบจะแสดง Modal: "🔒 ห้องสอบถูกล็อกโดยผู้คุมสอบ - ห้องสอบปิดรับสมาชิกใหม่ (Room Locked)"
+          </div>
+          <div class="condition-item">
+            <strong>ข้อยกเว้นพิเศษ (Bypass Rule):</strong>
+            สมาชิกเดิมที่มีชื่ออยู่ในห้องแล้ว (isExistingMember === true) จะได้รับการยกเว้นและสามารถกลับเข้าห้องได้เสมอแม้ห้องจะถูกล็อคอยู่ก็ตาม
+            <span class="condition-code">if (roomData.isLocked && !isExistingMember) { showRoomBlockedModal(...); }</span>
+          </div>
+        </div>
+
+        <!-- Condition 11: Name Collision & Roster Guard -->
+        <div class="condition-card" data-tags="name collision roster mismatch duplicate reject alert">
+          <div class="condition-head">
+            <span class="condition-title">11. ชื่อไม่ตรง / ชื่อซ้ำเข้าไม่ได้ (Name Guard)</span>
+            <span class="condition-badge badge-warning">Identity Integrity</span>
+          </div>
+          <div class="condition-item">
+            <strong>การป้องกันชื่อชนกันใน Lobby:</strong>
+            ในขั้นตอนรอสอบ (status === 'setup') หากมีคนใหม่พิมพ์ชื่อซ้ำกับผู้ที่มีอยู่ในห้อง ระบบจะปฏิเสธด้วยการแจ้งเตือน: "ชื่อนี้มีผู้ใช้งานอยู่ในห้องสอบนี้แล้ว กรุณาใช้ชื่ออื่น"
+          </div>
+          <div class="condition-item">
+            <strong>การป้องกันการนั่งทับโต๊ะ (Seat Conflict):</strong>
+            ระบบตรวจสอบ targetTable.examinerName และ targetTable.participantName เพื่อไม่ให้เกิดการนั่งซ้อนทับกันที่โต๊ะสอบย่อย
+          </div>
+          <div class="condition-item">
+            <strong>การกู้คืนด้วยชื่อเดิม:</strong>
+            หากผู้สอบเปิดอุปกรณ์ใหม่แต่ไม่มี Session Storage เดิม หากพิมพ์ "ชื่อเดิมที่ถูกต้อง" ระบบจะแมตช์ existingByName และกู้คืน Player ID เดิมให้ทันที
+            <span class="condition-code">if (roomData.status === 'setup' && !existingById && existingByName) { alert(...); }</span>
+          </div>
+        </div>
+
+        <!-- Condition 12: Mid-Exam Join Block -->
+        <div class="condition-card" data-tags="running started block in-progress mid-exam fair sequence">
+          <div class="condition-head">
+            <span class="condition-title">12. ห้องสอบเริ่มแล้วห้ามเข้า (Mid-Exam Barrier)</span>
+            <span class="condition-badge badge-danger">Exam Integrity</span>
+          </div>
+          <div class="condition-item">
+            <strong>เงื่อนไขเหตุการณ์:</strong>
+            เมื่อสถานะห้องสอบเปลี่ยนเป็น status === 'running' หรือ status === 'countdown'
+          </div>
+          <div class="condition-item">
+            <strong>การบล็อกคนใหม่:</strong>
+            บุคคลที่ไม่ได้อยู่ในรายชื่อเดิม (!isExistingMember) จะถูกบล็อกทันทีด้วย Modal: "⛔ ไม่สามารถเข้าห้องสอบได้ในขณะนี้ - การสอบได้เริ่มต้นขึ้นแล้ว (Exam in Progress)"
+          </div>
+          <div class="condition-item">
+            <strong>เหตุผลทางสถาปัตยกรรม:</strong>
+            เพื่อรักษาลำดับการวนสถานี (Rotation Order), ป้องกันตัวหารคะแนนของรุ่นคลาดเคลื่อน, และรักษาความเป็นธรรมของผู้เข้าสอบทุกคน
+            <span class="condition-code">if ((room.status === 'running' || room.status === 'countdown') && !isExistingMember)</span>
+          </div>
+        </div>
+
+        <!-- Condition 13: Zero-Latency Offline Fallback -->
+        <div class="condition-card" data-tags="offline fallback internet disconnect database">
+          <div class="condition-head">
+            <span class="condition-title">13. เครือข่ายอินเทอร์เน็ตขัดข้องระหว่างสอบ</span>
+            <span class="condition-badge badge-success">Offline Guarantee</span>
+          </div>
+          <div class="condition-item">
+            <strong>กลไกสำรอง:</strong>
+            ข้อมูลเคสและเกณฑ์การตรวจทั้งหมดถูกบรรจุอยู่ใน case-details-offline.js (10MB+) เรียบร้อยแล้ว
+          </div>
+          <div class="condition-item">
+            <strong>ผลลัพธ์:</strong>
+            การเปิดโจทย์, รูปภาพ, รายการตรวจ และการจับเวลาในเครื่องสามารถดำเนินต่อไปได้โดยไม่ต้องพึ่งพาเซิร์ฟเวอร์ภายนอก
+          </div>
+        </div>
+
+        <!-- Condition 14: Sound Alert Autoplay Policy -->
+        <div class="condition-card" data-tags="sound audio bell alarm autoplay">
+          <div class="condition-head">
+            <span class="condition-title">14. นโยบายเสียงเตือน (Browser Audio Policy)</span>
+            <span class="condition-badge badge-purple">Audio Engine</span>
+          </div>
+          <div class="condition-item">
+            <strong>ข้อจำกัดเบราว์เซอร์:</strong>
+            เบราว์เซอร์สมัยใหม่จะบล็อกการเล่นเสียงหากผู้ใช้ยังไม่ได้มีปฏิสัมพันธ์กับหน้าเว็บ (User Gesture)
+          </div>
+          <div class="condition-item">
+            <strong>วิธีแก้ปัญหาในระบบ:</strong>
+            ฟังก์ชัน unlockAudioContext() จะถูกเรียกทันทีเมื่อผู้ใช้คลิกปุ่ม Start Exam หรือเลือกบทบาทในห้องรอ
+          </div>
+        </div>
+
+        <!-- Condition 15: Scratchpad Prescription Drawing -->
+        <div class="condition-card" data-tags="scratchpad draw prescription canvas note">
+          <div class="condition-head">
+            <span class="condition-title">15. การใช้งานกระดานทดดิจิทัล (Scratchpad)</span>
+            <span class="condition-badge badge-primary">Tool Logic</span>
+          </div>
+          <div class="condition-item">
+            <strong>การทำงาน:</strong>
+            กระดานทดเป็น Client-side canvas อิสระของผู้เข้าสอบแต่ละคน ไม่ส่งข้อมูลผ่าน WebSockets เพื่อประหยัด Bandwidth
+          </div>
+          <div class="condition-item">
+            <strong>การรีเซ็ต:</strong>
+            กระดานทดจะถูกรีเซ็ตหรือบันทึกภาพอัตโนมัติเมื่อมีการเปลี่ยนสถานีสอบ
+          </div>
+        </div>
+
+        <!-- Condition 16: Firebase Quota Resilience -->
+        <div class="condition-card" data-tags="firebase quota limit bandwidth download 360mb">
+          <div class="condition-head">
+            <span class="condition-title">16. ขีดจำกัดดาวน์โหลด Firebase (360 MB/วัน)</span>
+            <span class="condition-badge badge-warning">Quota Safety</span>
+          </div>
+          <div class="condition-item">
+            <strong>กลไกประหยัด Bandwidth:</strong>
+            ระบบใช้ Throttling ในการบันทึกคะแนน (300ms) และแยกข้อมูลเคสขนาดใหญ่ (10MB+) ไปไว้ในออฟไลน์ไฟล์ ไม่ดึงผ่าน Firebase
+          </div>
+          <div class="condition-item">
+            <strong>ความปลอดภัย:</strong>
+            Firebase รับส่งเฉพาะตัวเลขตัวจับเวลา สถานะห้องสอบ และ Array คะแนนขนาดเล็ก ทำให้รองรับนิสิตทั้งรุ่นได้ตลอดทั้งวันโดยไม่แตะเพดานโควตา
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- TAB 5: 4 EXAM MODES COMPARISON MATRIX -->
+    <div id="tab-matrix" class="tab-pane">
+      <div class="diagram-card" style="padding: 1.25rem;">
+        <h3 style="font-size: 1.1rem; font-weight: 700; margin-bottom: 0.5rem; color: #fff;">📊 ตารางเปรียบเทียบเชิงลึก: 4 โหมดการสอบใน PLE-CC Simulation</h3>
+        <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 1.25rem;">วิเคราะห์ความแตกต่างของสถาปัตยกรรม การควบคุมตัวจับเวลา การบันทึกคะแนน และพฤติกรรมของแต่ละโหมด</p>
+
+        <div class="table-container">
+          <table>
+            <thead>
+              <tr>
+                <th>คุณลักษณะ / มิติ</th>
+                <th>1. Solo Practice Mode</th>
+                <th>2. Standard Room Mode</th>
+                <th>3. Cohort Breakout Mode</th>
+                <th>4. Carousel Rotation Mode</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><strong>กลุ่มเป้าหมายการใช้งาน</strong></td>
+                <td>นิสิตฝึกซ้อมเดี่ยวที่บ้าน</td>
+                <td>สอบตัวต่อตัว (1 นศ. + 1 กรรมการ)</td>
+                <td>สอบจำลองทั้งรุ่นพร้อมกัน (Super Host + โต๊ะย่อย)</td>
+                <td>สอบหมุนเวียนฐาน (กรรมการนั่งประจำฐาน)</td>
+              </tr>
+              <tr>
+                <td><strong>การควบคุมตัวจับเวลา</strong></td>
+                <td>Client-side ภายในเครื่อง (startTimer)</td>
+                <td>Server Epoch Timestamp ผ่าน Firebase</td>
+                <td>Super Host สั่งจับเวลากลางผ่าน Firebase</td>
+                <td>Super Host สั่งรอบกลางผ่าน Firebase</td>
+              </tr>
+              <tr>
+                <td><strong>การเปลี่ยนสถานี</strong></td>
+                <td>นิสิตกด Next/Prev หรือหมดเวลาอัตโนมัติ</td>
+                <td>Host หรือ Examiner กดเปลี่ยนสถานี</td>
+                <td>Super Host สั่งเปลี่ยนพร้อมกันทุกโต๊ะ</td>
+                <td>Super Host สั่งเปลี่ยนรอบหมุนเวียน</td>
+              </tr>
+              <tr>
+                <td><strong>การบันทึกคะแนน</strong></td>
+                <td>บันทึกลงหน่วยความจำเครื่อง (LocalStorage)</td>
+                <td>บันทึกลง rooms/[id]/scoresByStation</td>
+                <td>บันทึกลง breakouts/[tableId]/scores/[stNum]</td>
+                <td>บันทึกลง participantScores/[pId]/stations/[stNum]</td>
+              </tr>
+              <tr>
+                <td><strong>ผลกระทบจาก Race Condition</strong></td>
+                <td><strong>ไม่มีผลกระทบ</strong> (ไม่ใช้ Firebase)</td>
+                <td>มีโอกาสต่ำ (ถ้าห้องเล็ก)</td>
+                <td><strong>ความเสี่ยงสูงสุด</strong> (เกิดบั๊กที่พบในสัปดาห์ 2)</td>
+                <td>ความเสี่ยงปานกลาง</td>
+              </tr>
+              <tr>
+                <td><strong>ระบบดูย้อนหลัง (Local Review)</strong></td>
+                <td>กดปุ่ม Prev ดูย้อนหลังได้อิสระ</td>
+                <td>กดปุ่ม Prev ดูย้อนหลังได้</td>
+                <td><strong>ต้องใช้ Local Review Mode ใหม่ (เฟส 2)</strong></td>
+                <td>กรรมการอยู่ประจำฐานเดิมตลอดเวลา</td>
+              </tr>
+              <tr>
+                <td><strong>การสรุปผลคะแนน</strong></td>
+                <td>ประเมินตนเอง แสดงเกรดทันที</td>
+                <td>สรุปผลหลังสอบเสร็จรายบุคคล</td>
+                <td>สรุปผลแยกรายโต๊ะ + Podium รวมทั้งห้อง</td>
+                <td>สรุปผลคะแนนหมุนเวียนครบทุกสถานี</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- TAB 6: FULL ARCHITECTURE PLAN MARKDOWN VIEWER -->
+    <div id="tab-plan" class="tab-pane">
+      <div class="diagram-card" style="padding: 1.5rem;">
+        <div class="diagram-head" style="margin: -1.5rem -1.5rem 1.5rem -1.5rem;">
+          <div>
+            <div class="diagram-title">📑 แผนงานสถาปัตยกรรมและเงื่อนไขฉบับสมบูรณ์ (Full Plan Document)</div>
+            <div class="diagram-desc">แสดงเนื้อหาไฟล์ plan_full_platform_architecture_and_workflows.md ที่บันทึกไว้ในเว็บไซต์</div>
+          </div>
+          <div class="diagram-actions">
+            <a href="plan_full_platform_architecture_and_workflows.md" target="_blank" class="btn-action">↗️ เปิดไฟล์ .md เต็มจอ</a>
+          </div>
+        </div>
+        <div id="plan-markdown-content" style="background: rgba(15, 23, 42, 0.7); padding: 1.5rem; border-radius: var(--radius); border: 1px solid var(--border); font-size: 0.92rem; line-height: 1.7; color: #e2e8f0; white-space: pre-wrap; font-family: var(--font-main); max-height: 750px; overflow-y: auto;">
+          กำลังโหลดเนื้อหาแผนงาน...
+        </div>
+      </div>
+    </div>
+
+  </main>
+
+  <footer>
+    โครงการเตรียมสอบใบประกอบวิชาชีพเภสัชกรรม (PLE-CC) ปีการศึกษา 2569 | คณะเภสัชศาสตร์ จุฬาลงกรณ์มหาวิทยาลัย (RxCU 84/85)
+  </footer>
+
+  <script>
+    function switchTab(tabId, btn) {
+      document.querySelectorAll('.tab-pane').forEach(el => el.classList.remove('active'));
+      document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
+      
+      const targetPane = document.getElementById(tabId);
+      if (targetPane) targetPane.classList.add('active');
+      if (btn) btn.classList.add('active');
+    }
+
+    function filterConditions() {
+      const q = document.getElementById('condition-search').value.toLowerCase();
+      const cards = document.querySelectorAll('.condition-card');
+      cards.forEach(card => {
+        const text = card.textContent.toLowerCase();
+        const tags = (card.getAttribute('data-tags') || '').toLowerCase();
+        if (text.includes(q) || tags.includes(q)) {
+          card.style.display = 'block';
+        } else {
+          card.style.display = 'none';
+        }
+      });
+    }
+
+    async function loadPlanMarkdown() {
+      const container = document.getElementById('plan-markdown-content');
+      if (!container || container.dataset.loaded === 'true') return;
+      try {
+        const res = await fetch('plan_full_platform_architecture_and_workflows.md');
+        if (res.ok) {
+          const text = await res.text();
+          container.textContent = text;
+          container.dataset.loaded = 'true';
+        } else {
+          container.innerHTML = 'ไม่สามารถโหลดเนื้อหาไฟล์ได้ สามารถคลิกเปิดไฟล์ .md โดยตรงได้ที่ปุ่มด้านบน';
+        }
+      } catch (e) {
+        container.innerHTML = 'ไม่สามารถอ่านไฟล์ผ่าน fetch ได้ สามารถคลิกเปิดไฟล์ .md โดยตรงได้ที่ปุ่มด้านบน';
+      }
+    }
+  </script>
+</body>
+</html>

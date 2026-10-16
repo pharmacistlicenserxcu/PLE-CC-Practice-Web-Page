@@ -3018,12 +3018,14 @@
       timeoutTransitionMode: 'auto', // 'auto' or 'manual'
       alarmSound: localStorage.getItem('ple_ospe_alarm_sound') || 'school-bell',
       
-      // Examiner Local Review State
+      // Examiner Local Review & Timeout Control State
       _isLocalReview: false,
       _localReviewStationIdx: null,
       _localReviewRound: null,
       _localReviewParticipantId: null,
-      _localReviewParticipantName: null
+      _localReviewParticipantName: null,
+      _timeoutPopupTimerId: null,
+      _expiredForStationKey: null
     };
 
     // Auto synchronize timer on background tab wake up
@@ -3031,7 +3033,7 @@
       if (!document.hidden && SimState.timerRunning) {
         if (typeof updateTimerDisplay === 'function') {
           if (SimState.isLobby && SimState.cachedRoom?.timerStartedAt) {
-            const now = Date.now();
+            const now = (typeof getSyncedNow === 'function') ? getSyncedNow() : Date.now();
             const elapsed = Math.floor((now - SimState.cachedRoom.timerStartedAt) / 1000);
             const totalDur = SimState.cachedRoom.timerDuration || 240;
             SimState.timerValue = Math.max(0, totalDur - elapsed);
@@ -5301,17 +5303,45 @@
             myPlayerId = savedPlayerId;
             playerEmoji = existingById.emoji || '💊';
             playerRole = existingById.role || 'examinee';
-            isPlayerHost = Boolean(existingById.isHost);
+            isPlayerHost = Boolean(existingById.isHost || (roomData.hostId && roomData.hostId === savedPlayerId));
           } else if (existingByName) {
             myPlayerId = existingByName.id;
             playerEmoji = existingByName.emoji || '💊';
             playerRole = existingByName.role || 'examinee';
-            isPlayerHost = Boolean(existingByName.isHost && (roomData.hostId === existingByName.id));
+            isPlayerHost = Boolean(existingByName.isHost || (roomData.hostId && roomData.hostId === existingByName.id));
           } else {
             myPlayerId = 'p_' + Date.now() + '_' + Math.random().toString(36).substr(2, 6);
             playerEmoji = localStorage.getItem('ple_player_emoji') || '💊';
             playerRole = 'examinee';
             isPlayerHost = false;
+          }
+
+          // Restore breakout table or carousel station seat on reconnect so role modal does not wipe seats
+          if (isExistingMember) {
+            SimState.roleSelectedThisSession = true;
+            if (roomData.examMode === 'cohort_breakout' && roomData.breakouts) {
+              Object.entries(roomData.breakouts).forEach(([tId, t]) => {
+                if (t.examinerId === myPlayerId || (t.examinerName && t.examinerName === playerName)) {
+                  SimState.myBreakoutTableId = tId;
+                  SimState.myBreakoutRole = 'examiner';
+                  playerRole = 'examiner';
+                } else if (t.participantId === myPlayerId || (t.participantName && t.participantName === playerName)) {
+                  SimState.myBreakoutTableId = tId;
+                  SimState.myBreakoutRole = 'participant';
+                  playerRole = 'participant';
+                }
+              });
+            } else if (roomData.examMode === 'carousel_rotation' && roomData.carouselPosts) {
+              Object.values(roomData.carouselPosts).forEach(post => {
+                if (post.examinerId === myPlayerId || (post.examinerName && post.examinerName === playerName)) {
+                  SimState.myCarouselStation = post.stationNumber;
+                  playerRole = 'examiner';
+                } else if (post.startParticipantId === myPlayerId || (post.startParticipantName && post.startParticipantName === playerName)) {
+                  SimState.myCarouselStation = post.stationNumber;
+                  playerRole = 'participant';
+                }
+              });
+            }
           }
 
           SimState.myPlayerId = myPlayerId;
@@ -5376,9 +5406,12 @@
             roomId: roomIdInput,
             playerId: myPlayerId,
             playerName: playerName,
-            isHost: false,
+            isHost: isPlayerHost,
             role: playerRole,
-            mode: roomData.examMode || 'standard'
+            mode: roomData.examMode || 'standard',
+            breakoutTableId: SimState.myBreakoutTableId || null,
+            breakoutRole: SimState.myBreakoutRole || null,
+            carouselStation: SimState.myCarouselStation || null
           });
           setupLobbyRoomUI();
         }
@@ -5914,8 +5947,13 @@
     function syncLobbyStatus() {}
 
     let _isApplyingRoomState = false;
+    let _pendingRoomState = null;
     async function applyRoomState(room) {
-      if (!room || _isApplyingRoomState) return;
+      if (!room) return;
+      if (_isApplyingRoomState) {
+        _pendingRoomState = room;
+        return;
+      }
       _isApplyingRoomState = true;
       try {
         SimState.cachedRoom = room;
@@ -6424,7 +6462,8 @@
           }
 
           // If the exam is already running, bypass countdown immediately on reconnect/refresh
-          const isLateOrRejoin = room.status === 'running' && ((Date.now() - (room.timerStartedAt || 0) > 2500) || (room.currentStationIdx > 0));
+          const syncedNowForCheck = (typeof getSyncedNow === 'function') ? getSyncedNow() : Date.now();
+          const isLateOrRejoin = room.status === 'running' && ((syncedNowForCheck - (room.timerStartedAt || 0) > 2500) || (room.currentStationIdx > 0));
           if (isLateOrRejoin) {
             SimState.hasDoneCountdown = true;
             const cdEl = document.getElementById('lobby-countdown-screen');
@@ -6455,11 +6494,12 @@
                   SimState.hasDoneCountdown = true;
                   document.getElementById('lobby-countdown-screen').style.display = 'none';
                   
-                  if (room.isSuperHost && SimState.isHost) {
+                  const latestRoomOnCd = SimState.cachedRoom || room;
+                  if (latestRoomOnCd.isSuperHost && SimState.isHost) {
                     // Super Host transition after countdown
                     document.querySelector('.exam-layout').style.display = 'none';
-                    SimState.currentIdx = room.currentStationIdx !== undefined ? room.currentStationIdx : (SimState.currentIdx || 0);
-                    renderSuperHostMonitor(room);
+                    SimState.currentIdx = latestRoomOnCd.currentStationIdx !== undefined ? latestRoomOnCd.currentStationIdx : (SimState.currentIdx || 0);
+                    renderSuperHostMonitor(latestRoomOnCd);
                   } else {
                     document.querySelector('.exam-layout').style.display = 'flex';
                     const stickyTimer = document.getElementById('exam-sticky-timer-bar');
@@ -6468,54 +6508,54 @@
                     if (stickyHeader) stickyHeader.style.display = 'block';
                     
                     let initialTargetIdx = 0;
-                    if (room.examMode === 'carousel_rotation') {
+                    if (latestRoomOnCd.examMode === 'carousel_rotation') {
                       const N = SimState.stations.length || 1;
-                      const r = room.currentStationIdx !== undefined ? room.currentStationIdx : 0;
+                      const r = latestRoomOnCd.currentStationIdx !== undefined ? latestRoomOnCd.currentStationIdx : 0;
                       if (SimState.role === 'examiner') {
                         let stNum = 1;
-                        if (room.carouselPosts) {
-                          const post = Object.values(room.carouselPosts).find(p => p.examinerId === SimState.myPlayerId || p.examinerName === SimState.lobbyPlayerName);
+                        if (latestRoomOnCd.carouselPosts) {
+                          const post = Object.values(latestRoomOnCd.carouselPosts).find(p => p.examinerId === SimState.myPlayerId || p.examinerName === SimState.lobbyPlayerName);
                           if (post) stNum = post.stationNumber;
                         }
                         initialTargetIdx = Math.max(0, Math.min(N - 1, stNum - 1));
                       } else {
                         let stNum = 1;
-                        if (room.carouselPosts) {
-                          const post = Object.values(room.carouselPosts).find(p => p.startParticipantId === SimState.myPlayerId || p.startParticipantName === SimState.lobbyPlayerName);
+                        if (latestRoomOnCd.carouselPosts) {
+                          const post = Object.values(latestRoomOnCd.carouselPosts).find(p => p.startParticipantId === SimState.myPlayerId || p.startParticipantName === SimState.lobbyPlayerName);
                           if (post) stNum = post.stationNumber;
                         }
                         const activeSt = ((stNum - 1 + r) % N) + 1;
                         initialTargetIdx = Math.max(0, Math.min(N - 1, activeSt - 1));
                       }
                     } else {
-                      initialTargetIdx = room.currentStationIdx !== undefined ? room.currentStationIdx : 0;
+                      initialTargetIdx = latestRoomOnCd.currentStationIdx !== undefined ? latestRoomOnCd.currentStationIdx : 0;
                     }
                     renderStation(initialTargetIdx);
                   }
                   
                   // Compute initial timer immediately from Super Host's timerStartedAt
-                  SimState.cachedRoom = room;
+                  SimState.cachedRoom = latestRoomOnCd;
                   const curCase = SimState.stations && SimState.stations[SimState.currentIdx]?.case;
                   const fallbackDur = parseCaseDurationSec(curCase);
-                  if (room.timerRunning) {
+                  if (latestRoomOnCd.timerRunning) {
                     SimState.timerRunning = true;
-                    if (room.timerStartedAt) {
-                      const now = Date.now();
-                      if (now < room.timerStartedAt) {
-                        SimState.timerValue = room.timerDuration || fallbackDur || 240;
+                    if (latestRoomOnCd.timerStartedAt) {
+                      const now = (typeof getSyncedNow === 'function') ? getSyncedNow() : Date.now();
+                      if (now < latestRoomOnCd.timerStartedAt) {
+                        SimState.timerValue = latestRoomOnCd.timerDuration || fallbackDur || 240;
                       } else {
-                        const elapsed = Math.floor((now - room.timerStartedAt) / 1000);
-                        const totalDur = room.timerDuration || fallbackDur || 240;
+                        const elapsed = Math.floor((now - latestRoomOnCd.timerStartedAt) / 1000);
+                        const totalDur = latestRoomOnCd.timerDuration || fallbackDur || 240;
                         SimState.timerValue = Math.max(0, totalDur - elapsed);
                       }
                     } else {
-                      SimState.timerValue = room.timerValue !== undefined ? room.timerValue : (fallbackDur || 240);
+                      SimState.timerValue = latestRoomOnCd.timerValue !== undefined ? latestRoomOnCd.timerValue : (fallbackDur || 240);
                     }
                     updateTimerDisplay();
                     startLocalCountdown();
                   } else {
                     SimState.timerRunning = false;
-                    SimState.timerValue = room.timerValue !== undefined ? room.timerValue : (fallbackDur || 240);
+                    SimState.timerValue = latestRoomOnCd.timerValue !== undefined ? latestRoomOnCd.timerValue : (fallbackDur || 240);
                     updateTimerDisplay();
                   }
                 }
@@ -6594,8 +6634,10 @@
               const startNum = ((assignedStationNum - 1 - r + N) % N) + 1;
               const partId = room.carouselPosts?.['st_' + startNum]?.startParticipantId;
               const partName = room.carouselPosts?.['st_' + startNum]?.startParticipantName || 'ยังไม่มีผู้เข้าสอบ';
-              const badge = document.getElementById('exam-station-badge');
-              if (badge) badge.textContent = `STATION ${assignedStationNum} (ประจำฐาน) · ผู้เข้าสอบ: ${partName}`;
+              if (!SimState._isLocalReview) {
+                const badge = document.getElementById('exam-station-badge');
+                if (badge) badge.textContent = `STATION ${assignedStationNum} (ประจำฐาน) · ผู้เข้าสอบ: ${partName}`;
+              }
 
               // Detect Carousel Round Transition for Examiner
               const isInitialRound = (SimState.lastCarouselRound === undefined);
@@ -6616,11 +6658,24 @@
                   if (currentCase) {
                     renderExamChecklist(assignedStationNum, currentCase);
                     updateExamProgressUI(assignedStationNum, currentCase);
+                    if (typeof setupExaminerLiveSubmissionListener === 'function') {
+                      setupExaminerLiveSubmissionListener(assignedStationNum, currentCase);
+                    }
+                  }
+
+                  // Update live feedback textarea for incoming candidate
+                  const liveFeedbackTextarea = document.getElementById('exam-live-feedback-textarea');
+                  if (liveFeedbackTextarea) {
+                    const candFb = (partId && room.participantScores?.[partId]?.stationFeedbacks?.[assignedStationNum]) || '';
+                    liveFeedbackTextarea.value = candFb;
                   }
 
                   // Switch station chat to the new round / candidate
-                  if (typeof StationChatController !== 'undefined' && StationChatController.currentInstance) {
-                    StationChatController.currentInstance.initStation(assignedStationNum, currentCase);
+                  if (typeof StationChatController !== 'undefined') {
+                    const chatInst = StationChatController.currentInstance || StationChatController;
+                    if (chatInst && typeof chatInst.initStation === 'function') {
+                      chatInst.initStation(assignedStationNum, currentCase);
+                    }
                   }
 
                   if (typeof closeManualTimeoutOverlay === 'function') closeManualTimeoutOverlay();
@@ -6640,12 +6695,11 @@
               if (badge) badge.textContent = `STATION ${activeStationNum} (รอบที่ ${r + 1}/${N})`;
             }
           } else {
-            // cohort_breakout or standard: all follow room.currentStationIdx or room.caseId
-            if (room.currentStationIdx !== undefined) {
-              targetIdx = room.currentStationIdx;
+            // cohort_breakout or standard: follow room.currentStationIdx directly (do NOT use findIndex on caseId which breaks on duplicate REST stations)
+            if (room.currentStationIdx !== undefined && room.currentStationIdx !== null) {
+              targetIdx = Number(room.currentStationIdx);
             } else {
-              targetIdx = SimState.stations.findIndex(st => st.case && st.case.caseId === room.caseId);
-              if (targetIdx === -1) targetIdx = 0;
+              targetIdx = SimState.currentIdx || 0;
             }
           }
 
@@ -6719,7 +6773,7 @@
                 }
               });
             }
-          } else if (room.examMode === 'carousel_rotation' && SimState.role === 'examiner') {
+          } else if (room.examMode === 'carousel_rotation' && SimState.role === 'examiner' && !SimState._isLocalReview) {
             const r = room.currentStationIdx !== undefined ? room.currentStationIdx : 0;
             const N = SimState.stations.length || 1;
             let assignedStationNum = 1;
@@ -6735,8 +6789,8 @@
             }
           }
           
-          // Live sync checklist items across ALL participants in real time
-          if (SimState.stations && SimState.stations[SimState.currentIdx]) {
+          // Live sync checklist items across ALL participants in real time (skip while Examiner is in Local Review)
+          if (!SimState._isLocalReview && SimState.stations && SimState.stations[SimState.currentIdx]) {
             const currStationNum = SimState.stations[SimState.currentIdx].stationNumber;
             const currentChecked = SimState.studentScores[currStationNum] || SimState.studentScores[String(currStationNum)] || [];
             document.querySelectorAll('.checklist-item').forEach(el => {
@@ -6791,15 +6845,18 @@
           }
           
           if (SimState.stations.length === 0) {
-            // Just a fallback
-            let matchedCase = room.caseDetail || AppState.cases.find(c => c.caseId === room.caseId) || AppState.cases[0];
-            SimState.stations = [{ stationNumber: 1, case: matchedCase }];
+            if (room.examSet && typeof buildStationsFromRoom === 'function') {
+              await buildStationsFromRoom(room);
+            }
+            if (SimState.stations.length === 0) {
+              let matchedCase = room.caseDetail || AppState.cases.find(c => c.caseId === room.caseId) || AppState.cases[0];
+              SimState.stations = [{ stationNumber: 1, case: matchedCase }];
+            }
           }
           if (room.status === 'results') {
             if (SimState.isFinishingExam || SimState.isExamFinished) {
               return;
             }
-            SimState.isFinishingExam = true;
             await finishExamSimulation();
           }
         }
@@ -6812,6 +6869,11 @@
         }
       } finally {
         _isApplyingRoomState = false;
+        if (_pendingRoomState) {
+          const nextRoom = _pendingRoomState;
+          _pendingRoomState = null;
+          applyRoomState(nextRoom);
+        }
       }
     }
 
@@ -7328,11 +7390,11 @@
         const firstCase = SimState.stations[0]?.case;
         const firstCaseId = firstCase?.caseId || null;
         const firstDur = parseCaseDurationSec(firstCase);
-        const now = Date.now();
+        const now = (typeof getSyncedNow === 'function') ? getSyncedNow() : Date.now();
         await _fbDb.ref('rooms/' + SimState.roomId).update({
           status: 'running',
           isLocked: true,
-          lockedAt: Date.now(),
+          lockedAt: now,
           timerRunning: true,
           timerValue: firstDur,
           timerDuration: firstDur,
@@ -7402,8 +7464,29 @@
       } catch(e) {}
     }
 
+    // Single Master Station Controller Authority: guarantees exactly ONE client in a room triggers auto-advance
+    function isSingleMasterStationController() {
+      if (!SimState.isLobby) return true;
+      const room = SimState.cachedRoom;
+      const mode = SimState.examMode || (room && room.examMode) || 'standard';
+      if (mode === 'cohort_breakout' || mode === 'carousel_rotation' || (room && room.isSuperHost)) {
+        return Boolean(SimState.isHost);
+      }
+      const players = (room && room.players) ? Object.values(room.players) : (SimState.cachedPlayersList || []);
+      const hasExaminer = players.some(p => p && p.role === 'examiner');
+      if (hasExaminer) {
+        return SimState.role === 'examiner';
+      }
+      return Boolean(SimState.isHost);
+    }
+    window.isSingleMasterStationController = isSingleMasterStationController;
+
     function closeManualTimeoutOverlay(stopAudio = true) {
       if (stopAudio) stopTimeoutAlarmSound();
+      if (SimState._timeoutPopupTimerId) {
+        clearTimeout(SimState._timeoutPopupTimerId);
+        SimState._timeoutPopupTimerId = null;
+      }
       const existing = document.getElementById('manual-timeout-overlay');
       if (existing && existing.parentNode) {
         existing.parentNode.removeChild(existing);
@@ -7420,9 +7503,12 @@
       closeManualTimeoutOverlay(false);
       playTimeoutSound();
 
-      const canAdvance = (!SimState.isLobby) || SimState.isHost || (SimState.examMode === 'standard' && SimState.role === 'examiner');
-      const isLast = (SimState.currentIdx >= SimState.stations.length - 1);
-      const nextStationNum = SimState.currentIdx + 2;
+      const canAdvance = isSingleMasterStationController();
+      const activeIdx = (SimState.isLobby && SimState.cachedRoom && SimState.cachedRoom.currentStationIdx !== undefined)
+        ? Number(SimState.cachedRoom.currentStationIdx)
+        : SimState.currentIdx;
+      const isLast = (SimState.stations.length > 0 && activeIdx >= SimState.stations.length - 1);
+      const nextStationNum = activeIdx + 2;
 
       const overlay = document.createElement('div');
       overlay.id = 'manual-timeout-overlay';
@@ -7442,7 +7528,7 @@
               ท่านสามารถตรวจให้คะแนนหรือสรุปประเด็นเพิ่มเติมได้ เมื่อพร้อมแล้วให้กดปุ่มด้านล่างเพื่อเริ่มสถานีถัดไป
             </p>
             <div style="display:flex;flex-direction:column;gap:0.75rem;">
-              <button class="btn btn-primary" style="padding:0.85rem 1.5rem;font-size:1.05rem;font-weight:700;box-shadow:var(--shadow-md);border-radius:var(--radius-md);" onclick="closeManualTimeoutOverlay(); ${isLast ? 'finishExamSimulation();' : 'nextStation();'}">
+              <button class="btn btn-primary" style="padding:0.85rem 1.5rem;font-size:1.05rem;font-weight:700;box-shadow:var(--shadow-md);border-radius:var(--radius-md);" onclick="closeManualTimeoutOverlay(); ${isLast ? 'finishExamSimulation();' : `nextStation(${activeIdx});`}">
                 ${isLast ? '🏁 สรุปผลการสอบ (Finish Exam)' : `⏭️ ไปยังสถานีถัดไป (สถานีที่ ${nextStationNum})`}
               </button>
               <button class="btn btn-secondary" style="padding:0.6rem 1rem;font-size:0.88rem;color:var(--text-muted);" onclick="closeManualTimeoutOverlay();">
@@ -7492,10 +7578,14 @@
         <p style="font-size: 1.5rem; color: var(--text-muted); font-family: var(--font-body);">กำลังเตรียมพร้อม...</p>
       `;
       document.body.appendChild(overlay);
-      setTimeout(() => {
-        if(document.body.contains(overlay)) document.body.removeChild(overlay);
+      if (SimState._timeoutPopupTimerId) {
+        clearTimeout(SimState._timeoutPopupTimerId);
+      }
+      SimState._timeoutPopupTimerId = setTimeout(() => {
+        SimState._timeoutPopupTimerId = null;
+        if (document.body.contains(overlay)) document.body.removeChild(overlay);
         _isShowingTimeoutPopup = false;
-        if(callback) callback();
+        if (callback) callback();
       }, 3000);
     }
 
@@ -7534,17 +7624,32 @@
           SimState.timerRunning = false;
           clearInterval(SimState.timerInterval);
           SimState.timerInterval = null;
+
+          const roomRefObj = SimState.cachedRoom;
+          const expiredIdx = (SimState.isLobby && roomRefObj && roomRefObj.currentStationIdx !== undefined)
+            ? Number(roomRefObj.currentStationIdx)
+            : SimState.currentIdx;
+          const expiryKey = `${expiredIdx}_${(roomRefObj && roomRefObj.timerStartedAt) || 'solo'}`;
+          if (SimState.isLobby && SimState._expiredForStationKey === expiryKey) {
+            return;
+          }
+          SimState._expiredForStationKey = expiryKey;
+
           if (SimState.timeoutTransitionMode === 'manual') {
             showManualTimeoutPopup();
           } else {
             showTimeoutPopup(() => {
-              const canAdvance = (!SimState.isLobby) || SimState.isHost || (SimState.examMode === 'standard' && SimState.role === 'examiner');
-              if (canAdvance) {
-                if (SimState.currentIdx < SimState.stations.length - 1) {
-                  nextStation();
-                } else {
-                  finishExamSimulation();
-                }
+              if (!isSingleMasterStationController()) return;
+              if (!SimState.stations || SimState.stations.length === 0) return;
+              const currentRoomIdx = (SimState.isLobby && SimState.cachedRoom && SimState.cachedRoom.currentStationIdx !== undefined)
+                ? Number(SimState.cachedRoom.currentStationIdx)
+                : SimState.currentIdx;
+              if (currentRoomIdx !== expiredIdx) return;
+
+              if (expiredIdx < SimState.stations.length - 1) {
+                nextStation(expiredIdx);
+              } else {
+                finishExamSimulation();
               }
             });
           }
@@ -8005,8 +8110,8 @@
 
       if (SimState.isLobby && SimState.isHost) {
         if (SimState.timerRunning) {
-          // Resumed: compute timerStartedAt from now
-          const now = Date.now();
+          // Resumed: compute timerStartedAt from synced server time
+          const now = (typeof getSyncedNow === 'function') ? getSyncedNow() : Date.now();
           const remaining = SimState.timerValue;
           _fbDb.ref('rooms/' + SimState.roomId).update({
             timerRunning: true,
@@ -8335,6 +8440,17 @@
       if (!SimState.stations || !SimState.stations[idx]) {
         console.warn('renderStation: station not found at index', idx);
         return;
+      }
+      if (typeof flushPendingExamineeBlanks === 'function') {
+        try { flushPendingExamineeBlanks(); } catch (e) {}
+      }
+      if (SimState._isLocalReview) {
+        SimState._isLocalReview = false;
+        SimState._localReviewStationIdx = null;
+        SimState._localReviewRound = null;
+        SimState._localReviewParticipantId = null;
+        SimState._localReviewParticipantName = null;
+        if (typeof removeLocalReviewBanner === 'function') removeLocalReviewBanner();
       }
       SimState.currentIdx = idx;
       const st = SimState.stations[idx];
@@ -9097,7 +9213,7 @@
             partId = SimState._localReviewParticipantId;
             partName = SimState._localReviewParticipantName || 'ผู้เข้าสอบ (ย้อนตรวจ)';
           } else {
-            const r = SimState.currentIdx || 0;
+            const r = (SimState.cachedRoom && SimState.cachedRoom.currentStationIdx !== undefined) ? SimState.cachedRoom.currentStationIdx : 0;
             const N = SimState.stations.length || 1;
             const startNum = ((assignedStationNum - 1 - r + N) % N) + 1;
             partId = SimState.cachedRoom?.carouselPosts?.['st_' + startNum]?.startParticipantId;
@@ -9153,8 +9269,13 @@
     };
 
     async function resetCurrentStationChecklist() {
-      const curStation = SimState.stations[SimState.currentIdx];
-      const stationNum = curStation?.stationNumber || (SimState.currentIdx + 1);
+      const targetStIdx = (SimState._isLocalReview && typeof SimState._localReviewStationIdx === 'number')
+        ? SimState._localReviewStationIdx
+        : SimState.currentIdx;
+      const curStation = SimState.stations[targetStIdx] || SimState.stations[SimState.currentIdx];
+      const stationNum = (SimState.examMode === 'carousel_rotation' && SimState.myCarouselStation)
+        ? SimState.myCarouselStation
+        : (curStation?.stationNumber || (targetStIdx + 1));
       
       const ok = await showPleConfirmModal({
         title: 'รีเซ็ต Checklist',
@@ -9198,14 +9319,21 @@
             updatedAt: Date.now()
           });
         } else if (SimState.examMode === 'carousel_rotation') {
-          const r = SimState.currentIdx || 0;
-          const N = SimState.stations.length || 1;
           const assignedStationNum = SimState.myCarouselStation || stationNum;
-          const startNum = ((assignedStationNum - 1 - r + N) % N) + 1;
-          const partId = SimState.cachedRoom?.carouselPosts?.['st_' + startNum]?.startParticipantId;
-          const partName = SimState.cachedRoom?.carouselPosts?.['st_' + startNum]?.startParticipantName 
-            || SimState.cachedRoom?.players?.[partId]?.name 
-            || 'ผู้เข้าสอบ';
+          let partId = null;
+          let partName = 'ผู้เข้าสอบ';
+          if (SimState._isLocalReview && SimState._localReviewParticipantId) {
+            partId = SimState._localReviewParticipantId;
+            partName = SimState._localReviewParticipantName || 'ผู้เข้าสอบ (ย้อนตรวจ)';
+          } else {
+            const r = (SimState.cachedRoom && SimState.cachedRoom.currentStationIdx !== undefined) ? SimState.cachedRoom.currentStationIdx : 0;
+            const N = SimState.stations.length || 1;
+            const startNum = ((assignedStationNum - 1 - r + N) % N) + 1;
+            partId = SimState.cachedRoom?.carouselPosts?.['st_' + startNum]?.startParticipantId;
+            partName = SimState.cachedRoom?.carouselPosts?.['st_' + startNum]?.startParticipantName 
+              || SimState.cachedRoom?.players?.[partId]?.name 
+              || 'ผู้เข้าสอบ';
+          }
           const { currentScore, totalScore } = calculateStationScore(currentCase?.checklist || [], []);
           if (partId) {
             _fbDb.ref(`rooms/${SimState.roomId}/participantScores/${partId}/participantId`).set(partId);
@@ -9220,10 +9348,13 @@
             });
           }
         } else {
-          _fbDb.ref('rooms/' + SimState.roomId).update({
-            checklistProgress: [],
+          const updatePayload = {
             scoresByStation: JSON.stringify(SimState.studentScores)
-          });
+          };
+          if (!SimState._isLocalReview) {
+            updatePayload.checklistProgress = [];
+          }
+          _fbDb.ref('rooms/' + SimState.roomId).update(updatePayload);
         }
       }
       if (typeof saveSoloSession === 'function') saveSoloSession();
@@ -9258,11 +9389,23 @@
       }
     }
 
-    function jumpToStation(targetIdx) {
+    function jumpToStation(targetIdx, expectedFromIdx = null) {
+      if (!SimState.stations || SimState.stations.length === 0) return;
       if (typeof targetIdx !== 'number' || isNaN(targetIdx)) return;
       if (targetIdx < 0 || targetIdx >= SimState.stations.length) return;
-      if (targetIdx === SimState.currentIdx) return;
 
+      const currentRoomIdx = (SimState.isLobby && SimState.cachedRoom && SimState.cachedRoom.currentStationIdx !== undefined)
+        ? Number(SimState.cachedRoom.currentStationIdx)
+        : SimState.currentIdx;
+
+      if (expectedFromIdx !== null && expectedFromIdx !== undefined && currentRoomIdx !== expectedFromIdx) {
+        return;
+      }
+      if (targetIdx === currentRoomIdx && targetIdx === SimState.currentIdx) return;
+
+      if (typeof flushPendingExamineeBlanks === 'function') {
+        try { flushPendingExamineeBlanks(); } catch (e) {}
+      }
       stopTimeoutAlarmSound();
       if (typeof closeManualTimeoutOverlay === 'function') closeManualTimeoutOverlay();
 
@@ -9315,7 +9458,7 @@
           timerRunning: true,
           status: 'running'
         };
-        if (!SimState.cachedRoom?.isSuperHost && SimState.examMode === 'standard') {
+        if (!SimState.cachedRoom?.isSuperHost && (SimState.examMode === 'standard' || !SimState.examMode) && SimState.role === 'examiner') {
           updatePayload.scoresByStation = JSON.stringify(SimState.studentScores);
         }
         _fbDb.ref('rooms/' + SimState.roomId).update(updatePayload);
@@ -9329,19 +9472,48 @@
     }
 
     let _isAdvancingStation = false;
-    function nextStation() {
+    function nextStation(expectedFromIdx = null) {
+      if (!SimState.stations || SimState.stations.length === 0) return;
+
+      // If Examiner is in Local Review mode (non-carousel) and manually clicks Next, step through Local Review instead of moving the live room!
+      if (SimState._isLocalReview && SimState.examMode !== 'carousel_rotation' && (expectedFromIdx === null || expectedFromIdx === undefined || typeof expectedFromIdx === 'object')) {
+        const revIdx = typeof SimState._localReviewStationIdx === 'number' ? SimState._localReviewStationIdx : SimState.currentIdx;
+        if (revIdx + 1 < SimState.currentIdx) {
+          enterStationLocalReview(revIdx + 1);
+        } else {
+          exitExaminerLocalReview();
+        }
+        return;
+      }
+
       if (_isAdvancingStation) return;
+      const fromIdx = (typeof expectedFromIdx === 'number' && !isNaN(expectedFromIdx))
+        ? expectedFromIdx
+        : ((SimState.isLobby && SimState.cachedRoom && SimState.cachedRoom.currentStationIdx !== undefined)
+            ? Number(SimState.cachedRoom.currentStationIdx)
+            : SimState.currentIdx);
+
       _isAdvancingStation = true;
       setTimeout(() => { _isAdvancingStation = false; }, 900);
 
-      if (SimState.currentIdx < SimState.stations.length - 1) {
-        jumpToStation(SimState.currentIdx + 1);
+      if (fromIdx < SimState.stations.length - 1) {
+        jumpToStation(fromIdx + 1, fromIdx);
       } else {
         finishExamSimulation();
       }
     }
 
     function prevStation() {
+      if (!SimState.stations || SimState.stations.length === 0) return;
+      if (SimState.isLobby && SimState.role === 'examiner' && SimState.examMode !== 'carousel_rotation') {
+        const baseIdx = (SimState._isLocalReview && typeof SimState._localReviewStationIdx === 'number')
+          ? SimState._localReviewStationIdx
+          : SimState.currentIdx;
+        if (baseIdx > 0) {
+          enterStationLocalReview(baseIdx - 1);
+        }
+        return;
+      }
       if (SimState.currentIdx > 0) {
         jumpToStation(SimState.currentIdx - 1);
       }
@@ -9378,6 +9550,9 @@
       renderScenarioAndNotesForReview(st);
       renderExamChecklist(st.stationNumber, c);
       updateExamProgressUI(st.stationNumber, c);
+      if (typeof setupExaminerLiveSubmissionListener === 'function') {
+        setupExaminerLiveSubmissionListener(st.stationNumber, c, { isReview: true });
+      }
       renderLocalReviewBanner();
       renderMiniMap(false);
     }
@@ -9407,6 +9582,15 @@
       if (targetCase) {
         renderExamChecklist(assignedStationNum, targetCase);
         updateExamProgressUI(assignedStationNum, targetCase);
+        if (typeof setupExaminerLiveSubmissionListener === 'function') {
+          setupExaminerLiveSubmissionListener(assignedStationNum, targetCase, { isReview: true, reviewParticipantId: partId });
+        }
+      }
+
+      const liveFeedbackTextarea = document.getElementById('exam-live-feedback-textarea');
+      if (liveFeedbackTextarea) {
+        const revFb = (partId && SimState.cachedRoom?.participantScores?.[partId]?.stationFeedbacks?.[assignedStationNum]) || '';
+        liveFeedbackTextarea.value = revFb;
       }
 
       renderCarouselReviewBanner(roundIdx, partName);
@@ -9440,6 +9624,14 @@
         if (currentCase) {
           renderExamChecklist(assignedStationNum, currentCase);
           updateExamProgressUI(assignedStationNum, currentCase);
+          if (typeof setupExaminerLiveSubmissionListener === 'function') {
+            setupExaminerLiveSubmissionListener(assignedStationNum, currentCase);
+          }
+        }
+        const liveFeedbackTextarea = document.getElementById('exam-live-feedback-textarea');
+        if (liveFeedbackTextarea) {
+          const curFb = (currentPartId && SimState.cachedRoom?.participantScores?.[currentPartId]?.stationFeedbacks?.[assignedStationNum]) || '';
+          liveFeedbackTextarea.value = curFb;
         }
         renderCarouselCandidateSwitcher();
       } else {
@@ -9605,21 +9797,79 @@
     function renderScenarioAndNotesForReview(st) {
       if (!st || !st.case) return;
       const c = st.case;
+      function stripSectionHeadersLocal(str) {
+        if (!str) return '';
+        return str
+          .replace(/<p[^>]*>(?:\s*<[^>]+>)*\s*#+\s*(?:สถานการณ์|โจทย์|ข้อมูลผู้ป่วย|สิ่งที่มีให้|อุปกรณ์|Checklist|เกณฑ์ประเมิน|ข้อมูลผู้ตรวจ|เฉลย|หมายเหตุ|ข้อมูลเคส)[^<]*(?:<\/[^>]+>)*\s*<\/p>/gi, '')
+          .replace(/^#+\s*(?:สถานการณ์|โจทย์|ข้อมูลผู้ป่วย|สิ่งที่มีให้|อุปกรณ์|Checklist|เกณฑ์ประเมิน|ข้อมูลผู้ตรวจ|เฉลย|หมายเหตุ|ข้อมูลเคส)[^\n]*\n?/gim, '');
+      }
+
+      const rawScenario = stripSectionHeadersLocal(c.contentHtml || c.scenarioHtml || (c.scenario ? `<p>${c.scenario}</p>` : '') || c.content || '');
+      const isExaminer = (SimState.role === 'examiner');
+      const cleanScenario = (typeof renderInteractiveBlanks === 'function')
+        ? renderInteractiveBlanks(rawScenario, { isExaminer, stationNum: st.stationNumber, caseId: c.caseId })
+        : rawScenario;
       const contentEl = document.getElementById('exam-scenario-content');
       if (contentEl) {
-        contentEl.innerHTML = `
-          <div style="font-size:0.85rem; line-height:1.6; color:var(--text-primary);">
-            ${c.scenarioHtml || c.scenario || c.contentHtml || c.content || '<p style="color:var(--text-muted);">ไม่มีข้อมูลสถานการณ์</p>'}
-          </div>
-        `;
+        contentEl.innerHTML = cleanScenario || '<p style="color:var(--text-muted);">ไม่มีข้อมูลสถานการณ์</p>';
       }
+
+      // Update Patient Info Accordion for reviewed station
+      const rawPatient = stripSectionHeadersLocal(c.patientInfoHtml || '');
+      const patientAccordion = document.getElementById('exam-patient-accordion');
+      const patientContentEl = document.getElementById('exam-patient-content');
+      const hasPatientInfo = Boolean(
+        rawPatient && rawPatient.trim() && (
+          rawPatient.replace(/<[^>]*>/g, '').trim().length > 0 ||
+          /<(?:img|svg|canvas|table|iframe|picture)\b/i.test(rawPatient)
+        )
+      );
+      if (hasPatientInfo && patientContentEl) {
+        if (patientAccordion) patientAccordion.style.display = 'block';
+        patientContentEl.innerHTML = rawPatient.replace(
+          /<p[^>]*>##([^<]+)<\/p>/gi,
+          (match, heading) => `<p style="font-family:var(--font-title);font-weight:700;color:var(--text-primary);margin:1rem 0 0.35rem 0;font-size:0.92rem;border-left:3px solid var(--primary);padding-left:0.6rem;">&#128204; ${heading.trim()}</p>`
+        );
+      } else {
+        if (patientAccordion) patientAccordion.style.display = 'none';
+        if (patientContentEl) patientContentEl.innerHTML = '';
+      }
+
+      // Update Equipment Accordion for reviewed station
+      const equipAccordion = document.getElementById('exam-equipment-accordion');
+      const eqContent = document.getElementById('exam-equipment-content');
+      if (c.equipmentHtml && eqContent) {
+        if (equipAccordion) equipAccordion.style.display = 'block';
+        const rawEq = (c.equipmentHtml || '').trim();
+        if (rawEq.startsWith('<li')) {
+          const isNumbered = /^\s*<li[^>]*>\s*(\d+[\.\)]|\(\d+\))/i.test(rawEq);
+          const tag = isNumbered ? 'ol' : 'ul';
+          const listClass = isNumbered ? 'ordered-list' : 'bullet-list';
+          eqContent.innerHTML = `<${tag} class="${listClass}">${rawEq}</${tag}>`;
+        } else {
+          eqContent.innerHTML = rawEq;
+        }
+      } else {
+        if (equipAccordion) equipAccordion.style.display = 'none';
+        if (eqContent) eqContent.innerHTML = '';
+      }
+
+      // Update Examiner Notes for reviewed station
       const noteEl = document.getElementById('exam-note-content-area');
       if (noteEl) {
-        noteEl.innerHTML = `
-          <div style="font-size:0.85rem; line-height:1.6;">
-            ${c.examinerNotesHtml || c.examinerNotes || c.notesHtml || c.notes || '<p style="color:var(--text-muted);">ไม่มีข้อมูลสำหรับผู้ประเมิน</p>'}
-          </div>
-        `;
+        const rawNote = c.noteHtml || c.note || c.examinerNotesHtml || c.examinerNotes || c.notesHtml || c.notes || '<p style="color:var(--text-muted);">ไม่มีเฉลย/รายละเอียดเพิ่มเติม</p>';
+        noteEl.innerHTML = (typeof renderRichNoteContent === 'function') ? renderRichNoteContent(rawNote) : rawNote;
+      }
+
+      // Update Live Feedback label and textarea for reviewed station
+      const liveFeedbackLabel = document.getElementById('exam-live-feedback-station-label');
+      if (liveFeedbackLabel) {
+        liveFeedbackLabel.textContent = `สถานีที่ ${st.stationNumber} (ตรวจย้อนหลัง)`;
+      }
+      const liveFeedbackTextarea = document.getElementById('exam-live-feedback-textarea');
+      if (liveFeedbackTextarea) {
+        const curFb = (SimState.stationFeedbacks && (SimState.stationFeedbacks[st.stationNumber] || SimState.stationFeedbacks[String(st.stationNumber)])) || '';
+        liveFeedbackTextarea.value = curFb;
       }
     }
 
@@ -9632,9 +9882,23 @@
 
     // ─── Live Fill-in-the-Blank Multiplayer Synchronization ───
     let _examineeBlankDebounceTimer = null;
+    let _pendingExamineeFlushFn = null;
     let _activeExaminerLiveRef = null;
     let _examineeBlankHandler = null;
     let _activeRenderLiveCards = null;
+
+    function flushPendingExamineeBlanks() {
+      if (_examineeBlankDebounceTimer) {
+        clearTimeout(_examineeBlankDebounceTimer);
+        _examineeBlankDebounceTimer = null;
+      }
+      if (typeof _pendingExamineeFlushFn === 'function') {
+        const fn = _pendingExamineeFlushFn;
+        _pendingExamineeFlushFn = null;
+        fn();
+      }
+    }
+    window.flushPendingExamineeBlanks = flushPendingExamineeBlanks;
 
     function encodeFirebaseKey(k) {
       return String(k)
@@ -9746,9 +10010,12 @@
         }
 
         if (isImmediate) {
+          _pendingExamineeFlushFn = null;
           syncToFirebaseNow(payload);
         } else {
+          _pendingExamineeFlushFn = () => syncToFirebaseNow(payload);
           _examineeBlankDebounceTimer = setTimeout(() => {
+            _pendingExamineeFlushFn = null;
             syncToFirebaseNow(payload);
           }, 350);
         }
@@ -9759,7 +10026,7 @@
       window.addEventListener('interactiveBlankChanged', _examineeBlankHandler);
     }
 
-    function setupExaminerLiveSubmissionListener(stationNum, c) {
+    function setupExaminerLiveSubmissionListener(stationNum, c, opts = {}) {
       const panel = document.getElementById('examiner-live-submission-panel');
       const listEl = document.getElementById('examiner-live-submission-list');
       const nameBadge = document.getElementById('live-examinee-name-badge');
@@ -9820,6 +10087,12 @@
           return;
         }
 
+        // Guard against auto-checking another station's checklist if Examiner switched Local Review target
+        const currentlyDisplayedStNum = (SimState._isLocalReview && typeof SimState._localReviewStationIdx === 'number')
+          ? (SimState.stations[SimState._localReviewStationIdx]?.stationNumber || stationNum)
+          : (SimState.stations[SimState.currentIdx]?.stationNumber || stationNum);
+        const canAutoCheck = (currentlyDisplayedStNum === stationNum);
+
         let html = '';
         blankDefs.forEach((b, idx) => {
           const userVal = (liveAnswers[b.tag] || '').trim();
@@ -9833,8 +10106,8 @@
             });
           }
 
-          // Auto-tick linked checklist item on Examiner side
-          if (typeof autoCheckLinkedChecklistItem === 'function') {
+          // Auto-tick linked checklist item on Examiner side only if this listener matches the displayed checklist
+          if (canAutoCheck && typeof autoCheckLinkedChecklistItem === 'function') {
             if (userVal && isMatch) {
               autoCheckLinkedChecklistItem(b.tag, true);
             } else if (userVal && !isMatch) {
@@ -9888,11 +10161,14 @@
         if (SimState.examMode === 'cohort_breakout' && SimState.myBreakoutTableId) {
           livePath = `rooms/${SimState.roomId}/breakouts/${SimState.myBreakoutTableId}/examineeAnswers/st_${stationNum}`;
         } else if (SimState.examMode === 'carousel_rotation') {
-          const r = SimState.currentIdx || 0;
-          const N = SimState.stations.length || 1;
           const assignedStationNum = SimState.myCarouselStation || stationNum;
-          const startNum = ((assignedStationNum - 1 - r + N) % N) + 1;
-          const partId = SimState.cachedRoom?.carouselPosts?.['st_' + startNum]?.startParticipantId;
+          let partId = opts.reviewParticipantId || (SimState._isLocalReview ? SimState._localReviewParticipantId : null);
+          if (!partId) {
+            const r = (SimState.cachedRoom && SimState.cachedRoom.currentStationIdx !== undefined) ? SimState.cachedRoom.currentStationIdx : 0;
+            const N = SimState.stations.length || 1;
+            const startNum = ((assignedStationNum - 1 - r + N) % N) + 1;
+            partId = SimState.cachedRoom?.carouselPosts?.['st_' + startNum]?.startParticipantId;
+          }
           if (partId) {
             livePath = `rooms/${SimState.roomId}/participantAnswers/${partId}/st_${assignedStationNum}`;
           }
@@ -9918,6 +10194,8 @@
               if (!SimState.writtenAnswers) SimState.writtenAnswers = {};
               SimState.writtenAnswers[stationNum] = decodedAnswers;
               renderLiveCards(decodedAnswers);
+            } else {
+              renderLiveCards({});
             }
           });
         }
@@ -11313,6 +11591,24 @@ ${caseContext || '(ยังไม่มีข้อมูลเคส)'}
         }
       },
 
+      getTypingPath(stNum) {
+        if (!SimState.isLobby || !SimState.roomId || typeof _fbDb === 'undefined' || !_fbDb) {
+          return null;
+        }
+        const mode = SimState.examMode || 'standard';
+        if (mode === 'cohort_breakout') {
+          const tableId = SimState.myBreakoutTableId || 'table_1';
+          return `roomTyping/${SimState.roomId}/breakouts/${tableId}/st_${stNum}`;
+        } else if (mode === 'carousel_rotation') {
+          const r = (SimState.cachedRoom && SimState.cachedRoom.currentStationIdx !== undefined)
+                    ? SimState.cachedRoom.currentStationIdx 
+                    : (SimState.currentIdx || 0);
+          return `roomTyping/${SimState.roomId}/carousel/st_${stNum}/round_${r}`;
+        } else {
+          return `roomTyping/${SimState.roomId}/standard/st_${stNum}`;
+        }
+      },
+
       initStation(stNum, caseDataObj) {
         const stationChanged = this.currentStationNum !== stNum;
         this.currentStationNum = stNum;
@@ -11407,7 +11703,8 @@ ${caseContext || '(ยังไม่มีข้อมูลเคส)'}
         // Multiplayer Mode: Attach Firebase RTDB Listeners
         try {
           this.activeRef = _fbDb.ref(path + '/messages');
-          this.activeTypingRef = _fbDb.ref(path + '/typing');
+          const typingPath = this.getTypingPath(stNum) || (path + '/typing');
+          this.activeTypingRef = _fbDb.ref(typingPath);
 
           this.activeRef.on('child_added', snap => {
             const msg = snap.val();
@@ -11540,13 +11837,13 @@ ${caseContext || '(ยังไม่มีข้อมูลเคส)'}
       },
 
       setTyping(isTyping) {
-        const path = this.getChatPath(this.currentStationNum);
-        if (!path || typeof _fbDb === 'undefined' || !_fbDb) return;
+        const typingPath = this.getTypingPath(this.currentStationNum);
+        if (!typingPath || typeof _fbDb === 'undefined' || !_fbDb) return;
         const myId = SimState.myPlayerId || SimState.lobbyPlayerId || 'me';
         const myName = SimState.lobbyPlayerName || (SimState.role === 'examiner' ? 'ผู้ประเมิน' : 'ผู้เข้าสอบ');
         const myRole = SimState.role || 'examinee';
         try {
-          _fbDb.ref(path + `/typing/${myId}`).set({
+          _fbDb.ref(`${typingPath}/${myId}`).set({
             isTyping: !!isTyping,
             senderName: myName,
             role: myRole,
@@ -12860,6 +13157,9 @@ ${caseContext || '(ยังไม่มีข้อมูลเคส)'}
       }
 
       SimState.isFinishingExam = true;
+      if (typeof flushPendingExamineeBlanks === 'function') {
+        try { flushPendingExamineeBlanks(); } catch (e) {}
+      }
       if (typeof showPleToast === 'function') {
         showPleToast('กำลังประมวลผลและสรุปคะแนนการสอบ...', 'info');
       }
@@ -13042,10 +13342,13 @@ ${caseContext || '(ยังไม่มีข้อมูลเคส)'}
           }
         }
 
-        // If multiplayer room, sync and listen for debrief feedbacks
+        // If multiplayer room, sync and listen for debrief feedbacks (scoped by mode)
         if (SimState.roomId && typeof _fbDb !== 'undefined' && _fbDb) {
           try {
-            const fbFeedbacksRef = _fbDb.ref('rooms/' + SimState.roomId + '/stationFeedbacks');
+            const feedbackBasePath = typeof getScopedStationFeedbacksPath === 'function'
+              ? getScopedStationFeedbacksPath(false)
+              : ('rooms/' + SimState.roomId + '/stationFeedbacks');
+            const fbFeedbacksRef = _fbDb.ref(feedbackBasePath);
             fbFeedbacksRef.once('value').then(snap => {
               const val = snap.val();
               if (val && typeof val === 'object') {
@@ -13636,6 +13939,36 @@ ${caseContext || '(ยังไม่มีข้อมูลเคส)'}
     }
 
     // Debrief Feedback Handler for Station Accordion and Live Exam
+    function getScopedStationFeedbacksPath(forLiveExaminer = false) {
+      if (!SimState.roomId) return '';
+      if (SimState.examMode === 'cohort_breakout' && SimState.myBreakoutTableId) {
+        return `rooms/${SimState.roomId}/breakouts/${SimState.myBreakoutTableId}/stationFeedbacks`;
+      }
+      if (SimState.examMode === 'carousel_rotation') {
+        if (SimState.role === 'examiner' && forLiveExaminer) {
+          let partId = null;
+          if (SimState._isLocalReview && SimState._localReviewParticipantId) {
+            partId = SimState._localReviewParticipantId;
+          } else if (SimState.myCarouselStation) {
+            const N = SimState.stations.length || 1;
+            const r = (SimState.cachedRoom && typeof SimState.cachedRoom.currentStationIdx === 'number')
+              ? SimState.cachedRoom.currentStationIdx
+              : (SimState.currentIdx || 0);
+            const currStartStNum = ((SimState.myCarouselStation - 1 - r + N) % N) + 1;
+            const startPost = SimState.cachedRoom?.carouselPosts?.['st_' + currStartStNum];
+            partId = startPost?.startParticipantId || ('guest_start_' + currStartStNum);
+          }
+          if (partId) {
+            return `rooms/${SimState.roomId}/participantScores/${partId}/stationFeedbacks`;
+          }
+        } else if (SimState.myPlayerId) {
+          return `rooms/${SimState.roomId}/participantScores/${SimState.myPlayerId}/stationFeedbacks`;
+        }
+      }
+      return `rooms/${SimState.roomId}/stationFeedbacks`;
+    }
+    window.getScopedStationFeedbacksPath = getScopedStationFeedbacksPath;
+
     function handleStationFeedbackInput(stationNum, text) {
       if (!SimState.stationFeedbacks) SimState.stationFeedbacks = {};
       SimState.stationFeedbacks[stationNum] = text;
@@ -13650,7 +13983,10 @@ ${caseContext || '(ยังไม่มีข้อมูลเคส)'}
       }
 
       // Keep live feedback textarea in sync if currently viewing this station
-      const currentSt = SimState.stations && SimState.stations[SimState.currentIdx];
+      const activeIdx = (SimState._isLocalReview && typeof SimState._localReviewStationIdx === 'number')
+        ? SimState._localReviewStationIdx
+        : SimState.currentIdx;
+      const currentSt = SimState.stations && SimState.stations[activeIdx];
       if (currentSt && currentSt.stationNumber === stationNum) {
         const liveInputEl = document.getElementById('exam-live-feedback-textarea');
         if (liveInputEl && document.activeElement !== liveInputEl) {
@@ -13660,7 +13996,10 @@ ${caseContext || '(ยังไม่มีข้อมูลเคส)'}
 
       if (SimState.roomId && typeof _fbDb !== 'undefined' && _fbDb) {
         try {
-          _fbDb.ref('rooms/' + SimState.roomId + '/stationFeedbacks/' + stationNum).set(text);
+          const basePath = getScopedStationFeedbacksPath(SimState.role === 'examiner' && !SimState.isExamFinished);
+          if (basePath) {
+            _fbDb.ref(basePath + '/' + stationNum).set(text);
+          }
         } catch (e) {
           console.warn('Error syncing debrief feedback to Firebase:', e);
         }
@@ -13669,7 +14008,10 @@ ${caseContext || '(ยังไม่มีข้อมูลเคส)'}
     window.handleStationFeedbackInput = handleStationFeedbackInput;
 
     function handleLiveStationFeedbackInput(text) {
-      const st = SimState.stations && SimState.stations[SimState.currentIdx];
+      const activeIdx = (SimState._isLocalReview && typeof SimState._localReviewStationIdx === 'number')
+        ? SimState._localReviewStationIdx
+        : SimState.currentIdx;
+      const st = SimState.stations && SimState.stations[activeIdx];
       if (!st) return;
       handleStationFeedbackInput(st.stationNumber, text);
 
@@ -15480,70 +15822,91 @@ ${caseContext || '(ยังไม่มีข้อมูลเคส)'}
       try {
         const postKey = 'st_' + stationNum;
         const roomRef = _fbDb.ref(`rooms/${SimState.roomId}/carouselPosts`);
-        const snapshot = await roomRef.once('value');
-        const allPosts = snapshot.val() || {};
-        const currPost = allPosts[postKey] || {};
-        const updateData = {};
+        let conflictOccupantName = null;
+        let newAssignedStation = SimState.myCarouselStation;
 
-        if (role === 'examiner') {
-          // If already assigned to this station, toggle off (unassign)
-          if (currPost.examinerId === myId) {
-            updateData[`rooms/${SimState.roomId}/carouselPosts/${postKey}/examinerId`] = null;
-            updateData[`rooms/${SimState.roomId}/carouselPosts/${postKey}/examinerName`] = null;
-            SimState.myCarouselStation = null;
-          } else {
-            // Check if someone else already took this station
+        const result = await roomRef.transaction((currentPosts) => {
+          const allPosts = currentPosts ? Object.assign({}, currentPosts) : {};
+          const currPost = allPosts[postKey] ? Object.assign({}, allPosts[postKey]) : {};
+          conflictOccupantName = null;
+
+          if (role === 'examiner') {
+            if (currPost.examinerId === myId) {
+              delete currPost.examinerId;
+              delete currPost.examinerName;
+              allPosts[postKey] = currPost;
+              newAssignedStation = null;
+              return allPosts;
+            }
             if (currPost.examinerId && currPost.examinerId !== myId) {
-              alert(`⚠️ สถานีที่ ${stationNum} มีผู้ประเมิน (${currPost.examinerName}) ประจำอยู่แล้ว โปรดเลือกสถานีอื่น`);
-              return;
+              conflictOccupantName = currPost.examinerName || 'ผู้อื่น';
+              return; // Abort transaction
             }
-            // CRITICAL: Clear myId from ANY other station so user only has ONE station!
             Object.keys(allPosts).forEach(k => {
-              if (allPosts[k].examinerId === myId) {
-                updateData[`rooms/${SimState.roomId}/carouselPosts/${k}/examinerId`] = null;
-                updateData[`rooms/${SimState.roomId}/carouselPosts/${k}/examinerName`] = null;
+              if (!allPosts[k]) return;
+              const copyK = Object.assign({}, allPosts[k]);
+              if (copyK.examinerId === myId) {
+                delete copyK.examinerId;
+                delete copyK.examinerName;
               }
-              if (allPosts[k].startParticipantId === myId) {
-                updateData[`rooms/${SimState.roomId}/carouselPosts/${k}/startParticipantId`] = null;
-                updateData[`rooms/${SimState.roomId}/carouselPosts/${k}/startParticipantName`] = null;
+              if (copyK.startParticipantId === myId) {
+                delete copyK.startParticipantId;
+                delete copyK.startParticipantName;
               }
+              allPosts[k] = copyK;
             });
-            // Assign to this station
-            updateData[`rooms/${SimState.roomId}/carouselPosts/${postKey}/examinerId`] = myId;
-            updateData[`rooms/${SimState.roomId}/carouselPosts/${postKey}/examinerName`] = myName;
-            SimState.myCarouselStation = stationNum;
-          }
-        } else {
-          // Participant role (คนสอบ)
-          // If already assigned to this station, toggle off (unassign)
-          if (currPost.startParticipantId === myId) {
-            updateData[`rooms/${SimState.roomId}/carouselPosts/${postKey}/startParticipantId`] = null;
-            updateData[`rooms/${SimState.roomId}/carouselPosts/${postKey}/startParticipantName`] = null;
-            SimState.myCarouselStation = null;
+            const updatedTarget = allPosts[postKey] ? Object.assign({}, allPosts[postKey]) : {};
+            updatedTarget.examinerId = myId;
+            updatedTarget.examinerName = myName;
+            allPosts[postKey] = updatedTarget;
+            newAssignedStation = stationNum;
+            return allPosts;
           } else {
-            // Check if someone else already selected this start station
-            if (currPost.startParticipantId && currPost.startParticipantId !== myId) {
-              alert(`⚠️ สถานีที่ ${stationNum} มีผู้เข้าสอบ (${currPost.startParticipantName}) เลือกเป็นจุดเริ่มต้นแล้ว โปรดเลือกสถานีอื่น`);
-              return;
+            if (currPost.startParticipantId === myId) {
+              delete currPost.startParticipantId;
+              delete currPost.startParticipantName;
+              allPosts[postKey] = currPost;
+              newAssignedStation = null;
+              return allPosts;
             }
-            // CRITICAL: Clear myId from ANY other station so participant only has ONE starting station!
+            if (currPost.startParticipantId && currPost.startParticipantId !== myId) {
+              conflictOccupantName = currPost.startParticipantName || 'ผู้อื่น';
+              return; // Abort transaction
+            }
             Object.keys(allPosts).forEach(k => {
-              if (allPosts[k].examinerId === myId) {
-                updateData[`rooms/${SimState.roomId}/carouselPosts/${k}/examinerId`] = null;
-                updateData[`rooms/${SimState.roomId}/carouselPosts/${k}/examinerName`] = null;
+              if (!allPosts[k]) return;
+              const copyK = Object.assign({}, allPosts[k]);
+              if (copyK.examinerId === myId) {
+                delete copyK.examinerId;
+                delete copyK.examinerName;
               }
-              if (allPosts[k].startParticipantId === myId) {
-                updateData[`rooms/${SimState.roomId}/carouselPosts/${k}/startParticipantId`] = null;
-                updateData[`rooms/${SimState.roomId}/carouselPosts/${k}/startParticipantName`] = null;
+              if (copyK.startParticipantId === myId) {
+                delete copyK.startParticipantId;
+                delete copyK.startParticipantName;
               }
+              allPosts[k] = copyK;
             });
-            // Assign to this station
-            updateData[`rooms/${SimState.roomId}/carouselPosts/${postKey}/startParticipantId`] = myId;
-            updateData[`rooms/${SimState.roomId}/carouselPosts/${postKey}/startParticipantName`] = myName;
-            SimState.myCarouselStation = stationNum;
+            const updatedTarget = allPosts[postKey] ? Object.assign({}, allPosts[postKey]) : {};
+            updatedTarget.startParticipantId = myId;
+            updatedTarget.startParticipantName = myName;
+            allPosts[postKey] = updatedTarget;
+            newAssignedStation = stationNum;
+            return allPosts;
           }
+        });
+
+        if (!result.committed) {
+          if (conflictOccupantName) {
+            if (role === 'examiner') {
+              alert(`⚠️ สถานีที่ ${stationNum} มีผู้ประเมิน (${conflictOccupantName}) ประจำอยู่แล้ว โปรดเลือกสถานีอื่น`);
+            } else {
+              alert(`⚠️ สถานีที่ ${stationNum} มีผู้เข้าสอบ (${conflictOccupantName}) เลือกเป็นจุดเริ่มต้นแล้ว โปรดเลือกสถานีอื่น`);
+            }
+          }
+          return;
         }
-        await _fbDb.ref().update(updateData);
+
+        SimState.myCarouselStation = newAssignedStation;
         updateOnlineExamSession({ carouselStation: SimState.myCarouselStation });
       } catch (e) {
         console.error('Failed to assign carousel station:', e);

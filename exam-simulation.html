@@ -5298,7 +5298,6 @@
           let playerEmoji;
           let playerRole = 'examinee';
           let isPlayerHost = false;
-          const isExistingMember = Boolean(existingById || existingByName);
 
           if (existingById) {
             myPlayerId = savedPlayerId;
@@ -13158,6 +13157,9 @@ ${caseContext || '(ยังไม่มีข้อมูลเคส)'}
       }
 
       SimState.isFinishingExam = true;
+      if (typeof flushPendingExamineeBlanks === 'function') {
+        try { flushPendingExamineeBlanks(); } catch (e) {}
+      }
       if (typeof showPleToast === 'function') {
         showPleToast('กำลังประมวลผลและสรุปคะแนนการสอบ...', 'info');
       }
@@ -13340,10 +13342,13 @@ ${caseContext || '(ยังไม่มีข้อมูลเคส)'}
           }
         }
 
-        // If multiplayer room, sync and listen for debrief feedbacks
+        // If multiplayer room, sync and listen for debrief feedbacks (scoped by mode)
         if (SimState.roomId && typeof _fbDb !== 'undefined' && _fbDb) {
           try {
-            const fbFeedbacksRef = _fbDb.ref('rooms/' + SimState.roomId + '/stationFeedbacks');
+            const feedbackBasePath = typeof getScopedStationFeedbacksPath === 'function'
+              ? getScopedStationFeedbacksPath(false)
+              : ('rooms/' + SimState.roomId + '/stationFeedbacks');
+            const fbFeedbacksRef = _fbDb.ref(feedbackBasePath);
             fbFeedbacksRef.once('value').then(snap => {
               const val = snap.val();
               if (val && typeof val === 'object') {
@@ -13934,6 +13939,36 @@ ${caseContext || '(ยังไม่มีข้อมูลเคส)'}
     }
 
     // Debrief Feedback Handler for Station Accordion and Live Exam
+    function getScopedStationFeedbacksPath(forLiveExaminer = false) {
+      if (!SimState.roomId) return '';
+      if (SimState.examMode === 'cohort_breakout' && SimState.myBreakoutTableId) {
+        return `rooms/${SimState.roomId}/breakouts/${SimState.myBreakoutTableId}/stationFeedbacks`;
+      }
+      if (SimState.examMode === 'carousel_rotation') {
+        if (SimState.role === 'examiner' && forLiveExaminer) {
+          let partId = null;
+          if (SimState._isLocalReview && SimState._localReviewParticipantId) {
+            partId = SimState._localReviewParticipantId;
+          } else if (SimState.myCarouselStation) {
+            const N = SimState.stations.length || 1;
+            const r = (SimState.cachedRoom && typeof SimState.cachedRoom.currentStationIdx === 'number')
+              ? SimState.cachedRoom.currentStationIdx
+              : (SimState.currentIdx || 0);
+            const currStartStNum = ((SimState.myCarouselStation - 1 - r + N) % N) + 1;
+            const startPost = SimState.cachedRoom?.carouselPosts?.['st_' + currStartStNum];
+            partId = startPost?.startParticipantId || ('guest_start_' + currStartStNum);
+          }
+          if (partId) {
+            return `rooms/${SimState.roomId}/participantScores/${partId}/stationFeedbacks`;
+          }
+        } else if (SimState.myPlayerId) {
+          return `rooms/${SimState.roomId}/participantScores/${SimState.myPlayerId}/stationFeedbacks`;
+        }
+      }
+      return `rooms/${SimState.roomId}/stationFeedbacks`;
+    }
+    window.getScopedStationFeedbacksPath = getScopedStationFeedbacksPath;
+
     function handleStationFeedbackInput(stationNum, text) {
       if (!SimState.stationFeedbacks) SimState.stationFeedbacks = {};
       SimState.stationFeedbacks[stationNum] = text;
@@ -13948,7 +13983,10 @@ ${caseContext || '(ยังไม่มีข้อมูลเคส)'}
       }
 
       // Keep live feedback textarea in sync if currently viewing this station
-      const currentSt = SimState.stations && SimState.stations[SimState.currentIdx];
+      const activeIdx = (SimState._isLocalReview && typeof SimState._localReviewStationIdx === 'number')
+        ? SimState._localReviewStationIdx
+        : SimState.currentIdx;
+      const currentSt = SimState.stations && SimState.stations[activeIdx];
       if (currentSt && currentSt.stationNumber === stationNum) {
         const liveInputEl = document.getElementById('exam-live-feedback-textarea');
         if (liveInputEl && document.activeElement !== liveInputEl) {
@@ -13958,7 +13996,10 @@ ${caseContext || '(ยังไม่มีข้อมูลเคส)'}
 
       if (SimState.roomId && typeof _fbDb !== 'undefined' && _fbDb) {
         try {
-          _fbDb.ref('rooms/' + SimState.roomId + '/stationFeedbacks/' + stationNum).set(text);
+          const basePath = getScopedStationFeedbacksPath(SimState.role === 'examiner' && !SimState.isExamFinished);
+          if (basePath) {
+            _fbDb.ref(basePath + '/' + stationNum).set(text);
+          }
         } catch (e) {
           console.warn('Error syncing debrief feedback to Firebase:', e);
         }
@@ -13967,7 +14008,10 @@ ${caseContext || '(ยังไม่มีข้อมูลเคส)'}
     window.handleStationFeedbackInput = handleStationFeedbackInput;
 
     function handleLiveStationFeedbackInput(text) {
-      const st = SimState.stations && SimState.stations[SimState.currentIdx];
+      const activeIdx = (SimState._isLocalReview && typeof SimState._localReviewStationIdx === 'number')
+        ? SimState._localReviewStationIdx
+        : SimState.currentIdx;
+      const st = SimState.stations && SimState.stations[activeIdx];
       if (!st) return;
       handleStationFeedbackInput(st.stationNumber, text);
 
@@ -15778,70 +15822,91 @@ ${caseContext || '(ยังไม่มีข้อมูลเคส)'}
       try {
         const postKey = 'st_' + stationNum;
         const roomRef = _fbDb.ref(`rooms/${SimState.roomId}/carouselPosts`);
-        const snapshot = await roomRef.once('value');
-        const allPosts = snapshot.val() || {};
-        const currPost = allPosts[postKey] || {};
-        const updateData = {};
+        let conflictOccupantName = null;
+        let newAssignedStation = SimState.myCarouselStation;
 
-        if (role === 'examiner') {
-          // If already assigned to this station, toggle off (unassign)
-          if (currPost.examinerId === myId) {
-            updateData[`rooms/${SimState.roomId}/carouselPosts/${postKey}/examinerId`] = null;
-            updateData[`rooms/${SimState.roomId}/carouselPosts/${postKey}/examinerName`] = null;
-            SimState.myCarouselStation = null;
-          } else {
-            // Check if someone else already took this station
+        const result = await roomRef.transaction((currentPosts) => {
+          const allPosts = currentPosts ? Object.assign({}, currentPosts) : {};
+          const currPost = allPosts[postKey] ? Object.assign({}, allPosts[postKey]) : {};
+          conflictOccupantName = null;
+
+          if (role === 'examiner') {
+            if (currPost.examinerId === myId) {
+              delete currPost.examinerId;
+              delete currPost.examinerName;
+              allPosts[postKey] = currPost;
+              newAssignedStation = null;
+              return allPosts;
+            }
             if (currPost.examinerId && currPost.examinerId !== myId) {
-              alert(`⚠️ สถานีที่ ${stationNum} มีผู้ประเมิน (${currPost.examinerName}) ประจำอยู่แล้ว โปรดเลือกสถานีอื่น`);
-              return;
+              conflictOccupantName = currPost.examinerName || 'ผู้อื่น';
+              return; // Abort transaction
             }
-            // CRITICAL: Clear myId from ANY other station so user only has ONE station!
             Object.keys(allPosts).forEach(k => {
-              if (allPosts[k].examinerId === myId) {
-                updateData[`rooms/${SimState.roomId}/carouselPosts/${k}/examinerId`] = null;
-                updateData[`rooms/${SimState.roomId}/carouselPosts/${k}/examinerName`] = null;
+              if (!allPosts[k]) return;
+              const copyK = Object.assign({}, allPosts[k]);
+              if (copyK.examinerId === myId) {
+                delete copyK.examinerId;
+                delete copyK.examinerName;
               }
-              if (allPosts[k].startParticipantId === myId) {
-                updateData[`rooms/${SimState.roomId}/carouselPosts/${k}/startParticipantId`] = null;
-                updateData[`rooms/${SimState.roomId}/carouselPosts/${k}/startParticipantName`] = null;
+              if (copyK.startParticipantId === myId) {
+                delete copyK.startParticipantId;
+                delete copyK.startParticipantName;
               }
+              allPosts[k] = copyK;
             });
-            // Assign to this station
-            updateData[`rooms/${SimState.roomId}/carouselPosts/${postKey}/examinerId`] = myId;
-            updateData[`rooms/${SimState.roomId}/carouselPosts/${postKey}/examinerName`] = myName;
-            SimState.myCarouselStation = stationNum;
-          }
-        } else {
-          // Participant role (คนสอบ)
-          // If already assigned to this station, toggle off (unassign)
-          if (currPost.startParticipantId === myId) {
-            updateData[`rooms/${SimState.roomId}/carouselPosts/${postKey}/startParticipantId`] = null;
-            updateData[`rooms/${SimState.roomId}/carouselPosts/${postKey}/startParticipantName`] = null;
-            SimState.myCarouselStation = null;
+            const updatedTarget = allPosts[postKey] ? Object.assign({}, allPosts[postKey]) : {};
+            updatedTarget.examinerId = myId;
+            updatedTarget.examinerName = myName;
+            allPosts[postKey] = updatedTarget;
+            newAssignedStation = stationNum;
+            return allPosts;
           } else {
-            // Check if someone else already selected this start station
-            if (currPost.startParticipantId && currPost.startParticipantId !== myId) {
-              alert(`⚠️ สถานีที่ ${stationNum} มีผู้เข้าสอบ (${currPost.startParticipantName}) เลือกเป็นจุดเริ่มต้นแล้ว โปรดเลือกสถานีอื่น`);
-              return;
+            if (currPost.startParticipantId === myId) {
+              delete currPost.startParticipantId;
+              delete currPost.startParticipantName;
+              allPosts[postKey] = currPost;
+              newAssignedStation = null;
+              return allPosts;
             }
-            // CRITICAL: Clear myId from ANY other station so participant only has ONE starting station!
+            if (currPost.startParticipantId && currPost.startParticipantId !== myId) {
+              conflictOccupantName = currPost.startParticipantName || 'ผู้อื่น';
+              return; // Abort transaction
+            }
             Object.keys(allPosts).forEach(k => {
-              if (allPosts[k].examinerId === myId) {
-                updateData[`rooms/${SimState.roomId}/carouselPosts/${k}/examinerId`] = null;
-                updateData[`rooms/${SimState.roomId}/carouselPosts/${k}/examinerName`] = null;
+              if (!allPosts[k]) return;
+              const copyK = Object.assign({}, allPosts[k]);
+              if (copyK.examinerId === myId) {
+                delete copyK.examinerId;
+                delete copyK.examinerName;
               }
-              if (allPosts[k].startParticipantId === myId) {
-                updateData[`rooms/${SimState.roomId}/carouselPosts/${k}/startParticipantId`] = null;
-                updateData[`rooms/${SimState.roomId}/carouselPosts/${k}/startParticipantName`] = null;
+              if (copyK.startParticipantId === myId) {
+                delete copyK.startParticipantId;
+                delete copyK.startParticipantName;
               }
+              allPosts[k] = copyK;
             });
-            // Assign to this station
-            updateData[`rooms/${SimState.roomId}/carouselPosts/${postKey}/startParticipantId`] = myId;
-            updateData[`rooms/${SimState.roomId}/carouselPosts/${postKey}/startParticipantName`] = myName;
-            SimState.myCarouselStation = stationNum;
+            const updatedTarget = allPosts[postKey] ? Object.assign({}, allPosts[postKey]) : {};
+            updatedTarget.startParticipantId = myId;
+            updatedTarget.startParticipantName = myName;
+            allPosts[postKey] = updatedTarget;
+            newAssignedStation = stationNum;
+            return allPosts;
           }
+        });
+
+        if (!result.committed) {
+          if (conflictOccupantName) {
+            if (role === 'examiner') {
+              alert(`⚠️ สถานีที่ ${stationNum} มีผู้ประเมิน (${conflictOccupantName}) ประจำอยู่แล้ว โปรดเลือกสถานีอื่น`);
+            } else {
+              alert(`⚠️ สถานีที่ ${stationNum} มีผู้เข้าสอบ (${conflictOccupantName}) เลือกเป็นจุดเริ่มต้นแล้ว โปรดเลือกสถานีอื่น`);
+            }
+          }
+          return;
         }
-        await _fbDb.ref().update(updateData);
+
+        SimState.myCarouselStation = newAssignedStation;
         updateOnlineExamSession({ carouselStation: SimState.myCarouselStation });
       } catch (e) {
         console.error('Failed to assign carousel station:', e);

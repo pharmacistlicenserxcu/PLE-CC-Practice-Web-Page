@@ -467,13 +467,13 @@
       </div>
     </div>
 
-    <!-- TAB 3.5: ANTI-SKIP SHIELD WORKFLOW -->
+    <!-- TAB 3.5: ANTI-SKIP SHIELD WORKFLOW & 26-POINT ONLINE STABILITY REMEDIATION -->
     <div id="tab-anti-skip" class="tab-pane">
       <div class="diagram-card">
         <div class="diagram-head">
           <div>
-            <div class="diagram-title">🛡️ แผนผังระบบป้องกันการข้ามสถานีและการหมุนเวียนแบบปรมาณู (Anti-Skip & Atomic Shield)</div>
-            <div class="diagram-desc">แสดงสถาปัตยกรรม Single Master Authority, Auto-Cleanup Timer Registry และ Atomic Index Validation จาก 8 Root Causes</div>
+            <div class="diagram-title">🛡️ แผนผังระบบป้องกันการข้ามสถานีและเกราะความเสถียรออนไลน์ 26 จุด (Anti-Skip & 26-Point Stability Shield)</div>
+            <div class="diagram-desc">แสดงสถาปัตยกรรม Single Master Authority, Universal Local Review Isolation, Server Clock Sync และ Atomic Firebase Guards ครบทั้ง 26 กรณี</div>
           </div>
           <div class="diagram-actions">
             <a href="station-skip-workflow.html" target="_blank" class="btn-action">↗️ เปิดเต็มจอ</a>
@@ -481,21 +481,64 @@
         </div>
         <iframe src="station-skip-workflow.html?embed=1" class="iframe-container" title="Station Skip Workflow"></iframe>
       </div>
+
+      <div class="diagram-card" style="padding: 1.25rem; margin-top: 1.25rem;">
+        <h3 style="font-size: 1.05rem; font-weight: 700; margin-bottom: 0.5rem; color: #fff;">🛡️ สรุปสถาปัตยกรรมการป้องกันบั๊กการซ้อมสอบออนไลน์ครบ 26 จุด (26-Point Remediation Matrix)</h3>
+        <p style="font-size: 0.84rem; color: var(--text-muted); margin-bottom: 1rem;">ครอบคลุมทุก Scenario ตั้งแต่การข้ามสถานี, การตรวจย้อนหลัง (Local Review), การสลับผู้เข้าสอบใน Carousel, การกู้คืนเซสชันเมื่อเน็ตหลุด ไปจนถึงการแยก Channel ของ Typing Indicator</p>
+        <div class="table-container" style="margin-bottom: 0;">
+          <table>
+            <thead>
+              <tr>
+                <th>หมวดหมู่ (Category)</th>
+                <th>รายการบั๊ก / จุดเสี่ยง (Bugs #)</th>
+                <th>กลไกสถาปัตยกรรมที่ป้องกัน (Architectural Safeguard)</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><strong>1. การป้องกันการข้ามสถานีซ้อน (Anti-Skip & Single Master)</strong></td>
+                <td>Bugs #1, #2, #3, #4, #6, #14</td>
+                <td>ใช้ฟังก์ชัน <code>isSingleMasterStationController()</code> จำกัดสิทธิ์สั่งเลื่อนสถานีอัตโนมัติให้มีเพียง 1 เครื่องต่อห้อง, เก็บ <code>_timeoutPopupTimerId</code> เพื่อสั่งยกเลิกทันทีเมื่อมีคนกดข้ามมือ, ตรวจสอบ <code>expectedFromIdx</code> ก่อนเขียน Firebase และล็อก <code>_expiredForStationKey</code> ไม่ให้หมดเวลาซ้ำในรอบเดิม</td>
+              </tr>
+              <tr>
+                <td><strong>2. โหมดตรวจย้อนหลังแยกอิสระ (Universal Local Review Isolation)</strong></td>
+                <td>Bugs #5, #9, #10, #16, #20, #21, #22</td>
+                <td>เมื่อกรรมการคลิกสถานีใน Minimap หรือกดปุ่ม Prev/Next หรือสลับผู้เข้าสอบใน Carousel จะเข้าสู่ <code>SimState._isLocalReview = true</code> แยกจากตัวแปรสถานีกลาง บล็อกการเขียนทับจาก Snapshot เบื้องหลัง ดึงคำตอบเติมคำและโจทย์ของสถานี/ผู้เข้าสอบที่กำลังรีวิวมาแสดง และพาออกจากโหมดรีวิวพร้อมแจ้งเตือนเมื่อห้องเปลี่ยนสถานี</td>
+              </tr>
+              <tr>
+                <td><strong>3. ความแม่นยำของเวลาและการซิงก์ (Server Time & Snapshot Queue)</strong></td>
+                <td>Bugs #7, #8, #11, #12, #13</td>
+                <td>ใช้เวลาเซิร์ฟเวอร์ <code>getSyncedNow()</code> (ผ่าน <code>.info/serverTimeOffset</code>) แทน <code>Date.now()</code> ทุกจุดรวมถึงตอนสลับแท็บกลับมา, จัดคิว <code>_pendingRoomState</code> ป้องกัน Snapshot ตกหล่นขณะโหลดเคส, ลบ <code>findIndex</code> ที่ทำให้สถานีพัก (REST) ซ้ำกันกระโดดข้าม และปลดล็อก <code>status === 'results'</code> ให้สรุปผลได้ทันที</td>
+              </tr>
+              <tr>
+                <td><strong>4. ความถูกต้องของคะแนนและคำตอบ (Score & Blank Data Integrity)</strong></td>
+                <td>Bugs #15, #17, #18, #23, #25</td>
+                <td>จำกัดให้เฉพาะ Examiner เท่านั้นที่เขียน <code>scoresByStation</code> ในโหมด Standard, คำนวณรหัสผู้เข้าสอบใน Carousel จากรอบจริง <code>cachedRoom.currentStationIdx</code> เสมอ, สั่ง <code>flushPendingExamineeBlanks()</code> ทันทีก่อนเปลี่ยนสถานีหรือจบสอบ และแยก Path ของ <code>stationFeedbacks</code> ตามโต๊ะย่อย/ผู้เข้าสอบแต่ละคน</td>
+              </tr>
+              <tr>
+                <td><strong>5. ความเสถียรของที่นั่งและเครือข่าย (Atomic Seats, Reconnect & Chat)</strong></td>
+                <td>Bugs #19, #24, #26</td>
+                <td>ใช้ <code>roomRef.transaction(...)</code> ป้องกันการแย่งเก้าอี้ Carousel พร้อมกัน, กู้คืนที่นั่งและตั้ง <code>roleSelectedThisSession = true</code> อัตโนมัติเมื่อรีเฟรชหน้าจอ และย้ายสถานะกำลังพิมพ์แชทไปยัง <code>roomTyping/{roomId}</code> นอก Tree ห้องสอบเพื่อลดภาระการบรอดแคสต์</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
     </div>
 
     <!-- TAB 4: COMPREHENSIVE SPECIAL CONDITIONS -->
     <div id="tab-conditions" class="tab-pane">
       <div class="search-bar">
-        <input type="text" id="condition-search" class="search-input" placeholder="🔍 ค้นหาเงื่อนไขพิเศษ เช่น timer, local review, score, snapshot, offline, audio..." onkeyup="filterConditions()">
+        <input type="text" id="condition-search" class="search-input" placeholder="🔍 ค้นหาเงื่อนไขพิเศษ เช่น timer, local review, carousel, transaction, feedback, typing..." onkeyup="filterConditions()">
       </div>
 
       <div class="conditions-grid" id="conditions-container">
 
         <!-- Condition 1: Timer Hits Zero -->
-        <div class="condition-card" data-tags="timer zero timeout race countdown">
+        <div class="condition-card" data-tags="timer zero timeout race countdown expiredkey">
           <div class="condition-head">
             <span class="condition-title">1. เมื่อตัวจับเวลานับถอยหลังถึง 00:00</span>
-            <span class="condition-badge badge-danger">Fix Point 1</span>
+            <span class="condition-badge badge-danger">Fix Bugs #4, #14</span>
           </div>
           <div class="condition-item">
             <strong>เงื่อนไขเหตุการณ์:</strong>
@@ -503,175 +546,171 @@
           </div>
           <div class="condition-item">
             <strong>พฤติกรรมเดิม (สาเหตุบั๊ก):</strong>
-            สั่ง clearInterval แต่ลืมตั้ง SimState.timerRunning = false ทำให้สถานะยังค้างว่าจับเวลาอยู่
+            หากมี Snapshot เข้ามาซ้ำตอนเวลาเป็น 0 อาจเกิดการเรียกหมดเวลาซ้ำซ้อน หรือสถานะ timerRunning ค้างเมื่อออกก่อนจบฟังก์ชัน
           </div>
           <div class="condition-item">
-            <strong>พฤติกรรมที่ถูกต้อง (Fix 1):</strong>
-            ตั้งค่า SimState.timerRunning = false ทันที เพื่อป้องกันไม่ให้ applyRoomState สร้าง Timer ซ้ำเมื่อมี Snapshot ส่งเข้ามา
-            <span class="condition-code">clearInterval(SimState.timerInterval); SimState.timerRunning = false;</span>
+            <strong>พฤติกรรมที่ถูกต้อง:</strong>
+            ตั้งค่า SimState.timerRunning = false ทันที และผูกกุญแจ _expiredForStationKey เข้ากับดัชนีสถานีและเวลาเริ่ม เพื่อรับประกันว่าการหมดเวลาจะทำงานเพียงครั้งเดียวต่อรอบ
+            <span class="condition-code">const expiryKey = `${expiredIdx}_${roomRefObj?.timerStartedAt || 'solo'}`;</span>
           </div>
         </div>
 
-        <!-- Condition 2: Timeout Modal Overlay Debounce -->
-        <div class="condition-card" data-tags="modal popup overlay timeout debounce">
+        <!-- Condition 2: Timeout Modal Overlay & Timer Cancel -->
+        <div class="condition-card" data-tags="modal popup overlay timeout debounce cancel">
           <div class="condition-head">
-            <span class="condition-title">2. หน้าต่างแจ้งหมดเวลา (3-Second Window)</span>
-            <span class="condition-badge badge-danger">Fix Point 2</span>
+            <span class="condition-title">2. หน้าต่างแจ้งหมดเวลาและการยกเลิก Timer ค้าง</span>
+            <span class="condition-badge badge-danger">Fix Bugs #2, #3</span>
           </div>
           <div class="condition-item">
             <strong>เงื่อนไขเหตุการณ์:</strong>
-            เมื่อเวลาแตะ 00:00 ฟังก์ชัน showTimeoutPopup ถูกเรียกเพื่อเปิด Modal นับถอยหลัง 3 วินาที
+            เมื่อเวลาแตะ 00:00 ฟังก์ชัน showTimeoutPopup เปิด Modal นับถอยหลัง 3 วินาที แต่ผู้คุมสอบกดปุ่มเลื่อนสถานีด้วยตนเองก่อนครบ 3 วินาที
           </div>
           <div class="condition-item">
             <strong>จุดเสี่ยง Race Condition:</strong>
-            หากมี Snapshot เข้ามาระหว่าง 3 วินาทีนี้ showTimeoutPopup อาจถูกเรียกซ้อน ส่งผลให้มี Callback เลื่อนสถานีทำงานพร้อมกัน 2 ตัว
+            หากไม่ยกเลิก setTimeout ของ Popup เมื่อครบ 3 วินาที Callback ที่ค้างอยู่จะสั่งเลื่อนสถานีซ้ำอีกครั้ง (กระโดดข้ามจากสถานี 2 ไป 3 ทันที)
           </div>
           <div class="condition-item">
             <strong>มาตรการป้องกัน:</strong>
-            เพิ่มตัวแปรล็อกและตรวจสอบ ID หากมี overlay-timeout อยู่แล้ว จะไม่สร้างใหม่และยกเลิก callback ซ้ำ
-            <span class="condition-code">if (document.getElementById('auto-timeout-overlay')) return;</span>
+            เก็บไอดีไว้ใน SimState._timeoutPopupTimerId เพื่อสั่ง clearTimeout ทันทีเมื่อเปลี่ยนสถานี และส่ง expectedFromIdx ไปตรวจสอบซ้ำก่อนอัปเดต Firebase
+            <span class="condition-code">clearTimeout(SimState._timeoutPopupTimerId); nextStation(expiredIdx);</span>
           </div>
         </div>
 
-        <!-- Condition 3: Examiner Jump Guard -->
-        <div class="condition-card" data-tags="examiner cohort breakout jump permission">
+        <!-- Condition 3: Single Master Authority -->
+        <div class="condition-card" data-tags="examiner cohort breakout carousel single master authority">
           <div class="condition-head">
-            <span class="condition-title">3. สิทธิ์การสั่งเปลี่ยนสถานีในโหมด Cohort</span>
-            <span class="condition-badge badge-warning">Fix Point 3</span>
+            <span class="condition-title">3. สิทธิ์ Single Master ในการสั่งเลื่อนสถานี</span>
+            <span class="condition-badge badge-warning">Fix Bug #1</span>
           </div>
           <div class="condition-item">
             <strong>เงื่อนไขเหตุการณ์:</strong>
-            เมื่อฟังก์ชัน jumpToStation ถูกสั่งทำงานในห้องสอบแบบ Cohort Breakout
+            เมื่อหมดเวลาในโหมด Standard Room (ที่มีทั้ง Host และ Examiner) หรือในโหมด Cohort Breakout / Carousel Rotation
           </div>
           <div class="condition-item">
-            <strong>กฎการควบคุม (Access Control):</strong>
-            เฉพาะ Super Host เท่านั้นที่มีสิทธิ์เขียน currentStationIdx ลง Firebase ส่วน Examiner ประจำโต๊ะห้ามแตะเด็ดขาด
+            <strong>กฎการควบคุม (Single Master Authority):</strong>
+            ในห้องใหญ่ (Breakout/Carousel) เฉพาะ Super Host เท่านั้นที่สั่งเลื่อนรอบ ส่วนในห้อง Standard หากมี Examiner อยู่ ให้ Examiner เป็นผู้สั่งเลื่อนเพียงคนเดียว ป้องกัน Host และ Examiner ยิงคำสั่งพร้อมกัน
           </div>
           <div class="condition-item">
             <strong>โค้ดบังคับใช้:</strong>
-            <span class="condition-code">if (SimState.examMode === 'cohort_breakout' && SimState.isLobby && !SimState.isHost) return;</span>
+            <span class="condition-code">function isSingleMasterStationController() { ... }</span>
           </div>
         </div>
 
-        <!-- Condition 4: Results Transition Lock -->
-        <div class="condition-card" data-tags="results finish exam lock async await">
+        <!-- Condition 4: Results Transition & Late Joiner -->
+        <div class="condition-card" data-tags="results finish exam lock async await deadlock">
           <div class="condition-head">
-            <span class="condition-title">4. การปิดการสอบ (Results Transition Lock)</span>
-            <span class="condition-badge badge-warning">Fix Point 4</span>
+            <span class="condition-title">4. การปิดการสอบโดยไม่เกิด Deadlock</span>
+            <span class="condition-badge badge-warning">Fix Bug #11</span>
           </div>
           <div class="condition-item">
             <strong>เงื่อนไขเหตุการณ์:</strong>
-            เมื่อห้องสอบได้รับ status = 'results' จาก Firebase ใน applyRoomState
+            เมื่อห้องสอบได้รับ status = 'results' จาก Firebase หรือมีผู้เข้าสอบรีเฟรชหน้าจอเข้ามาตอนสอบเสร็จพอดี
           </div>
           <div class="condition-item">
             <strong>จุดเสี่ยงเดิม:</strong>
-            สั่ง await finishExamSimulation() โดยไม่ได้ล็อก isFinishingExam ไว้ล่วงหน้า ทำให้ Snapshot อื่นเรียกซ้อนได้
+            การตั้ง SimState.isFinishingExam = true ก่อนเรียก finishExamSimulation() ทำให้เกิด Deadlock เพราะฟังก์ชันเห็นว่ากำลังจบสอบอยู่แล้วจึง Return ออกทันที
           </div>
           <div class="condition-item">
             <strong>มาตรการป้องกัน:</strong>
-            ตั้งค่า SimState.isFinishingExam = true ก่อนเข้าสู่คำสั่ง async finishExamSimulation()
-            <span class="condition-code">SimState.isFinishingExam = true; await finishExamSimulation();</span>
+            สร้างรายการสถานีจากห้องสอบหากยังว่างอยู่ และให้ finishExamSimulation() เป็นผู้ตั้งค่า SimState.isFinishingExam = true ด้วยตนเองเมื่อเริ่มทำงาน
+            <span class="condition-code">if (!SimState.isFinishingExam && !SimState.isExamFinished) await finishExamSimulation();</span>
           </div>
         </div>
 
-        <!-- Condition 5: Examiner Local Review Click -->
-        <div class="condition-card" data-tags="examiner local review prev button">
+        <!-- Condition 5: Universal Examiner Local Review -->
+        <div class="condition-card" data-tags="examiner local review prev next minimap">
           <div class="condition-head">
-            <span class="condition-title">5. กรรมการกดย้อนดูสถานีก่อนหน้า (Local View)</span>
-            <span class="condition-badge badge-primary">Feature Logic</span>
+            <span class="condition-title">5. โหมดตรวจย้อนหลังครบวงจร (Universal Local Review)</span>
+            <span class="condition-badge badge-primary">Fix Bugs #5, #16, #20</span>
           </div>
           <div class="condition-item">
-            <strong>สิทธิ์การแสดงปุ่ม:</strong>
-            แสดงเฉพาะ Examiner ในโหมด Cohort Breakout เท่านั้น ส่วน Examinee และ Super Host จะไม่เห็นปุ่มนี้เลย
+            <strong>การใช้งาน:</strong>
+            กรรมการสามารถคลิกเลือกสถานีที่ผ่านมาแล้วบน Minimap หรือกดปุ่มก่อนหน้า/ถัดไป หรือคลิกเลือกชื่อผู้เข้าสอบรอบก่อนหน้าในโหมด Carousel ได้อย่างอิสระ
+          </div>
+          <div class="condition-item">
+            <strong>การแสดงผลครบทุกส่วน:</strong>
+            ฟังก์ชัน renderScenarioAndNotesForReview อัปเดตทั้งโจทย์, ข้อมูลผู้ป่วย, อุปกรณ์, เฉลยกรรมการ, ช่องคอมเมนต์ และคำตอบเติมคำของสถานีที่กำลังรีวิวให้ตรงกันทั้งหมด
           </div>
           <div class="condition-item">
             <strong>การแยกสถานะ (State Isolation):</strong>
-            เก็บค่าลงใน SimState._localReviewIdx โดยไม่เปลี่ยนสถานะของห้องสอบใน Firebase
-          </div>
-          <div class="condition-item">
-            <strong>การแสดงผลหน้าจอ:</strong>
-            แสดงแบนเนอร์เตือนสีส้ม "โหมดดูย้อนหลัง: คุณกำลังดูสถานีที่ X (ห้องสอบกำลังอยู่ที่สถานีที่ Y)" พร้อมปุ่มกดกลับสถานีปัจจุบัน
+            ใช้ตัวแปร SimState._isLocalReview และ _localReviewStationIdx โดยไม่ไปแก้ไข currentStationIdx ของห้องสอบจริง
           </div>
         </div>
 
-        <!-- Condition 6: Scoring during Local Review -->
-        <div class="condition-card" data-tags="score grading checklist local review write">
+        <!-- Condition 6: Scoring & Reset during Local Review -->
+        <div class="condition-card" data-tags="score grading checklist local review write reset">
           <div class="condition-head">
-            <span class="condition-title">6. การติ๊กคะแนนขณะอยู่ในโหมดดูย้อนหลัง</span>
-            <span class="condition-badge badge-success">Data Integrity</span>
+            <span class="condition-title">6. การติ๊กและรีเซ็ตคะแนนขณะตรวจย้อนหลัง</span>
+            <span class="condition-badge badge-success">Fix Bugs #9, #10, #22</span>
           </div>
           <div class="condition-item">
-            <strong>คำถามสำคัญ:</strong>
-            คะแนนจะถูกบันทึกไปทับสถานีปัจจุบันของห้องสอบหรือไม่?
+            <strong>การป้องกันการเขียนทับจาก Snapshot:</strong>
+            ขณะที่ SimState._isLocalReview เป็น true ระบบจะบล็อกไม่ให้ applyRoomState นำคะแนนของสถานีปัจจุบันมาเขียนทับ DOM ของหน้าจอที่กรรมการกำลังตรวจย้อนหลังอยู่
           </div>
           <div class="condition-item">
-            <strong>คำตอบทางเทคนิค:</strong>
-            ไม่ทับแน่นอน เพราะฟังก์ชัน updateLobbyChecklistOnServer อิงหมายเลขสถานีตามเคสที่กำลังเปิดดูอยู่ (SimState.stations[currentIdx].stationNumber)
+            <strong>ความแม่นยำของเป้าหมายคะแนน:</strong>
+            ทั้งการติ๊กให้คะแนนและการกดปุ่มรีเซ็ตคะแนน (resetCurrentStationChecklist) จะอ้างอิงสถานีและรหัสผู้เข้าสอบที่กำลังรีวิวอยู่โดยตรง
           </div>
           <div class="condition-item">
             <strong>พาทข้อมูล Firebase:</strong>
-            <span class="condition-code">rooms/[roomId]/breakouts/[tableId]/scores/[viewedStationNumber]</span>
+            <span class="condition-code">participantScores/[reviewPartId]/stations/[assignedStationNum]</span>
           </div>
         </div>
 
-        <!-- Condition 7: Auto Snapback on Host Advance -->
-        <div class="condition-card" data-tags="auto snapback advance super host cohort">
+        <!-- Condition 7: Auto Snapback & Round Alert -->
+        <div class="condition-card" data-tags="auto snapback advance super host cohort carousel">
           <div class="condition-head">
-            <span class="condition-title">7. การดึงกรรมการกลับอัตโนมัติ (Auto Snapback)</span>
-            <span class="condition-badge badge-success">UX Guard</span>
+            <span class="condition-title">7. การแจ้งเตือนและดึงกลับเมื่อเปลี่ยนสถานี/รอบ</span>
+            <span class="condition-badge badge-success">Fix Bugs #16, #18</span>
           </div>
           <div class="condition-item">
             <strong>เงื่อนไขเหตุการณ์:</strong>
-            กรรมการกำลังย้อนดูสถานีที่ 2 แต่ Super Host กดสั่งเปลี่ยนจากสถานี 3 ไปยังสถานี 4
+            เมื่อ Super Host สั่งเปลี่ยนสถานีในโหมด Breakout หรือเปลี่ยนรอบหมุนเวียนในโหมด Carousel
           </div>
           <div class="condition-item">
             <strong>กลไกการทำงาน:</strong>
-            เมื่อ Firebase ส่ง Snapshot ที่มี targetIdx ใหม่เข้ามา ระบบจะตรวจพบว่า stationChanged เป็น true
+            ในโหมด Breakout ระบบจะล้างสถานะรีวิวและพากรรมการไปยังสถานีใหม่ทันที ส่วนในโหมด Carousel หากกรรมการกำลังตรวจย้อนหลังอยู่ ระบบจะส่งเสียงเตือนและอัปเดตแบนเนอร์แจ้งว่ามีผู้เข้าสอบคนใหม่เข้าประจำฐานแล้ว
           </div>
           <div class="condition-item">
-            <strong>ผลลัพธ์:</strong>
-            ระบบจะล้างค่า SimState._localReviewIdx = null และสั่ง renderStation(targetIdx) เพื่อพากรรมการกลับมาสถานีที่ 4 ทันที พร้อมแสดง Toast แจ้งเตือน
+            <strong>การสลับ Listener อัตโนมัติ:</strong>
+            เมื่อเปลี่ยนรอบ Carousel ระบบจะสลับ Listener คำตอบเติมคำและช่อง Feedback ไปยังผู้เข้าสอบคนใหม่ทันที
           </div>
         </div>
 
-        <!-- Condition 8: Examinee Screen Isolation -->
-        <div class="condition-card" data-tags="examinee isolation security screen student">
+        <!-- Condition 8: Examinee Screen & Score Isolation -->
+        <div class="condition-card" data-tags="examinee isolation security screen student score">
           <div class="condition-head">
-            <span class="condition-title">8. การป้องกันหน้าจอผู้เข้าสอบ (Examinee Guard)</span>
-            <span class="condition-badge badge-purple">Isolation</span>
+            <span class="condition-title">8. การป้องกันผู้เข้าสอบเขียนทับคะแนนกรรมการ</span>
+            <span class="condition-badge badge-purple">Fix Bug #15</span>
           </div>
           <div class="condition-item">
             <strong>ข้อกำหนดเข้มงวด:</strong>
-            ผู้เข้าสอบต้องไม่ได้รับผลกระทบใดๆ เมื่อกรรมการกดย้อนดูสถานีเก่า
+            ในโหมด Standard Room หากผู้สร้างห้อง (Host) เลือกบทบาทเป็นผู้เข้าสอบ (Examinee) เครื่องของผู้เข้าสอบต้องไม่เขียน studentScores ที่ว่างเปล่าไปทับคะแนนของ Examiner
           </div>
           <div class="condition-item">
             <strong>การควบคุม:</strong>
-            หน้าจอผู้เข้าสอบอิงตาม room.currentStationIdx จาก Firebase เสมอ ไม่รู้จักตัวแปร _localReviewIdx และไม่แสดงปุ่มย้อนดู
+            อนุญาตให้แนบ scoresByStation ลง Firebase เฉพาะเมื่อผู้ใช้งานมีบทบาทเป็น Examiner เท่านั้น
           </div>
           <div class="condition-item">
-            <strong>ความปลอดภัย:</strong>
-            ผู้เข้าสอบยังคงเห็นโจทย์และเวลาของสถานีปัจจุบันตามจริง 100%
+            <strong>โค้ดบังคับใช้:</strong>
+            <span class="condition-code">if (!SimState.cachedRoom?.isSuperHost && SimState.examMode === 'standard' && SimState.role === 'examiner')</span>
           </div>
         </div>
 
-        <!-- Condition 9: Seamless Reconnection & Table Re-seat -->
-        <div class="condition-card" data-tags="reconnect session resume restore table seat breakout f5 refresh">
+        <!-- Condition 9: Seamless Reconnection & Seat Recovery -->
+        <div class="condition-card" data-tags="reconnect session resume restore table seat breakout carousel f5 refresh">
           <div class="condition-head">
-            <span class="condition-title">9. หลุดจากหน้าจอแล้วกลับมาจอยห้องสอบเดิม</span>
-            <span class="condition-badge badge-success">Session Reconnect</span>
+            <span class="condition-title">9. เน็ตหลุด/รีเฟรชแล้วกลับมาที่นั่งเดิมทันที</span>
+            <span class="condition-badge badge-success">Fix Bug #24</span>
           </div>
           <div class="condition-item">
-            <strong>กลไกการจำสถานะ:</strong>
-            เมื่อผู้เข้าสอบหรือกรรมการหลุด ปิดแท็บ หรือกดรีเฟรช ระบบเก็บ ple_session_player_id และ ple_session_room_id ใน Session Storage
+            <strong>ปัญหาเดิมที่พบ:</strong>
+            เมื่อผู้เล่นกดรีเฟรชและเข้าห้องเดิม หากไม่ได้ตั้งค่า roleSelectedThisSession = true หน้าต่างเลือกบทบาทจะเด้งขึ้นมาใหม่ และเมื่อกดยืนยันจะไปสั่งล้างที่นั่งในโต๊ะ Breakout หรือฐาน Carousel ทิ้ง
           </div>
           <div class="condition-item">
-            <strong>การคืนที่นั่งโต๊ะย่อย (Table Re-seat):</strong>
-            ฟังก์ชัน autoReconnectCohortSession ตรวจพบ existingById หรือ existingByName และคืนค่า SimState.myBreakoutTableId และบทบาทเดิม (examiner/examinee) ทันที
-          </div>
-          <div class="condition-item">
-            <strong>ข้ามจอนับถอยหลังทันที:</strong>
-            หากการสอบกำลังดำเนินอยู่ (room.status === 'running') ระบบจะบายพาสจอนับถอยหลัง 5-4-3-2-1 และพาเข้าสู่สถานีปัจจุบัน พร้อมกู้คืน Checklist ที่เคยตรวจค้างไว้ทั้งหมด 100%
-            <span class="condition-code">const isExistingMember = Boolean(existingById || existingByName);</span>
+            <strong>การกู้คืนที่นั่งอัตโนมัติ:</strong>
+            เมื่อตรวจพบว่าเป็นสมาชิกเดิม (isExistingMember) ระบบจะตั้ง roleSelectedThisSession = true ทันที พร้อมกู้คืน myBreakoutTableId หรือ myCarouselStation และสถานะ isHost ลง Session Storage
+            <span class="condition-code">if (isExistingMember) { SimState.roleSelectedThisSession = true; ... }</span>
           </div>
         </div>
 
@@ -696,24 +735,20 @@
           </div>
         </div>
 
-        <!-- Condition 11: Name Collision & Roster Guard -->
-        <div class="condition-card" data-tags="name collision roster mismatch duplicate reject alert">
+        <!-- Condition 11: Atomic Carousel Seat Assignment -->
+        <div class="condition-card" data-tags="carousel seat transaction atomic collision">
           <div class="condition-head">
-            <span class="condition-title">11. ชื่อไม่ตรง / ชื่อซ้ำเข้าไม่ได้ (Name Guard)</span>
-            <span class="condition-badge badge-warning">Identity Integrity</span>
+            <span class="condition-title">11. การจองฐาน Carousel แบบ Atomic Transaction</span>
+            <span class="condition-badge badge-warning">Fix Bug #19</span>
           </div>
           <div class="condition-item">
-            <strong>การป้องกันชื่อชนกันใน Lobby:</strong>
-            ในขั้นตอนรอสอบ (status === 'setup') หากมีคนใหม่พิมพ์ชื่อซ้ำกับผู้ที่มีอยู่ในห้อง ระบบจะปฏิเสธด้วยการแจ้งเตือน: "ชื่อนี้มีผู้ใช้งานอยู่ในห้องสอบนี้แล้ว กรุณาใช้ชื่ออื่น"
+            <strong>จุดเสี่ยงเดิม:</strong>
+            การใช้ .once('value') ตามด้วย .update() ทำให้เมื่อผู้เล่น 2 คนกดเลือกฐานเดียวกันพร้อมกันในเสี้ยววินาที คนที่สองจะเขียนทับคนที่หนึ่งจนเกิดผู้เล่นหายจากผัง
           </div>
           <div class="condition-item">
-            <strong>การป้องกันการนั่งทับโต๊ะ (Seat Conflict):</strong>
-            ระบบตรวจสอบ targetTable.examinerName และ targetTable.participantName เพื่อไม่ให้เกิดการนั่งซ้อนทับกันที่โต๊ะสอบย่อย
-          </div>
-          <div class="condition-item">
-            <strong>การกู้คืนด้วยชื่อเดิม:</strong>
-            หากผู้สอบเปิดอุปกรณ์ใหม่แต่ไม่มี Session Storage เดิม หากพิมพ์ "ชื่อเดิมที่ถูกต้อง" ระบบจะแมตช์ existingByName และกู้คืน Player ID เดิมให้ทันที
-            <span class="condition-code">if (roomData.status === 'setup' && !existingById && existingByName) { alert(...); }</span>
+            <strong>มาตรการป้องกัน:</strong>
+            เปลี่ยนฟังก์ชัน assignCarouselStation ให้ทำงานผ่าน Firebase Transaction บนพาท carouselPosts เพื่อตรวจสอบที่ว่างและสลับที่นั่งอย่างปลอดภัยระดับปรมาณู
+            <span class="condition-code">const result = await roomRef.transaction((currentPosts) => { ... });</span>
           </div>
         </div>
 
@@ -738,67 +773,105 @@
           </div>
         </div>
 
-        <!-- Condition 13: Zero-Latency Offline Fallback -->
-        <div class="condition-card" data-tags="offline fallback internet disconnect database">
+        <!-- Condition 13: Server Clock Offset Synchronization -->
+        <div class="condition-card" data-tags="clock offset server time getSyncedNow countdown visibilitychange">
           <div class="condition-head">
-            <span class="condition-title">13. เครือข่ายอินเทอร์เน็ตขัดข้องระหว่างสอบ</span>
-            <span class="condition-badge badge-success">Offline Guarantee</span>
+            <span class="condition-title">13. การซิงก์นาฬิกาเซิร์ฟเวอร์ (Server Clock Sync)</span>
+            <span class="condition-badge badge-primary">Fix Bugs #8, #13</span>
           </div>
           <div class="condition-item">
-            <strong>กลไกสำรอง:</strong>
-            ข้อมูลเคสและเกณฑ์การตรวจทั้งหมดถูกบรรจุอยู่ใน case-details-offline.js (10MB+) เรียบร้อยแล้ว
+            <strong>ปัญหานาฬิกาเครื่องคลาดเคลื่อน:</strong>
+            หากนาฬิกาในคอมพิวเตอร์หรือไอแพดของผู้เข้าสอบเดินเร็วกว่าปกติ การใช้ Date.now() จะทำให้เวลานับถอยหลังหมดเร็วกว่าเครื่องอื่น หรือตัดจบหน้าจอ 5-4-3-2-1 ทันที
           </div>
           <div class="condition-item">
-            <strong>ผลลัพธ์:</strong>
-            การเปิดโจทย์, รูปภาพ, รายการตรวจ และการจับเวลาในเครื่องสามารถดำเนินต่อไปได้โดยไม่ต้องพึ่งพาเซิร์ฟเวอร์ภายนอก
+            <strong>กลไกแก้ไข:</strong>
+            ใช้ฟังก์ชัน getSyncedNow() ซึ่งบวกค่าชดเชยเวลาจาก Firebase (.info/serverTimeOffset) ในทุกจุดที่คำนวณเวลาสอบ รวมถึงเมื่อผู้ใช้สลับหน้าจอกลับมา (visibilitychange)
+            <span class="condition-code">const elapsed = Math.floor((getSyncedNow() - room.timerStartedAt) / 1000);</span>
           </div>
         </div>
 
-        <!-- Condition 14: Sound Alert Autoplay Policy -->
-        <div class="condition-card" data-tags="sound audio bell alarm autoplay">
+        <!-- Condition 14: Multiple REST Stations Indexing -->
+        <div class="condition-card" data-tags="rest station duplicate index findindex skip">
           <div class="condition-head">
-            <span class="condition-title">14. นโยบายเสียงเตือน (Browser Audio Policy)</span>
-            <span class="condition-badge badge-purple">Audio Engine</span>
+            <span class="condition-title">14. การรองรับสถานีพัก (REST) หลายจุดโดยไม่ข้ามสถานี</span>
+            <span class="condition-badge badge-danger">Fix Bug #7</span>
           </div>
           <div class="condition-item">
-            <strong>ข้อจำกัดเบราว์เซอร์:</strong>
-            เบราว์เซอร์สมัยใหม่จะบล็อกการเล่นเสียงหากผู้ใช้ยังไม่ได้มีปฏิสัมพันธ์กับหน้าเว็บ (User Gesture)
+            <strong>สาเหตุบั๊กเดิม:</strong>
+            ในการสอบ OSPE 16 สถานีที่มีสถานีพัก 2 จุด ทั้งสองจุดจะมี caseId เป็น 'REST' เหมือนกัน หากระบบใช้ findIndex(c => c.caseId === room.caseId) เมื่อถึงสถานีพักจุดที่ 2 ระบบจะดีดกลับไปสถานีพักจุดที่ 1
           </div>
           <div class="condition-item">
-            <strong>วิธีแก้ปัญหาในระบบ:</strong>
-            ฟังก์ชัน unlockAudioContext() จะถูกเรียกทันทีเมื่อผู้ใช้คลิกปุ่ม Start Exam หรือเลือกบทบาทในห้องรอ
+            <strong>วิธีแก้ปัญหา:</strong>
+            ยกเลิกการค้นหาด้วย caseId และใช้ดัชนี room.currentStationIdx โดยตรงในการระบุสถานีปัจจุบันเสมอ
+            <span class="condition-code">targetIdx = Number(room.currentStationIdx);</span>
           </div>
         </div>
 
-        <!-- Condition 15: Scratchpad Prescription Drawing -->
-        <div class="condition-card" data-tags="scratchpad draw prescription canvas note">
+        <!-- Condition 15: Async applyRoomState Snapshot Queue -->
+        <div class="condition-card" data-tags="snapshot queue pending applyRoomState async">
           <div class="condition-head">
-            <span class="condition-title">15. การใช้งานกระดานทดดิจิทัล (Scratchpad)</span>
-            <span class="condition-badge badge-primary">Tool Logic</span>
+            <span class="condition-title">15. คิวรับข้อมูล Snapshot ขณะโหลดเคส (_pendingRoomState)</span>
+            <span class="condition-badge badge-warning">Fix Bug #12</span>
           </div>
           <div class="condition-item">
-            <strong>การทำงาน:</strong>
-            กระดานทดเป็น Client-side canvas อิสระของผู้เข้าสอบแต่ละคน ไม่ส่งข้อมูลผ่าน WebSockets เพื่อประหยัด Bandwidth
+            <strong>เงื่อนไขเหตุการณ์:</strong>
+            เมื่อ applyRoomState กำลังทำงานแบบ async (เช่น รอถอดรหัสเคสหรือสร้างสถานี) แล้วมี Snapshot ใหม่ที่สำคัญกว่า (เช่น สั่งเริ่มจับเวลา หรือสั่งเปลี่ยนสถานี) ส่งเข้ามาพอดี
           </div>
           <div class="condition-item">
-            <strong>การรีเซ็ต:</strong>
-            กระดานทดจะถูกรีเซ็ตหรือบันทึกภาพอัตโนมัติเมื่อมีการเปลี่ยนสถานีสอบ
+            <strong>การป้องกันข้อมูลตกหล่น:</strong>
+            แทนที่จะทิ้ง Snapshot ใหม่ไปเฉยๆ ระบบจะเก็บไว้ในตัวแปร _pendingRoomState และประมวลผลต่อทันทีในบล็อก finally
+            <span class="condition-code">if (_isApplyingRoomState) { _pendingRoomState = room; return; }</span>
           </div>
         </div>
 
-        <!-- Condition 16: Firebase Quota Resilience -->
-        <div class="condition-card" data-tags="firebase quota limit bandwidth download 360mb">
+        <!-- Condition 16: Carousel Stationary Examiner Round Math -->
+        <div class="condition-card" data-tags="carousel round index examiner formula">
           <div class="condition-head">
-            <span class="condition-title">16. ขีดจำกัดดาวน์โหลด Firebase (360 MB/วัน)</span>
-            <span class="condition-badge badge-warning">Quota Safety</span>
+            <span class="condition-title">16. สูตรคำนวณผู้เข้าสอบของกรรมการประจำฐาน Carousel</span>
+            <span class="condition-badge badge-primary">Fix Bug #17</span>
           </div>
           <div class="condition-item">
-            <strong>กลไกประหยัด Bandwidth:</strong>
-            ระบบใช้ Throttling ในการบันทึกคะแนน (300ms) และแยกข้อมูลเคสขนาดใหญ่ (10MB+) ไปไว้ในออฟไลน์ไฟล์ ไม่ดึงผ่าน Firebase
+            <strong>ความพิเศษของโหมด Carousel:</strong>
+            กรรมการที่ประจำอยู่ฐานที่ K จะมีค่า SimState.currentIdx คงที่เท่ากับ K-1 ตลอดการสอบ ในขณะที่รอบการหมุนเวียนจริงอยู่ที่ room.currentStationIdx (r)
           </div>
           <div class="condition-item">
-            <strong>ความปลอดภัย:</strong>
-            Firebase รับส่งเฉพาะตัวเลขตัวจับเวลา สถานะห้องสอบ และ Array คะแนนขนาดเล็ก ทำให้รองรับนิสิตทั้งรุ่นได้ตลอดทั้งวันโดยไม่แตะเพดานโควตา
+            <strong>การอ้างอิงรอบที่ถูกต้อง:</strong>
+            ทุกฟังก์ชันการตรวจคะแนน ดูคำตอบเติมคำ และรีเซ็ตคะแนนของกรรมการในโหมด Carousel จะอ่านค่ารอบ r จาก SimState.cachedRoom.currentStationIdx เสมอ
+            <span class="condition-code">const currStartStNum = ((myCarouselStation - 1 - r + N) % N) + 1;</span>
+          </div>
+        </div>
+
+        <!-- Condition 17: Flush Pending Fill-in-the-Blank Inputs -->
+        <div class="condition-card" data-tags="blank fill debounce flush examinee answer">
+          <div class="condition-head">
+            <span class="condition-title">17. การบันทึกคำตอบเติมคำทันทีเมื่อหมดเวลา (Blank Flush)</span>
+            <span class="condition-badge badge-success">Fix Bug #25</span>
+          </div>
+          <div class="condition-item">
+            <strong>จุดเสี่ยงเดิม:</strong>
+            การพิมพ์คำตอบในช่องว่าง [BLANK:...] มีหน่วงเวลา Debounce 350ms หากผู้เข้าสอบพิมพ์คำตอบในวินาทีสุดท้ายก่อนตัดเปลี่ยนสถานี คำตอบอาจยังไม่ถูกส่งขึ้น Firebase
+          </div>
+          <div class="condition-item">
+            <strong>กลไกป้องกันคำตอบหาย:</strong>
+            ฟังก์ชัน flushPendingExamineeBlanks() จะถูกเรียกทำงานทันทีเป็นอันดับแรกเมื่อเริ่มเปลี่ยนสถานี (jumpToStation / renderStation) และเมื่อจบการสอบ (finishExamSimulation)
+            <span class="condition-code">if (typeof flushPendingExamineeBlanks === 'function') flushPendingExamineeBlanks();</span>
+          </div>
+        </div>
+
+        <!-- Condition 18: Scoped Station Feedbacks & Isolated Typing Root -->
+        <div class="condition-card" data-tags="feedback debrief typing chat bandwidth isolation">
+          <div class="condition-head">
+            <span class="condition-title">18. การแยกพื้นที่ Feedback รายบุคคลและ Typing Channel</span>
+            <span class="condition-badge badge-purple">Fix Bugs #23, #26</span>
+          </div>
+          <div class="condition-item">
+            <strong>การแยกข้อเสนอแนะ (Scoped Feedbacks):</strong>
+            ข้อความข้อเสนอแนะของกรรมการถูกแยกเก็บตามโต๊ะสอบย่อย (breakouts/[tableId]/stationFeedbacks) หรือตามผู้เข้าสอบแต่ละคนใน Carousel (participantScores/[partId]/stationFeedbacks) ไม่ปะปนกันทั้งห้อง
+          </div>
+          <div class="condition-item">
+            <strong>การแยกสัญญาณกำลังพิมพ์แชท (Typing Root Isolation):</strong>
+            ย้ายสัญญาณกำลังพิมพ์ออกจาก rooms/[roomId] ไปยังพาทแยกอิสระ roomTyping/[roomId] เพื่อไม่ให้ทุกการกดแป้นพิมพ์ไปกระตุ้น Listener หลักของห้องสอบ
+            <span class="condition-code">return `roomTyping/${SimState.roomId}/breakouts/${tableId}/st_${stNum}`;</span>
           </div>
         </div>
 

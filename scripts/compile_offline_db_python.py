@@ -54,9 +54,17 @@ def load_existing_case_details(details_path):
     try:
         with open(details_path, "r", encoding="utf-8") as f:
             text = f.read()
-        m = re.search(r"const\s+OFFLINE_CASE_DETAILS\s*=\s*(\{.*\});?", text, re.DOTALL)
-        if m:
-            data = json.loads(m.group(1))
+        target_prefix = "const OFFLINE_CASE_DETAILS = "
+        idx = text.find(target_prefix)
+        if idx != -1:
+            s = text[idx + len(target_prefix):].strip()
+            semicolon_idx = s.find(";\n")
+            if semicolon_idx != -1:
+                candidate = s[:semicolon_idx].strip()
+            else:
+                last_brace = s.rfind("}")
+                candidate = s[:last_brace + 1].strip()
+            data = json.loads(candidate)
             print(f"Loaded existing offline case details: {len(data)} cases cached.")
             return data
     except Exception as e:

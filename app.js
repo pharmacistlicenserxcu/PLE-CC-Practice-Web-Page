@@ -33,6 +33,16 @@ let currentApiUrl = API_URL;
   }
 })();
 
+// Ensure global availability of OFFLINE_DATA and OFFLINE_CASE_DETAILS across all contexts
+if (typeof window !== 'undefined') {
+  if (typeof OFFLINE_DATA !== 'undefined' && !window.OFFLINE_DATA) {
+    window.OFFLINE_DATA = OFFLINE_DATA;
+  }
+  if (typeof OFFLINE_CASE_DETAILS !== 'undefined' && !window.OFFLINE_CASE_DETAILS) {
+    window.OFFLINE_CASE_DETAILS = OFFLINE_CASE_DETAILS;
+  }
+}
+
 const AppState = {
   theme: 'light',
   cases: [],
@@ -2764,9 +2774,12 @@ function hideSplashOverlay() {
 }
 
 async function loadOfflineDetailsWithProgress() {
-  // 0. หากมี OFFLINE_CASE_DETAILS ใน Memory จากไฟล์ script อยู่แล้ว -> ใช้ทันที 0ms ไม่ต้องดาวน์โหลดซ้ำ!
+  // 0. หากมี OFFLINE_CASE_DETAILS ใน Memory จากไฟล์ script อยู่แล้ว และมีเคสสมบูรณ์ -> ใช้ทันที 0ms ไม่ต้องดาวน์โหลดซ้ำ!
   const inMemDetails = (typeof OFFLINE_CASE_DETAILS !== 'undefined' && OFFLINE_CASE_DETAILS) || window.OFFLINE_CASE_DETAILS;
-  if (inMemDetails && Object.keys(inMemDetails).length > 0) {
+  const expectedTotal = (typeof OFFLINE_DATA !== 'undefined' && OFFLINE_DATA.cases) ? OFFLINE_DATA.cases.length : 100;
+  const minThreshold = Math.min(50, Math.round(expectedTotal * 0.5));
+
+  if (inMemDetails && Object.keys(inMemDetails).length >= minThreshold) {
     window.OFFLINE_CASE_DETAILS = inMemDetails;
     console.log(`[Database Preloader] OFFLINE_CASE_DETAILS is ready in memory (${Object.keys(inMemDetails).length} cases). 0ms instant load!`);
     mergeOfflineDetails();
@@ -2786,15 +2799,17 @@ async function loadOfflineDetailsWithProgress() {
     const cachedVersion = localStorage.getItem('ospe_db_version');
     const targetVersion = (typeof OFFLINE_DATA !== 'undefined' && OFFLINE_DATA.version) ? OFFLINE_DATA.version : DB_VERSION_STR;
     
-    // A. หากเคยโหลดและบันทึกลง IndexedDB เวอร์ชันตรงกัน -> ดึงมาใช้ทันที 0ms
+    // A. หากเคยโหลดและบันทึกลง IndexedDB เวอร์ชันตรงกัน และแคชมีความสมบูรณ์ -> ดึงมาใช้ทันที 0ms
     if (cachedVersion === targetVersion) {
       console.log(`[Database Preloader] Database matches targetVersion (${targetVersion}) in IndexedDB.`);
       const allDetails = await getCasesFromDB(db);
-      if (allDetails && Object.keys(allDetails).length > 0) {
+      if (allDetails && Object.keys(allDetails).length >= minThreshold) {
         window.OFFLINE_CASE_DETAILS = allDetails;
         console.log('[Database Preloader] All cases retrieved instantly from IndexedDB cache (0ms).');
         mergeOfflineDetails();
         return;
+      } else {
+        console.warn(`[Database Preloader] Partial or corrupt cache detected in IndexedDB (${allDetails ? Object.keys(allDetails).length : 0} cases). Re-syncing full database...`);
       }
     }
     
@@ -2809,11 +2824,19 @@ async function loadOfflineDetailsWithProgress() {
 
     // 1) ดึงแคชเดิมที่มีอยู่แล้วขึ้นมาแสดงก่อนทันที 0ms เพื่อไม่ให้ผู้ใช้ต้องรอ!
     const existingDetails = await getCasesFromDB(db);
-    if (existingDetails && Object.keys(existingDetails).length > 0) {
-      const liveScriptDetails = (typeof OFFLINE_CASE_DETAILS !== 'undefined' && OFFLINE_CASE_DETAILS) || window.OFFLINE_CASE_DETAILS || {};
-      window.OFFLINE_CASE_DETAILS = Object.assign({}, existingDetails, liveScriptDetails);
+    const liveScriptDetails = (typeof OFFLINE_CASE_DETAILS !== 'undefined' && OFFLINE_CASE_DETAILS) || window.OFFLINE_CASE_DETAILS || {};
+    const existingCount = existingDetails ? Object.keys(existingDetails).length : 0;
+    const liveCount = Object.keys(liveScriptDetails).length;
+
+    // หากแคชเดิมมีจำนวนเคสน้อยผิดปกติ (เช่น partial 1 เคส) แต่ใน liveScript มีมากกว่า ให้เลือกใช้ตัวที่มีเคสมากกว่า
+    const baseDetails = (existingCount >= minThreshold) 
+      ? Object.assign({}, existingDetails, liveScriptDetails) 
+      : ((liveCount >= minThreshold) ? liveScriptDetails : Object.assign({}, existingDetails || {}, liveScriptDetails));
+
+    if (Object.keys(baseDetails).length > 0) {
+      window.OFFLINE_CASE_DETAILS = baseDetails;
       mergeOfflineDetails();
-      console.log('[Database Preloader] Previous cache loaded instantly (0ms); updating new cases in background...');
+      console.log('[Database Preloader] Valid cache loaded instantly (0ms); updating new cases in background...');
     }
     
     // 2) แสดง Splash Overlay เฉพาะเมื่อ "ไม่มีแคชเลยสักเคส" และ "อยู่หน้า case-viewer" เท่านั้น
@@ -2874,10 +2897,10 @@ async function loadOfflineDetailsWithProgress() {
     
     // บันทึกลง IndexedDB เพื่อใช้งานครั้งต่อไป
     const finalDetails = (typeof OFFLINE_CASE_DETAILS !== 'undefined' && OFFLINE_CASE_DETAILS) || window.OFFLINE_CASE_DETAILS;
-    if (finalDetails) {
+    if (finalDetails && Object.keys(finalDetails).length >= minThreshold) {
       await saveCasesToDB(db, finalDetails);
       localStorage.setItem('ospe_db_version', targetVersion);
-      console.log(`[Database Preloader] Database stored in IndexedDB (version: ${targetVersion}).`);
+      console.log(`[Database Preloader] Database stored in IndexedDB (version: ${targetVersion}, cases: ${Object.keys(finalDetails).length}).`);
     }
     
     mergeOfflineDetails();

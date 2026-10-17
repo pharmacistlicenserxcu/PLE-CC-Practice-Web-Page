@@ -1238,34 +1238,63 @@
         
         // ตรวจสอบฐานข้อมูลออฟไลน์ (ดึงจากหน่วยความจำ หรือ IndexedDB ทันที 0-5ms)
         const cleanId = (activeCaseId || '').trim();
+        const ospeId = cleanId.startsWith('OSPE-') ? cleanId : ('OSPE-' + cleanId);
+        const rawId = cleanId.replace(/^OSPE-/i, '');
         const globalDetails = (typeof OFFLINE_CASE_DETAILS !== 'undefined' && OFFLINE_CASE_DETAILS) || window.OFFLINE_CASE_DETAILS;
-        if (globalDetails && Object.keys(globalDetails).length > 0) {
+        
+        const hasDirectMatch = Boolean(
+          globalDetails && (
+            globalDetails[cleanId] || 
+            globalDetails[cleanId.toUpperCase()] || 
+            globalDetails[ospeId] || 
+            globalDetails[ospeId.toUpperCase()] ||
+            globalDetails[rawId] ||
+            globalDetails[rawId.toUpperCase()]
+          )
+        );
+
+        if (hasDirectMatch) {
           window.OFFLINE_CASE_DETAILS = globalDetails;
           loadCaseDetail();
         } else {
           // ดึงจาก IndexedDB ทันที (5-10ms) เพื่อเปิดเคสได้ทันทีโดยไม่ต้องรอ
           openIndexedDB().then(db => getCasesFromDB(db)).then(cached => {
             const inMemory = (typeof OFFLINE_CASE_DETAILS !== 'undefined' && OFFLINE_CASE_DETAILS) || window.OFFLINE_CASE_DETAILS || {};
-            const merged = Object.assign({}, cached || {}, inMemory);
+            const cachedCount = cached ? Object.keys(cached).length : 0;
+            const inMemCount = Object.keys(inMemory).length;
+            
+            // หาก cached ใน IndexedDB มีเคสน้อยผิดปกติ (< 50) แต่ inMemory มีมากกว่า ให้ใช้ inMemory เป็นหลัก
+            const merged = (cachedCount < 50 && inMemCount >= 50) 
+              ? inMemory 
+              : Object.assign({}, cached || {}, inMemory);
             window.OFFLINE_CASE_DETAILS = merged;
 
             // ตรวจสอบว่าในแคชมีเคสเป้าหมายนี้อยู่แล้วหรือไม่
             const hasTargetCase = Boolean(
               merged[cleanId] || 
               merged[cleanId.toUpperCase()] || 
-              merged['OSPE-' + cleanId.replace(/^OSPE-/i, '')] ||
-              merged[cleanId.replace(/^OSPE-/i, '')]
+              merged[ospeId] || 
+              merged[ospeId.toUpperCase()] ||
+              merged[rawId] ||
+              merged[rawId.toUpperCase()]
             );
 
             if (hasTargetCase) {
-              console.log('[Case Viewer] Loaded case details directly from IndexedDB (5ms).');
+              console.log('[Case Viewer] Loaded case details directly from IndexedDB / memory (5ms).');
               loadCaseDetail();
             } else {
               // หากในแคชเดิมยังไม่มีเคสใหม่ ให้รอ case-details-offline.js โหลดเสร็จ
               let checkCount = 0;
               const checkInterval = setInterval(() => {
                 const liveDetails = (typeof OFFLINE_CASE_DETAILS !== 'undefined' && OFFLINE_CASE_DETAILS) || window.OFFLINE_CASE_DETAILS;
-                if (liveDetails && (liveDetails[cleanId] || liveDetails[cleanId.toUpperCase()] || liveDetails['OSPE-' + cleanId.replace(/^OSPE-/i, '')])) {
+                if (liveDetails && (
+                  liveDetails[cleanId] || 
+                  liveDetails[cleanId.toUpperCase()] || 
+                  liveDetails[ospeId] || 
+                  liveDetails[ospeId.toUpperCase()] ||
+                  liveDetails[rawId] ||
+                  liveDetails[rawId.toUpperCase()]
+                )) {
                   clearInterval(checkInterval);
                   window.OFFLINE_CASE_DETAILS = Object.assign({}, window.OFFLINE_CASE_DETAILS || {}, liveDetails);
                   loadCaseDetail();

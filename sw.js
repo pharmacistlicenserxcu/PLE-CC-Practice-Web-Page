@@ -4,10 +4,10 @@
  * ====================================================
  * จัดการ Caching ทรัพยากรระบบเพื่อเพิ่มความเร็วในการโหลด (Preloading) 
  * และสนับสนุนการเข้าใช้งานแบบออฟไลน์ (Offline Mode)
- * Version: ple-cc2-ospe-v1.3.2 (Fast-Timeout Network-First for Navigation)
+ * Version: ple-cc2-ospe-v1.3.3 (Fast-Timeout Network-First for Navigation)
  */
 
-const CACHE_NAME = 'ple-cc2-ospe-v1.3.2';
+const CACHE_NAME = 'ple-cc2-ospe-v1.3.3';
 const ASSETS = [
   './',
   './index.html',
@@ -22,7 +22,7 @@ const ASSETS = [
 
 // 1. Install Event: บันทึก Cache ของทรัพยากรตั้งต้น
 self.addEventListener('install', event => {
-  console.log('[Service Worker] Installing ple-cc2-ospe-v1.3.2...');
+  console.log('[Service Worker] Installing ple-cc2-ospe-v1.3.3...');
   event.waitUntil(
     caches.open(CACHE_NAME).then(cache => {
       return Promise.allSettled(
@@ -41,7 +41,7 @@ self.addEventListener('install', event => {
 
 // 2. Activate Event: ล้าง Cache เก่าที่ไม่ได้ใช้งาน
 self.addEventListener('activate', event => {
-  console.log('[Service Worker] Activating ple-cc2-ospe-v1.3.2 & Cleaning old caches...');
+  console.log('[Service Worker] Activating ple-cc2-ospe-v1.3.3 & Cleaning old caches...');
   event.waitUntil(
     caches.keys().then(cacheNames => {
       return Promise.all(

@@ -6,9 +6,118 @@
   <title>คลังเคสข้อสอบ OSPE | RxCU</title>
   <meta name="description" content="คลังเคสข้อสอบ OSPE ค้นหา ติ๊ก Checklist และอ่านเฉลยตามหมวดหมู่ Clinic, Product, SAP สำหรับนิสิตเภสัชฯ จุฬาฯ">
   <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>💊</text></svg>">
-  <link rel="stylesheet" href="style.css?v=1791019915">
-  
-</head>
+  <link rel="stylesheet" href="style.css?v=v_20261017_143500">
+  <style>
+    /* Critical inline styles to guarantee theme harmony regardless of CDN cache */
+    .btn-mobile-filter-toggle {
+      display: none;
+      align-items: center;
+      justify-content: center;
+      gap: 0.4rem;
+      height: 36px;
+      padding: 0 0.85rem;
+      background: var(--surface, #ffffff);
+      border: 1.5px solid var(--border, #e2e8f0);
+      border-radius: var(--radius-md, 10px);
+      color: var(--text-primary, #0f172a);
+      font-family: var(--font-title, 'Bai Jamjuree', sans-serif);
+      font-size: 0.82rem;
+      font-weight: 700;
+      cursor: pointer;
+      white-space: nowrap;
+      flex-shrink: 0;
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.04);
+      transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+      -webkit-tap-highlight-color: transparent;
+      user-select: none;
+    }
+    .btn-mobile-filter-toggle:active {
+      transform: scale(0.97);
+      background: var(--bg-secondary, #f8fafc);
+    }
+    .btn-mobile-filter-toggle.is-active,
+    .btn-mobile-filter-toggle.drawer-open {
+      background: rgba(14, 165, 233, 0.12) !important;
+      border-color: #0284c7 !important;
+      color: #0284c7 !important;
+    }
+    .btn-close-filter-drawer-mobile {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.45rem;
+      width: 100%;
+      height: 42px;
+      padding: 0 1rem;
+      background: linear-gradient(135deg, #0284c7 0%, #0ea5e9 100%);
+      color: #ffffff;
+      border: none;
+      border-radius: var(--radius-md, 10px);
+      font-family: var(--font-title, 'Bai Jamjuree', sans-serif);
+      font-weight: 700;
+      font-size: 0.88rem;
+      letter-spacing: 0.02em;
+      cursor: pointer;
+      box-shadow: 0 4px 14px rgba(2, 132, 199, 0.3);
+      transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+      -webkit-tap-highlight-color: transparent;
+    }
+    .btn-close-filter-drawer-mobile:active {
+      transform: scale(0.98);
+      box-shadow: 0 2px 6px rgba(2, 132, 199, 0.2);
+      background: #0284c7;
+    }
+    .mobile-filter-badge {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-width: 18px;
+      height: 18px;
+      padding: 0 5px;
+      border-radius: 9999px;
+      background: #0284c7;
+      color: #ffffff;
+      font-size: 0.7rem;
+      font-weight: 800;
+      line-height: 1;
+    }
+    .filter-toggle-chevron {
+      font-size: 0.72rem;
+      transition: transform 0.25s ease;
+      display: inline-block;
+      color: var(--text-muted, #64748b);
+    }
+    .btn-mobile-filter-toggle.drawer-open .filter-toggle-chevron {
+      transform: rotate(180deg);
+      color: #0284c7;
+    }
+    @media (max-width: 900px) {
+      .btn-mobile-filter-toggle {
+        display: inline-flex !important;
+      }
+      .filter-header-bar {
+        display: flex !important;
+        flex-direction: row !important;
+        align-items: center;
+        gap: 0.45rem;
+        width: 100%;
+      }
+      .filter-header-bar .search-input-wrapper {
+        flex: 1;
+        min-width: 0;
+      }
+      .filter-mobile-apply-row {
+        display: block !important;
+      }
+      .filter-console.is-mobile-collapsed .filter-selects {
+        display: none !important;
+      }
+      .filter-console.is-mobile-expanded .filter-selects {
+        display: flex !important;
+        animation: slideDownFilter 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+      }
+    }
+  </style>
 <body>
   <div class="app-shell shell-library" id="appShell">
     <div class="phone-notch"></div>
@@ -135,7 +244,7 @@
 
             <!-- Mobile Apply / Collapse Action Button -->
             <div class="filter-mobile-apply-row">
-              <button type="button" class="btn-close-filter-drawer-mobile" id="btn-apply-filter-mobile" onclick="toggleMobileFilterDrawer(false)">
+              <button type="button" class="btn-close-filter-drawer-mobile" id="btn-apply-filter-mobile" onclick="applyAndCollapseMobileFilters()">
                 ✓ นำไปใช้และย่อแถบตัวกรอง
               </button>
             </div>
@@ -273,7 +382,7 @@
 </div><!-- /.app-shell -->
 
   <script src="case-data-offline.js?v=v_20261017_141308"></script>
-  <script src="app.js?v=v_20261017_141308"></script>
+  <script src="app.js?v=v_20261017_143500"></script>
 
   <script>
     function toggleFullscreen() {

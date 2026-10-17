@@ -3156,6 +3156,7 @@ ol.ordered-list li,
   gap: 0.65rem;
 }
 
+/* ─── Filter Console Header Bar & Mobile Drawer System ─── */
 .filter-header-bar {
   display: flex;
   flex-direction: column;
@@ -3165,10 +3166,121 @@ ol.ordered-list li,
 
 .btn-mobile-filter-toggle {
   display: none !important;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4rem;
+  height: 36px;
+  padding: 0 0.85rem;
+  background: var(--surface, #ffffff);
+  border: 1.5px solid var(--border, #e2e8f0);
+  border-radius: var(--radius-md, 10px);
+  color: var(--text-primary, #0f172a);
+  font-family: var(--font-title, 'Bai Jamjuree', sans-serif);
+  font-size: 0.82rem;
+  font-weight: 700;
+  cursor: pointer;
+  white-space: nowrap;
+  flex-shrink: 0;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.04);
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  -webkit-tap-highlight-color: transparent;
+  user-select: none;
+}
+
+.btn-mobile-filter-toggle:active {
+  transform: scale(0.97);
+  background: var(--bg-secondary, #f8fafc);
+}
+
+.btn-mobile-filter-toggle.is-active,
+.btn-mobile-filter-toggle.drawer-open {
+  background: rgba(14, 165, 233, 0.12) !important;
+  border-color: #0284c7 !important;
+  color: #0284c7 !important;
+}
+
+.filter-toggle-icon {
+  font-size: 0.95rem;
+  line-height: 1;
+}
+
+.mobile-filter-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 18px;
+  height: 18px;
+  padding: 0 5px;
+  border-radius: 9999px;
+  background: #0284c7;
+  color: #ffffff;
+  font-size: 0.7rem;
+  font-weight: 800;
+  line-height: 1;
+  box-shadow: 0 2px 4px rgba(2, 132, 199, 0.35);
+}
+
+.filter-toggle-chevron {
+  font-size: 0.72rem;
+  transition: transform 0.25s ease;
+  display: inline-block;
+  color: var(--text-muted, #64748b);
+}
+
+.btn-mobile-filter-toggle.drawer-open .filter-toggle-chevron {
+  transform: rotate(180deg);
+  color: #0284c7;
+}
+
+[data-theme="dark"] .btn-mobile-filter-toggle,
+body.dark-mode .btn-mobile-filter-toggle {
+  background: var(--surface, #1e293b);
+  border-color: var(--border, #334155);
+  color: var(--text-primary, #f1f5f9);
+}
+
+[data-theme="dark"] .btn-mobile-filter-toggle.is-active,
+[data-theme="dark"] .btn-mobile-filter-toggle.drawer-open,
+body.dark-mode .btn-mobile-filter-toggle.is-active,
+body.dark-mode .btn-mobile-filter-toggle.drawer-open {
+  background: rgba(14, 165, 233, 0.22) !important;
+  border-color: #38bdf8 !important;
+  color: #38bdf8 !important;
 }
 
 .filter-mobile-apply-row {
   display: none !important;
+  margin-top: 0.5rem;
+  padding-top: 0.5rem;
+  border-top: 1px dashed var(--border, #e2e8f0);
+}
+
+.btn-close-filter-drawer-mobile {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.45rem;
+  width: 100%;
+  height: 42px;
+  padding: 0 1rem;
+  background: linear-gradient(135deg, #0284c7 0%, #0ea5e9 100%);
+  color: #ffffff;
+  border: none;
+  border-radius: var(--radius-md, 10px);
+  font-family: var(--font-title, 'Bai Jamjuree', sans-serif);
+  font-weight: 700;
+  font-size: 0.88rem;
+  letter-spacing: 0.02em;
+  cursor: pointer;
+  box-shadow: 0 4px 14px rgba(2, 132, 199, 0.3);
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  -webkit-tap-highlight-color: transparent;
+}
+
+.btn-close-filter-drawer-mobile:active {
+  transform: scale(0.98);
+  box-shadow: 0 2px 6px rgba(2, 132, 199, 0.2);
+  background: #0284c7;
 }
 
 @media (max-width: 900px) {
@@ -3203,52 +3315,6 @@ ol.ordered-list li,
 
   .btn-mobile-filter-toggle {
     display: inline-flex !important;
-    align-items: center;
-    justify-content: center;
-    gap: 0.35rem;
-    background: var(--bg-secondary);
-    border: 1px solid var(--border);
-    border-radius: var(--radius-md);
-    padding: 0 0.65rem;
-    height: 34px;
-    font-size: 0.8rem;
-    font-weight: 600;
-    color: var(--text-primary);
-    cursor: pointer;
-    white-space: nowrap;
-    flex-shrink: 0;
-    transition: background 0.15s ease, border-color 0.15s ease;
-  }
-
-  .btn-mobile-filter-toggle:active {
-    background: var(--surface-hover, #e2e8f0);
-  }
-
-  .btn-mobile-filter-toggle.is-active {
-    background: #e0f2fe;
-    border-color: #38bdf8;
-    color: #0369a1;
-  }
-
-  .mobile-filter-badge {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    min-width: 18px;
-    height: 18px;
-    padding: 0 4px;
-    border-radius: 9px;
-    background: #0284c7;
-    color: #ffffff;
-    font-size: 0.7rem;
-    font-weight: 700;
-    line-height: 1;
-  }
-
-  .filter-toggle-chevron {
-    font-size: 0.75rem;
-    transition: transform 0.2s ease;
-    display: inline-block;
   }
 
   /* Collapsed state on mobile: hide filter-selects drawer */
@@ -3282,30 +3348,6 @@ ol.ordered-list li,
 
   .filter-mobile-apply-row {
     display: block !important;
-    margin-top: 0.4rem;
-    padding-top: 0.4rem;
-  }
-
-  .btn-close-filter-drawer-mobile {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    width: 100%;
-    padding: 0.55rem 1rem;
-    background: #0284c7;
-    color: #ffffff;
-    border: none;
-    border-radius: var(--radius-md);
-    font-family: var(--font-title);
-    font-weight: 600;
-    font-size: 0.85rem;
-    cursor: pointer;
-    box-shadow: 0 2px 6px rgba(2, 132, 199, 0.25);
-    transition: background 0.15s ease;
-  }
-
-  .btn-close-filter-drawer-mobile:active {
-    background: #0369a1;
   }
 }
 

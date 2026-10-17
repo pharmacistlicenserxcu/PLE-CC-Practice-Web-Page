@@ -1671,14 +1671,36 @@ function toggleMobileFilterDrawer(forceState) {
   if (shouldExpand) {
     consoleElem.classList.remove('is-mobile-collapsed');
     consoleElem.classList.add('is-mobile-expanded');
-    if (toggleBtn) toggleBtn.setAttribute('aria-expanded', 'true');
+    if (toggleBtn) {
+      toggleBtn.setAttribute('aria-expanded', 'true');
+      toggleBtn.classList.add('drawer-open');
+    }
   } else {
     consoleElem.classList.remove('is-mobile-expanded');
     consoleElem.classList.add('is-mobile-collapsed');
-    if (toggleBtn) toggleBtn.setAttribute('aria-expanded', 'false');
+    if (toggleBtn) {
+      toggleBtn.setAttribute('aria-expanded', 'false');
+      toggleBtn.classList.remove('drawer-open');
+    }
   }
 }
 window.toggleMobileFilterDrawer = toggleMobileFilterDrawer;
+
+function applyAndCollapseMobileFilters() {
+  if (typeof applyFilters === 'function') applyFilters();
+  if (typeof renderCaseList === 'function') renderCaseList();
+  if (typeof updateActiveFilterCountBadge === 'function') updateActiveFilterCountBadge();
+  toggleMobileFilterDrawer(false);
+
+  // Smooth scroll down to cases on mobile so user sees results immediately
+  const listElem = document.getElementById('case-list-container');
+  if (listElem && window.innerWidth <= 900) {
+    const yOffset = -70;
+    const y = listElem.getBoundingClientRect().top + window.pageYOffset + yOffset;
+    window.scrollTo({ top: Math.max(0, y), behavior: 'smooth' });
+  }
+}
+window.applyAndCollapseMobileFilters = applyAndCollapseMobileFilters;
 
 function updateActiveFilterCountBadge() {
   const badge = document.getElementById('mobile-filter-badge');
@@ -2417,9 +2439,24 @@ function detectCurrentPage() {
     updateActiveFilterCountBadge();
     const btnMobileToggle = document.getElementById('btn-mobile-filter-toggle');
     if (btnMobileToggle) {
-      btnMobileToggle.addEventListener('click', () => {
+      btnMobileToggle.onclick = function(e) {
+        if (e) {
+          e.preventDefault();
+          e.stopPropagation();
+        }
         toggleMobileFilterDrawer();
-      });
+      };
+    }
+
+    const btnApplyMobile = document.getElementById('btn-apply-filter-mobile');
+    if (btnApplyMobile) {
+      btnApplyMobile.onclick = function(e) {
+        if (e) {
+          e.preventDefault();
+          e.stopPropagation();
+        }
+        applyAndCollapseMobileFilters();
+      };
     }
   }
 }

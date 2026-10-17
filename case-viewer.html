@@ -1140,9 +1140,9 @@
   </div><!-- /.page-viewport -->
 </div><!-- /.app-shell -->
 
-  <script src="case-data-offline.js?v=v_20261017_224834"></script>
-  <script src="case-details-offline.js?v=v_20261017_224834"></script>
-  <script src="app.js?v=v_20261017_224834"></script>
+  <script src="case-data-offline.js?v=v_20261018_005115"></script>
+  <script src="case-details-offline.js?v=v_20261018_005115"></script>
+  <script src="app.js?v=v_20261018_005115"></script>
   <script src="scratchpad.js?v=20261004_234400"></script>
   <script src="station-chat.js?v=20261004_234400"></script>
 
@@ -1945,6 +1945,15 @@
           el.className = `checklist-item ${isChecked ? 'checked' : ''} ${isSubset ? ('is-subset is-' + subType) : ''}`;
           el.setAttribute('data-id', item.id);
           el.setAttribute('data-score', item.score);
+          const rawItemText = item.text || '';
+          let parsedTagMatch = item.tag || '';
+          if (!parsedTagMatch) {
+            const m = rawItemText.match(/(?:^|[(\[\s]|ข้อ\s*)(\d+(?:\.\d+)+)(?=[)\]:\s]|$)/i) || rawItemText.match(/^(?:ข้อ\s*)?(\d+(?:\.\d+)*)/i);
+            if (m) parsedTagMatch = m[1];
+          }
+          if (parsedTagMatch) {
+            el.setAttribute('data-tag', String(parsedTagMatch).trim());
+          }
           el.setAttribute('tabindex', '0');
           el.setAttribute('role', 'checkbox');
           el.setAttribute('aria-checked', isChecked ? 'true' : 'false');

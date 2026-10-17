@@ -2672,7 +2672,7 @@ if ('serviceWorker' in navigator && window.location.protocol !== 'file:') {
 const DB_NAME = 'RxCU_OSPE_DB';
 const DB_VERSION = 1;
 const STORE_NAME = 'case_details';
-const DB_VERSION_STR = 'v_20261017_224834'; // อัปเดตเวอร์ชันนี้เพื่อบังคับโหลดใหม่เมื่อมีเคสเพิ่มเติมในสคริปต์ออฟไลน์
+const DB_VERSION_STR = 'v_20261018_005115'; // อัปเดตเวอร์ชันนี้เพื่อบังคับโหลดใหม่เมื่อมีเคสเพิ่มเติมในสคริปต์ออฟไลน์
 
 function openIndexedDB() {
   return new Promise((resolve, reject) => {
@@ -4292,6 +4292,34 @@ function autoCheckLinkedChecklistItem(tag, shouldCheck = true) {
       }
     }
   });
+
+  // Also if in exam simulation with hidden checklist: sync SimState.studentScores in real time
+  if (typeof SimState !== 'undefined' && SimState.currentStationIndex != null && SimState.stations) {
+    const st = SimState.stations[SimState.currentStationIndex];
+    if (st && st.case && Array.isArray(st.case.checklist)) {
+      const sNum = st.stationNumber;
+      if (!SimState.studentScores) SimState.studentScores = {};
+      if (!SimState.studentScores[sNum]) SimState.studentScores[sNum] = [];
+      const checkedArr = SimState.studentScores[sNum];
+
+      const matched = st.case.checklist.find(it => {
+        const itTag = (it.tag || '').replace(/^ข้อ\s*/, '').trim();
+        if (itTag && (itTag === numOnly || itTag === tag)) return true;
+        return boundaryRegex.test((it.text || '').trim());
+      });
+
+      if (matched) {
+        const idx = checkedArr.indexOf(matched.id);
+        if (shouldCheck && idx === -1) {
+          checkedArr.push(matched.id);
+          if (typeof updateExamProgressUI === 'function') updateExamProgressUI(sNum, st.case);
+        } else if (!shouldCheck && idx > -1) {
+          checkedArr.splice(idx, 1);
+          if (typeof updateExamProgressUI === 'function') updateExamProgressUI(sNum, st.case);
+        }
+      }
+    }
+  }
 }
 
 function checkAllInteractiveBlanks() {

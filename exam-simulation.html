@@ -7,9 +7,9 @@
   <meta name="description" content="ระบบจำลองสอบ OSPE 16 สถานีเสมือนจริง พร้อมจับเวลา 4 นาที ติ๊ก Checklist และคำนวณผลคะแนน Leaderboard">
   <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>💊</text></svg>">
   <link rel="stylesheet" href="style.css?v=1791019915">
-  <script src="case-data-offline.js?v=v_20261017_224834"></script>
-  <script src="case-details-offline.js?v=v_20261017_224834"></script>
-  <script src="app.js?v=v_20261017_224834"></script>
+  <script src="case-data-offline.js?v=v_20261018_005115"></script>
+  <script src="case-details-offline.js?v=v_20261018_005115"></script>
+  <script src="app.js?v=v_20261018_005115"></script>
   <script src="scratchpad.js?v=20261004_201700"></script>
   <style>
     /* Simulation Source and Topic Selector */
@@ -8915,6 +8915,90 @@
       return { currentScore, totalScore };
     }
 
+    function syncStationWrittenAnswersToChecklist(stationNumber, c, writtenAnswers) {
+      if (!c || !stationNumber) return;
+      const checklist = Array.isArray(c.checklist) ? c.checklist : [];
+      if (checklist.length === 0) return;
+
+      let rawScenarioContent = '';
+      if (c.scenario && c.scenario.includes('[BLANK:')) {
+        rawScenarioContent = c.scenario;
+      } else if (c.scenarioHtml && c.scenarioHtml.includes('[BLANK:')) {
+        rawScenarioContent = c.scenarioHtml;
+      } else if (c.contentHtml && c.contentHtml.includes('[BLANK:')) {
+        rawScenarioContent = c.contentHtml;
+      } else {
+        rawScenarioContent = c.scenario || c.scenarioHtml || c.contentHtml || '';
+      }
+      if (!rawScenarioContent.includes('[BLANK:')) return;
+
+      if (!SimState.studentScores) SimState.studentScores = {};
+      if (!SimState.studentScores[stationNumber]) SimState.studentScores[stationNumber] = [];
+      const checkedList = SimState.studentScores[stationNumber];
+      const answersMap = writtenAnswers || (SimState.writtenAnswers && SimState.writtenAnswers[stationNumber]) || {};
+
+      const blankRegex = /\[BLANK:\s*([^|\]]+)(?:\s*\|\s*([^|\]]+))?(?:\s*\|\s*([^|\]]+))?(?:\s*\|\s*([^\]]+))?\]/gi;
+      let bMatch;
+      let bCount = 0;
+      const seenTags = new Set();
+
+      while ((bMatch = blankRegex.exec(rawScenarioContent)) !== null) {
+        bCount++;
+        const cleanAnswersRaw = (bMatch[1] || '').replace(/<[^>]+>/g, '').replace(/&nbsp;/g, ' ').trim();
+        const answers = cleanAnswersRaw.split(/[,/]/).map(a => a.trim()).filter(Boolean);
+        const rawParts = [bMatch[2], bMatch[3], bMatch[4]].filter(Boolean);
+        let tag = '';
+        rawParts.forEach(p => {
+          const t = p.trim().replace(/<[^>]+>/g, '');
+          if (!/^\d+(\.\d+)?$/.test(t) && !/^len:/i.test(t)) {
+            tag = t.replace(/^#/, '').trim();
+          }
+        });
+        if (!tag) tag = `ข้อ ${bCount}`;
+        const cleanDisplayTag = tag.startsWith('ข้อ') ? tag : `ข้อ ${tag}`;
+        const cleanDataTag = tag.replace(/^ข้อ\s*/, '').trim();
+
+        if (seenTags.has(cleanDataTag)) continue;
+        seenTags.add(cleanDataTag);
+
+        const userVal = String(
+          (answersMap[cleanDataTag] != null ? answersMap[cleanDataTag] :
+           answersMap[cleanDisplayTag] != null ? answersMap[cleanDisplayTag] :
+           answersMap[tag] != null ? answersMap[tag] :
+           answersMap['ข้อ ' + cleanDataTag] != null ? answersMap['ข้อ ' + cleanDataTag] :
+           answersMap['#' + cleanDataTag] != null ? answersMap['#' + cleanDataTag] :
+           answersMap[bCount - 1] != null ? answersMap[bCount - 1] :
+           '')
+        ).trim();
+
+        const normUserVal = (typeof normalizeAnswerText === 'function') ? normalizeAnswerText(userVal) : userVal.toLowerCase().trim();
+        let isMatch = false;
+        if (normUserVal) {
+          isMatch = answers.some(ans => {
+            const nAns = (typeof normalizeAnswerText === 'function') ? normalizeAnswerText(ans) : ans.toLowerCase().trim();
+            return normUserVal === nAns;
+          });
+        }
+
+        const escapedNum = cleanDataTag.replace(/([.\\+*?^$[\](){}|])/g, '\\$1');
+        const bRegex = new RegExp('(?:^|[\\s(\\[]|ข้อ\\s*)' + escapedNum + '(?=[:\\s)\\]]|(?:\\.(?!\\d))|$)', 'i');
+
+        const matchedItem = checklist.find(it => {
+          const itTag = (it.tag || '').replace(/^ข้อ\s*/, '').trim();
+          if (itTag && (itTag === cleanDataTag || itTag === tag)) return true;
+          const itText = it.text || '';
+          return bRegex.test(itText.trim());
+        });
+
+        if (matchedItem) {
+          const idxInChecked = checkedList.indexOf(matchedItem.id);
+          if (isMatch) {
+            if (idxInChecked === -1) checkedList.push(matchedItem.id);
+          }
+        }
+      }
+    }
+
     function renderExamChecklist(stationNum, c) {
       const chkContainer = document.getElementById('exam-checklist-container');
       chkContainer.innerHTML = '';
@@ -13458,8 +13542,15 @@ ${caseContext || '(ยังไม่มีข้อมูลเคส)'}
         stationsList.forEach(st => {
           try {
             const c = st.case || {};
-            const checked = (SimState.studentScores && (SimState.studentScores[st.stationNumber] || SimState.studentScores[String(st.stationNumber)])) || [];
             const checklist = Array.isArray(c.checklist) ? c.checklist : [];
+            const stationWrittenAnswers = (SimState.writtenAnswers && SimState.writtenAnswers[st.stationNumber]) || {};
+
+            // Proactively sync interactive blanks answers to checklist items before score calculation
+            if (typeof syncStationWrittenAnswersToChecklist === 'function') {
+              syncStationWrittenAnswersToChecklist(st.stationNumber, c, stationWrittenAnswers);
+            }
+
+            const checked = (SimState.studentScores && (SimState.studentScores[st.stationNumber] || SimState.studentScores[String(st.stationNumber)])) || [];
             const { currentScore: earned, totalScore: max } = (typeof calculateStationScore === 'function')
               ? calculateStationScore(checklist, checked)
               : { currentScore: 0, totalScore: checklist.length };
@@ -13485,10 +13576,19 @@ ${caseContext || '(ยังไม่มีข้อมูลเคส)'}
               const titleText = escapeHtml(c.title || ('สถานี ' + st.stationNumber));
               const caseIdText = c.caseId ? escapeHtml(c.caseId) : '';
               const catText = c.category || (isRest ? 'REST' : 'CLINIC');
+              
               // Check if station has blanks and answers
-              const rawScenarioContent = (c.scenario || '') + ' ' + (c.contentHtml || '') + ' ' + (c.scenarioHtml || '');
+              let rawScenarioContent = '';
+              if (c.scenario && c.scenario.includes('[BLANK:')) {
+                rawScenarioContent = c.scenario;
+              } else if (c.scenarioHtml && c.scenarioHtml.includes('[BLANK:')) {
+                rawScenarioContent = c.scenarioHtml;
+              } else if (c.contentHtml && c.contentHtml.includes('[BLANK:')) {
+                rawScenarioContent = c.contentHtml;
+              } else {
+                rawScenarioContent = c.scenario || c.scenarioHtml || c.contentHtml || '';
+              }
               const hasBlanks = rawScenarioContent.includes('[BLANK:');
-              const stationWrittenAnswers = (SimState.writtenAnswers && SimState.writtenAnswers[st.stationNumber]) || {};
 
               let blanksReviewHtml = '';
               if (hasBlanks) {
@@ -13499,7 +13599,8 @@ ${caseContext || '(ยังไม่มีข้อมูลเคส)'}
                 const seenTags = new Set();
                 while ((bMatch = blankRegex.exec(rawScenarioContent)) !== null) {
                   bCount++;
-                  const answers = (bMatch[1] || '').split(/[,/]/).map(a => a.trim()).filter(Boolean);
+                  const cleanAnswersRaw = (bMatch[1] || '').replace(/<[^>]+>/g, '').replace(/&nbsp;/g, ' ').trim();
+                  const answers = cleanAnswersRaw.split(/[,/]/).map(a => a.trim()).filter(Boolean);
                   const rawParts = [bMatch[2], bMatch[3], bMatch[4]].filter(Boolean);
                   let score = 1.0;
                   let tag = '';
@@ -14171,6 +14272,9 @@ ${caseContext || '(ยังไม่มีข้อมูลเคส)'}
 
       const stationData = stationsList.map((st) => {
         const c = st.case || {};
+        if (typeof syncStationWrittenAnswersToChecklist === 'function') {
+          syncStationWrittenAnswersToChecklist(st.stationNumber, c, SimState.writtenAnswers && SimState.writtenAnswers[st.stationNumber]);
+        }
         const checked = SimState.studentScores[st.stationNumber] || SimState.studentScores[String(st.stationNumber)] || [];
         const checklist = Array.isArray(c.checklist) ? c.checklist : [];
         const { currentScore: earned, totalScore: max } = calculateStationScore(checklist, checked);
@@ -14435,7 +14539,16 @@ ${caseContext || '(ยังไม่มีข้อมูลเคส)'}
 
           // Check blanks for this station
           const c = s.caseObj;
-          const rawScenarioContent = (c.scenario || '') + ' ' + (c.contentHtml || '') + ' ' + (c.scenarioHtml || '');
+          let rawScenarioContent = '';
+          if (c.scenario && c.scenario.includes('[BLANK:')) {
+            rawScenarioContent = c.scenario;
+          } else if (c.scenarioHtml && c.scenarioHtml.includes('[BLANK:')) {
+            rawScenarioContent = c.scenarioHtml;
+          } else if (c.contentHtml && c.contentHtml.includes('[BLANK:')) {
+            rawScenarioContent = c.contentHtml;
+          } else {
+            rawScenarioContent = c.scenario || c.scenarioHtml || c.contentHtml || '';
+          }
           const hasBlanks = rawScenarioContent.includes('[BLANK:');
           const stationWrittenAnswers = (SimState.writtenAnswers && SimState.writtenAnswers[s.stationNumber]) || {};
           let blanksReportHtml = '';
@@ -14445,14 +14558,16 @@ ${caseContext || '(ยังไม่มีข้อมูลเคส)'}
             let m;
             let bIdx = 0;
             let blanksRows = '';
+            const seenPrintTags = new Set();
             while ((m = blankRegex.exec(rawScenarioContent)) !== null) {
               bIdx++;
-              const answers = (m[1] || '').split(/[,/]/).map(a => a.trim()).filter(Boolean);
+              const cleanAnswersRaw = (m[1] || '').replace(/<[^>]+>/g, '').replace(/&nbsp;/g, ' ').trim();
+              const answers = cleanAnswersRaw.split(/[,/]/).map(a => a.trim()).filter(Boolean);
               const rawParts = [m[2], m[3], m[4]].filter(Boolean);
               let score = 1.0;
               let tag = '';
               rawParts.forEach(p => {
-                const t = p.trim();
+                const t = p.trim().replace(/<[^>]+>/g, '');
                 if (/^\d+(\.\d+)?$/.test(t)) score = parseFloat(t);
                 else if (!/^len:/i.test(t)) tag = t.replace(/^#/, '').trim();
               });
@@ -14460,18 +14575,38 @@ ${caseContext || '(ยังไม่มีข้อมูลเคส)'}
               const cleanDisplayTag = tag.startsWith('ข้อ') ? tag : `ข้อ ${tag}`;
               const cleanDataTag = tag.replace(/^ข้อ\s*/, '').trim();
 
+              if (seenPrintTags.has(cleanDataTag)) continue;
+              seenPrintTags.add(cleanDataTag);
+
               const userAns = (
                 stationWrittenAnswers[cleanDataTag] != null ? stationWrittenAnswers[cleanDataTag] :
                 stationWrittenAnswers[cleanDisplayTag] != null ? stationWrittenAnswers[cleanDisplayTag] :
                 stationWrittenAnswers[tag] != null ? stationWrittenAnswers[tag] :
+                stationWrittenAnswers['ข้อ ' + cleanDataTag] != null ? stationWrittenAnswers['ข้อ ' + cleanDataTag] :
                 stationWrittenAnswers['#' + cleanDataTag] != null ? stationWrittenAnswers['#' + cleanDataTag] :
                 stationWrittenAnswers[bIdx] != null ? stationWrittenAnswers[bIdx] :
                 ''
               ).toString().trim();
 
+              const normVal = (typeof normalizeAnswerText === 'function') ? normalizeAnswerText(userAns) : userAns.toLowerCase().trim();
+              let isMatch = false;
+              if (normVal) {
+                isMatch = answers.some(ans => {
+                  const nAns = (typeof normalizeAnswerText === 'function') ? normalizeAnswerText(ans) : ans.toLowerCase().trim();
+                  return normVal === nAns;
+                });
+              }
+
+              const statusBadge = userAns
+                ? (isMatch
+                    ? `<span style="color: #15803d; font-weight: 700; background: #dcfce7; border: 1px solid #86efac; border-radius: 3px; padding: 1px 5px; font-size: 7pt; margin-left: 6px;">✓ ถูกต้อง (+${score})</span>`
+                    : `<span style="color: #b91c1c; font-weight: 700; background: #fee2e2; border: 1px solid #fca5a5; border-radius: 3px; padding: 1px 5px; font-size: 7pt; margin-left: 6px;">❌ ยังไม่ถูก</span>`)
+                : `<span style="color: #64748b; font-weight: 600; background: #f1f5f9; border: 1px solid #cbd5e1; border-radius: 3px; padding: 1px 5px; font-size: 7pt; margin-left: 6px;">(ไม่ได้ตอบ)</span>`;
+
+              const rowCount = seenPrintTags.size;
               blanksRows += `
-                <div style="display: flex; justify-content: space-between; font-size: 8pt; padding: 3px 6px; border-bottom: 1px dotted #e2e8f0;">
-                  <span><strong>ช่องที่ ${bIdx} (${escapeHtml(cleanDisplayTag)}):</strong> ${escapeHtml(userAns || '(ไม่ได้ตอบ)')}</span>
+                <div style="display: flex; justify-content: space-between; align-items: center; font-size: 8pt; padding: 3px 6px; border-bottom: 1px dotted #e2e8f0;">
+                  <span><strong>ช่องที่ ${rowCount} (${escapeHtml(cleanDisplayTag)}):</strong> ${escapeHtml(userAns || '(ไม่ได้ตอบ)')} ${statusBadge}</span>
                   <span style="color: #1e3a8a;"><strong>เฉลย:</strong> ${escapeHtml(answers.join(' / '))} (${score} คะแนน)</span>
                 </div>
               `;

@@ -7,9 +7,9 @@
   <meta name="description" content="ระบบจำลองสอบ OSPE 16 สถานีเสมือนจริง พร้อมจับเวลา 4 นาที ติ๊ก Checklist และคำนวณผลคะแนน Leaderboard">
   <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>💊</text></svg>">
   <link rel="stylesheet" href="style.css?v=1791019915">
-  <script src="case-data-offline.js?v=v_20261017_221946"></script>
-  <script src="case-details-offline.js?v=v_20261017_221946"></script>
-  <script src="app.js?v=v_20261017_221946"></script>
+  <script src="case-data-offline.js?v=v_20261017_224834"></script>
+  <script src="case-details-offline.js?v=v_20261017_224834"></script>
+  <script src="app.js?v=v_20261017_224834"></script>
   <script src="scratchpad.js?v=20261004_201700"></script>
   <style>
     /* Simulation Source and Topic Selector */
@@ -8980,11 +8980,13 @@
           el.setAttribute('data-id', item.id);
           el.setAttribute('data-score', item.score);
           const rawItemText = item.text || '';
-          const parsedTagMatch = item.tag || (rawItemText.match(/^(?:ข้อ\s*)?(\d+(?:\.\d+)*)/i) ? rawItemText.match(/^(?:ข้อ\s*)?(\d+(?:\.\d+)*)/i)[1] : '');
+          let parsedTagMatch = item.tag || '';
+          if (!parsedTagMatch) {
+            const m = rawItemText.match(/(?:^|[(\[\s]|ข้อ\s*)(\d+(?:\.\d+)+)(?=[)\]:\s]|$)/i) || rawItemText.match(/^(?:ข้อ\s*)?(\d+(?:\.\d+)*)/i);
+            if (m) parsedTagMatch = m[1];
+          }
           if (parsedTagMatch) {
             el.setAttribute('data-tag', String(parsedTagMatch).trim());
-          } else if (item.tag) {
-            el.setAttribute('data-tag', String(item.tag).trim());
           }
           el.setAttribute('tabindex', '0');
           el.setAttribute('role', 'checkbox');
@@ -9927,10 +9929,34 @@
         clearTimeout(_examineeBlankDebounceTimer);
         _examineeBlankDebounceTimer = null;
       }
+      try {
+        const container = document.getElementById('exam-scenario-content');
+        if (container && SimState.stations && typeof SimState.currentIdx === 'number') {
+          const st = SimState.stations[SimState.currentIdx];
+          if (st && st.stationNumber) {
+            if (!SimState.writtenAnswers) SimState.writtenAnswers = {};
+            if (!SimState.writtenAnswers[st.stationNumber]) SimState.writtenAnswers[st.stationNumber] = {};
+            const wrappers = container.querySelectorAll('.interactive-blank-wrapper');
+            wrappers.forEach(w => {
+              const t = (w.getAttribute('data-tag') || '').trim();
+              const inp = w.querySelector('.interactive-blank-input');
+              if (t && inp) {
+                const val = inp.value;
+                const cleanTag = t.replace(/^ข้อ\s*/, '').trim();
+                SimState.writtenAnswers[st.stationNumber][cleanTag] = val;
+                SimState.writtenAnswers[st.stationNumber][t] = val;
+                SimState.writtenAnswers[st.stationNumber]['ข้อ ' + cleanTag] = val;
+              }
+            });
+          }
+        }
+      } catch (err) {
+        console.warn('flushPendingExamineeBlanks harvest error:', err);
+      }
       if (typeof _pendingExamineeFlushFn === 'function') {
         const fn = _pendingExamineeFlushFn;
         _pendingExamineeFlushFn = null;
-        fn();
+        try { fn(); } catch (e) {}
       }
     }
     window.flushPendingExamineeBlanks = flushPendingExamineeBlanks;
@@ -10027,7 +10053,13 @@
         wrappers.forEach(w => {
           const t = w.getAttribute('data-tag') || 'ans';
           const inp = w.querySelector('.interactive-blank-input');
-          if (inp) payload[t] = inp.value;
+          if (inp) {
+            const val = inp.value;
+            const cleanTag = t.replace(/^ข้อ\s*/, '').trim();
+            payload[t] = val;
+            payload[cleanTag] = val;
+            payload['ข้อ ' + cleanTag] = val;
+          }
         });
 
         SimState.writtenAnswers[stationNum] = payload;
@@ -13487,7 +13519,14 @@ ${caseContext || '(ยังไม่มีข้อมูลเคส)'}
 
                 if (blankEntries.length > 0) {
                   const blankCards = blankEntries.map((b, bIdx) => {
-                    const userVal = (stationWrittenAnswers[b.tag] || '').trim();
+                    const userVal = String(
+                      (stationWrittenAnswers[b.tag] != null ? stationWrittenAnswers[b.tag] :
+                       stationWrittenAnswers[b.displayTag] != null ? stationWrittenAnswers[b.displayTag] :
+                       stationWrittenAnswers['ข้อ ' + b.tag] != null ? stationWrittenAnswers['ข้อ ' + b.tag] :
+                       stationWrittenAnswers['#' + b.tag] != null ? stationWrittenAnswers['#' + b.tag] :
+                       stationWrittenAnswers[bIdx] != null ? stationWrittenAnswers[bIdx] :
+                       '')
+                    ).trim();
                     const normVal = (typeof normalizeAnswerText === 'function') ? normalizeAnswerText(userVal) : userVal.toLowerCase().trim();
                     let isMatch = false;
                     if (normVal) {

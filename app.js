@@ -2672,7 +2672,7 @@ if ('serviceWorker' in navigator && window.location.protocol !== 'file:') {
 const DB_NAME = 'RxCU_OSPE_DB';
 const DB_VERSION = 1;
 const STORE_NAME = 'case_details';
-const DB_VERSION_STR = 'v_20261017_221946'; // อัปเดตเวอร์ชันนี้เพื่อบังคับโหลดใหม่เมื่อมีเคสเพิ่มเติมในสคริปต์ออฟไลน์
+const DB_VERSION_STR = 'v_20261017_224834'; // อัปเดตเวอร์ชันนี้เพื่อบังคับโหลดใหม่เมื่อมีเคสเพิ่มเติมในสคริปต์ออฟไลน์
 
 function openIndexedDB() {
   return new Promise((resolve, reject) => {
@@ -4124,8 +4124,11 @@ function decodeFirebaseKey(k) {
 
 function normalizeAnswerText(str) {
   if (!str) return '';
-  return str.toLowerCase()
-    .replace(/[\s\-_.,/()]/g, '') // remove spaces, dashes, dots, punctuation
+  return str
+    .replace(/[\u200B-\u200D\uFEFF]/g, '')
+    .replace(/[\u0E3A\u0E47-\u0E4E]/g, '')
+    .toLowerCase()
+    .replace(/[\s\-_.,/()\[\]]/g, '')
     .trim();
 }
 

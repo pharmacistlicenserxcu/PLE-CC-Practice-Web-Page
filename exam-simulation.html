@@ -7,9 +7,9 @@
   <meta name="description" content="ระบบจำลองสอบ OSPE 16 สถานีเสมือนจริง พร้อมจับเวลา 4 นาที ติ๊ก Checklist และคำนวณผลคะแนน Leaderboard">
   <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>💊</text></svg>">
   <link rel="stylesheet" href="style.css?v=1791019915">
-  <script src="case-data-offline.js?v=v_20261016_122255"></script>
-  <script src="case-details-offline.js?v=v_20261016_122255"></script>
-  <script src="app.js?v=v_20261016_122255"></script>
+  <script src="case-data-offline.js?v=v_20261017_141308"></script>
+  <script src="case-details-offline.js?v=v_20261017_141308"></script>
+  <script src="app.js?v=v_20261017_141308"></script>
   <script src="scratchpad.js?v=20261004_201700"></script>
   <style>
     /* Simulation Source and Topic Selector */
@@ -2888,7 +2888,8 @@
         <label style="display:block; font-size:0.86rem; font-weight:700; margin-bottom:0.4rem; color:var(--text-primary);">
           ชื่อ-นามสกุล / รหัสนิสิต (สำหรับพิมพ์บนหัวรายงาน):
         </label>
-        <input type="text" id="ospe-print-student-name" class="form-input" style="width:100%; padding:0.6rem 0.85rem; border-radius:var(--radius-md); border:1px solid var(--border); background:var(--bg); color:var(--text-primary); font-size:0.92rem;" placeholder="ระบุชื่อนิสิต หรือปล่อยว่าง">
+        <input type="text" id="ospe-print-student-name" list="ospe-print-candidates-list" class="form-input" style="width:100%; padding:0.6rem 0.85rem; border-radius:var(--radius-md); border:1px solid var(--border); background:var(--bg); color:var(--text-primary); font-size:0.92rem;" placeholder="ระบุชื่อนิสิต หรือเลือกจากรายชื่อห้องสอบ">
+        <datalist id="ospe-print-candidates-list"></datalist>
       </div>
 
       <div style="margin-bottom:1.5rem;">
@@ -4635,7 +4636,8 @@
           return;
         }
         // 7. Scratchpad
-        if (window.Scratchpad && typeof window.Scratchpad.isOpen === 'function' && window.Scratchpad.isOpen()) {
+        const isScratchpadOpen = Boolean(window.Scratchpad && (typeof window.Scratchpad.isOpen === 'function' ? window.Scratchpad.isOpen() : window.Scratchpad.isOpen));
+        if (isScratchpadOpen && typeof window.Scratchpad.close === 'function') {
           window.Scratchpad.close();
           return;
         }
@@ -7619,6 +7621,15 @@
         }
         
         updateTimerDisplay();
+
+        if (SimState.timerValue === 60) {
+          const roomRef = SimState.cachedRoom;
+          const warnKey = `${SimState.currentIdx}_${(roomRef && roomRef.timerStartedAt) || 'lobby'}`;
+          if (SimState._warnedForStationKey !== warnKey) {
+            SimState._warnedForStationKey = warnKey;
+            if (typeof play1MinuteWarningSound === 'function') play1MinuteWarningSound();
+          }
+        }
         
         if (SimState.timerValue <= 0) {
           SimState.timerRunning = false;
@@ -8079,6 +8090,15 @@
         if (!SimState.timerRunning) return;
         SimState.timerValue--;
         updateTimerDisplay();
+
+        if (SimState.timerValue === 60) {
+          const warnKey = `solo_${SimState.currentIdx}`;
+          if (SimState._warnedForStationKey !== warnKey) {
+            SimState._warnedForStationKey = warnKey;
+            if (typeof play1MinuteWarningSound === 'function') play1MinuteWarningSound();
+          }
+        }
+
         if (SimState.timerValue <= 0) {
           SimState.timerRunning = false;
           clearInterval(SimState.timerInterval);
@@ -8468,7 +8488,8 @@
       
       document.getElementById('exam-station-badge').textContent = `STATION ${st.stationNumber}`;
       
-      if (SimState.role === 'examinee') {
+      const isCandidateUser = (SimState.role === 'examinee' || SimState.role === 'participant' || SimState.role === 'candidate');
+      if (isCandidateUser) {
         document.getElementById('exam-case-title').textContent = st.isRest ? 'สถานีพัก' : 'สถานีที่ ' + st.stationNumber;
         document.getElementById('exam-case-id').style.display = 'none';
       } else {
@@ -9374,6 +9395,13 @@
           fill.style.width = `${pct}%`;
           fill.classList.toggle('pass', pct >= 80);
         }
+      } else {
+        document.getElementById('exam-pct').textContent = '-';
+        const fill = document.getElementById('exam-bar-fill');
+        if (fill) {
+          fill.style.width = '0%';
+          fill.classList.remove('pass');
+        }
       }
     }
 
@@ -9439,29 +9467,35 @@
       if (SimState.timerInterval) clearInterval(SimState.timerInterval);
       updateTimerDisplay();
 
-      if (SimState.isLobby && (SimState.isHost || SimState.role === 'examiner')) {
-        if (SimState.cachedRoom) {
-          SimState.cachedRoom.currentStationIdx = targetIdx;
-          SimState.cachedRoom.timerValue = nextDur;
-          SimState.cachedRoom.timerDuration = nextDur;
-          SimState.cachedRoom.timerStartedAt = now;
-          SimState.cachedRoom.timerRunning = true;
-        }
-        startLocalCountdown();
+      SimState._warnedForStationKey = null;
+      if (SimState.isLobby) {
+        if (SimState.isHost || SimState.role === 'examiner') {
+          if (SimState.cachedRoom) {
+            SimState.cachedRoom.currentStationIdx = targetIdx;
+            SimState.cachedRoom.timerValue = nextDur;
+            SimState.cachedRoom.timerDuration = nextDur;
+            SimState.cachedRoom.timerStartedAt = now;
+            SimState.cachedRoom.timerRunning = true;
+          }
+          startLocalCountdown();
 
-        const updatePayload = {
-          currentStationIdx: targetIdx,
-          caseId: SimState.stations[targetIdx]?.case?.caseId || SimState.stations[targetIdx]?.caseId,
-          timerValue: nextDur,
-          timerDuration: nextDur,
-          timerStartedAt: now,
-          timerRunning: true,
-          status: 'running'
-        };
-        if (!SimState.cachedRoom?.isSuperHost && (SimState.examMode === 'standard' || !SimState.examMode) && SimState.role === 'examiner') {
-          updatePayload.scoresByStation = JSON.stringify(SimState.studentScores);
+          const updatePayload = {
+            currentStationIdx: targetIdx,
+            caseId: SimState.stations[targetIdx]?.case?.caseId || SimState.stations[targetIdx]?.caseId,
+            timerValue: nextDur,
+            timerDuration: nextDur,
+            timerStartedAt: now,
+            timerRunning: true,
+            status: 'running'
+          };
+          if (!SimState.cachedRoom?.isSuperHost && (SimState.examMode === 'standard' || !SimState.examMode) && SimState.role === 'examiner') {
+            updatePayload.scoresByStation = JSON.stringify(SimState.studentScores);
+          }
+          _fbDb.ref('rooms/' + SimState.roomId).update(updatePayload);
         }
-        _fbDb.ref('rooms/' + SimState.roomId).update(updatePayload);
+      } else {
+        // Solo practice: restart local timer
+        startTimer();
       }
 
       renderStation(targetIdx);
@@ -11080,7 +11114,7 @@
           for (let attempt = 0; attempt < maxAttempts; attempt++) {
             const currentEntry = this._geminiKeyPool[this._currentKeyIdx];
             const API_KEY = localStorage.getItem('_gemini_api_key') || currentEntry.key;
-            const ENDPOINT = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3.5-flash-lite:generateContent?key=${API_KEY}`;
+            const ENDPOINT = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${API_KEY}`;
 
             try {
               const controller = new AbortController();
@@ -11097,7 +11131,7 @@
                 ],
                 generationConfig: {
                   temperature: 0.1,
-                  maxOutputTokens: 120
+                  maxOutputTokens: 250
                 }
               };
 
@@ -11111,7 +11145,7 @@
 
               if (!res.ok) {
                 const errBody = await res.text().catch(() => '');
-                if (res.status === 429 || errBody.includes('RESOURCE_EXHAUSTED')) {
+                if (res.status === 404 || res.status === 429 || res.status >= 500 || errBody.includes('RESOURCE_EXHAUSTED')) {
                   this._currentKeyIdx = (this._currentKeyIdx + 1) % this._geminiKeyPool.length;
                   continue;
                 }
@@ -11489,7 +11523,7 @@ ${caseContext || '(ยังไม่มีข้อมูลเคส)'}
         for (let attempt = 0; attempt < maxAttempts; attempt++) {
           const currentEntry = this._geminiKeyPool[this._currentKeyIdx];
           const API_KEY = localStorage.getItem('_gemini_api_key') || currentEntry.key;
-          const ENDPOINT = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3.5-flash-lite:generateContent?key=${API_KEY}`;
+          const ENDPOINT = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${API_KEY}`;
 
           try {
             const controller = new AbortController();
@@ -11506,7 +11540,7 @@ ${caseContext || '(ยังไม่มีข้อมูลเคส)'}
               ],
               generationConfig: {
                 temperature: isGuruRole ? 0.3 : 0.7,
-                maxOutputTokens: 400
+                maxOutputTokens: 1000
               }
             };
 
@@ -11521,7 +11555,7 @@ ${caseContext || '(ยังไม่มีข้อมูลเคส)'}
             if (!res.ok) {
               const errBody = await res.text().catch(() => '');
               console.warn(`Gemini API key [${this._currentKeyIdx} - ${currentEntry.email}] failed:`, res.status, errBody);
-              if (res.status === 429 || errBody.includes('RESOURCE_EXHAUSTED')) {
+              if (res.status === 404 || res.status === 429 || res.status >= 500 || errBody.includes('RESOURCE_EXHAUSTED')) {
                 // Advance key in pool and try next key
                 this._currentKeyIdx = (this._currentKeyIdx + 1) % this._geminiKeyPool.length;
                 lastError = new Error('QUOTA_EXHAUSTED');
@@ -12742,7 +12776,7 @@ ${caseContext || '(ยังไม่มีข้อมูลเคส)'}
               sumStationPct += pct;
               activeStationCount++;
             }
-            if (isRest || pct >= 80) passedStations++;
+            if (!isRest && pct >= 80) passedStations++;
           });
 
           const pObj = Object.values(room.players || {}).find(p => p.id === partId || p.name === partName);
@@ -12762,7 +12796,7 @@ ${caseContext || '(ยังไม่มีข้อมูลเคส)'}
             max: safeFormatScore(totalMax),
             percent: overallPct,
             passedStations: passedStations,
-            totalStations: stationsList.length,
+            totalStations: (activeStationCount > 0 ? activeStationCount : stationsList.length),
             isPassed: isAllPassed
           });
         });
@@ -12835,7 +12869,7 @@ ${caseContext || '(ยังไม่มีข้อมูลเคส)'}
               sumStationPct += pct;
               activeStationCount++;
             }
-            if (isRest || pct >= 80) passedStations++;
+            if (!isRest && pct >= 80) passedStations++;
           });
 
           const pObj = Object.values(room.players || {}).find(p => p.id === pId || p.name === pData.name);
@@ -12855,7 +12889,7 @@ ${caseContext || '(ยังไม่มีข้อมูลเคส)'}
             max: safeFormatScore(totalMax),
             percent: overallPct,
             passedStations: passedStations,
-            totalStations: stationsList.length,
+            totalStations: (activeStationCount > 0 ? activeStationCount : stationsList.length),
             isPassed: isAllPassed
           });
         });
@@ -12895,7 +12929,7 @@ ${caseContext || '(ยังไม่มีข้อมูลเคส)'}
               sumStationPct += pct;
               activeStationCount++;
             }
-            if (isRest || pct >= 80) passedStations++;
+            if (!isRest && pct >= 80) passedStations++;
           });
           // Equal-weight average percentage across active stations
           const overallPct = activeStationCount > 0 ? Math.round(sumStationPct / activeStationCount) : (totalMax > 0 ? Math.round((totalEarned / totalMax) * 100) : 0);
@@ -12911,7 +12945,7 @@ ${caseContext || '(ยังไม่มีข้อมูลเคส)'}
             max: safeFormatScore(totalMax),
             percent: overallPct,
             passedStations: passedStations,
-            totalStations: stationsList.length,
+            totalStations: (activeStationCount > 0 ? activeStationCount : stationsList.length),
             isPassed: isAllPassed
           });
         });
@@ -14034,8 +14068,26 @@ ${caseContext || '(ยังไม่มีข้อมูลเคส)'}
       const modal = document.getElementById('ospe-print-modal');
       if (!modal) return;
       const nameInput = document.getElementById('ospe-print-student-name');
+      const datalist = document.getElementById('ospe-print-candidates-list');
+
+      // Populate candidate names if in multiplayer room
+      if (datalist) {
+        datalist.innerHTML = '';
+        const room = SimState.cachedRoom;
+        if (room && room.players) {
+          const players = Object.values(room.players).filter(p => !p.isHost && p.role !== 'examiner');
+          players.forEach(p => {
+            if (p && p.name) {
+              const opt = document.createElement('option');
+              opt.value = p.name;
+              datalist.appendChild(opt);
+            }
+          });
+        }
+      }
+
       if (nameInput) {
-        const defaultName = SimState.lobbyPlayerName || SimState.myPlayerId || '';
+        const defaultName = SimState._localReviewParticipantName || SimState.lobbyPlayerName || SimState.myPlayerId || '';
         nameInput.value = defaultName;
       }
       modal.style.display = 'flex';
@@ -14091,7 +14143,7 @@ ${caseContext || '(ยังไม่มีข้อมูลเคส)'}
           sumStationPct += pct;
           activeStationCount++;
         }
-        const isPassed = isRest ? true : (pct >= 80);
+        const isPassed = !isRest && (pct >= 80);
         if (isPassed) passedStations++;
 
         return {
@@ -14118,8 +14170,10 @@ ${caseContext || '(ยังไม่มีข้อมูลเคส)'}
       // Generate Station Summary Table HTML
       let stationRowsHtml = '';
       stationData.forEach(s => {
-        const statusText = s.isRest ? 'ผ่าน (พัก)' : (s.isPassed ? 'ผ่าน' : 'ไม่ผ่าน');
-        const statusColor = s.isRest ? '#475569' : (s.isPassed ? '#15803d' : '#b91c1c');
+        const statusText = s.isRest ? 'สถานีพัก' : (s.isPassed ? 'ผ่าน' : 'ไม่ผ่าน');
+        const statusColor = s.isRest ? '#64748b' : (s.isPassed ? '#15803d' : '#b91c1c');
+        const maxDisplay = s.isRest ? '-' : safeFormatScore(s.max);
+        const earnedDisplay = s.isRest ? '-' : `${safeFormatScore(s.earned)} (${s.pct}%)`;
         stationRowsHtml += `
           <tr style="border-bottom: 1px solid #cbd5e1;">
             <td style="padding: 6px 8px; text-align: center; font-weight: 700;">สถานีที่ ${s.stationNumber}</td>
@@ -14128,8 +14182,8 @@ ${caseContext || '(ยังไม่มีข้อมูลเคส)'}
               ${s.caseId ? `<div style="font-size: 8pt; color: #64748b;">รหัสเคส: ${escapeHtml(s.caseId)}</div>` : ''}
             </td>
             <td style="padding: 6px 8px; text-align: center; font-size: 8.5pt;">${escapeHtml(s.category)}</td>
-            <td style="padding: 6px 8px; text-align: center;">${safeFormatScore(s.max)}</td>
-            <td style="padding: 6px 8px; text-align: center; font-weight: 700;">${safeFormatScore(s.earned)} (${s.pct}%)</td>
+            <td style="padding: 6px 8px; text-align: center;">${maxDisplay}</td>
+            <td style="padding: 6px 8px; text-align: center; font-weight: 700;">${earnedDisplay}</td>
             <td style="padding: 6px 8px; text-align: center; font-weight: 700; color: ${statusColor};">${statusText}</td>
           </tr>
         `;
@@ -14353,14 +14407,32 @@ ${caseContext || '(ยังไม่มีข้อมูลเคส)'}
             let blanksRows = '';
             while ((m = blankRegex.exec(rawScenarioContent)) !== null) {
               bIdx++;
-              const bId = (m[1] || '').trim();
-              const bAns = (m[2] || '').trim();
-              const userAns = (stationWrittenAnswers[bId] != null ? String(stationWrittenAnswers[bId]) : '').trim();
-              const isFilled = userAns !== '';
+              const answers = (m[1] || '').split(/[,/]/).map(a => a.trim()).filter(Boolean);
+              const rawParts = [m[2], m[3], m[4]].filter(Boolean);
+              let score = 1.0;
+              let tag = '';
+              rawParts.forEach(p => {
+                const t = p.trim();
+                if (/^\d+(\.\d+)?$/.test(t)) score = parseFloat(t);
+                else if (!/^len:/i.test(t)) tag = t.replace(/^#/, '').trim();
+              });
+              if (!tag) tag = `ข้อ ${bIdx}`;
+              const cleanDisplayTag = tag.startsWith('ข้อ') ? tag : `ข้อ ${tag}`;
+              const cleanDataTag = tag.replace(/^ข้อ\s*/, '').trim();
+
+              const userAns = (
+                stationWrittenAnswers[cleanDataTag] != null ? stationWrittenAnswers[cleanDataTag] :
+                stationWrittenAnswers[cleanDisplayTag] != null ? stationWrittenAnswers[cleanDisplayTag] :
+                stationWrittenAnswers[tag] != null ? stationWrittenAnswers[tag] :
+                stationWrittenAnswers['#' + cleanDataTag] != null ? stationWrittenAnswers['#' + cleanDataTag] :
+                stationWrittenAnswers[bIdx] != null ? stationWrittenAnswers[bIdx] :
+                ''
+              ).toString().trim();
+
               blanksRows += `
                 <div style="display: flex; justify-content: space-between; font-size: 8pt; padding: 3px 6px; border-bottom: 1px dotted #e2e8f0;">
-                  <span><strong>ช่องที่ ${bIdx} (${escapeHtml(bId)}):</strong> ${escapeHtml(userAns || '(ไม่ได้ตอบ)')}</span>
-                  <span style="color: #1e3a8a;"><strong>เฉลย:</strong> ${escapeHtml(bAns)}</span>
+                  <span><strong>ช่องที่ ${bIdx} (${escapeHtml(cleanDisplayTag)}):</strong> ${escapeHtml(userAns || '(ไม่ได้ตอบ)')}</span>
+                  <span style="color: #1e3a8a;"><strong>เฉลย:</strong> ${escapeHtml(answers.join(' / '))} (${score} คะแนน)</span>
                 </div>
               `;
             }
@@ -14433,7 +14505,7 @@ ${caseContext || '(ยังไม่มีข้อมูลเคส)'}
                 ${isExamPassed ? 'PASSED' : 'FAILED'}
               </div>
               <div style="font-size: 8pt; color: #64748b; margin-top: 2px;">
-                คะแนนเฉลี่ยถ่วงน้ำหนัก ${totalPct}% · ผ่าน ${passedStations} จากทั้งหมด ${totalStationsCount} สถานีสอบ (เกณฑ์ผ่านร้อยละ 80)
+                คะแนนเฉลี่ยถ่วงน้ำหนัก ${totalPct}% · ผ่าน ${passedStations} จาก ${activeStationCount > 0 ? activeStationCount : totalStationsCount} สถานีประเมิน (เกณฑ์ผ่านร้อยละ 80)
               </div>
             </div>
             <div style="text-align: right;">
@@ -15058,6 +15130,33 @@ ${caseContext || '(ยังไม่มีข้อมูลเคส)'}
       }
     }
     window.playStationTimeoutAlarm = playStationTimeoutAlarm;
+
+    function play1MinuteWarningSound() {
+      try {
+        const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+        if (!AudioContextClass) return;
+        if (!_unlockedAudioCtx) {
+          _unlockedAudioCtx = new AudioContextClass();
+        }
+        const ctx = _unlockedAudioCtx;
+        if (ctx.state === 'suspended') ctx.resume().catch(() => {});
+        const now = ctx.currentTime;
+        // Two warning beeps at 1-minute remaining: 880Hz (A5) then 1174.66Hz (D6)
+        [880, 1174.66].forEach((freq, idx) => {
+          const osc = ctx.createOscillator();
+          const gain = ctx.createGain();
+          osc.type = 'sine';
+          osc.frequency.setValueAtTime(freq, now + idx * 0.15);
+          gain.gain.setValueAtTime(0.28, now + idx * 0.15);
+          gain.gain.exponentialRampToValueAtTime(0.0001, now + idx * 0.15 + 0.25);
+          osc.connect(gain);
+          gain.connect(ctx.destination);
+          osc.start(now + idx * 0.15);
+          osc.stop(now + idx * 0.15 + 0.25);
+        });
+      } catch (e) {}
+    }
+    window.play1MinuteWarningSound = play1MinuteWarningSound;
 
     async function broadcastBellSignal() {
       playStationTimeoutAlarm('bell');
@@ -17286,7 +17385,7 @@ ${caseContext || '(ยังไม่มีข้อมูลเคส)'}
       <div style="display: flex; align-items: center; gap: 4px;">
         <button type="button" id="btn-ai-chat-toggle"
           onclick="toggleAIChatMode()"
-          title="เปิด/ปิด Gemini AI ติวเตอร์และผู้ป่วยจำลอง (gemini-3.5-flash-lite)"
+          title="เปิด/ปิด Gemini AI ติวเตอร์และผู้ป่วยจำลอง (gemini-2.0-flash)"
           style="background: none; border: 1.5px solid var(--border-color, #e2e8f0);
                  font-size: 0.73rem; cursor: pointer; color: var(--text-muted);
                  line-height: 1; padding: 0.22rem 0.6rem; border-radius: 7px;

@@ -3142,18 +3142,6 @@ ol.ordered-list li,
   margin-top: 1.5rem;
 }
 
-@media (max-width: 900px) {
-  .library-layout {
-    grid-template-columns: 1fr;
-    gap: 1.5rem;
-  }
-  .filter-console {
-    position: relative;
-    top: 0;
-    box-shadow: none;
-  }
-}
-
 .filter-console {
   background-color: var(--surface);
   border: 1px solid var(--border);
@@ -3166,6 +3154,170 @@ ol.ordered-list li,
   display: flex;
   flex-direction: column;
   gap: 0.65rem;
+}
+
+.filter-header-bar {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  width: 100%;
+}
+
+.btn-mobile-filter-toggle {
+  display: none !important;
+}
+
+.filter-mobile-apply-row {
+  display: none !important;
+}
+
+@media (max-width: 900px) {
+  .library-layout {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+    margin-top: 0.75rem;
+  }
+
+  .filter-console {
+    position: sticky !important;
+    top: 0.5rem !important;
+    z-index: 100;
+    padding: 0.5rem 0.65rem !important;
+    margin-bottom: 0.5rem;
+    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.08) !important;
+    transition: all 0.25s ease-in-out;
+  }
+
+  .filter-header-bar {
+    display: flex !important;
+    flex-direction: row !important;
+    align-items: center;
+    gap: 0.45rem;
+    width: 100%;
+  }
+
+  .filter-header-bar .search-input-wrapper {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .btn-mobile-filter-toggle {
+    display: inline-flex !important;
+    align-items: center;
+    justify-content: center;
+    gap: 0.35rem;
+    background: var(--bg-secondary);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+    padding: 0 0.65rem;
+    height: 34px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: var(--text-primary);
+    cursor: pointer;
+    white-space: nowrap;
+    flex-shrink: 0;
+    transition: background 0.15s ease, border-color 0.15s ease;
+  }
+
+  .btn-mobile-filter-toggle:active {
+    background: var(--surface-hover, #e2e8f0);
+  }
+
+  .btn-mobile-filter-toggle.is-active {
+    background: #e0f2fe;
+    border-color: #38bdf8;
+    color: #0369a1;
+  }
+
+  .mobile-filter-badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 18px;
+    height: 18px;
+    padding: 0 4px;
+    border-radius: 9px;
+    background: #0284c7;
+    color: #ffffff;
+    font-size: 0.7rem;
+    font-weight: 700;
+    line-height: 1;
+  }
+
+  .filter-toggle-chevron {
+    font-size: 0.75rem;
+    transition: transform 0.2s ease;
+    display: inline-block;
+  }
+
+  /* Collapsed state on mobile: hide filter-selects drawer */
+  .filter-console.is-mobile-collapsed .filter-selects {
+    display: none !important;
+  }
+
+  .filter-console.is-mobile-collapsed .filter-toggle-chevron {
+    transform: rotate(0deg);
+  }
+
+  /* Expanded state on mobile: show filter-selects drawer */
+  .filter-console.is-mobile-expanded {
+    max-height: 85vh;
+    overflow-y: auto;
+  }
+
+  .filter-console.is-mobile-expanded .filter-selects {
+    display: flex !important;
+    flex-direction: column;
+    gap: 0.55rem;
+    padding-top: 0.65rem;
+    margin-top: 0.25rem;
+    border-top: 1px solid var(--border);
+    animation: slideDownFilter 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  .filter-console.is-mobile-expanded .filter-toggle-chevron {
+    transform: rotate(180deg);
+  }
+
+  .filter-mobile-apply-row {
+    display: block !important;
+    margin-top: 0.4rem;
+    padding-top: 0.4rem;
+  }
+
+  .btn-close-filter-drawer-mobile {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    padding: 0.55rem 1rem;
+    background: #0284c7;
+    color: #ffffff;
+    border: none;
+    border-radius: var(--radius-md);
+    font-family: var(--font-title);
+    font-weight: 600;
+    font-size: 0.85rem;
+    cursor: pointer;
+    box-shadow: 0 2px 6px rgba(2, 132, 199, 0.25);
+    transition: background 0.15s ease;
+  }
+
+  .btn-close-filter-drawer-mobile:active {
+    background: #0369a1;
+  }
+}
+
+@keyframes slideDownFilter {
+  from {
+    opacity: 0;
+    transform: translateY(-8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 .filter-console .search-input-wrapper {

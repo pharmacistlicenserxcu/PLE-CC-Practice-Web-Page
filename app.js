@@ -903,31 +903,36 @@ window.refreshCaseLibraryFromLive = refreshCaseLibraryFromLive;
  */
 async function decryptCaseData(encryptedObj, password) {
   if (!encryptedObj || !encryptedObj.ciphertext || !password) return null;
-  const enc = new TextEncoder();
-  const keyMaterial = await window.crypto.subtle.importKey(
-    'raw',
-    enc.encode(password.trim()),
-    'PBKDF2',
-    false,
-    ['deriveKey']
-  );
-  const salt = Uint8Array.from(atob(encryptedObj.salt), c => c.charCodeAt(0));
-  const iv = Uint8Array.from(atob(encryptedObj.iv), c => c.charCodeAt(0));
-  const ciphertext = Uint8Array.from(atob(encryptedObj.ciphertext), c => c.charCodeAt(0));
-  const key = await window.crypto.subtle.deriveKey(
-    { name: 'PBKDF2', salt: salt, iterations: 100000, hash: 'SHA-256' },
-    keyMaterial,
-    { name: 'AES-GCM', length: 256 },
-    false,
-    ['decrypt']
-  );
-  const decrypted = await window.crypto.subtle.decrypt(
-    { name: 'AES-GCM', iv: iv },
-    key,
-    ciphertext
-  );
-  const dec = new TextDecoder();
-  return JSON.parse(dec.decode(decrypted));
+  try {
+    const enc = new TextEncoder();
+    const keyMaterial = await window.crypto.subtle.importKey(
+      'raw',
+      enc.encode(password.trim()),
+      'PBKDF2',
+      false,
+      ['deriveKey']
+    );
+    const salt = Uint8Array.from(atob(encryptedObj.salt), c => c.charCodeAt(0));
+    const iv = Uint8Array.from(atob(encryptedObj.iv), c => c.charCodeAt(0));
+    const ciphertext = Uint8Array.from(atob(encryptedObj.ciphertext), c => c.charCodeAt(0));
+    const key = await window.crypto.subtle.deriveKey(
+      { name: 'PBKDF2', salt: salt, iterations: 100000, hash: 'SHA-256' },
+      keyMaterial,
+      { name: 'AES-GCM', length: 256 },
+      false,
+      ['decrypt']
+    );
+    const decrypted = await window.crypto.subtle.decrypt(
+      { name: 'AES-GCM', iv: iv },
+      key,
+      ciphertext
+    );
+    const dec = new TextDecoder();
+    return JSON.parse(dec.decode(decrypted));
+  } catch (e) {
+    console.warn('[Crypto] decryptCaseData failed (invalid password or corrupted payload):', e);
+    return null;
+  }
 }
 window.decryptCaseData = decryptCaseData;
 
@@ -1604,11 +1609,19 @@ function restoreFilterState() {
     if (saved) {
       const parsed = JSON.parse(saved);
       if (parsed && typeof parsed === 'object') {
-        AppState.activeFilters.category = urlCat || parsed.category || 'All';
-        AppState.activeFilters.mainGroup = parsed.mainGroup || 'All';
-        AppState.activeFilters.disease = parsed.disease || 'All';
-        AppState.activeFilters.source = parsed.source || 'All';
-        AppState.activeFilters.search = urlSearch || parsed.search || '';
+        if (urlCat && urlCat !== parsed.category) {
+          AppState.activeFilters.category = urlCat;
+          AppState.activeFilters.mainGroup = 'All';
+          AppState.activeFilters.disease = 'All';
+          AppState.activeFilters.source = 'All';
+          AppState.activeFilters.search = urlSearch || '';
+        } else {
+          AppState.activeFilters.category = urlCat || parsed.category || 'All';
+          AppState.activeFilters.mainGroup = parsed.mainGroup || 'All';
+          AppState.activeFilters.disease = parsed.disease || 'All';
+          AppState.activeFilters.source = parsed.source || 'All';
+          AppState.activeFilters.search = urlSearch || parsed.search || '';
+        }
         return true;
       }
     } else {
@@ -1643,8 +1656,61 @@ function resetAllFilters() {
   renderFilterSelectOptions();
   applyFilters();
   renderCaseList();
+  updateActiveFilterCountBadge();
 }
 window.resetAllFilters = resetAllFilters;
+
+function toggleMobileFilterDrawer(forceState) {
+  const consoleElem = document.getElementById('filters-section');
+  const toggleBtn = document.getElementById('btn-mobile-filter-toggle');
+  if (!consoleElem) return;
+
+  const isCurrentlyExpanded = consoleElem.classList.contains('is-mobile-expanded');
+  const shouldExpand = typeof forceState === 'boolean' ? forceState : !isCurrentlyExpanded;
+
+  if (shouldExpand) {
+    consoleElem.classList.remove('is-mobile-collapsed');
+    consoleElem.classList.add('is-mobile-expanded');
+    if (toggleBtn) toggleBtn.setAttribute('aria-expanded', 'true');
+  } else {
+    consoleElem.classList.remove('is-mobile-expanded');
+    consoleElem.classList.add('is-mobile-collapsed');
+    if (toggleBtn) toggleBtn.setAttribute('aria-expanded', 'false');
+  }
+}
+window.toggleMobileFilterDrawer = toggleMobileFilterDrawer;
+
+function updateActiveFilterCountBadge() {
+  const badge = document.getElementById('mobile-filter-badge');
+  const toggleBtn = document.getElementById('btn-mobile-filter-toggle');
+  if (!badge && !toggleBtn) return;
+
+  const filters = AppState.activeFilters || {};
+  let count = 0;
+  if (filters.category && filters.category !== 'All') count++;
+  if (filters.mainGroup && filters.mainGroup !== 'All') count++;
+  if (filters.disease && filters.disease !== 'All') count++;
+  if (filters.source && filters.source !== 'All') count++;
+
+  if (badge) {
+    if (count > 0) {
+      badge.textContent = String(count);
+      badge.style.display = 'inline-flex';
+    } else {
+      badge.textContent = '0';
+      badge.style.display = 'none';
+    }
+  }
+
+  if (toggleBtn) {
+    if (count > 0) {
+      toggleBtn.classList.add('is-active');
+    } else {
+      toggleBtn.classList.remove('is-active');
+    }
+  }
+}
+window.updateActiveFilterCountBadge = updateActiveFilterCountBadge;
 
 function parseDiseaseTags(str) {
   if (!str || typeof str !== 'string') return [];
@@ -1732,6 +1798,7 @@ function applyFilters() {
   }
   
   AppState.filteredCases = list;
+  updateActiveFilterCountBadge();
 }
 
 function renderFilterSelectOptions() {
@@ -1844,7 +1911,7 @@ function renderCaseList() {
         <div class="empty-icon">🔍</div>
         <h3>ไม่พบเคสสอบที่ตรงตามตัวเลือกของคุณ</h3>
         <p>ลองเปลี่ยนคำค้นหาหรือตัวกรองหมวดหมู่</p>
-        <button class="btn btn-primary" onclick="resetFilters()" style="margin-top: 0.85rem; font-size: 0.88rem; padding: 0.5rem 1.25rem;">
+        <button class="btn btn-primary" onclick="resetAllFilters()" style="margin-top: 0.85rem; font-size: 0.88rem; padding: 0.5rem 1.25rem;">
           🔄 ล้างตัวกรองและแสดงเคสทั้งหมด
         </button>
       </div>
@@ -1942,7 +2009,15 @@ function loadChecklistProgress() {
 }
 
 function saveChecklistProgress() {
-  localStorage.setItem('ospe_checklist_progress', JSON.stringify(AppState.checklistProgress));
+  try {
+    if (typeof safeSetLocalStorage === 'function') {
+      safeSetLocalStorage('ospe_checklist_progress', JSON.stringify(AppState.checklistProgress));
+    } else {
+      localStorage.setItem('ospe_checklist_progress', JSON.stringify(AppState.checklistProgress));
+    }
+  } catch (e) {
+    console.warn('[Checklist] Failed to save progress to storage:', e);
+  }
 }
 
 function handleChecklistItemClick(caseId, itemId, itemScore, aiTriggered = false) {
@@ -2337,6 +2412,15 @@ function detectCurrentPage() {
         renderCaseList();
       });
     }
+
+    // ตั้งค่าสถานะตัวกรองบนมือถือ (Mobile Collapsible Filter Drawer)
+    updateActiveFilterCountBadge();
+    const btnMobileToggle = document.getElementById('btn-mobile-filter-toggle');
+    if (btnMobileToggle) {
+      btnMobileToggle.addEventListener('click', () => {
+        toggleMobileFilterDrawer();
+      });
+    }
   }
 }
 
@@ -2539,7 +2623,7 @@ if ('serviceWorker' in navigator && window.location.protocol !== 'file:') {
 const DB_NAME = 'RxCU_OSPE_DB';
 const DB_VERSION = 1;
 const STORE_NAME = 'case_details';
-const DB_VERSION_STR = 'v_20261016_122255'; // อัปเดตเวอร์ชันนี้เพื่อบังคับโหลดใหม่เมื่อมีเคสเพิ่มเติมในสคริปต์ออฟไลน์
+const DB_VERSION_STR = 'v_20261017_141308'; // อัปเดตเวอร์ชันนี้เพื่อบังคับโหลดใหม่เมื่อมีเคสเพิ่มเติมในสคริปต์ออฟไลน์
 
 function openIndexedDB() {
   return new Promise((resolve, reject) => {
@@ -2574,6 +2658,20 @@ function saveCasesToDB(db, casesObj) {
     transaction.onerror = (e) => reject(e.target.error);
   });
 }
+
+async function saveCaseToIndexedDB(caseData) {
+  if (!caseData || !caseData.caseId) return;
+  try {
+    const db = await openIndexedDB();
+    const all = (await getCasesFromDB(db)) || {};
+    const cid = (caseData.caseId || '').trim();
+    all[cid] = caseData;
+    await saveCasesToDB(db, all);
+  } catch (e) {
+    console.warn('[IndexedDB] saveCaseToIndexedDB failed:', e);
+  }
+}
+window.saveCaseToIndexedDB = saveCaseToIndexedDB;
 
 function injectSplashOverlay() {
   if (document.getElementById('db-loading-splash')) return;
@@ -2631,7 +2729,7 @@ async function loadOfflineDetailsWithProgress() {
   if (typeof OFFLINE_CASE_DETAILS !== 'undefined' && Object.keys(OFFLINE_CASE_DETAILS).length > 0) {
     console.log(`[Database Preloader] OFFLINE_CASE_DETAILS is ready in memory (${Object.keys(OFFLINE_CASE_DETAILS).length} cases). 0ms instant load!`);
     mergeOfflineDetails();
-    removeSplashOverlay();
+    hideSplashOverlay();
     try {
       const targetVersion = (typeof OFFLINE_DATA !== 'undefined' && OFFLINE_DATA.version) ? OFFLINE_DATA.version : DB_VERSION_STR;
       localStorage.setItem('ospe_db_version', targetVersion);
@@ -2662,7 +2760,9 @@ async function loadOfflineDetailsWithProgress() {
     // B. หากเป็นเวอร์ชันใหม่ (เพิ่ง compile มาเพิ่มเคส):
     try {
       Object.keys(sessionStorage).forEach(k => {
-        if (k.startsWith('ple_unlocked_')) sessionStorage.removeItem(k);
+        if (k.startsWith('ple_unlocked_') || k.startsWith('viewer_unlocked_') || k.startsWith('sim_unlocked_')) {
+          sessionStorage.removeItem(k);
+        }
       });
     } catch (e) {}
 
@@ -3152,10 +3252,10 @@ async function executeBatchPrint() {
           if (dec && (dec.scenario || dec.contentHtml || dec.checklist)) {
             const curVer = (typeof DB_VERSION_STR !== 'undefined' ? DB_VERSION_STR : '');
             const wrapped = Object.assign({}, dec, { _db_version: curVer });
-            sessionStorage.setItem('ple_unlocked_' + cid, JSON.stringify(wrapped));
-            sessionStorage.setItem('viewer_unlocked_' + cid, JSON.stringify(wrapped));
-            if (!cid.startsWith('OSPE-')) {
-              sessionStorage.setItem('ple_unlocked_OSPE-' + cid, JSON.stringify(wrapped));
+            try {
+              sessionStorage.setItem('ple_unlocked_' + cid, JSON.stringify(wrapped));
+            } catch (storageErr) {
+              console.warn('[BatchPrint] Storage quota full, kept in memory:', storageErr);
             }
             details = Object.assign({}, details, dec);
           }
@@ -3168,23 +3268,26 @@ async function executeBatchPrint() {
         const pwd = prompt(`🔒 มีข้อสอบลับที่มีรหัสผ่าน (เช่น เคส ${cid})\nกรุณากรอกรหัสผ่านเพื่อปลดล็อกเนื้อหาสำหรับพิมพ์ (ระบบจะใช้รหัสนี้ปลดล็อกเคสอื่นในชุดเดียวกันอัตโนมัติ):`);
         if (pwd && typeof window.decryptCaseData === 'function') {
           lastUsedPasscode = pwd.trim();
-          sessionStorage.setItem('ple_saved_passcode', lastUsedPasscode);
+          try {
+            sessionStorage.setItem('ple_saved_passcode', lastUsedPasscode);
+          } catch (_) {}
           showGlobalLoader(true, `กำลังถอดรหัสเคส ${cid}...`);
           try {
             const dec = await window.decryptCaseData(details, lastUsedPasscode);
             if (dec && (dec.scenario || dec.contentHtml || dec.checklist)) {
               const curVer = (typeof DB_VERSION_STR !== 'undefined' ? DB_VERSION_STR : '');
               const wrapped = Object.assign({}, dec, { _db_version: curVer });
-              sessionStorage.setItem('ple_unlocked_' + cid, JSON.stringify(wrapped));
-              sessionStorage.setItem('viewer_unlocked_' + cid, JSON.stringify(wrapped));
-              if (!cid.startsWith('OSPE-')) {
-                sessionStorage.setItem('ple_unlocked_OSPE-' + cid, JSON.stringify(wrapped));
+              try {
+                sessionStorage.setItem('ple_unlocked_' + cid, JSON.stringify(wrapped));
+              } catch (storageErr) {
+                console.warn('[BatchPrint] Storage quota full, kept in memory:', storageErr);
               }
               details = Object.assign({}, details, dec);
             } else {
               alert(`❌ รหัสผ่านของเคส ${cid} ไม่ถูกต้อง เคสนี้จะไม่ถูกพิมพ์เนื้อหา`);
             }
           } catch(err) {
+            console.warn('[BatchPrint] Decrypt error for', cid, err);
             alert(`❌ ไม่สามารถถอดรหัสเคส ${cid} ได้: รหัสผ่านไม่ถูกต้อง`);
           }
         }
@@ -3536,8 +3639,11 @@ async function submitCaseReport() {
       description: description
     });
     
+    const timeoutSignal = (typeof AbortSignal !== 'undefined' && typeof AbortSignal.timeout === 'function')
+      ? AbortSignal.timeout(15000)
+      : undefined;
     const res = await fetch(`${currentApiUrl}?${params.toString()}`, {
-      signal: AbortSignal.timeout(15000)
+      signal: timeoutSignal
     });
     const json = await res.json();
     
@@ -3577,8 +3683,11 @@ async function loadReportHistory() {
   `;
 
   try {
+    const timeoutSignal = (typeof AbortSignal !== 'undefined' && typeof AbortSignal.timeout === 'function')
+      ? AbortSignal.timeout(15000)
+      : undefined;
     const res = await fetch(`${currentApiUrl}?action=getReports`, {
-      signal: AbortSignal.timeout(15000)
+      signal: timeoutSignal
     });
     const json = await res.json();
     
@@ -4079,28 +4188,29 @@ function checkSingleInteractiveBlank(wrapper) {
 function autoCheckLinkedChecklistItem(tag, shouldCheck = true) {
   if (!tag) return;
   const rawTag = tag.replace(/^#/, '').trim();
-  const numOnly = rawTag.replace(/^ข้อ\s*/, '').trim(); // e.g. "1.1"
-  const fullTextTag = rawTag.startsWith('ข้อ') ? rawTag : `ข้อ ${rawTag}`; // e.g. "ข้อ 1.1"
+  const numOnly = rawTag.replace(/^ข้อ\s{0,}/, '').trim(); // e.g. "1.1"
+  if (!numOnly) return;
+  const fullTextTag = rawTag.startsWith('ข้อ') ? rawTag : `ข้อ ${numOnly}`;
+
+  // Escape special regex characters in numOnly
+  const escapedNum = numOnly.replace(/([.\\+*?^$[\](){}|])/g, '\\$1');
+  // Match number preceded by start of string, whitespace, (, [, or ข้อ
+  // and followed by colon, whitespace, ), ], end-of-string, or dot not followed by a digit
+  const boundaryRegex = new RegExp('(?:^|[\\s(\\[]|ข้อ\\s{0,})' + escapedNum + '(?=[:\\s)\\]]|(?:\\.(?!\\d))|$)', 'i');
 
   const items = document.querySelectorAll('.checklist-item');
   items.forEach(item => {
     const itemText = item.textContent || '';
     const itemDataTag = (item.getAttribute('data-tag') || '').trim();
-    
-    // Robust multi-format matching for e.g. (ข้อ 1.1), ข้อ 1.1, 1.1, [1.1], etc.
-    const hasTagMatch = (itemDataTag && (itemDataTag === numOnly || itemDataTag === fullTextTag || itemDataTag.replace(/^ข้อ\s*/, '') === numOnly)) ||
-                        itemText.includes(`(${fullTextTag})`) ||
-                        itemText.includes(`(${numOnly})`) ||
-                        itemText.includes(`(ข้อ ${numOnly})`) ||
-                        itemText.includes(`[${fullTextTag}]`) ||
-                        itemText.includes(`[${numOnly}]`) ||
-                        itemText.includes(`[ข้อ ${numOnly}]`) ||
-                        itemText.includes(fullTextTag) ||
-                        itemText.includes(`ข้อ ${numOnly}`) ||
-                        itemText.trim().startsWith(fullTextTag) ||
-                        itemText.trim().startsWith(`(${fullTextTag})`) ||
-                        itemText.trim().startsWith(`(${numOnly})`) ||
-                        itemText.trim().startsWith(numOnly);
+
+    const tagMatchesAttr = Boolean(
+      itemDataTag && (
+        itemDataTag === numOnly ||
+        itemDataTag === fullTextTag ||
+        itemDataTag.replace(/^ข้อ\s{0,}/, '') === numOnly
+      )
+    );
+    const hasTagMatch = tagMatchesAttr || boundaryRegex.test(itemText.trim());
 
     if (hasTagMatch) {
       const isAlreadyChecked = item.classList.contains('checked');

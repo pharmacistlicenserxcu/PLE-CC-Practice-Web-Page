@@ -1532,6 +1532,11 @@
         if (tag) tag.textContent = title;
       }
 
+      // Always synchronize station text and canvas upon opening
+      if (this.currentStationKey) {
+        this.loadStationData(this.currentStationKey);
+      }
+
       const targetTab = (initialTab && (initialTab === 'draw' || initialTab === 'type' || initialTab === 'label'))
         ? initialTab
         : (this.activeTab || 'draw');

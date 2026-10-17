@@ -62,13 +62,15 @@ self.addEventListener('fetch', event => {
 
   const url = new URL(event.request.url);
 
-  // ยกเว้น API การเรียกข้อมูลสดจาก Google Apps Script และระบบ Realtime Database ของ Firebase
+  // ยกเว้น API การเรียกข้อมูลสดจาก Google Apps Script, Firebase และบริการคลาวด์ภายนอก
   if (
     url.hostname.includes('script.google.com') ||
     url.hostname.includes('firebaseio.com') ||
     url.hostname.includes('googleapis.com') ||
     url.hostname.includes('gstatic.com') ||
-    url.hostname.includes('firebaseapp.com')
+    url.hostname.includes('firebaseapp.com') ||
+    url.hostname.includes('drive.google.com') ||
+    url.hostname.includes('lh3.googleusercontent.com')
   ) {
     return;
   }
@@ -89,8 +91,12 @@ self.addEventListener('fetch', event => {
 
         return Promise.race([networkPromise, timeoutPromise]).then(fastestResponse => {
           if (fastestResponse) return fastestResponse;
-          return cache.match(event.request).then(cachedResponse => {
-            return cachedResponse || networkPromise;
+          return cache.match(event.request, { ignoreSearch: true }).then(cachedResponse => {
+            if (cachedResponse) return cachedResponse;
+            return networkPromise.then(res => {
+              if (res) return res;
+              return cache.match('./index.html', { ignoreSearch: true });
+            });
           });
         });
       })
@@ -101,7 +107,7 @@ self.addEventListener('fetch', event => {
   // ทรัพยากรไฟล์อื่น (CSS, JS, มีเดีย, เสียง) ให้ใช้ Stale-While-Revalidate เพื่อความเร็วสูงสุด (0ms)
   event.respondWith(
     caches.open(CACHE_NAME).then(cache => {
-      return cache.match(event.request).then(cachedResponse => {
+      return cache.match(event.request, { ignoreSearch: true }).then(cachedResponse => {
         const fetchPromise = fetch(event.request).then(networkResponse => {
           if (networkResponse && networkResponse.status === 200) {
             cache.put(event.request, networkResponse.clone());
@@ -109,9 +115,14 @@ self.addEventListener('fetch', event => {
           return networkResponse;
         }).catch(err => {
           console.warn('[Service Worker] Network request failed (serving cached/offline):', err);
+          return null;
         });
 
-        return cachedResponse || fetchPromise;
+        if (cachedResponse) return cachedResponse;
+        return fetchPromise.then(res => {
+          if (res) return res;
+          return new Response('', { status: 503, statusText: 'Service Unavailable (Offline)' });
+        });
       });
     })
   );

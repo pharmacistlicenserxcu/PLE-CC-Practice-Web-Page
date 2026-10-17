@@ -56,17 +56,25 @@
       
       <div class="library-layout">
         <!-- Filter Bar (Sidebar Console) -->
-        <aside class="filter-console" id="filters-section">
-          <!-- Search bar -->
-          <div class="search-input-wrapper">
-            <svg class="search-icon-svg" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
-            </svg>
-            <input type="text" id="search-case" class="search-input" placeholder="ค้นหาชื่อเคส, ยา, โรค..." aria-label="Search cases">
+        <aside class="filter-console is-mobile-collapsed" id="filters-section">
+          <!-- Header Bar: Search input and Mobile Filter Toggle Button -->
+          <div class="filter-header-bar">
+            <div class="search-input-wrapper">
+              <svg class="search-icon-svg" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+              </svg>
+              <input type="text" id="search-case" class="search-input" placeholder="ค้นหาชื่อเคส, ยา, โรค..." aria-label="Search cases">
+            </div>
+            <button type="button" id="btn-mobile-filter-toggle" class="btn-mobile-filter-toggle" aria-expanded="false" aria-controls="filter-selects-drawer" onclick="toggleMobileFilterDrawer()" title="เปิด/ปิด ตัวกรอง">
+              <span class="filter-toggle-icon">🎛️</span>
+              <span class="filter-toggle-label">ตัวกรอง</span>
+              <span id="mobile-filter-badge" class="mobile-filter-badge" style="display: none;">0</span>
+              <span class="filter-toggle-chevron">▾</span>
+            </button>
           </div>
           
-          <!-- Select filters (Ladder Filter System) -->
-          <div class="filter-selects">
+          <!-- Select filters drawer (Ladder Filter System) -->
+          <div class="filter-selects" id="filter-selects-drawer">
             <!-- Category Filter -->
             <label class="filter-group-label">Category</label>
             <select id="filter-category" class="select-filter" aria-label="Filter by category">
@@ -122,6 +130,13 @@
               </button>
               <button type="button" class="btn-filter-action btn-report-action" id="btn-open-report-modal" onclick="openReportModal()" title="แจ้งปัญหาเคสสอบ" aria-label="แจ้งปัญหาเคสสอบ">
                 🚨
+              </button>
+            </div>
+
+            <!-- Mobile Apply / Collapse Action Button -->
+            <div class="filter-mobile-apply-row">
+              <button type="button" class="btn-close-filter-drawer-mobile" id="btn-apply-filter-mobile" onclick="toggleMobileFilterDrawer(false)">
+                ✓ นำไปใช้และย่อแถบตัวกรอง
               </button>
             </div>
 
@@ -257,8 +272,8 @@
   </div><!-- /.page-viewport -->
 </div><!-- /.app-shell -->
 
-  <script src="case-data-offline.js?v=v_20261016_122255"></script>
-  <script src="app.js?v=v_20261016_122255"></script>
+  <script src="case-data-offline.js?v=v_20261017_141308"></script>
+  <script src="app.js?v=v_20261017_141308"></script>
 
   <script>
     function toggleFullscreen() {

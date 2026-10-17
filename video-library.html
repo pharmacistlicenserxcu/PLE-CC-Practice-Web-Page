@@ -831,11 +831,11 @@
           <!-- Stats Bar -->
           <div class="video-stats-bar">
             <div class="video-stat-item">
-              <span class="video-stat-num" id="stat-total-videos">77</span>
+              <span class="video-stat-num" id="stat-total-videos">76</span>
               <span>คลิปทั้งหมด</span>
             </div>
             <div class="video-stat-item">
-              <span class="video-stat-num" id="stat-product-videos" style="color: #0284c7;">46</span>
+              <span class="video-stat-num" id="stat-product-videos" style="color: #0284c7;">45</span>
               <span>🔬 Product</span>
             </div>
             <div class="video-stat-item">
@@ -855,7 +855,7 @@
               </h3>
               <p class="domain-card-desc">รวมทั้ง Product และ Clinic ทุกรูปแบบ</p>
             </div>
-            <span class="domain-count-badge" id="badge-count-all">77</span>
+            <span class="domain-count-badge" id="badge-count-all">76</span>
           </div>
 
           <div class="domain-select-card" id="domain-card-product" onclick="selectDomainFilter('Product', this)">
@@ -866,7 +866,7 @@
               </h3>
               <p class="domain-card-desc">เทคนิคชั่งตวง บดผสม สารละลาย ยาน้ำ แขวนตะกอน อิมัลชัน ครีม ขี้ผึ้ง แคปซูล</p>
             </div>
-            <span class="domain-count-badge" id="badge-count-product">46</span>
+            <span class="domain-count-badge" id="badge-count-product">45</span>
           </div>
 
           <div class="domain-select-card" id="domain-card-clinic" onclick="selectDomainFilter('Clinic', this)">
@@ -910,7 +910,7 @@
         <!-- Video Count Indicator -->
         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
           <div style="font-size: 0.88rem; font-weight: 700; color: var(--text-secondary);">
-            แสดง <span id="video-display-count" style="color: var(--primary);">46</span> รายการ
+            แสดง <span id="video-display-count" style="color: var(--primary);">76</span> รายการ
           </div>
           <div style="display: flex; gap: 0.5rem;">
             <label style="font-size: 0.82rem; display: flex; align-items: center; gap: 0.35rem; cursor: pointer; user-select: none;">
@@ -1043,6 +1043,33 @@
     } catch (e) {}
   }
 
+  function toggleVideoWatched(id) {
+    if (!id) return;
+    const s = getWatchedSet();
+    if (s.has(id)) {
+      s.delete(id);
+    } else {
+      s.add(id);
+    }
+    saveWatchedSet(s);
+    renderVideoGrid();
+  }
+
+  function toggleVideoFav(id) {
+    if (!id) return;
+    const s = getFavSet();
+    if (s.has(id)) {
+      s.delete(id);
+    } else {
+      s.add(id);
+    }
+    saveFavSet(s);
+    renderVideoGrid();
+  }
+
+  window.toggleVideoWatched = toggleVideoWatched;
+  window.toggleVideoFav = toggleVideoFav;
+
   document.addEventListener('DOMContentLoaded', () => {
     // Setup Search Event
     const searchInput = document.getElementById('video-search-input');
@@ -1094,8 +1121,8 @@
     if (activeDomain === 'Product') {
       groupContainer.innerHTML = `
         <span style="font-size: 0.82rem; font-weight: 700; color: var(--text-secondary); margin-right: 0.25rem;">หมวด Product:</span>
-        <button class="video-group-btn ${activeMajorGroup === 'all' ? 'active' : ''}" onclick="setMajorGroup('all', this)">All Product (46)</button>
-        <button class="video-group-btn ${activeMajorGroup === 'หมวด 1' ? 'active' : ''}" onclick="setMajorGroup('หมวด 1', this)">🧪 หมวด 1: พื้นฐานสำคัญ (19)</button>
+        <button class="video-group-btn ${activeMajorGroup === 'all' ? 'active' : ''}" onclick="setMajorGroup('all', this)">All Product (45)</button>
+        <button class="video-group-btn ${activeMajorGroup === 'หมวด 1' ? 'active' : ''}" onclick="setMajorGroup('หมวด 1', this)">🧪 หมวด 1: พื้นฐานสำคัญ (18)</button>
         <button class="video-group-btn ${activeMajorGroup === 'หมวด 2' ? 'active' : ''}" onclick="setMajorGroup('หมวด 2', this)">📦 หมวด 2: เภสัชภัณฑ์เฉพาะรูปแบบ (27)</button>
       `;
 
@@ -1137,8 +1164,8 @@
       // ALL
       groupContainer.innerHTML = `
         <span style="font-size: 0.82rem; font-weight: 700; color: var(--text-secondary); margin-right: 0.25rem;">หมวดวิชา:</span>
-        <button class="video-group-btn ${activeMajorGroup === 'all' ? 'active' : ''}" onclick="setMajorGroup('all', this)">All Domains (77)</button>
-        <button class="video-group-btn ${activeMajorGroup === 'Product' ? 'active' : ''}" onclick="setMajorGroup('Product', this)">🔬 Product (46)</button>
+        <button class="video-group-btn ${activeMajorGroup === 'all' ? 'active' : ''}" onclick="setMajorGroup('all', this)">All Domains (76)</button>
+        <button class="video-group-btn ${activeMajorGroup === 'Product' ? 'active' : ''}" onclick="setMajorGroup('Product', this)">🔬 Product (45)</button>
         <button class="video-group-btn ${activeMajorGroup === 'Clinic' ? 'active' : ''}" onclick="setMajorGroup('Clinic', this)">💊 Clinic (31)</button>
       `;
 
@@ -1351,7 +1378,7 @@
   }
 
   function updateProgressStats() {
-    const total = currentActiveVideos.length || 77;
+    const total = currentActiveVideos.length || 76;
     const watchedSet = getWatchedSet();
     const count = watchedSet.size;
 

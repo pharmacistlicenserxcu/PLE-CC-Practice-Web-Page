@@ -874,7 +874,7 @@
         for (let attempt = 0; attempt < maxAttempts; attempt++) {
           const currentEntry = this._geminiKeyPool[this._currentKeyIdx];
           const API_KEY = localStorage.getItem('_gemini_api_key') || currentEntry.key;
-          const ENDPOINT = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3.5-flash-lite:generateContent?key=${API_KEY}`;
+          const ENDPOINT = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${API_KEY}`;
 
           try {
             const controller = new AbortController();
@@ -891,7 +891,7 @@
               ],
               generationConfig: {
                 temperature: 0.1,
-                maxOutputTokens: 120
+                maxOutputTokens: 250
               }
             };
 
@@ -905,7 +905,7 @@
 
             if (!res.ok) {
               const errBody = await res.text().catch(() => '');
-              if (res.status === 429 || errBody.includes('RESOURCE_EXHAUSTED')) {
+              if (res.status === 404 || res.status === 429 || res.status >= 500 || errBody.includes('RESOURCE_EXHAUSTED')) {
                 this._currentKeyIdx = (this._currentKeyIdx + 1) % this._geminiKeyPool.length;
                 continue;
               }
@@ -1230,7 +1230,7 @@ ${caseContext || '(ยังไม่มีข้อมูลเคส)'}
       for (let attempt = 0; attempt < maxAttempts; attempt++) {
         const currentEntry = this._geminiKeyPool[this._currentKeyIdx];
         const API_KEY = localStorage.getItem('_gemini_api_key') || currentEntry.key;
-        const ENDPOINT = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3.5-flash-lite:generateContent?key=${API_KEY}`;
+        const ENDPOINT = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${API_KEY}`;
 
         try {
           const controller = new AbortController();
@@ -1247,7 +1247,7 @@ ${caseContext || '(ยังไม่มีข้อมูลเคส)'}
             ],
             generationConfig: {
               temperature: isGuruRole ? 0.3 : 0.7,
-              maxOutputTokens: 400
+              maxOutputTokens: 1000
             }
           };
 
@@ -1262,7 +1262,7 @@ ${caseContext || '(ยังไม่มีข้อมูลเคส)'}
           if (!res.ok) {
             const errBody = await res.text().catch(() => '');
             console.warn(`Gemini API key [${this._currentKeyIdx} - ${currentEntry.email}] failed:`, res.status, errBody);
-            if (res.status === 429 || errBody.includes('RESOURCE_EXHAUSTED')) {
+            if (res.status === 404 || res.status === 429 || res.status >= 500 || errBody.includes('RESOURCE_EXHAUSTED')) {
               this._currentKeyIdx = (this._currentKeyIdx + 1) % this._geminiKeyPool.length;
               lastError = new Error('QUOTA_EXHAUSTED');
               continue;

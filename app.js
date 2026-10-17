@@ -1224,12 +1224,14 @@ async function fetchCaseDetail(caseId, forceLive = false) {
   const rawId = cleanId.replace(/^OSPE-/i, '');
 
   // 1. Check local OFFLINE_CASE_DETAILS if loaded and not forceLive (0ms instant resolution)
-  if (!forceLive && typeof OFFLINE_CASE_DETAILS !== 'undefined') {
-    const det = OFFLINE_CASE_DETAILS[cleanId] || 
-                OFFLINE_CASE_DETAILS[ospeId] || 
-                OFFLINE_CASE_DETAILS[rawId] || 
-                OFFLINE_CASE_DETAILS[cleanId.toUpperCase()] || 
-                OFFLINE_CASE_DETAILS[ospeId.toUpperCase()];
+  const offlineDict = (typeof OFFLINE_CASE_DETAILS !== 'undefined' && OFFLINE_CASE_DETAILS) || window.OFFLINE_CASE_DETAILS;
+  if (!forceLive && offlineDict) {
+    const det = offlineDict[cleanId] || 
+                offlineDict[ospeId] || 
+                offlineDict[rawId] || 
+                offlineDict[cleanId.toUpperCase()] || 
+                offlineDict[ospeId.toUpperCase()] ||
+                offlineDict[rawId.toUpperCase()];
     if (det) {
       if (det.isEncrypted) {
         const curVer = (typeof DB_VERSION_STR !== 'undefined' ? DB_VERSION_STR : '') || (typeof OFFLINE_DATA !== 'undefined' ? OFFLINE_DATA.version : '');
@@ -1283,7 +1285,7 @@ async function fetchCaseDetail(caseId, forceLive = false) {
   try {
     const cb = new Date().getTime();
     const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), 20000); // 20s for GAS cold start
+    const timeoutId = setTimeout(() => controller.abort(), 7000); // 7s timeout
     const res = await fetch(`${currentApiUrl}?action=getCase&id=${encodeURIComponent(cleanId)}&_cb=${cb}`, { signal: controller.signal });
     clearTimeout(timeoutId);
     const json = await res.json();
@@ -2660,7 +2662,7 @@ if ('serviceWorker' in navigator && window.location.protocol !== 'file:') {
 const DB_NAME = 'RxCU_OSPE_DB';
 const DB_VERSION = 1;
 const STORE_NAME = 'case_details';
-const DB_VERSION_STR = 'v_20261017_141308'; // อัปเดตเวอร์ชันนี้เพื่อบังคับโหลดใหม่เมื่อมีเคสเพิ่มเติมในสคริปต์ออฟไลน์
+const DB_VERSION_STR = 'v_20261017_144014'; // อัปเดตเวอร์ชันนี้เพื่อบังคับโหลดใหม่เมื่อมีเคสเพิ่มเติมในสคริปต์ออฟไลน์
 
 function openIndexedDB() {
   return new Promise((resolve, reject) => {
@@ -2763,14 +2765,16 @@ function hideSplashOverlay() {
 
 async function loadOfflineDetailsWithProgress() {
   // 0. หากมี OFFLINE_CASE_DETAILS ใน Memory จากไฟล์ script อยู่แล้ว -> ใช้ทันที 0ms ไม่ต้องดาวน์โหลดซ้ำ!
-  if (typeof OFFLINE_CASE_DETAILS !== 'undefined' && Object.keys(OFFLINE_CASE_DETAILS).length > 0) {
-    console.log(`[Database Preloader] OFFLINE_CASE_DETAILS is ready in memory (${Object.keys(OFFLINE_CASE_DETAILS).length} cases). 0ms instant load!`);
+  const inMemDetails = (typeof OFFLINE_CASE_DETAILS !== 'undefined' && OFFLINE_CASE_DETAILS) || window.OFFLINE_CASE_DETAILS;
+  if (inMemDetails && Object.keys(inMemDetails).length > 0) {
+    window.OFFLINE_CASE_DETAILS = inMemDetails;
+    console.log(`[Database Preloader] OFFLINE_CASE_DETAILS is ready in memory (${Object.keys(inMemDetails).length} cases). 0ms instant load!`);
     mergeOfflineDetails();
     hideSplashOverlay();
     try {
       const targetVersion = (typeof OFFLINE_DATA !== 'undefined' && OFFLINE_DATA.version) ? OFFLINE_DATA.version : DB_VERSION_STR;
       localStorage.setItem('ospe_db_version', targetVersion);
-      openIndexedDB().then(db => saveCasesToDB(db, OFFLINE_CASE_DETAILS)).catch(() => {});
+      openIndexedDB().then(db => saveCasesToDB(db, inMemDetails)).catch(() => {});
     } catch(e) {}
     return;
   }
@@ -2806,7 +2810,8 @@ async function loadOfflineDetailsWithProgress() {
     // 1) ดึงแคชเดิมที่มีอยู่แล้วขึ้นมาแสดงก่อนทันที 0ms เพื่อไม่ให้ผู้ใช้ต้องรอ!
     const existingDetails = await getCasesFromDB(db);
     if (existingDetails && Object.keys(existingDetails).length > 0) {
-      window.OFFLINE_CASE_DETAILS = Object.assign({}, existingDetails, window.OFFLINE_CASE_DETAILS || {});
+      const liveScriptDetails = (typeof OFFLINE_CASE_DETAILS !== 'undefined' && OFFLINE_CASE_DETAILS) || window.OFFLINE_CASE_DETAILS || {};
+      window.OFFLINE_CASE_DETAILS = Object.assign({}, existingDetails, liveScriptDetails);
       mergeOfflineDetails();
       console.log('[Database Preloader] Previous cache loaded instantly (0ms); updating new cases in background...');
     }
@@ -2868,8 +2873,9 @@ async function loadOfflineDetailsWithProgress() {
     console.log('[Database Preloader] New database downloaded and evaluated.');
     
     // บันทึกลง IndexedDB เพื่อใช้งานครั้งต่อไป
-    if (typeof OFFLINE_CASE_DETAILS !== 'undefined') {
-      await saveCasesToDB(db, OFFLINE_CASE_DETAILS);
+    const finalDetails = (typeof OFFLINE_CASE_DETAILS !== 'undefined' && OFFLINE_CASE_DETAILS) || window.OFFLINE_CASE_DETAILS;
+    if (finalDetails) {
+      await saveCasesToDB(db, finalDetails);
       localStorage.setItem('ospe_db_version', targetVersion);
       console.log(`[Database Preloader] Database stored in IndexedDB (version: ${targetVersion}).`);
     }

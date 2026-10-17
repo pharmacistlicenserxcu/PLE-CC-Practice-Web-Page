@@ -7,9 +7,9 @@
   <meta name="description" content="ระบบจำลองสอบ OSPE 16 สถานีเสมือนจริง พร้อมจับเวลา 4 นาที ติ๊ก Checklist และคำนวณผลคะแนน Leaderboard">
   <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>💊</text></svg>">
   <link rel="stylesheet" href="style.css?v=1791019915">
-  <script src="case-data-offline.js?v=v_20261017_141308"></script>
-  <script src="case-details-offline.js?v=v_20261017_141308"></script>
-  <script src="app.js?v=v_20261017_141308"></script>
+  <script src="case-data-offline.js?v=v_20261017_144014"></script>
+  <script src="case-details-offline.js?v=v_20261017_144014"></script>
+  <script src="app.js?v=v_20261017_144014"></script>
   <script src="scratchpad.js?v=20261004_201700"></script>
   <style>
     /* Simulation Source and Topic Selector */
@@ -7186,8 +7186,9 @@
           }
 
           // 4. Check offline case details (0ms instant)
-          if (!unlockedCase && typeof OFFLINE_CASE_DETAILS !== 'undefined' && OFFLINE_CASE_DETAILS) {
-            unlockedCase = OFFLINE_CASE_DETAILS[targetCaseId] || OFFLINE_CASE_DETAILS[ospeId] || OFFLINE_CASE_DETAILS[rawId];
+          const offDetails = (typeof OFFLINE_CASE_DETAILS !== 'undefined' && OFFLINE_CASE_DETAILS) || window.OFFLINE_CASE_DETAILS;
+          if (!unlockedCase && offDetails) {
+            unlockedCase = offDetails[targetCaseId] || offDetails[ospeId] || offDetails[rawId] || offDetails[targetCaseId.toUpperCase()];
           }
 
           const matchedCase = Object.assign({}, baseCase || { caseId: targetCaseId, title: 'สถานีสอบ' }, unlockedCase || {});

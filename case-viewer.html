@@ -1140,9 +1140,9 @@
   </div><!-- /.page-viewport -->
 </div><!-- /.app-shell -->
 
-  <script src="case-data-offline.js?v=v_20261017_141308"></script>
-  <script src="case-details-offline.js?v=v_20261017_141308"></script>
-  <script src="app.js?v=v_20261017_141308"></script>
+  <script src="case-data-offline.js?v=v_20261017_144014"></script>
+  <script src="case-details-offline.js?v=v_20261017_144014"></script>
+  <script src="app.js?v=v_20261017_144014"></script>
   <script src="scratchpad.js?v=20261004_234400"></script>
   <script src="station-chat.js?v=20261004_234400"></script>
 
@@ -1237,27 +1237,44 @@
         }
         
         // ตรวจสอบฐานข้อมูลออฟไลน์ (ดึงจากหน่วยความจำ หรือ IndexedDB ทันที 0-5ms)
-        if (typeof OFFLINE_CASE_DETAILS !== 'undefined') {
+        const cleanId = (activeCaseId || '').trim();
+        const globalDetails = (typeof OFFLINE_CASE_DETAILS !== 'undefined' && OFFLINE_CASE_DETAILS) || window.OFFLINE_CASE_DETAILS;
+        if (globalDetails && Object.keys(globalDetails).length > 0) {
+          window.OFFLINE_CASE_DETAILS = globalDetails;
           loadCaseDetail();
         } else {
           // ดึงจาก IndexedDB ทันที (5-10ms) เพื่อเปิดเคสได้ทันทีโดยไม่ต้องรอ
           openIndexedDB().then(db => getCasesFromDB(db)).then(cached => {
-            if (cached && Object.keys(cached).length > 0) {
-              window.OFFLINE_CASE_DETAILS = Object.assign({}, cached, window.OFFLINE_CASE_DETAILS || {});
+            const inMemory = (typeof OFFLINE_CASE_DETAILS !== 'undefined' && OFFLINE_CASE_DETAILS) || window.OFFLINE_CASE_DETAILS || {};
+            const merged = Object.assign({}, cached || {}, inMemory);
+            window.OFFLINE_CASE_DETAILS = merged;
+
+            // ตรวจสอบว่าในแคชมีเคสเป้าหมายนี้อยู่แล้วหรือไม่
+            const hasTargetCase = Boolean(
+              merged[cleanId] || 
+              merged[cleanId.toUpperCase()] || 
+              merged['OSPE-' + cleanId.replace(/^OSPE-/i, '')] ||
+              merged[cleanId.replace(/^OSPE-/i, '')]
+            );
+
+            if (hasTargetCase) {
               console.log('[Case Viewer] Loaded case details directly from IndexedDB (5ms).');
               loadCaseDetail();
             } else {
+              // หากในแคชเดิมยังไม่มีเคสใหม่ ให้รอ case-details-offline.js โหลดเสร็จ
               let checkCount = 0;
               const checkInterval = setInterval(() => {
-                if (typeof OFFLINE_CASE_DETAILS !== 'undefined') {
+                const liveDetails = (typeof OFFLINE_CASE_DETAILS !== 'undefined' && OFFLINE_CASE_DETAILS) || window.OFFLINE_CASE_DETAILS;
+                if (liveDetails && (liveDetails[cleanId] || liveDetails[cleanId.toUpperCase()] || liveDetails['OSPE-' + cleanId.replace(/^OSPE-/i, '')])) {
                   clearInterval(checkInterval);
+                  window.OFFLINE_CASE_DETAILS = Object.assign({}, window.OFFLINE_CASE_DETAILS || {}, liveDetails);
                   loadCaseDetail();
-                } else if (checkCount > 60) { // ~1.8 วินาที
+                } else if (checkCount > 100) { // รอสูงสุด ~5 วินาที
                   clearInterval(checkInterval);
                   loadCaseDetail();
                 }
                 checkCount++;
-              }, 30);
+              }, 50);
             }
           }).catch(() => {
             loadCaseDetail();
@@ -1299,13 +1316,14 @@
         ) || {};
       }
 
-      if (typeof OFFLINE_CASE_DETAILS !== 'undefined') {
-        const details = OFFLINE_CASE_DETAILS[cleanId] || 
-                        OFFLINE_CASE_DETAILS[ospeId] || 
-                        OFFLINE_CASE_DETAILS[rawId] || 
-                        OFFLINE_CASE_DETAILS[upperId] || 
-                        OFFLINE_CASE_DETAILS[upperOspeId] || 
-                        OFFLINE_CASE_DETAILS[upperRawId];
+      const detailsMap = (typeof OFFLINE_CASE_DETAILS !== 'undefined' && OFFLINE_CASE_DETAILS) || window.OFFLINE_CASE_DETAILS;
+      if (detailsMap) {
+        const details = detailsMap[cleanId] || 
+                        detailsMap[ospeId] || 
+                        detailsMap[rawId] || 
+                        detailsMap[upperId] || 
+                        detailsMap[upperOspeId] || 
+                        detailsMap[upperRawId];
         if (details) {
           const merged = Object.assign({}, baseCase);
           Object.keys(details).forEach(k => {
@@ -1521,7 +1539,7 @@
         try {
           const cacheBuster = new Date().getTime();
           const controller = new AbortController();
-          const timeoutId = setTimeout(() => controller.abort(), 20000); // 20s timeout
+          const timeoutId = setTimeout(() => controller.abort(), 7000); // 7s timeout
           const res = await fetch(`${currentApiUrl}?action=getCase&id=${encodeURIComponent(cleanId)}&_cb=${cacheBuster}`, { signal: controller.signal });
           clearTimeout(timeoutId);
           const result = await res.json();

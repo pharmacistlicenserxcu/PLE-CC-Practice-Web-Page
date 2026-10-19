@@ -2618,16 +2618,15 @@
             </div>
 
             <!-- Locked Patient Info Placeholder Card (For Examinee / Solo when gated) -->
-            <div id="exam-patient-locked-card" style="display: none; margin-bottom: 1.5rem; padding: 1.15rem 1.25rem; border: 1.5px dashed #f59e0b; border-radius: var(--radius-md); background: rgba(245, 158, 11, 0.08); text-align: center;">
-              <div style="font-family: var(--font-title); font-weight: 700; color: #d97706; font-size: 0.98rem; margin-bottom: 0.35rem; display: flex; align-items: center; justify-content: center; gap: 0.4rem;">
-                <span>🔒 ข้อมูลผู้ป่วย (ส่งโดยผู้ประเมิน)</span>
+            <div id="exam-patient-locked-card" style="display: none; margin-bottom: 1.5rem; padding: 1.5rem 1.25rem; border: 1.5px dashed var(--border-dark); border-radius: var(--radius-md); background: var(--surface); text-align: center; box-shadow: var(--shadow-sm);">
+              <div style="font-size: 2.2rem; margin-bottom: 0.5rem; line-height: 1;">🔒</div>
+              <h4 style="font-family: var(--font-title); font-weight: 700; color: var(--text-primary); font-size: 1.05rem; margin-bottom: 0.35rem;">ข้อมูลผู้ป่วย</h4>
+              <div id="exam-patient-locked-desc" style="font-size: 0.88rem; color: var(--text-secondary); line-height: 1.5; max-width: 440px; margin: 0 auto;">
+                ผู้ประเมินจะส่งข้อมูลให้เมื่อถึงเวลา หน้านี้จะเปิดอัตโนมัติ
               </div>
-              <div id="exam-patient-locked-desc" style="font-size: 0.86rem; color: var(--text-secondary); line-height: 1.5;">
-                ข้อมูลผู้ป่วยจะแสดงเมื่อผู้ประเมินกดเปิดให้คุณดูระหว่างการสอบ
-              </div>
-              <div id="exam-patient-solo-unlock-wrap" style="display: none; margin-top: 0.75rem;">
-                <button type="button" onclick="window.unlockGatedSectionSolo('patientInfo')" style="padding: 0.45rem 1.1rem; border-radius: 8px; border: none; background: #d97706; color: #ffffff; font-weight: 700; font-size: 0.85rem; cursor: pointer; font-family: var(--font-body); box-shadow: 0 2px 6px rgba(217, 119, 6, 0.25);">
-                  🔓 กดเพื่อเปิดดูข้อมูลผู้ป่วย (โหมดฝึกซ้อมคนเดียว)
+              <div id="exam-patient-solo-unlock-wrap" style="display: none; margin-top: 1rem;">
+                <button type="button" onclick="window.unlockGatedSectionSolo('patientInfo')" style="padding: 0.45rem 1.2rem; border-radius: 9999px; border: 1px solid var(--border); background: var(--bg-secondary); color: var(--text-primary); font-weight: 700; font-size: 0.82rem; cursor: pointer; font-family: var(--font-body); transition: all 0.2s ease;">
+                  🔓 เปิดดูข้อมูล (โหมดฝึกซ้อมคนเดียว)
                 </button>
               </div>
             </div>
@@ -2674,16 +2673,15 @@
             </div>
 
             <!-- Locked Equipment Placeholder Card (For Examinee / Solo when gated) -->
-            <div id="exam-equipment-locked-card" style="display: none; margin-bottom: 1.5rem; padding: 1.15rem 1.25rem; border: 1.5px dashed #8b5cf6; border-radius: var(--radius-md); background: rgba(139, 92, 246, 0.08); text-align: center;">
-              <div style="font-family: var(--font-title); font-weight: 700; color: #7c3aed; font-size: 0.98rem; margin-bottom: 0.35rem; display: flex; align-items: center; justify-content: center; gap: 0.4rem;">
-                <span>🔒 สิ่งที่มีให้ในสถานี (ส่งโดยผู้ประเมิน)</span>
+            <div id="exam-equipment-locked-card" style="display: none; margin-bottom: 1.5rem; padding: 1.5rem 1.25rem; border: 1.5px dashed var(--border-dark); border-radius: var(--radius-md); background: var(--surface); text-align: center; box-shadow: var(--shadow-sm);">
+              <div style="font-size: 2.2rem; margin-bottom: 0.5rem; line-height: 1;">🔒</div>
+              <h4 style="font-family: var(--font-title); font-weight: 700; color: var(--text-primary); font-size: 1.05rem; margin-bottom: 0.35rem;">สิ่งที่มีให้ในสถานี</h4>
+              <div id="exam-equipment-locked-desc" style="font-size: 0.88rem; color: var(--text-secondary); line-height: 1.5; max-width: 440px; margin: 0 auto;">
+                ผู้ประเมินจะส่งข้อมูลให้เมื่อถึงเวลา หน้านี้จะเปิดอัตโนมัติ
               </div>
-              <div id="exam-equipment-locked-desc" style="font-size: 0.86rem; color: var(--text-secondary); line-height: 1.5;">
-                สิ่งที่มีให้ในสถานีจะแสดงเมื่อผู้ประเมินกดส่งให้คุณระหว่างการสอบ
-              </div>
-              <div id="exam-equipment-solo-unlock-wrap" style="display: none; margin-top: 0.75rem;">
-                <button type="button" onclick="window.unlockGatedSectionSolo('equipment')" style="padding: 0.45rem 1.1rem; border-radius: 8px; border: none; background: #7c3aed; color: #ffffff; font-weight: 700; font-size: 0.85rem; cursor: pointer; font-family: var(--font-body); box-shadow: 0 2px 6px rgba(124, 58, 237, 0.25);">
-                  🔓 กดเพื่อเปิดดูสิ่งที่มีให้ในสถานี (โหมดฝึกซ้อมคนเดียว)
+              <div id="exam-equipment-solo-unlock-wrap" style="display: none; margin-top: 1rem;">
+                <button type="button" onclick="window.unlockGatedSectionSolo('equipment')" style="padding: 0.45rem 1.2rem; border-radius: 9999px; border: 1px solid var(--border); background: var(--bg-secondary); color: var(--text-primary); font-weight: 700; font-size: 0.82rem; cursor: pointer; font-family: var(--font-body); transition: all 0.2s ease;">
+                  🔓 เปิดดูข้อมูล (โหมดฝึกซ้อมคนเดียว)
                 </button>
               </div>
             </div>
@@ -2701,15 +2699,17 @@
             </div>
 
             <!-- Examiner Gated Section Release Controls Panel -->
-            <div id="examiner-gated-controls-panel" style="display: none; margin-bottom: 1.5rem; background: var(--surface); border: 1.5px solid #f59e0b; border-radius: var(--radius-md); padding: 1rem 1.25rem; box-shadow: var(--shadow-sm);">
-              <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.75rem; border-bottom: 1px solid var(--border); padding-bottom: 0.5rem; flex-wrap: wrap; gap: 0.4rem;">
-                <div style="font-family: var(--font-title); font-weight: 700; color: #d97706; font-size: 0.95rem; display: flex; align-items: center; gap: 0.4rem;">
-                  <span>🎛️ ควบคุมการส่งข้อมูลให้ผู้เข้าสอบ (Examiner Release Control)</span>
+            <div id="examiner-gated-controls-panel" style="display: none; margin-bottom: 1.5rem; background: var(--surface); border: 1.5px solid var(--border-dark); border-radius: var(--radius-md); padding: 0.9rem 1.15rem; box-shadow: var(--shadow-sm);">
+              <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.65rem; border-bottom: 1px solid var(--border); padding-bottom: 0.45rem;">
+                <div style="font-family: var(--font-title); font-weight: 700; color: var(--text-primary); font-size: 0.95rem; display: flex; align-items: center; gap: 0.4rem;">
+                  <span>🎛️ Examiner Release Control</span>
                 </div>
-                <span style="background: rgba(245, 158, 11, 0.14); color: #b45309; font-size: 0.75rem; font-weight: 700; padding: 2px 8px; border-radius: 999px;">กดปุ่มเพื่อเปิด/ซ่อนหน้าจอผู้เข้าสอบแบบเรียลไทม์</span>
               </div>
-              <div id="examiner-gated-controls-list" style="display: flex; flex-direction: column; gap: 0.65rem;">
+              <div id="examiner-gated-controls-list" style="display: flex; flex-direction: column; gap: 0.6rem;">
                 <!-- Dynamically populated gated section toggle rows -->
+              </div>
+              <div style="margin-top: 0.6rem; padding-top: 0.45rem; border-top: 1px dashed var(--border); font-size: 0.76rem; color: var(--text-muted); display: flex; align-items: center; gap: 0.35rem;">
+                <span>💡 กดสลับ Show / Hide ได้ตลอดเวลา</span>
               </div>
             </div>
 
@@ -10199,15 +10199,18 @@
           if (showPatControl) {
             const isOpen = Boolean(rev.patientInfo);
             controlsHtml += `
-              <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:0.65rem;padding:0.65rem 0.85rem;background:var(--bg);border:1px solid ${isOpen ? '#86efac' : '#fde68a'};border-radius:var(--radius-sm);">
-                <div style="display:flex;align-items:center;gap:0.5rem;flex-wrap:wrap;">
-                  <strong style="font-size:0.9rem;color:var(--text-primary);">👤 ข้อมูลผู้ป่วย (ส่งโดยผู้ประเมิน)</strong>
-                  <span class="badge" style="background:${isOpen ? '#dcfce7' : '#fef3c7'};color:${isOpen ? '#15803d' : '#b45309'};font-weight:700;font-size:0.76rem;padding:2px 8px;border-radius:999px;">
-                    ${isOpen ? '🟢 เปิดให้ผู้เข้าสอบเห็นแล้ว' : '🔒 ซ่อนอยู่ (ผู้เข้าสอบยังไม่เห็น)'}
-                  </span>
+              <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:0.75rem;padding:0.65rem 0.85rem;background:var(--bg);border:1px solid ${isOpen ? 'rgba(34,197,94,0.35)' : 'var(--border)'};border-radius:var(--radius-sm);transition:all 0.2s ease;">
+                <div style="display:flex;flex-direction:column;gap:0.2rem;">
+                  <div style="display:flex;align-items:center;gap:0.45rem;flex-wrap:wrap;">
+                    <strong style="font-size:0.88rem;color:var(--text-primary);">👤 ข้อมูลผู้ป่วย</strong>
+                    <span class="badge" style="background:${isOpen ? 'rgba(34,197,94,0.12)' : 'rgba(100,116,139,0.12)'};color:${isOpen ? '#15803d' : '#64748b'};font-weight:700;font-size:0.74rem;padding:2px 8px;border-radius:9999px;">
+                      ${isOpen ? '🟢 แสดงแล้ว (Visible)' : '🔒 ซ่อนอยู่ (Hidden)'}
+                    </span>
+                  </div>
+                  <span style="font-size:0.76rem;color:var(--text-secondary);">ประวัติผู้ป่วยและค่า Lab</span>
                 </div>
-                <button type="button" id="btn-toggle-gated-patientInfo" onclick="window.toggleStationGatedSection('patientInfo')" style="padding:0.45rem 0.95rem;border-radius:8px;border:1px solid ${isOpen ? '#ef4444' : '#16a34a'};background:${isOpen ? 'rgba(239,68,68,0.1)' : '#16a34a'};color:${isOpen ? '#dc2626' : '#ffffff'};font-weight:700;font-size:0.84rem;cursor:pointer;font-family:var(--font-body);transition:all 0.15s;">
-                  ${isOpen ? '🙈 ซ่อนข้อมูลผู้ป่วยกลับ' : '📤 ส่งข้อมูลผู้ป่วยให้ผู้เข้าสอบ'}
+                <button type="button" id="btn-toggle-gated-patientInfo" onclick="window.toggleStationGatedSection('patientInfo')" style="display:inline-flex;align-items:center;gap:0.35rem;padding:0.42rem 0.95rem;border-radius:9999px;border:1px solid ${isOpen ? 'rgba(239,68,68,0.35)' : '#16a34a'};background:${isOpen ? 'rgba(239,68,68,0.08)' : '#16a34a'};color:${isOpen ? '#dc2626' : '#ffffff'};font-weight:700;font-size:0.82rem;cursor:pointer;font-family:var(--font-body);transition:all 0.15s ease;${isOpen ? '' : 'box-shadow:0 1px 3px rgba(22,163,74,0.25);'}">
+                  ${isOpen ? '🙈 Hide' : '👁️ Show'}
                 </button>
               </div>
             `;
@@ -10215,15 +10218,18 @@
           if (showEqControl) {
             const isOpen = Boolean(rev.equipment);
             controlsHtml += `
-              <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:0.65rem;padding:0.65rem 0.85rem;background:var(--bg);border:1px solid ${isOpen ? '#86efac' : '#ddd6fe'};border-radius:var(--radius-sm);">
-                <div style="display:flex;align-items:center;gap:0.5rem;flex-wrap:wrap;">
-                  <strong style="font-size:0.9rem;color:var(--text-primary);">📦 สิ่งที่มีให้ในสถานี (ส่งโดยผู้ประเมิน)</strong>
-                  <span class="badge" style="background:${isOpen ? '#dcfce7' : '#ede9fe'};color:${isOpen ? '#15803d' : '#6d28d9'};font-weight:700;font-size:0.76rem;padding:2px 8px;border-radius:999px;">
-                    ${isOpen ? '🟢 เปิดให้ผู้เข้าสอบเห็นแล้ว' : '🔒 ซ่อนอยู่ (ผู้เข้าสอบยังไม่เห็น)'}
-                  </span>
+              <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:0.75rem;padding:0.65rem 0.85rem;background:var(--bg);border:1px solid ${isOpen ? 'rgba(34,197,94,0.35)' : 'var(--border)'};border-radius:var(--radius-sm);transition:all 0.2s ease;">
+                <div style="display:flex;flex-direction:column;gap:0.2rem;">
+                  <div style="display:flex;align-items:center;gap:0.45rem;flex-wrap:wrap;">
+                    <strong style="font-size:0.88rem;color:var(--text-primary);">📦 สิ่งที่มีให้ในสถานี</strong>
+                    <span class="badge" style="background:${isOpen ? 'rgba(34,197,94,0.12)' : 'rgba(100,116,139,0.12)'};color:${isOpen ? '#15803d' : '#64748b'};font-weight:700;font-size:0.74rem;padding:2px 8px;border-radius:9999px;">
+                      ${isOpen ? '🟢 แสดงแล้ว (Visible)' : '🔒 ซ่อนอยู่ (Hidden)'}
+                    </span>
+                  </div>
+                  <span style="font-size:0.76rem;color:var(--text-secondary);">ใบสั่งยา อุปกรณ์ และสื่อที่ผู้เข้าสอบจะได้รับ</span>
                 </div>
-                <button type="button" id="btn-toggle-gated-equipment" onclick="window.toggleStationGatedSection('equipment')" style="padding:0.45rem 0.95rem;border-radius:8px;border:1px solid ${isOpen ? '#ef4444' : '#7c3aed'};background:${isOpen ? 'rgba(239,68,68,0.1)' : '#7c3aed'};color:${isOpen ? '#dc2626' : '#ffffff'};font-weight:700;font-size:0.84rem;cursor:pointer;font-family:var(--font-body);transition:all 0.15s;">
-                  ${isOpen ? '🙈 ซ่อนสิ่งที่มีให้ในสถานีกลับ' : '📤 ส่งสิ่งที่มีให้ในสถานีให้ผู้เข้าสอบ'}
+                <button type="button" id="btn-toggle-gated-equipment" onclick="window.toggleStationGatedSection('equipment')" style="display:inline-flex;align-items:center;gap:0.35rem;padding:0.42rem 0.95rem;border-radius:9999px;border:1px solid ${isOpen ? 'rgba(239,68,68,0.35)' : '#7c3aed'};background:${isOpen ? 'rgba(239,68,68,0.08)' : '#7c3aed'};color:${isOpen ? '#dc2626' : '#ffffff'};font-weight:700;font-size:0.82rem;cursor:pointer;font-family:var(--font-body);transition:all 0.15s ease;${isOpen ? '' : 'box-shadow:0 1px 3px rgba(124,58,237,0.25);'}">
+                  ${isOpen ? '🙈 Hide' : '👁️ Show'}
                 </button>
               </div>
             `;
@@ -10286,9 +10292,9 @@
       const secLabel = sectionKey === 'patientInfo' ? 'ข้อมูลผู้ป่วย' : 'สิ่งที่มีให้ในสถานี';
       if (typeof showPleToast === 'function') {
         if (nextVal) {
-          showPleToast(`✅ เปิด "${secLabel}" ให้ผู้เข้าสอบเห็นแล้ว`, 'success');
+          showPleToast(`👁️ Show "${secLabel}" ให้ผู้เข้าสอบแล้ว`, 'success');
         } else {
-          showPleToast(`🔒 ซ่อน "${secLabel}" จากหน้าจอผู้เข้าสอบแล้ว`, 'info');
+          showPleToast(`🙈 Hide "${secLabel}" จากผู้เข้าสอบแล้ว`, 'info');
         }
       }
 
@@ -10344,7 +10350,7 @@
             playGatedReleaseNotificationChime(newPat);
             if (typeof showPleToast === 'function') {
               showPleToast(
-                newPat ? '🔔 ผู้ประเมินได้เปิด "ข้อมูลผู้ป่วย" ให้คุณแล้ว' : '🔒 ผู้ประเมินได้ซ่อน "ข้อมูลผู้ป่วย" แล้ว',
+                newPat ? '🔔 ผู้ประเมิน Show "ข้อมูลผู้ป่วย" ให้คุณแล้ว' : '🔒 ผู้ประเมิน Hide "ข้อมูลผู้ป่วย" แล้ว',
                 newPat ? 'success' : 'info'
               );
             }
@@ -10359,7 +10365,7 @@
             playGatedReleaseNotificationChime(newEq);
             if (typeof showPleToast === 'function') {
               showPleToast(
-                newEq ? '🔔 ผู้ประเมินได้ส่ง "สิ่งที่มีให้ในสถานี" ให้คุณแล้ว' : '🔒 ผู้ประเมินได้ซ่อน "สิ่งที่มีให้ในสถานี" แล้ว',
+                newEq ? '🔔 ผู้ประเมิน Show "สิ่งที่มีให้ในสถานี" ให้คุณแล้ว' : '🔒 ผู้ประเมิน Hide "สิ่งที่มีให้ในสถานี" แล้ว',
                 newEq ? 'success' : 'info'
               );
             }

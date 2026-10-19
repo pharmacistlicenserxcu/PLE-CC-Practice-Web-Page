@@ -106,6 +106,334 @@
       to { transform: scale(1.05); }
     }
 
+    .viewer-unified-card {
+      box-sizing: border-box;
+      display: flex;
+      align-items: stretch;
+      background: var(--surface, #FFFFFF);
+      border: 1.5px solid var(--border, #E4E2DA);
+      border-radius: 16px;
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.06);
+      overflow: hidden;
+      margin-bottom: 1.5rem;
+      transition: all 0.2s ease;
+    }
+
+    .viewer-mode-section {
+      box-sizing: border-box;
+      flex: 1;
+      min-width: 0;
+      padding: 24px 28px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      gap: 18px;
+    }
+
+    .viewer-mode-heading {
+      font-size: 13px;
+      color: var(--text-secondary, #475569);
+      font-weight: 600;
+      margin-bottom: 2px;
+    }
+
+    .viewer-mode-grid {
+      display: flex;
+      gap: 12px;
+    }
+
+    .viewer-mode-card {
+      position: relative;
+      box-sizing: border-box;
+      flex: 1;
+      border: 2px solid var(--border, #E4E2DA);
+      background: var(--surface, #FFFFFF);
+      border-radius: 14px;
+      padding: 18px 16px 16px;
+      cursor: pointer;
+      transition: all 0.18s ease;
+      display: flex;
+      flex-direction: column;
+      user-select: none;
+    }
+
+    .viewer-mode-card:hover {
+      border-color: #0E7490;
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(14, 116, 144, 0.12);
+    }
+
+    .viewer-mode-card.active {
+      border-color: #0E7490;
+      background: rgba(14, 116, 144, 0.05);
+      box-shadow: 0 2px 10px rgba(14, 116, 144, 0.15);
+    }
+
+    .viewer-mode-card .card-check-badge {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      background: #0E7490;
+      color: #FFFFFF;
+      font-size: 12px;
+      font-weight: 700;
+      display: none;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .viewer-mode-card.active .card-check-badge {
+      display: flex;
+    }
+
+    .viewer-mode-card .card-icon-box {
+      width: 40px;
+      height: 40px;
+      border-radius: 12px;
+      background: var(--bg-secondary, #ECEAE4);
+      color: var(--text-secondary, #555C54);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 12px;
+      transition: all 0.18s ease;
+    }
+
+    .viewer-mode-card.active .card-icon-box {
+      background: #0E7490;
+      color: #FFFFFF;
+    }
+
+    .viewer-mode-card .card-title {
+      font-size: 16px;
+      font-weight: 700;
+      line-height: 1.3;
+      color: var(--text-primary, #1C2320);
+    }
+
+    .viewer-mode-card .card-sub {
+      font-size: 12px;
+      color: var(--text-secondary, #555C54);
+      line-height: 1.45;
+      margin-top: 4px;
+    }
+
+    .viewer-duration-bar {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      background: var(--bg, #F6F5F1);
+      border: 1px solid var(--border, #E4E2DA);
+      border-radius: 12px;
+      padding: 10px 14px;
+      flex-wrap: wrap;
+    }
+
+    .viewer-duration-label {
+      font-size: 13px;
+      color: var(--text-secondary, #475569);
+      font-weight: 600;
+      margin-right: 4px;
+    }
+
+    .viewer-duration-pill {
+      font-family: inherit;
+      font-size: 13px;
+      font-weight: 600;
+      border: 1px solid var(--border, #D0CCC2);
+      border-radius: 9999px;
+      padding: 6px 16px;
+      background: var(--surface, #FFFFFF);
+      color: var(--text-secondary, #555C54);
+      cursor: pointer;
+      transition: all 0.15s ease;
+    }
+
+    .viewer-duration-pill:hover {
+      border-color: #0E7490;
+      color: #0E7490;
+    }
+
+    .viewer-duration-pill.active {
+      background: #0E7490;
+      color: #FFFFFF;
+      border-color: #0E7490;
+      box-shadow: 0 2px 6px rgba(14, 116, 144, 0.25);
+    }
+
+    .viewer-timer-panel {
+      box-sizing: border-box;
+      width: 440px;
+      flex: none;
+      padding: 24px 32px 28px;
+      background: rgba(14, 116, 144, 0.05);
+      border-left: 1.5px solid rgba(14, 116, 144, 0.25);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .viewer-timer-top-info {
+      width: 100%;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .viewer-timer-clock {
+      font-family: var(--font-mono, 'IBM Plex Mono', monospace);
+      font-size: clamp(4.5rem, 6.5vw, 6.8rem);
+      font-weight: 700;
+      line-height: 1.05;
+      color: #0E7490;
+      letter-spacing: -0.03em;
+      margin: 8px 0 12px;
+      text-align: center;
+      user-select: none;
+      transition: color 0.3s ease;
+    }
+
+    .viewer-timer-clock.warn {
+      color: var(--warning, #D97706);
+    }
+
+    .viewer-timer-clock.danger {
+      color: var(--danger, #DC2626);
+      animation: pulse 1s infinite alternate;
+    }
+
+    .viewer-timer-track {
+      height: 8px;
+      background: var(--surface, #FFFFFF);
+      border-radius: 9999px;
+      overflow: hidden;
+      width: 100%;
+      border: 1px solid rgba(14, 116, 144, 0.18);
+    }
+
+    .viewer-timer-fill {
+      width: 100%;
+      height: 100%;
+      background: #0E7490;
+      border-radius: 9999px;
+      transition: width 0.3s ease;
+    }
+
+    .viewer-timer-ticks {
+      display: flex;
+      justify-content: space-between;
+      font-family: var(--font-mono, 'IBM Plex Mono', monospace);
+      font-size: 11px;
+      font-weight: 500;
+      color: var(--text-secondary, #475569);
+      margin-top: 6px;
+      width: 100%;
+    }
+
+    .viewer-timer-actions {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-top: 18px;
+      width: 100%;
+      justify-content: center;
+    }
+
+    .viewer-btn-primary-timer {
+      min-height: 50px;
+      min-width: 210px;
+      padding: 0 24px;
+      font-size: 16px;
+      font-weight: 700;
+      background: #0E7490;
+      border: 1.5px solid #0E7490;
+      color: #FFFFFF;
+      border-radius: 9999px;
+      box-shadow: 0 4px 16px rgba(14, 116, 144, 0.28);
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      font-family: var(--font-title, 'Bai Jamjuree', sans-serif);
+      transition: all 0.18s ease;
+    }
+
+    .viewer-btn-primary-timer:hover {
+      background: #085a70;
+      transform: translateY(-1px);
+      box-shadow: 0 6px 20px rgba(14, 116, 144, 0.35);
+    }
+
+    .viewer-btn-reset-timer {
+      width: 50px;
+      height: 50px;
+      min-height: 50px;
+      padding: 0;
+      font-size: 20px;
+      border-radius: 9999px;
+      border: 1.5px solid var(--border, #E4E2DA);
+      background: var(--surface, #FFFFFF);
+      color: var(--text-primary, #1C2320);
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.15s ease;
+    }
+
+    .viewer-btn-reset-timer:hover {
+      border-color: #0E7490;
+      color: #0E7490;
+      background: var(--bg, #F6F5F1);
+      transform: rotate(-45deg);
+    }
+
+    .viewer-sticky-timer-bar {
+      position: -webkit-sticky;
+      position: sticky;
+      top: 0;
+      z-index: 990;
+      background: var(--surface, #FFFFFF);
+      border: 1.5px solid var(--border, #E4E2DA);
+      box-shadow: 0 4px 14px rgba(0, 0, 0, 0.08);
+      padding: 0.5rem 1.25rem;
+      display: none;
+      align-items: center;
+      justify-content: space-between;
+      gap: 0.75rem;
+      margin-bottom: 1rem;
+      border-radius: var(--radius-md, 8px);
+      animation: fadeIn 0.2s ease;
+    }
+
+    .viewer-sticky-timer-bar.is-stuck {
+      display: flex;
+    }
+
+    @media (max-width: 991px) {
+      .viewer-unified-card {
+        flex-direction: column;
+      }
+      .viewer-timer-panel {
+        width: 100%;
+        border-left: none;
+        border-top: 1.5px solid rgba(14, 116, 144, 0.25);
+        padding: 20px 16px 24px;
+      }
+      .viewer-mode-grid {
+        flex-direction: column;
+      }
+      .viewer-timer-clock {
+        font-size: 3.8rem;
+        margin: 6px 0 10px;
+      }
+    }
+
     /* ═══════════════════════════════════════════════════════════
        UNIFIED EXAM ACTION HUB & LIVE STATION CHAT (CASE VIEWER)
        ═══════════════════════════════════════════════════════════ */
@@ -1000,32 +1328,91 @@
         </div>
       </header>
 
-      <!-- Role / Practice Mode Selector, Timer, and Layout Mode Toggle (no-print) -->
-      <div class="viewer-controls-bar no-print" style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.75rem; margin-bottom: 1.25rem;">
-        <div style="display: flex; align-items: center; gap: 0.75rem; flex-wrap: wrap;">
-          <div id="mode-selector" class="role-selector-container" style="margin-bottom: 0;">
-            <button class="role-btn active" id="role-btn-solo" onclick="setViewerRole('solo')">👤 ฝึกคนเดียว</button>
-            <button class="role-btn" id="role-btn-examinee" onclick="setViewerRole('examinee')">✍️ เป็นคนสอบ</button>
-            <button class="role-btn" id="role-btn-examiner" onclick="setViewerRole('examiner')">🔎 เป็นคนตรวจ</button>
-          </div>
-          <div id="viewer-timer-card" style="display: inline-flex; align-items: center; gap: 0.5rem; background: var(--surface); border: 1.5px solid var(--border); border-radius: var(--radius-md); padding: 0.35rem 0.75rem; box-shadow: var(--shadow-sm);">
-            <div class="viewer-timer-display" id="viewer-timer">04:00</div>
-            <div style="display: inline-flex; align-items: center; gap: 0.35rem;">
-              <button class="btn btn-secondary" style="padding: 0.25rem 0.55rem; font-size: 0.78rem; font-weight: 600; border-radius: var(--radius-xs, 4px);" id="viewer-timer-btn" onclick="toggleViewerTimer()">⏱️ เริ่มจับเวลา</button>
-              <button class="btn btn-ghost" style="padding: 0.25rem 0.45rem; font-size: 0.82rem; border: 1px solid var(--border); border-radius: var(--radius-xs, 4px); cursor: pointer;" onclick="resetViewerTimer()" title="รีเซ็ตเวลา">🔄</button>
-            </div>
+      <!-- Pinned Sticky Timer Bar (Visible when scrolling past main card) -->
+      <div id="viewer-sticky-timer-bar" class="viewer-sticky-timer-bar no-print">
+        <div style="display: flex; align-items: center; gap: 8px; min-width: 0;">
+          <span id="sticky-case-id-badge" class="badge" style="background: rgba(14, 116, 144, 0.12); color: #0E7490; font-weight: 700; font-size: 0.84rem; padding: 4px 10px; border-radius: 9999px;">OSPE</span>
+          <span id="sticky-role-badge" class="badge" style="background: var(--bg-secondary, #ECEAE4); color: var(--text-secondary, #555C54); font-weight: 600; font-size: 0.8rem; padding: 4px 10px; border-radius: 9999px;">👤 ฝึกคนเดียว</span>
+          <span id="sticky-timer-status" class="status-badge" style="font-size: 0.76rem; padding: 2px 8px; border-radius: 9999px; background: rgba(14, 165, 233, 0.12); color: #0284c7; font-weight: 700;">พร้อมเริ่ม</span>
+        </div>
+        <div style="display: flex; align-items: center; gap: 14px;">
+          <div id="viewer-sticky-timer" style="font-family: var(--font-mono, 'IBM Plex Mono', monospace); font-size: 1.85rem; font-weight: 700; color: #0E7490; letter-spacing: -0.02em; line-height: 1;">04:00</div>
+          <div style="display: flex; align-items: center; gap: 6px;">
+            <button type="button" id="viewer-sticky-timer-btn" class="btn btn-primary" onclick="toggleViewerTimer()" style="min-height: 38px; padding: 0 16px; font-size: 0.88rem; font-weight: 700; background: #0E7490; border-color: #0E7490; border-radius: 9999px; color: #FFFFFF;">▶ เริ่มจับเวลา</button>
+            <button type="button" class="btn" onclick="resetViewerTimer()" title="รีเซ็ตเวลา" style="width: 38px; height: 38px; min-height: 38px; padding: 0; font-size: 1.1rem; border-radius: 50%; border: 1.5px solid var(--border); background: var(--surface); color: var(--text-primary); cursor: pointer; display: inline-flex; align-items: center; justify-content: center;">↻</button>
           </div>
         </div>
-        <div class="layout-toggle-container" id="viewer-layout-toggle-wrap" style="display: inline-flex; align-items: center; background: var(--bg-secondary); padding: 3px; border-radius: var(--radius-md); border: 1px solid var(--border);">
-          <span style="font-size: 0.78rem; font-weight: 600; color: var(--text-secondary); padding: 0 0.4rem;">มุมมอง:</span>
-          <button type="button" class="btn-layout-segment" id="btn-viewer-layout-split" onclick="setViewerLayoutModeExplicit('split')" title="มุมมองแบ่ง 2 ฝั่งล็อกจอ (โจทย์ซ้าย / Checklist ขวา มี scrollbar แยกในกรอบ)" style="display: inline-flex; align-items: center; gap: 0.35rem; padding: 0.35rem 0.75rem; font-size: 0.82rem; font-weight: 600; border-radius: var(--radius-sm); border: none; cursor: pointer; transition: all 0.2s;">
-            <span>◫</span>
-            <span>แบ่ง 2 ฝั่ง</span>
-          </button>
-          <button type="button" class="btn-layout-segment" id="btn-viewer-layout-classic" onclick="setViewerLayoutModeExplicit('classic')" title="มุมมองหน้าแบบยาวต่อเนื่อง (เลื่อนทั้งหน้าจอเหมือนเอกสารปกติ)" style="display: inline-flex; align-items: center; gap: 0.35rem; padding: 0.35rem 0.75rem; font-size: 0.82rem; font-weight: 600; border-radius: var(--radius-sm); border: none; cursor: pointer; transition: all 0.2s;">
-            <span>☰</span>
-            <span>แบบยาว</span>
-          </button>
+      </div>
+
+      <!-- Unified Case Controls & Big Timer Card (Image 1 Mockup) -->
+      <div id="viewer-unified-card" class="viewer-unified-card no-print">
+        <!-- Left Side: Role Selector & Duration Presets -->
+        <div class="viewer-mode-section">
+          <div>
+            <div class="viewer-mode-heading">เลือกโหมดการใช้งาน</div>
+            <div class="viewer-mode-grid" id="mode-selector">
+              <!-- Card 1: Solo -->
+              <div id="mode-card-solo" class="viewer-mode-card active" onclick="setViewerRole('solo')">
+                <span class="card-check-badge">✓</span>
+                <div class="card-icon-box">
+                  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="8" r="4"></circle><path d="M4 21c0-4.4 3.6-7 8-7s8 2.6 8 7"></path></svg>
+                </div>
+                <div class="card-title">ฝึกคนเดียว</div>
+                <div class="card-sub">ดูโจทย์และเฉลยได้เอง จับเวลาด้วยตัวเอง</div>
+              </div>
+
+              <!-- Card 2: Examinee -->
+              <div id="mode-card-examinee" class="viewer-mode-card" onclick="setViewerRole('examinee')">
+                <span class="card-check-badge">✓</span>
+                <div class="card-icon-box">
+                  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 20l1-4L16 5l3 3L8 19z"></path><path d="M14 7l3 3"></path></svg>
+                </div>
+                <div class="card-title">เป็นคนสอบ</div>
+                <div class="card-sub">รอผู้ตรวจปล่อยข้อมูลและเริ่มเวลาให้</div>
+              </div>
+
+              <!-- Card 3: Examiner -->
+              <div id="mode-card-examiner" class="viewer-mode-card" onclick="setViewerRole('examiner')">
+                <span class="card-check-badge">✓</span>
+                <div class="card-icon-box">
+                  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="5" y="4" width="14" height="17" rx="2"></rect><path d="M9 4V3h6v1M9 13l2 2 4-4"></path></svg>
+                </div>
+                <div class="card-title">เป็นคนตรวจ</div>
+                <div class="card-sub">ควบคุมเวลาและส่งข้อมูลให้ผู้เข้าสอบ</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Duration Presets Row -->
+          <div class="viewer-duration-bar">
+            <span class="viewer-duration-label">ตั้งเวลา</span>
+            <button type="button" class="viewer-duration-pill" data-min="2" onclick="setViewerDurationPreset(2)">2 นาที</button>
+            <button type="button" class="viewer-duration-pill active" data-min="4" onclick="setViewerDurationPreset(4)">4 นาที</button>
+            <button type="button" class="viewer-duration-pill" data-min="6" onclick="setViewerDurationPreset(6)">6 นาที</button>
+            <button type="button" class="viewer-duration-pill" id="pill-duration-custom" onclick="setViewerCustomDuration()">กำหนดเอง</button>
+          </div>
+        </div>
+
+        <!-- Right Side: Big Cyan Timer Panel -->
+        <div class="viewer-timer-panel" id="viewer-timer-card">
+          <div class="viewer-timer-top-info">
+            <span style="font-size: 13px; font-weight: 600; color: #0E7490;">เวลาสอบ</span>
+            <span id="viewer-timer-status-badge" style="font-size: 12px; font-weight: 600; color: #475569; background: #FFFFFF; border: 1px solid #A5F3FC; border-radius: 9999px; padding: 1px 10px;">พร้อมเริ่ม</span>
+            <span id="viewer-timer-total-label" style="margin-left: auto; font-family: var(--font-mono, 'IBM Plex Mono', monospace); font-size: 12px; font-weight: 500; color: #475569;">ทั้งหมด 4 นาที</span>
+          </div>
+          <div id="viewer-timer" class="viewer-timer-clock">04:00</div>
+          <div style="width: 100%;">
+            <div class="viewer-timer-track">
+              <div id="viewer-timer-progress-fill" class="viewer-timer-fill"></div>
+            </div>
+            <div id="viewer-timer-ticks" class="viewer-timer-ticks">
+              <span>00:00</span><span>01:00</span><span>02:00</span><span>03:00</span><span>04:00</span>
+            </div>
+          </div>
+          <div class="viewer-timer-actions">
+            <button type="button" id="viewer-timer-btn" class="viewer-btn-primary-timer" onclick="toggleViewerTimer()">▶ เริ่มจับเวลา</button>
+            <button type="button" id="viewer-timer-reset-btn" class="viewer-btn-reset-timer" onclick="resetViewerTimer()" aria-label="รีเซ็ตเวลา" title="รีเซ็ตเวลา">↻</button>
+          </div>
         </div>
       </div>
 
@@ -1038,6 +1425,21 @@
 
           <!-- Tab Content: Case Detail HTML (always visible, no tabs needed) -->
           <div id="view-tab-content-area" class="view-tab-content active print-hide-checklist">
+            
+            <!-- View Layout Toggle (Segmented: Split vs Long) -->
+            <div class="layout-toggle-container no-print" id="viewer-layout-toggle-wrap" style="display: flex; align-items: center; justify-content: flex-end; gap: 10px; font-size: 13px; color: var(--text-secondary, #475569); font-weight: 500; margin-bottom: 14px;">
+              <span>มุมมอง</span>
+              <div style="display: inline-flex; background: var(--bg-secondary, #ECEAE4); padding: 3px; border-radius: 9999px; border: 1px solid var(--border, #E4E2DA);">
+                <button type="button" class="btn-layout-segment" id="btn-viewer-layout-split" onclick="setViewerLayoutModeExplicit('split')" title="มุมมองแบ่ง 2 ฝั่ง" style="display: inline-flex; align-items: center; gap: 4px; padding: 5px 14px; font-size: 13px; font-weight: 600; border-radius: 9999px; border: none; cursor: pointer; transition: all 0.2s;">
+                  <span>◫</span>
+                  <span>แบ่ง 2 ฝั่ง</span>
+                </button>
+                <button type="button" class="btn-layout-segment" id="btn-viewer-layout-classic" onclick="setViewerLayoutModeExplicit('classic')" title="มุมมองแนวยาว" style="display: inline-flex; align-items: center; gap: 4px; padding: 5px 14px; font-size: 13px; font-weight: 600; border-radius: 9999px; border: none; cursor: pointer; transition: all 0.2s;">
+                  <span>☰</span>
+                  <span>แนวยาว</span>
+                </button>
+              </div>
+            </div>
             
             <h3 class="viewer-section-title" id="scenario-section-title">สถานการณ์</h3>
             <div id="case-scenario-content">
@@ -1215,6 +1617,7 @@
 
     // ตัวแปรจับเวลาสำหรับหน้ารายละเอียดเคสเดี่ยว
     let viewerTimerVal = 240;
+    let viewerTimerTotalDuration = 240;
     let viewerTimerInterval = null;
     let viewerTimerRunning = false;
 
@@ -1225,6 +1628,7 @@
 
     document.addEventListener('DOMContentLoaded', () => {
       applyViewerLayoutMode();
+      initStickyTimerBarObserver();
       if (activeCaseId) {
         // ดึงบทบาทจาก URL ถ้ามี (mode หรือ role)
         const modeParam = getUrlParam('mode') || getUrlParam('role');
@@ -1245,9 +1649,13 @@
           const topbarMeta = document.getElementById('topbar-case-meta');
           if (topbarMeta) topbarMeta.textContent = (initialCase.category || '') + (initialCase.subTopic ? ` · ${initialCase.subTopic}` : '');
 
+          const stickyBadge = document.getElementById('sticky-case-id-badge');
+          if (stickyBadge) stickyBadge.textContent = caseId ? (caseId.startsWith('OSPE-') ? caseId : ('OSPE-' + caseId)) : 'OSPE';
+
           // ตั้งค่าระยะเวลาตัวจับเวลาทันทีตั้งแต่ 0ms
-          viewerTimerVal = parseCaseDurationSec(initialCase);
-          updateViewerTimerDisplay();
+          const initDurSec = parseCaseDurationSec(initialCase);
+          const initDurMin = Math.round(initDurSec / 60);
+          setViewerDurationPreset(initDurMin);
         }
         
         // ตรวจสอบฐานข้อมูลออฟไลน์ (ดึงจากหน่วยความจำ หรือ IndexedDB ทันที 0-5ms)
@@ -1653,7 +2061,12 @@
       }
 
       // รีเซ็ตตัวจับเวลาให้ตรงกับเคสนี้เสมอ
-      resetViewerTimer();
+      const durSec = parseCaseDurationSec(c);
+      const durMin = Math.round(durSec / 60);
+      setViewerDurationPreset(durMin);
+
+      const stickyBadge = document.getElementById('sticky-case-id-badge');
+      if (stickyBadge) stickyBadge.textContent = caseId ? (caseId.startsWith('OSPE-') ? caseId : ('OSPE-' + caseId)) : 'OSPE';
 
       // Auto-extract checklist items if checklist is empty but items leaked into patientInfoHtml or contentHtml
       if ((!c.checklist || c.checklist.length === 0) && (c.patientInfoHtml || c.contentHtml)) {
@@ -2184,7 +2597,21 @@
       
       // อัปเดตปุ่ม Active ใน UI
       document.querySelectorAll('.role-btn').forEach(btn => btn.classList.remove('active'));
-      document.getElementById(`role-btn-${role}`).classList.add('active');
+      const legacyBtn = document.getElementById(`role-btn-${role}`);
+      if (legacyBtn) legacyBtn.classList.add('active');
+
+      // อัปเดตการ์ดบทบาทใหม่ (Viewer Mode Cards)
+      document.querySelectorAll('.viewer-mode-card').forEach(card => card.classList.remove('active'));
+      const activeCard = document.getElementById(`mode-card-${role}`);
+      if (activeCard) activeCard.classList.add('active');
+
+      // อัปเดตตราสัญลักษณ์บทบาทบนแถบเวลาตรึงด้านบน (Sticky Bar)
+      const stickyRoleBadge = document.getElementById('sticky-role-badge');
+      if (stickyRoleBadge) {
+        if (role === 'solo') stickyRoleBadge.textContent = '👤 ฝึกคนเดียว';
+        else if (role === 'examinee') stickyRoleBadge.textContent = '✍️ เป็นคนสอบ';
+        else if (role === 'examiner') stickyRoleBadge.textContent = '🔎 เป็นคนตรวจ';
+      }
 
       const chkSection = document.getElementById('checklist-and-notes-section');
       const noticeSection = document.getElementById('examinee-overlay-notice');
@@ -2212,7 +2639,6 @@
         if (noteWrap) noteWrap.style.display = 'block';
         if (docTabs) docTabs.style.display = 'flex';
         resetViewerTimer();
-        document.getElementById('viewer-timer-btn').textContent = '⏱️ เริ่มจับเวลา';
         
         // ซ่อนเฉลยตามดีฟอลต์ของโซโล่
         if (noteArea) noteArea.classList.remove('show');
@@ -2229,8 +2655,6 @@
         switchViewerTab('content');      // บังคับแสดงหน้าโจทย์
         
         resetViewerTimer();
-        // ไม่เล่นอัตโนมัติตามแผนใหม่: ค้างที่ 04:00 และเปลี่ยนข้อความปุ่ม
-        document.getElementById('viewer-timer-btn').textContent = '⏱️ เริ่มจับเวลา';
       } 
       else if (role === 'examiner') {
         // ตรวจ/ผู้ประเมิน: แสดง Checklist, ข้อความการแสดง, และปุ่มจับเวลา
@@ -2246,8 +2670,6 @@
         if (toggleNoteBtn) toggleNoteBtn.innerHTML = '<span>🔒 ซ่อนเฉลย / ข้อมูลผู้ตรวจ</span>';
         
         resetViewerTimer();
-        // ไม่ต้องเริ่มจับเวลาโดยอัตโนมัติ ให้ผู้ประเมินกดเริ่มเอง
-        document.getElementById('viewer-timer-btn').textContent = '⏱️ เริ่มจับเวลา';
       }
 
       // Re-render scenario to reflect examiner keys vs interactive student blanks
@@ -2280,12 +2702,98 @@
 
 
     // ──────────────────────────────────────────────────────────
-    // 4-Minute Timer Logic for Viewer
+    // Timer Logic for Viewer (Presets, Ticks, Dual Display & Sticky Bar)
     // ──────────────────────────────────────────────────────────
+    function setViewerDurationPreset(minutes) {
+      const mins = parseInt(minutes, 10) || 4;
+      viewerTimerTotalDuration = Math.round(mins / (1 / 60));
+      stopViewerTimer();
+      viewerTimerVal = viewerTimerTotalDuration;
+
+      // อัปเดตสถานะปุ่มเลือกนาที
+      document.querySelectorAll('.viewer-duration-pill').forEach(pill => {
+        pill.classList.remove('active');
+        const pMin = parseInt(pill.getAttribute('data-min'), 10);
+        if (pMin === mins) {
+          pill.classList.add('active');
+        }
+      });
+
+      // หากเป็นเวลากำหนดเอง ให้เปิดสถานะปุ่มกำหนดเอง
+      const customPill = document.getElementById('pill-duration-custom');
+      if (customPill) {
+        if (![2, 4, 6].includes(mins)) {
+          customPill.classList.add('active');
+          customPill.textContent = `${mins} นาที`;
+        } else {
+          customPill.textContent = 'กำหนดเอง';
+        }
+      }
+
+      // อัปเดตข้อความเวลารวมบนการ์ด
+      const totalLabel = document.getElementById('viewer-timer-total-label');
+      if (totalLabel) {
+        totalLabel.textContent = `ทั้งหมด ${mins} นาที`;
+      }
+
+      // วาดสเกลเวลาใหม่
+      renderTimerIntervalTicks(mins);
+
+      // อัปเดตหน้าปัดนาฬิกา
+      updateViewerTimerDisplay();
+
+      // รีเซ็ตข้อความปุ่มควบคุมเวลาทั้ง 2 จุด
+      const timerBtn = document.getElementById('viewer-timer-btn');
+      if (timerBtn) timerBtn.textContent = '▶ เริ่มจับเวลา';
+      const stickyBtn = document.getElementById('viewer-sticky-timer-btn');
+      if (stickyBtn) stickyBtn.textContent = '▶ เริ่มจับเวลา';
+    }
+    window.setViewerDurationPreset = setViewerDurationPreset;
+
+    function setViewerCustomDuration() {
+      const currentMin = Math.round(viewerTimerTotalDuration / 60);
+      const input = window.prompt('กรุณากรอกระยะเวลาที่ต้องการจับเวลา (นาที เช่น 3, 5, 8, 10):', currentMin.toString());
+      if (!input) return;
+      const parsed = parseInt(input.trim(), 10);
+      if (isNaN(parsed) || parsed < 1 || parsed > 120) {
+        alert('กรุณากรอกตัวเลขจำนวนเต็มระหว่าง 1 ถึง 120 นาที');
+        return;
+      }
+      setViewerDurationPreset(parsed);
+    }
+    window.setViewerCustomDuration = setViewerCustomDuration;
+
+    function renderTimerIntervalTicks(totalMin) {
+      const ticksEl = document.getElementById('viewer-timer-ticks');
+      if (!ticksEl) return;
+      const mins = parseInt(totalMin, 10) || 4;
+      const totalSec = Math.round(mins / (1 / 60));
+      const stepSec = Math.round(totalSec / 4);
+      const points = [
+        0,
+        stepSec,
+        stepSec + stepSec,
+        stepSec + stepSec + stepSec,
+        totalSec
+      ];
+      
+      const html = points.map(secVal => {
+        const m = Math.floor(secVal / 60);
+        const s = secVal % 60;
+        return `<span>${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}</span>`;
+      }).join('');
+      
+      ticksEl.innerHTML = html;
+    }
+    window.renderTimerIntervalTicks = renderTimerIntervalTicks;
+
     function startViewerTimer() {
       if (viewerTimerInterval) clearInterval(viewerTimerInterval);
       viewerTimerRunning = true;
-      document.getElementById('viewer-timer-btn').textContent = '⏸️ พักการจับเวลา';
+      const timerBtn = document.getElementById('viewer-timer-btn');
+      if (timerBtn) timerBtn.textContent = '⏸ พักการจับเวลา';
+      const stickyBtn = document.getElementById('viewer-sticky-timer-btn');
+      if (stickyBtn) stickyBtn.textContent = '⏸ พักการจับเวลา';
       
       updateViewerTimerDisplay();
       
@@ -2298,6 +2806,10 @@
         if (viewerTimerVal <= 0) {
           clearInterval(viewerTimerInterval);
           viewerTimerRunning = false;
+          const tBtn = document.getElementById('viewer-timer-btn');
+          if (tBtn) tBtn.textContent = '▶ เริ่มใหม่';
+          const sBtn = document.getElementById('viewer-sticky-timer-btn');
+          if (sBtn) sBtn.textContent = '▶ เริ่มใหม่';
           if (typeof playStationTimeoutAlarm === 'function') {
             playStationTimeoutAlarm();
           }
@@ -2315,14 +2827,15 @@
         [880, 1174.66, 1318.51].forEach((freq, idx) => {
           const osc = ctx.createOscillator();
           const gain = ctx.createGain();
+          const timeOffset = (idx === 0) ? 0 : ((idx === 1) ? 0.16 : 0.32);
           osc.type = 'sine';
-          osc.frequency.setValueAtTime(freq, now + idx * 0.16);
-          gain.gain.setValueAtTime(0.3, now + idx * 0.16);
-          gain.gain.exponentialRampToValueAtTime(0.001, now + idx * 0.16 + 0.8);
+          osc.frequency.setValueAtTime(freq, now + timeOffset);
+          gain.gain.setValueAtTime(0.3, now + timeOffset);
+          gain.gain.exponentialRampToValueAtTime(0.001, now + timeOffset + 0.8);
           osc.connect(gain);
           gain.connect(ctx.destination);
-          osc.start(now + idx * 0.16);
-          osc.stop(now + idx * 0.16 + 0.85);
+          osc.start(now + timeOffset);
+          osc.stop(now + timeOffset + 0.85);
         });
       } catch (e) {
         console.warn('Audio alert error:', e);
@@ -2330,12 +2843,10 @@
     }
 
     function showViewerTimeoutPopup() {
-      // Remove any existing overlay
       const existing = document.getElementById('viewer-timeout-overlay');
       if (existing) existing.remove();
 
-      const c = (typeof AppState !== 'undefined') && AppState.currentCase;
-      const durMin = Math.round(parseCaseDurationSec(c) / 60);
+      const durMin = Math.round(viewerTimerTotalDuration / 60);
 
       const overlay = document.createElement('div');
       overlay.id = 'viewer-timeout-overlay';
@@ -2356,12 +2867,19 @@
     }
 
     function toggleViewerTimer() {
-      if (!viewerTimerRunning && viewerTimerInterval === null) {
-        // ถ้าค้างไว้ที่ 04:00 (ยังไม่เคยสตาร์ท)
+      if (!viewerTimerRunning && (viewerTimerInterval === null || viewerTimerVal <= 0)) {
+        if (viewerTimerVal <= 0) {
+          viewerTimerVal = viewerTimerTotalDuration;
+        }
         startViewerTimer();
       } else {
         viewerTimerRunning = !viewerTimerRunning;
-        document.getElementById('viewer-timer-btn').textContent = viewerTimerRunning ? '⏸️ พักการจับเวลา' : '▶️ เล่นตัวจับเวลาต่อ';
+        const btnLabel = viewerTimerRunning ? '⏸ พักการจับเวลา' : '▶ เล่นตัวจับเวลาต่อ';
+        const timerBtn = document.getElementById('viewer-timer-btn');
+        if (timerBtn) timerBtn.textContent = btnLabel;
+        const stickyBtn = document.getElementById('viewer-sticky-timer-btn');
+        if (stickyBtn) stickyBtn.textContent = btnLabel;
+        updateViewerTimerDisplay();
       }
     }
 
@@ -2375,31 +2893,120 @@
 
     function resetViewerTimer() {
       stopViewerTimer();
-      const c = (typeof AppState !== 'undefined') && AppState.currentCase;
-      viewerTimerVal = c ? parseCaseDurationSec(c) : 240;
+      viewerTimerVal = viewerTimerTotalDuration || 240;
       updateViewerTimerDisplay();
-      const btn = document.getElementById('viewer-timer-btn');
-      if (btn) btn.textContent = '⏱️ เริ่มจับเวลา';
+      const timerBtn = document.getElementById('viewer-timer-btn');
+      if (timerBtn) timerBtn.textContent = '▶ เริ่มจับเวลา';
+      const stickyBtn = document.getElementById('viewer-sticky-timer-btn');
+      if (stickyBtn) stickyBtn.textContent = '▶ เริ่มจับเวลา';
     }
 
     function updateViewerTimerDisplay() {
       const min = Math.floor(viewerTimerVal / 60);
       const sec = viewerTimerVal % 60;
       const display = `${String(min).padStart(2, '0')}:${String(sec).padStart(2, '0')}`;
-      
+
+      // 1. Digital Clock Display on Card
       const timerEl = document.getElementById('viewer-timer');
       if (timerEl) {
         timerEl.textContent = display;
-        
-        // จัดการระดับความสำคัญตามสี
-        timerEl.className = 'viewer-timer-display';
-        if (viewerTimerVal < 10) {
-          timerEl.classList.add('danger');
-        } else if (viewerTimerVal < 60) {
-          timerEl.classList.add('warn');
+        if (viewerTimerVal <= 10) {
+          timerEl.style.color = '#EF4444';
+        } else if (viewerTimerVal <= 60) {
+          timerEl.style.color = '#F59E0B';
+        } else {
+          timerEl.style.color = '#0E7490';
         }
       }
+
+      // 2. Digital Clock Display on Sticky Bar
+      const stickyTimerEl = document.getElementById('viewer-sticky-timer');
+      if (stickyTimerEl) {
+        stickyTimerEl.textContent = display;
+        if (viewerTimerVal <= 10) {
+          stickyTimerEl.style.color = '#EF4444';
+        } else if (viewerTimerVal <= 60) {
+          stickyTimerEl.style.color = '#F59E0B';
+        } else {
+          stickyTimerEl.style.color = '#0E7490';
+        }
+      }
+
+      // 3. Progress Bar Fill
+      const tot = viewerTimerTotalDuration || 240;
+      const elapsed = Math.max(0, tot - viewerTimerVal);
+      // คำนวณเปอร์เซ็นต์โดยไม่ใช้เครื่องหมายดอกจัน
+      const pct = Math.min(100, Math.max(0, Math.round((elapsed / tot) / 0.01)));
+      const fillEl = document.getElementById('viewer-timer-progress-fill');
+      if (fillEl) {
+        fillEl.style.width = pct + '%';
+        if (viewerTimerVal <= 10) {
+          fillEl.style.background = '#EF4444';
+        } else if (viewerTimerVal <= 60) {
+          fillEl.style.background = '#F59E0B';
+        } else {
+          fillEl.style.background = '#0E7490';
+        }
+      }
+
+      // 4. Status Badges
+      let statusText = 'พร้อมเริ่ม';
+      let statusColor = '#0E7490';
+      let statusBg = '#E0F2FE';
+      let statusBorder = '#BAE6FD';
+
+      if (viewerTimerVal === 0) {
+        statusText = 'หมดเวลา';
+        statusColor = '#EF4444';
+        statusBg = '#FEE2E2';
+        statusBorder = '#FECACA';
+      } else if (viewerTimerRunning) {
+        statusText = 'กำลังสอบ';
+        statusColor = '#059669';
+        statusBg = '#D1FAE5';
+        statusBorder = '#A7F3D0';
+      } else if (viewerTimerInterval !== null && !viewerTimerRunning) {
+        statusText = 'พักชั่วคราว';
+        statusColor = '#D97706';
+        statusBg = '#FEF3C7';
+        statusBorder = '#FDE68A';
+      }
+
+      const statusBadge = document.getElementById('viewer-timer-status-badge');
+      if (statusBadge) {
+        statusBadge.textContent = statusText;
+        statusBadge.style.color = statusColor;
+        statusBadge.style.backgroundColor = statusBg;
+        statusBadge.style.borderColor = statusBorder;
+      }
+
+      const stickyStatus = document.getElementById('sticky-timer-status');
+      if (stickyStatus) {
+        stickyStatus.textContent = statusText;
+        stickyStatus.style.color = statusColor;
+        stickyStatus.style.backgroundColor = statusBg;
+        stickyStatus.style.borderColor = statusBorder;
+      }
     }
+
+    function initStickyTimerBarObserver() {
+      const card = document.getElementById('viewer-unified-card');
+      const stickyBar = document.getElementById('viewer-sticky-timer-bar');
+      if (!card || !stickyBar) return;
+
+      function checkSticky() {
+        const rect = card.getBoundingClientRect();
+        if (rect.bottom <= 10) {
+          stickyBar.classList.add('is-stuck');
+        } else {
+          stickyBar.classList.remove('is-stuck');
+        }
+      }
+
+      window.addEventListener('scroll', checkSticky, { passive: true });
+      checkSticky();
+    }
+    window.initStickyTimerBarObserver = initStickyTimerBarObserver;
 
     function switchViewerTab(tab) {
       const btnContent = document.getElementById('tab-btn-content');

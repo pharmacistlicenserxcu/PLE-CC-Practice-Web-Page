@@ -1,12 +1,12 @@
 /**
  * PLE-CC2 OSPE Practice System — Offline Case List Metadata (Auto-Generated)
- * Version: v_20261019_190531
- * Generated on 2026-10-19 19:05:31
+ * Version: v_20261019_193255
+ * Generated on 2026-10-19 19:32:55
  */
 
 const OFFLINE_DATA = {
-  "version": "v_20261019_190531",
-  "generatedAt": "2026-10-19 19:05:31",
+  "version": "v_20261019_193255",
+  "generatedAt": "2026-10-19 19:32:55",
   "totalCases": 406,
   "cases": [
     {
@@ -3938,11 +3938,11 @@ const OFFLINE_DATA = {
     },
     {
       "caseId": "OSPE-CLW1M01",
-      "title": "การตรวจสอบใบสั่งยา Mock RxCU84 Clinic Week 1",
+      "title": "OSPE-CLW1M01",
       "category": "Clinic",
-      "mainGroup": "การตรวจสอบใบสั่งยา",
-      "subTopic": "",
-      "disease": "",
+      "mainGroup": "Mock Exam 2569",
+      "subTopic": "🔒 ข้อสอบลับ (ต้องใช้รหัสผ่าน)",
+      "disease": "🔒 ล็อกด้วยรหัสผ่าน (Secret Mock)",
       "difficulty": 2,
       "docId": "1ZNKvEBVAUeVcJ2GSH4gGKujA8whv7zY0fH4pXVEJa4g",
       "author": "",
@@ -3951,15 +3951,18 @@ const OFFLINE_DATA = {
       "isActive": true,
       "caseStatus": "Active",
       "linkedNextCase": "",
-      "linkedFromCase": ""
+      "linkedFromCase": "",
+      "durationMin": 4,
+      "isProtected": true,
+      "hasPassword": true
     },
     {
       "caseId": "OSPE-CLW1M02",
-      "title": "การนับเม็ดยาและเขียนฉลากยา Mock RxCU84 Clinic Week 1",
+      "title": "OSPE-CLW1M02",
       "category": "Clinic",
-      "mainGroup": "การนับเม็ดยาและเขียนฉลากยา",
-      "subTopic": "",
-      "disease": "Cafegot",
+      "mainGroup": "Mock Exam 2569",
+      "subTopic": "🔒 ข้อสอบลับ (ต้องใช้รหัสผ่าน)",
+      "disease": "🔒 ล็อกด้วยรหัสผ่าน (Secret Mock)",
       "difficulty": 2,
       "docId": "1ZNKvEBVAUeVcJ2GSH4gGKujA8whv7zY0fH4pXVEJa4g",
       "author": "",
@@ -3968,15 +3971,18 @@ const OFFLINE_DATA = {
       "isActive": true,
       "caseStatus": "Active",
       "linkedNextCase": "",
-      "linkedFromCase": ""
+      "linkedFromCase": "",
+      "durationMin": 4,
+      "isProtected": true,
+      "hasPassword": true
     },
     {
       "caseId": "OSPE-CLW1M03",
-      "title": "Special precaution Mock RxCU84 Clinic Week 1",
+      "title": "OSPE-CLW1M03",
       "category": "Clinic",
-      "mainGroup": "Special precaution",
-      "subTopic": "",
-      "disease": "ยา Warfarin",
+      "mainGroup": "Mock Exam 2569",
+      "subTopic": "🔒 ข้อสอบลับ (ต้องใช้รหัสผ่าน)",
+      "disease": "🔒 ล็อกด้วยรหัสผ่าน (Secret Mock)",
       "difficulty": 2,
       "docId": "1ZNKvEBVAUeVcJ2GSH4gGKujA8whv7zY0fH4pXVEJa4g",
       "author": "",
@@ -3985,15 +3991,18 @@ const OFFLINE_DATA = {
       "isActive": true,
       "caseStatus": "Active",
       "linkedNextCase": "",
-      "linkedFromCase": ""
+      "linkedFromCase": "",
+      "durationMin": 4,
+      "isProtected": true,
+      "hasPassword": true
     },
     {
       "caseId": "OSPE-CLW1M04",
-      "title": "ข้อสอบผลิตภัณฑ์ Mock RxCU84 Clinic Week 1",
+      "title": "OSPE-CLW1M04",
       "category": "Product",
-      "mainGroup": "",
-      "subTopic": "",
-      "disease": "",
+      "mainGroup": "Mock Exam 2569",
+      "subTopic": "🔒 ข้อสอบลับ (ต้องใช้รหัสผ่าน)",
+      "disease": "🔒 ล็อกด้วยรหัสผ่าน (Secret Mock)",
       "difficulty": 2,
       "docId": "1ZNKvEBVAUeVcJ2GSH4gGKujA8whv7zY0fH4pXVEJa4g",
       "author": "",
@@ -4002,15 +4011,18 @@ const OFFLINE_DATA = {
       "isActive": true,
       "caseStatus": "Active",
       "linkedNextCase": "",
-      "linkedFromCase": ""
+      "linkedFromCase": "",
+      "durationMin": 4,
+      "isProtected": true,
+      "hasPassword": true
     },
     {
       "caseId": "OSPE-CLW1M05",
-      "title": "ข้อสอบกฎหมาย Mock RxCU84 Clinic Week 1",
+      "title": "OSPE-CLW1M05",
       "category": "SAP",
-      "mainGroup": "",
-      "subTopic": "",
-      "disease": "",
+      "mainGroup": "Mock Exam 2569",
+      "subTopic": "🔒 ข้อสอบลับ (ต้องใช้รหัสผ่าน)",
+      "disease": "🔒 ล็อกด้วยรหัสผ่าน (Secret Mock)",
       "difficulty": 2,
       "docId": "1ZNKvEBVAUeVcJ2GSH4gGKujA8whv7zY0fH4pXVEJa4g",
       "author": "",
@@ -4019,7 +4031,10 @@ const OFFLINE_DATA = {
       "isActive": true,
       "caseStatus": "Active",
       "linkedNextCase": "",
-      "linkedFromCase": ""
+      "linkedFromCase": "",
+      "durationMin": 4,
+      "isProtected": true,
+      "hasPassword": true
     },
     {
       "caseId": "OSPE-CLW2M01",

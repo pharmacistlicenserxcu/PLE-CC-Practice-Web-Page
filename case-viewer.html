@@ -1043,6 +1043,18 @@
             <div id="case-equipment-content" style="display: none;">
               <!-- Filled dynamically by JS -->
             </div>
+
+            <!-- Examiner Notes & Answer Key Section (Placed on Left Pane in Split View, or before Checklist in Classic View) -->
+            <div id="viewer-examiner-notes-container" class="viewer-examiner-notes-container no-print" style="margin-top: 1.5rem;">
+              <button type="button" class="btn btn-secondary" style="width: 100%; font-size: 0.88rem; padding: 0.55rem 1rem; display: flex; align-items: center; justify-content: center; gap: 0.4rem; font-weight: 600;" id="toggle-note-btn" onclick="toggleNote()">
+                <span>🔑 แสดงเฉลย / ข้อมูลผู้ตรวจ</span>
+              </button>
+              <div class="note-container print-page-break print-hide-question" id="case-note-section" style="margin-top: 0.75rem;">
+                <div class="note-content" id="note-content-area">
+                  <!-- Note content filled dynamically by JS -->
+                </div>
+              </div>
+            </div>
             
           </div>
 
@@ -1110,27 +1122,14 @@
             </div>
           </div>
 
-          <!-- Note / Answer Section (always visible when printing, toggleable on web screen) -->
-          <div class="note-container print-page-break print-hide-question" id="case-note-section">
-            <div class="note-content" id="note-content-area">
-              <!-- Note content filled dynamically by JS -->
-            </div>
-          </div>
-
-          <!-- Action buttons (2-Column Grid, no-print) -->
-          <div id="viewer-action-buttons" class="no-print" style="margin-top: 1rem;">
+          <!-- Action buttons (no-print) -->
+          <div id="viewer-action-buttons" class="no-print" style="margin-top: 1.25rem;">
             <button id="btn-next-linked-station" class="btn btn-primary" style="display: none; width: 100%; font-size: 0.95rem; padding: 0.65rem; margin-bottom: 0.5rem; justify-content: center; background: linear-gradient(135deg, var(--primary), var(--secondary));">
               ⏩ ไปยังสถานีต่อเนื่อง (ถัดไป)
             </button>
-            <div class="viewer-actions-grid-2col">
-              <button class="btn btn-primary" id="toggle-note-btn" onclick="toggleNote()">
-                📄 เปิดเฉลย
-              </button>
-              <button class="btn btn-secondary" onclick="openSingleCasePrintModal()">
-                🖨️ พิมพ์
-              </button>
-            </div>
-
+            <button class="btn btn-secondary" style="width: 100%; padding: 0.65rem 1rem; font-size: 0.88rem; font-weight: 600; display: inline-flex; align-items: center; justify-content: center; gap: 0.5rem;" onclick="openSingleCasePrintModal()">
+              🖨️ พิมพ์เคสข้อสอบ (Print Case)
+            </button>
           </div>
 
         </section>
@@ -2191,6 +2190,7 @@
       const progressCard = document.getElementById('viewer-progress-card');
       const timerCard = document.getElementById('viewer-timer-card');
       const docTabs = document.getElementById('doc-tabs-bar');
+      const noteWrap = document.getElementById('viewer-examiner-notes-container');
       const noteArea = document.getElementById('note-content-area');
       const toggleNoteBtn = document.getElementById('toggle-note-btn');
       const leftPane = document.getElementById('left-pane');
@@ -2208,13 +2208,14 @@
         noticeSection.style.display = 'none';
         progressCard.style.display = 'block';
         timerCard.style.display = 'block';
+        if (noteWrap) noteWrap.style.display = 'block';
         if (docTabs) docTabs.style.display = 'flex';
         resetViewerTimer();
         document.getElementById('viewer-timer-btn').textContent = '⏱️ เริ่มจับเวลา';
         
         // ซ่อนเฉลยตามดีฟอลต์ของโซโล่
-        noteArea.classList.remove('show');
-        if (toggleNoteBtn) toggleNoteBtn.textContent = '📄 เปิดเฉลย';
+        if (noteArea) noteArea.classList.remove('show');
+        if (toggleNoteBtn) toggleNoteBtn.innerHTML = '<span>🔑 แสดงเฉลย / ข้อมูลผู้ตรวจ</span>';
       } 
       else if (role === 'examinee') {
         // ผู้เข้าสอบ: ซ่อนเฉลยและเกณฑ์ประเมินทั้งหมด เห็นเฉพาะโจทย์และปุ่มจับเวลา
@@ -2222,6 +2223,7 @@
         noticeSection.style.display = 'block';
         progressCard.style.display = 'none';
         timerCard.style.display = 'block';
+        if (noteWrap) noteWrap.style.display = 'none';
         if (docTabs) docTabs.style.display = 'none'; // ซ่อนแท็บเอกสารกันเปิดดูเฉลย
         switchViewerTab('content');      // บังคับแสดงหน้าโจทย์
         
@@ -2235,11 +2237,12 @@
         noticeSection.style.display = 'none';
         progressCard.style.display = 'block';
         timerCard.style.display = 'block';
+        if (noteWrap) noteWrap.style.display = 'block';
         if (docTabs) docTabs.style.display = 'flex';
         
         // ทางเลือกแสดงแผนการตรวจผู้ประเมิน
-        noteArea.classList.add('show');
-        if (toggleNoteBtn) toggleNoteBtn.textContent = '🔒 ซ่อนเฉลย';
+        if (noteArea) noteArea.classList.add('show');
+        if (toggleNoteBtn) toggleNoteBtn.innerHTML = '<span>🔒 ซ่อนเฉลย / ข้อมูลผู้ตรวจ</span>';
         
         resetViewerTimer();
         // ไม่ต้องเริ่มจับเวลาโดยอัตโนมัติ ให้ผู้ประเมินกดเริ่มเอง
@@ -2418,12 +2421,13 @@
     function toggleNote() {
       const area = document.getElementById('note-content-area');
       const btn = document.getElementById('toggle-note-btn');
+      if (!area) return;
       if (area.classList.contains('show')) {
         area.classList.remove('show');
-        if (btn) btn.textContent = '📄 เปิดเฉลย';
+        if (btn) btn.innerHTML = '<span>🔑 แสดงเฉลย / ข้อมูลผู้ตรวจ</span>';
       } else {
         area.classList.add('show');
-        if (btn) btn.textContent = '🔒 ซ่อนเฉลย';
+        if (btn) btn.innerHTML = '<span>🔒 ซ่อนเฉลย / ข้อมูลผู้ตรวจ</span>';
       }
     }
 

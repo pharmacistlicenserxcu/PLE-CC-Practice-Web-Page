@@ -1,12 +1,12 @@
 /**
  * PLE-CC2 OSPE Practice System — Offline Case List Metadata (Auto-Generated)
- * Version: v_20261018_005115
- * Generated on 2026-10-18 00:51:15
+ * Version: v_20261019_132345
+ * Generated on 2026-10-19 13:23:45
  */
 
 const OFFLINE_DATA = {
-  "version": "v_20261018_005115",
-  "generatedAt": "2026-10-18 00:51:15",
+  "version": "v_20261019_132345",
+  "generatedAt": "2026-10-19 13:23:45",
   "totalCases": 406,
   "cases": [
     {
@@ -3989,11 +3989,11 @@ const OFFLINE_DATA = {
     },
     {
       "caseId": "OSPE-CLW1M04",
-      "title": "OSPE-CLW1M04",
+      "title": "ข้อสอบผลิตภัณฑ์ Mock RxCU84 Clinic Week 1",
       "category": "Product",
-      "mainGroup": "Mock Exam 2569",
-      "subTopic": "🔒 ข้อสอบลับ (ต้องใช้รหัสผ่าน)",
-      "disease": "🔒 ล็อกด้วยรหัสผ่าน (Secret Mock)",
+      "mainGroup": "",
+      "subTopic": "",
+      "disease": "",
       "difficulty": 2,
       "docId": "1ZNKvEBVAUeVcJ2GSH4gGKujA8whv7zY0fH4pXVEJa4g",
       "author": "",
@@ -4002,10 +4002,7 @@ const OFFLINE_DATA = {
       "isActive": true,
       "caseStatus": "Active",
       "linkedNextCase": "",
-      "linkedFromCase": "",
-      "durationMin": 4,
-      "isProtected": true,
-      "hasPassword": true
+      "linkedFromCase": ""
     },
     {
       "caseId": "OSPE-CLW1M05",

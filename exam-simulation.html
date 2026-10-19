@@ -10081,6 +10081,10 @@
         try { _activeStationRevealsRef.off(); } catch (e) {}
         _activeStationRevealsRef = null;
       }
+      const existingModal = document.getElementById('examinee-gated-release-modal');
+      if (existingModal) {
+        try { existingModal.remove(); } catch (e) {}
+      }
     }
     window.cleanupStationRevealsListener = cleanupStationRevealsListener;
 
@@ -10120,21 +10124,195 @@
         const ctx = (typeof _unlockedAudioCtx !== 'undefined' && _unlockedAudioCtx) ? _unlockedAudioCtx : new AudioContextClass();
         if (ctx.state === 'suspended') ctx.resume().catch(() => {});
         const now = ctx.currentTime;
-        const freqs = isOpening ? [587.33, 880] : [587.33, 440];
+        const freqs = isOpening ? [587.33, 739.99, 880, 1174.66] : [587.33, 440];
+        const step = isOpening ? 0.09 : 0.12;
+        const dur = isOpening ? 0.45 : 0.32;
         freqs.forEach((f, idx) => {
           const osc = ctx.createOscillator();
           const gain = ctx.createGain();
-          osc.type = 'sine';
-          osc.frequency.setValueAtTime(f, now + idx * 0.11);
-          gain.gain.setValueAtTime(0.22, now + idx * 0.11);
-          gain.gain.exponentialRampToValueAtTime(0.0001, now + idx * 0.11 + 0.25);
+          osc.type = isOpening ? 'triangle' : 'sine';
+          osc.frequency.setValueAtTime(f, now + idx * step);
+          gain.gain.setValueAtTime(0.28, now + idx * step);
+          gain.gain.exponentialRampToValueAtTime(0.0001, now + idx * step + dur);
           osc.connect(gain);
           gain.connect(ctx.destination);
-          osc.start(now + idx * 0.11);
-          osc.stop(now + idx * 0.11 + 0.26);
+          osc.start(now + idx * step);
+          osc.stop(now + idx * step + dur + 0.02);
         });
       } catch (e) {}
     }
+
+    function showExamineeGatedReleaseModal(sectionKey) {
+      const existing = document.getElementById('examinee-gated-release-modal');
+      if (existing) {
+        try { existing.remove(); } catch (e) {}
+      }
+
+      const isPatient = sectionKey === 'patientInfo';
+      const icon = isPatient ? '👤' : '📦';
+      const sectionTitle = isPatient ? 'ข้อมูลผู้ป่วย' : 'สิ่งที่มีให้ในสถานี';
+      const sectionSubtitle = isPatient ? 'ประวัติผู้ป่วยและค่า Lab' : 'ใบสั่งยา อุปกรณ์ และสื่อที่ผู้เข้าสอบจะได้รับ';
+      const themeColor = isPatient ? '#16a34a' : '#7c3aed';
+      const themeBg = isPatient ? 'rgba(22, 163, 74, 0.12)' : 'rgba(124, 58, 237, 0.12)';
+      const themeBorder = isPatient ? '#86efac' : '#ddd6fe';
+      const targetAccordionId = isPatient ? 'exam-patient-accordion' : 'exam-equipment-accordion';
+
+      if (!document.getElementById('examinee-gated-modal-styles')) {
+        const styleTag = document.createElement('style');
+        styleTag.id = 'examinee-gated-modal-styles';
+        styleTag.textContent = `
+          @keyframes pleFadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+          }
+          @keyframes plePopIn {
+            from { opacity: 0; transform: scale(0.88) translateY(12px); }
+            to { opacity: 1; transform: scale(1) translateY(0); }
+          }
+        `;
+        if (document.head && typeof document.head.appendChild === 'function') {
+          document.head.appendChild(styleTag);
+        } else if (document.body && typeof document.body.appendChild === 'function') {
+          document.body.appendChild(styleTag);
+        }
+      }
+
+      const overlay = document.createElement('div');
+      overlay.id = 'examinee-gated-release-modal';
+      overlay.style.cssText = `
+        position: fixed;
+        inset: 0;
+        z-index: 9999999;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: rgba(15, 23, 42, 0.65);
+        backdrop-filter: blur(6px);
+        padding: 1.25rem;
+        animation: pleFadeIn 0.2s ease-out;
+      `;
+
+      overlay.innerHTML = `
+        <div style="
+          background: var(--surface, #ffffff);
+          border: 2.5px solid ${themeColor};
+          border-radius: 20px;
+          box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.4), 0 0 0 1px rgba(0,0,0,0.05);
+          max-width: 460px;
+          width: 100%;
+          padding: 1.85rem 1.65rem;
+          text-align: center;
+          animation: plePopIn 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+          font-family: var(--font-body, inherit);
+          box-sizing: border-box;
+        ">
+          <div style="
+            width: 76px;
+            height: 76px;
+            margin: 0 auto 1rem auto;
+            border-radius: 50%;
+            background: ${themeBg};
+            border: 2px solid ${themeBorder};
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2.4rem;
+            box-shadow: 0 6px 16px ${themeBg};
+          ">
+            ${icon}
+          </div>
+
+          <div style="display: inline-flex; align-items: center; gap: 0.35rem; padding: 0.28rem 0.95rem; border-radius: 9999px; background: rgba(34, 197, 94, 0.14); color: #15803d; font-size: 0.82rem; font-weight: 700; margin-bottom: 0.65rem;">
+            <span>🔔 ผู้ประเมินส่งข้อมูลให้คุณแล้ว</span>
+          </div>
+
+          <h3 style="
+            font-family: var(--font-title, inherit);
+            font-size: 1.35rem;
+            font-weight: 800;
+            color: var(--text-primary, #0f172a);
+            margin: 0 0 0.35rem 0;
+            line-height: 1.3;
+          ">
+            เปิด${sectionTitle}
+          </h3>
+
+          <div style="
+            font-size: 0.92rem;
+            color: var(--text-secondary, #475569);
+            margin-bottom: 1.5rem;
+            line-height: 1.5;
+          ">
+            <strong style="color:var(--text-primary);">${sectionSubtitle}</strong><br>
+            ข้อมูลถูกเปิดบนหน้าจอของคุณแล้ว สามารถเริ่มตรวจสอบและดำเนินการได้ทันที
+          </div>
+
+          <button type="button" id="btn-examinee-gated-ack" style="
+            width: 100%;
+            padding: 0.85rem 1.5rem;
+            border-radius: 9999px;
+            border: none;
+            background: ${themeColor};
+            color: #ffffff;
+            font-family: var(--font-title, inherit);
+            font-size: 1.05rem;
+            font-weight: 800;
+            cursor: pointer;
+            box-shadow: 0 4px 14px ${themeBg};
+            transition: transform 0.15s ease, box-shadow 0.15s ease;
+          ">
+            ✓ รับทราบ / ดูข้อมูลทันที
+          </button>
+        </div>
+      `;
+
+      function dismissAndScroll() {
+        if (typeof window.removeEventListener === 'function') {
+          window.removeEventListener('keydown', handleKeyDown);
+        }
+        overlay.style.opacity = '0';
+        overlay.style.transition = 'opacity 0.15s ease-out';
+        setTimeout(() => {
+          try { overlay.remove(); } catch (e) {}
+          const acc = document.getElementById(targetAccordionId);
+          if (acc && typeof acc.scrollIntoView === 'function') {
+            try {
+              acc.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            } catch (e) {}
+          }
+        }, 150);
+      }
+
+      const ackBtn = overlay.querySelector('#btn-examinee-gated-ack');
+      if (ackBtn && typeof ackBtn.addEventListener === 'function') {
+        ackBtn.addEventListener('click', dismissAndScroll);
+        ackBtn.addEventListener('mouseenter', () => { ackBtn.style.transform = 'scale(1.02)'; });
+        ackBtn.addEventListener('mouseleave', () => { ackBtn.style.transform = 'scale(1)'; });
+      }
+
+      if (typeof overlay.addEventListener === 'function') {
+        overlay.addEventListener('click', (e) => {
+          if (e.target === overlay) dismissAndScroll();
+        });
+      }
+
+      function handleKeyDown(e) {
+        if (e.key === 'Enter' || e.key === 'Escape' || e.key === ' ') {
+          dismissAndScroll();
+        }
+      }
+      if (typeof window.addEventListener === 'function') {
+        window.addEventListener('keydown', handleKeyDown, { once: true });
+      }
+
+      if (document.body && typeof document.body.appendChild === 'function') {
+        document.body.appendChild(overlay);
+      }
+      setTimeout(() => {
+        if (ackBtn && typeof ackBtn.focus === 'function') ackBtn.focus();
+      }, 50);
+    }
+    window.showExamineeGatedReleaseModal = showExamineeGatedReleaseModal;
 
     function applyStationGatedVisibility(stationNum, c) {
       if (!c) return;
@@ -10348,31 +10526,37 @@
         if (!isInitialSnap && isCandidate) {
           if (patGated && newPat !== Boolean(prev.patientInfo)) {
             playGatedReleaseNotificationChime(newPat);
-            if (typeof showPleToast === 'function') {
-              showPleToast(
-                newPat ? '🔔 ผู้ประเมิน Show "ข้อมูลผู้ป่วย" ให้คุณแล้ว' : '🔒 ผู้ประเมิน Hide "ข้อมูลผู้ป่วย" แล้ว',
-                newPat ? 'success' : 'info'
-              );
-            }
             if (newPat) {
-              const acc = document.getElementById('exam-patient-accordion');
-              if (acc && typeof acc.scrollIntoView === 'function') {
-                try { acc.scrollIntoView({ behavior: 'smooth', block: 'nearest' }); } catch (e) {}
+              if (typeof showExamineeGatedReleaseModal === 'function') {
+                showExamineeGatedReleaseModal('patientInfo');
+              } else if (typeof showPleToast === 'function') {
+                showPleToast('🔔 ผู้ประเมิน Show "ข้อมูลผู้ป่วย" ให้คุณแล้ว', 'success');
+              }
+            } else {
+              const existingModal = document.getElementById('examinee-gated-release-modal');
+              if (existingModal) {
+                try { existingModal.remove(); } catch (e) {}
+              }
+              if (typeof showPleToast === 'function') {
+                showPleToast('🔒 ผู้ประเมิน Hide "ข้อมูลผู้ป่วย" แล้ว', 'info');
               }
             }
           }
           if (eqGated && newEq !== Boolean(prev.equipment)) {
             playGatedReleaseNotificationChime(newEq);
-            if (typeof showPleToast === 'function') {
-              showPleToast(
-                newEq ? '🔔 ผู้ประเมิน Show "สิ่งที่มีให้ในสถานี" ให้คุณแล้ว' : '🔒 ผู้ประเมิน Hide "สิ่งที่มีให้ในสถานี" แล้ว',
-                newEq ? 'success' : 'info'
-              );
-            }
             if (newEq) {
-              const acc = document.getElementById('exam-equipment-accordion');
-              if (acc && typeof acc.scrollIntoView === 'function') {
-                try { acc.scrollIntoView({ behavior: 'smooth', block: 'nearest' }); } catch (e) {}
+              if (typeof showExamineeGatedReleaseModal === 'function') {
+                showExamineeGatedReleaseModal('equipment');
+              } else if (typeof showPleToast === 'function') {
+                showPleToast('🔔 ผู้ประเมิน Show "สิ่งที่มีให้ในสถานี" ให้คุณแล้ว', 'success');
+              }
+            } else {
+              const existingModal = document.getElementById('examinee-gated-release-modal');
+              if (existingModal) {
+                try { existingModal.remove(); } catch (e) {}
+              }
+              if (typeof showPleToast === 'function') {
+                showPleToast('🔒 ผู้ประเมิน Hide "สิ่งที่มีให้ในสถานี" แล้ว', 'info');
               }
             }
           }

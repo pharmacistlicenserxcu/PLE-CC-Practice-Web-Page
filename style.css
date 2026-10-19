@@ -7256,6 +7256,15 @@ body.dark-mode .blank-status-badge.is-submitted {
   animation: fadeIn 0.2s ease;
 }
 
+.exam-checklist-submit-bar {
+  background: var(--surface);
+  border: 1.5px solid var(--border);
+  border-radius: var(--radius-md);
+  padding: 0.85rem 1.15rem;
+  box-shadow: var(--shadow-sm);
+  animation: fadeIn 0.2s ease;
+}
+
 .examiner-submit-bar {
   display: flex;
   align-items: center;

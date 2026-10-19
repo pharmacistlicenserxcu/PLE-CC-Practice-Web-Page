@@ -3053,6 +3053,9 @@
                 <span id="exam-live-feedback-saved-indicator" style="color: var(--success); font-weight: 700; display: none;">✓ บันทึกเรียบร้อย</span>
               </div>
             </div>
+
+            <!-- Examiner In-Pane Assessment Submission Bar (Under Checklist & Feedback) -->
+            <div id="exam-checklist-submit-bar" class="exam-checklist-submit-bar" style="display: none; margin-top: 1rem; margin-bottom: 2rem;"></div>
           </div>
 
         </div>
@@ -7109,17 +7112,26 @@
             }
 
             if (myTable) {
-              const currStNum = SimState.currentIdx + 1;
-              const isCurrSub = Boolean(myTable.scores?.[currStNum]?.isSubmitted || room.breakoutSubmissions?.['st_' + currStNum]?.[SimState.myBreakoutTableId]?.isSubmitted);
+              const activeStationIdx = (SimState._isLocalReview && typeof SimState._localReviewStationIdx === 'number')
+                ? SimState._localReviewStationIdx
+                : SimState.currentIdx;
+              const activeStNum = SimState.stations[activeStationIdx]?.stationNumber || (activeStationIdx + 1);
+              const isCurrSub = Boolean(myTable.scores?.[activeStNum]?.isSubmitted || room.breakoutSubmissions?.['st_' + activeStNum]?.[SimState.myBreakoutTableId]?.isSubmitted);
               const prevSub = SimState.isStationSubmitted;
               SimState.isStationSubmitted = isCurrSub;
               if (SimState.isStationGradingPhase && prevSub !== isCurrSub) {
-                renderStationGradingBanner(SimState.currentIdx);
+                renderStationGradingBanner(activeStationIdx);
+                if (typeof renderExaminerChecklistSubmitBar === 'function') {
+                  renderExaminerChecklistSubmitBar(activeStationIdx);
+                }
               }
               if (myTable.isSubmitted) {
                 SimState.myBreakoutSubmitted = true;
                 if (SimState.isStationGradingPhase) {
-                  renderStationGradingBanner(SimState.currentIdx);
+                  renderStationGradingBanner(activeStationIdx);
+                  if (typeof renderExaminerChecklistSubmitBar === 'function') {
+                    renderExaminerChecklistSubmitBar(activeStationIdx);
+                  }
                 }
               }
             }
@@ -7151,6 +7163,9 @@
             SimState.isStationSubmitted = isRoundSub;
             if (SimState.isStationGradingPhase && prevSub !== isRoundSub) {
               renderStationGradingBanner(SimState.currentIdx);
+              if (typeof renderExaminerChecklistSubmitBar === 'function') {
+                renderExaminerChecklistSubmitBar(SimState.currentIdx);
+              }
             }
           } else {
             const currStNum = SimState.currentIdx + 1;
@@ -7159,6 +7174,9 @@
             SimState.isStationSubmitted = isStdSub;
             if (SimState.isStationGradingPhase && prevSub !== isStdSub) {
               renderStationGradingBanner(SimState.currentIdx);
+              if (typeof renderExaminerChecklistSubmitBar === 'function') {
+                renderExaminerChecklistSubmitBar(SimState.currentIdx);
+              }
             }
           }
           
@@ -8010,12 +8028,17 @@
     }
     window.freezeCandidateStationInputs = freezeCandidateStationInputs;
 
-    function renderStationGradingBanner(expiredIdx) {
+    function renderStationGradingBanner(targetIdx = null) {
       const banner = document.getElementById('station-grading-phase-banner');
       if (!banner) return;
 
-      const currSt = SimState.stations && SimState.stations[SimState.currentIdx];
-      const stNum = currSt ? currSt.stationNumber : (SimState.currentIdx + 1);
+      const activeIdx = (typeof targetIdx === 'number' && !isNaN(targetIdx))
+        ? targetIdx
+        : ((SimState._isLocalReview && typeof SimState._localReviewStationIdx === 'number')
+            ? SimState._localReviewStationIdx
+            : SimState.currentIdx);
+      const currSt = SimState.stations && SimState.stations[activeIdx];
+      const stNum = currSt ? currSt.stationNumber : (activeIdx + 1);
       const checklist = (currSt && currSt.case && Array.isArray(currSt.case.checklist)) ? currSt.case.checklist : [];
       const checked = (SimState.studentScores && (SimState.studentScores[stNum] || SimState.studentScores[String(stNum)])) || [];
       const { currentScore: baseCurrScore, totalScore: baseTotScore } = (typeof calculateStationScore === 'function')
@@ -8028,16 +8051,19 @@
       const isExaminer = (SimState.role === 'examiner' || SimState.myBreakoutRole === 'examiner');
       const isCandidate = (SimState.role === 'examinee' || SimState.role === 'participant' || SimState.role === 'candidate');
       const isSolo = (SimState.role === 'solo' || !SimState.isLobby);
+      const isCohort = (SimState.examMode === 'cohort_breakout');
+      const isCarousel = (SimState.examMode === 'carousel_rotation');
+      const isLastSt = (SimState.stations.length > 0 && activeIdx >= SimState.stations.length - 1);
 
       if (isCandidate) {
-        if (SimState.examMode === 'cohort_breakout') {
+        if (isCohort) {
           const myTable = SimState.cachedRoom?.breakouts?.[SimState.myBreakoutTableId];
           const subData = myTable?.scores?.[stNum] || SimState.cachedRoom?.breakoutSubmissions?.['st_' + stNum]?.[SimState.myBreakoutTableId];
           if (subData && typeof subData.earnedScore === 'number') {
             currentScore = subData.earnedScore;
             if (typeof subData.maxScore === 'number' && subData.maxScore > 0) totalScore = subData.maxScore;
           }
-        } else if (SimState.examMode === 'carousel_rotation') {
+        } else if (isCarousel) {
           const r = (SimState.cachedRoom && SimState.cachedRoom.currentStationIdx !== undefined) ? SimState.cachedRoom.currentStationIdx : 0;
           const subData = SimState.cachedRoom?.carouselSubmissions?.[`round_${r}`]?.[`st_${stNum}`] || SimState.cachedRoom?.participantScores?.[SimState.myPlayerId]?.stations?.[stNum];
           if (subData && (typeof subData.earnedScore === 'number' || typeof subData.score === 'number')) {
@@ -8056,14 +8082,24 @@
       banner.style.display = 'block';
 
       if (isExaminer) {
-        const isSubmitted = Boolean(SimState.isStationSubmitted);
+        let isSubmitted = Boolean(SimState.isStationSubmitted);
+        if (isCohort && SimState.myBreakoutTableId && SimState.cachedRoom?.breakouts) {
+          const table = SimState.cachedRoom.breakouts[SimState.myBreakoutTableId];
+          if (table) {
+            isSubmitted = Boolean(table.scores?.[stNum]?.isSubmitted || SimState.cachedRoom.breakoutSubmissions?.['st_' + stNum]?.[SimState.myBreakoutTableId]?.isSubmitted);
+          }
+        } else if (isCarousel) {
+          const assignedStationNum = SimState.myCarouselStation || stNum;
+          const r = (SimState.cachedRoom && SimState.cachedRoom.currentStationIdx !== undefined) ? SimState.cachedRoom.currentStationIdx : 0;
+          isSubmitted = Boolean(SimState.cachedRoom?.carouselSubmissions?.[`round_${r}`]?.[`st_${assignedStationNum}`]?.isSubmitted);
+        } else if (SimState.isLobby) {
+          isSubmitted = Boolean(SimState.cachedRoom?.submissions?.[stNum]?.isSubmitted);
+        }
+
         const checklistCont = document.getElementById('exam-checklist-container');
         if (checklistCont) {
           checklistCont.classList.toggle('is-submitted-locked', isSubmitted);
         }
-
-        const isLastSt = (SimState.stations.length > 0 && SimState.currentIdx >= SimState.stations.length - 1);
-        const isCohort = (SimState.examMode === 'cohort_breakout');
 
         if (isSubmitted) {
           banner.innerHTML = `
@@ -8084,15 +8120,18 @@
             </div>
           `;
         } else {
+          const submitBtnLabel = isLastSt
+            ? `🏁 ยืนยันและส่งผลคะแนนสถานีสุดท้าย (${stNum})`
+            : `✅ ยืนยันและส่งผลคะแนนสถานีนี้`;
           banner.innerHTML = `
             <div class="examiner-submit-bar">
               <div class="submit-bar-info">
-                <span class="status-badge warn">⏱️ หมดเวลาสอบ (00:00) · ช่วงตรวจทานคะแนน</span>
+                <span class="status-badge warn">⏱️ สถานีที่ ${stNum} · ตรวจทานและส่งผลคะแนน</span>
                 <span class="score-summary-text" id="live-grading-score-display">คะแนนปัจจุบัน: ${formatScore(currentScore)} / ${formatScore(totalScore)} คะแนน</span>
               </div>
               <div class="submit-bar-actions" style="display: flex; gap: 0.5rem; align-items: center;">
                 <button id="btn-submit-station-assessment" class="btn btn-success submit-assessment-btn" onclick="submitCurrentStationAssessment()">
-                  ✅ ยืนยันและส่งผลคะแนนสถานีนี้
+                  ${submitBtnLabel}
                 </button>
               </div>
             </div>
@@ -8161,8 +8200,114 @@
           </div>
         `;
       }
+
+      if (typeof renderExaminerChecklistSubmitBar === 'function') {
+        renderExaminerChecklistSubmitBar(activeIdx);
+      }
     }
     window.renderStationGradingBanner = renderStationGradingBanner;
+
+    function renderExaminerChecklistSubmitBar(targetIdx = null) {
+      const barEl = document.getElementById('exam-checklist-submit-bar');
+      if (!barEl) return;
+
+      const isExaminer = (SimState.role === 'examiner' || SimState.myBreakoutRole === 'examiner');
+      if (!isExaminer || !SimState.isLobby) {
+        barEl.style.display = 'none';
+        barEl.innerHTML = '';
+        return;
+      }
+
+      const activeIdx = (typeof targetIdx === 'number' && !isNaN(targetIdx))
+        ? targetIdx
+        : ((SimState._isLocalReview && typeof SimState._localReviewStationIdx === 'number')
+            ? SimState._localReviewStationIdx
+            : SimState.currentIdx);
+      const currSt = SimState.stations && SimState.stations[activeIdx];
+      if (!currSt) {
+        barEl.style.display = 'none';
+        return;
+      }
+
+      const stNum = currSt.stationNumber || (activeIdx + 1);
+      const checklist = (currSt.case && Array.isArray(currSt.case.checklist)) ? currSt.case.checklist : [];
+      const checked = (SimState.studentScores && (SimState.studentScores[stNum] || SimState.studentScores[String(stNum)])) || [];
+      const { currentScore, totalScore } = (typeof calculateStationScore === 'function')
+        ? calculateStationScore(checklist, checked)
+        : { currentScore: 0, totalScore: checklist.length };
+      const formatScore = (typeof safeFormatScore === 'function') ? safeFormatScore : (n => n || '0');
+      const isLastSt = (SimState.stations.length > 0 && activeIdx >= SimState.stations.length - 1);
+      const isCohort = (SimState.examMode === 'cohort_breakout');
+      const isCarousel = (SimState.examMode === 'carousel_rotation');
+
+      let isStationSubmitted = false;
+      let isTableFullySubmitted = false;
+
+      if (isCohort && SimState.myBreakoutTableId && SimState.cachedRoom?.breakouts) {
+        const table = SimState.cachedRoom.breakouts[SimState.myBreakoutTableId];
+        if (table) {
+          isStationSubmitted = Boolean(table.scores?.[stNum]?.isSubmitted || SimState.cachedRoom.breakoutSubmissions?.['st_' + stNum]?.[SimState.myBreakoutTableId]?.isSubmitted);
+          isTableFullySubmitted = Boolean(table.isSubmitted);
+        }
+      } else if (isCarousel) {
+        const assignedStationNum = SimState.myCarouselStation || stNum;
+        const r = (SimState.cachedRoom && SimState.cachedRoom.currentStationIdx !== undefined) ? SimState.cachedRoom.currentStationIdx : 0;
+        isStationSubmitted = Boolean(SimState.cachedRoom?.carouselSubmissions?.[`round_${r}`]?.[`st_${assignedStationNum}`]?.isSubmitted);
+      } else {
+        isStationSubmitted = Boolean(SimState.cachedRoom?.submissions?.[stNum]?.isSubmitted);
+      }
+
+      barEl.style.display = 'block';
+
+      if (isStationSubmitted) {
+        barEl.innerHTML = `
+          <div class="examiner-submit-bar" style="background: rgba(22, 163, 74, 0.05); border: 1.5px solid rgba(22, 163, 74, 0.3); border-radius: var(--radius-md); padding: 0.85rem 1.15rem;">
+            <div class="submit-bar-info" style="display: flex; align-items: center; gap: 0.65rem; flex-wrap: wrap;">
+              <span class="status-badge" style="background: rgba(22, 163, 74, 0.15); color: #15803d; border-color: rgba(22, 163, 74, 0.35); font-weight: 700; font-size: 0.82rem; padding: 0.3rem 0.75rem;">
+                ✅ ส่งผลคะแนนสถานีที่ ${stNum} เรียบร้อยแล้ว
+              </span>
+              <span class="score-summary-text" style="color: var(--text-primary); font-size: 0.92rem; font-weight: 700;">
+                คะแนน: ${formatScore(currentScore)} / ${formatScore(totalScore)} คะแนน
+              </span>
+              <div style="font-size: 0.8rem; color: var(--text-muted); width: 100%; margin-top: 0.2rem;">
+                ${isLastSt && isCohort ? 'บันทึกคะแนนสถานีสุดท้ายเรียบร้อยแล้ว · รอ Super Host สรุปผลการสอบร่วมกัน (สามารถปลดล็อกเพื่อแก้ไขคะแนนได้)' : 'คะแนนถูกส่งเข้าสู่ระบบแล้ว คุณสามารถกดปลดล็อกหากต้องการปรับแก้คะแนน Checklist'}
+              </div>
+            </div>
+            <div class="submit-bar-actions" style="display: flex; gap: 0.5rem; align-items: center; flex-wrap: wrap;">
+              <button type="button" class="btn btn-outline" style="font-size: 0.82rem; padding: 0.45rem 0.9rem; font-weight: 600; border-radius: var(--radius-sm);" onclick="unlockStationAssessmentForEdit()">
+                ✏️ ปลดล็อกเพื่อแก้ไขคะแนน
+              </button>
+            </div>
+          </div>
+        `;
+      } else {
+        const submitBtnText = isLastSt
+          ? `🏁 ยืนยันและส่งผลคะแนนสถานีสุดท้าย (${stNum})`
+          : `✅ ยืนยันและส่งผลคะแนนสถานีที่ ${stNum}`;
+        const submitBtnStyle = isLastSt
+          ? 'background: linear-gradient(135deg, #059669 0%, #047857 100%); color: #ffffff;'
+          : 'background: #10b981; color: #ffffff;';
+
+        barEl.innerHTML = `
+          <div class="examiner-submit-bar" style="background: var(--surface); border: 1.5px solid var(--border); border-radius: var(--radius-md); padding: 0.85rem 1.15rem; box-shadow: var(--shadow-sm);">
+            <div class="submit-bar-info" style="display: flex; align-items: center; gap: 0.65rem; flex-wrap: wrap;">
+              <span class="status-badge warn" style="font-weight: 700; font-size: 0.82rem; padding: 0.3rem 0.75rem;">
+                📋 พร้อมส่งผลคะแนน (สถานีที่ ${stNum})
+              </span>
+              <span class="score-summary-text" style="color: var(--text-primary); font-size: 0.92rem; font-weight: 700;">
+                คะแนนที่ประเมิน: ${formatScore(currentScore)} / ${formatScore(totalScore)} คะแนน
+              </span>
+            </div>
+            <div class="submit-bar-actions" style="display: flex; gap: 0.5rem; align-items: center; flex-wrap: wrap;">
+              <button type="button" class="btn btn-success submit-assessment-btn" style="${submitBtnStyle} border: none; font-size: 0.88rem; padding: 0.5rem 1.25rem; font-weight: 700; border-radius: var(--radius-sm); cursor: pointer; box-shadow: 0 2px 6px rgba(16,185,129,0.3);" onclick="submitCurrentStationAssessment()">
+                ${submitBtnText}
+              </button>
+            </div>
+          </div>
+        `;
+      }
+    }
+    window.renderExaminerChecklistSubmitBar = renderExaminerChecklistSubmitBar;
 
     function enterSoloReviewMode() {
       SimState._isSoloReview = true;
@@ -8217,15 +8362,18 @@
     window.hideSoloGradingBanner = hideSoloGradingBanner;
 
     async function submitCurrentStationAssessment() {
-      const currSt = SimState.stations && SimState.stations[SimState.currentIdx];
-      const stNum = currSt ? currSt.stationNumber : (SimState.currentIdx + 1);
+      const activeIdx = (SimState._isLocalReview && typeof SimState._localReviewStationIdx === 'number')
+        ? SimState._localReviewStationIdx
+        : SimState.currentIdx;
+      const currSt = SimState.stations && SimState.stations[activeIdx];
+      const stNum = currSt ? currSt.stationNumber : (activeIdx + 1);
       const checklist = (currSt && currSt.case && Array.isArray(currSt.case.checklist)) ? currSt.case.checklist : [];
       const checked = (SimState.studentScores && (SimState.studentScores[stNum] || SimState.studentScores[String(stNum)])) || [];
       const { currentScore, totalScore } = (typeof calculateStationScore === 'function')
         ? calculateStationScore(checklist, checked)
         : { currentScore: 0, totalScore: checklist.length };
       const pct = totalScore > 0 ? Math.round((currentScore / totalScore) * 100) : 0;
-      const isLastSt = (SimState.currentIdx >= SimState.stations.length - 1);
+      const isLastSt = (activeIdx >= SimState.stations.length - 1);
 
       SimState.isStationSubmitted = true;
 
@@ -8243,6 +8391,23 @@
               tableUpdates['isSubmitted'] = true;
               tableUpdates['submittedAt'] = Date.now();
             }
+
+            if (SimState.cachedRoom?.breakouts?.[tableId]) {
+              if (!SimState.cachedRoom.breakouts[tableId].scores) SimState.cachedRoom.breakouts[tableId].scores = {};
+              SimState.cachedRoom.breakouts[tableId].scores[stNum] = {
+                ...(SimState.cachedRoom.breakouts[tableId].scores[stNum] || {}),
+                isSubmitted: true,
+                earnedScore: currentScore,
+                maxScore: totalScore,
+                percent: pct,
+                submittedAt: Date.now()
+              };
+              if (isLastSt) {
+                SimState.cachedRoom.breakouts[tableId].isSubmitted = true;
+                SimState.cachedRoom.breakouts[tableId].submittedAt = Date.now();
+              }
+            }
+
             await _fbDb.ref(`rooms/${SimState.roomId}/breakouts/${tableId}`).update(tableUpdates);
             await _fbDb.ref(`rooms/${SimState.roomId}/breakoutSubmissions/st_${stNum}/${tableId}`).set({
               isSubmitted: true,
@@ -8259,6 +8424,22 @@
             const N = SimState.stations.length || 1;
             const startNum = ((assignedStationNum - 1 - r + N) % N) + 1;
             const partId = SimState.cachedRoom?.carouselPosts?.['st_' + startNum]?.startParticipantId;
+
+            if (SimState.cachedRoom) {
+              if (!SimState.cachedRoom.carouselSubmissions) SimState.cachedRoom.carouselSubmissions = {};
+              if (!SimState.cachedRoom.carouselSubmissions[`round_${r}`]) SimState.cachedRoom.carouselSubmissions[`round_${r}`] = {};
+              SimState.cachedRoom.carouselSubmissions[`round_${r}`][`st_${assignedStationNum}`] = {
+                isSubmitted: true,
+                round: r,
+                stationNumber: assignedStationNum,
+                earnedScore: currentScore,
+                maxScore: totalScore,
+                percent: pct,
+                participantId: partId,
+                examinerName: SimState.lobbyPlayerName || 'Examiner',
+                submittedAt: Date.now()
+              };
+            }
 
             await _fbDb.ref(`rooms/${SimState.roomId}/carouselSubmissions/round_${r}/st_${assignedStationNum}`).set({
               isSubmitted: true,
@@ -8281,6 +8462,18 @@
             }
           } else {
             // Standard Practice Room
+            if (SimState.cachedRoom) {
+              if (!SimState.cachedRoom.submissions) SimState.cachedRoom.submissions = {};
+              SimState.cachedRoom.submissions[stNum] = {
+                isSubmitted: true,
+                earnedScore: currentScore,
+                maxScore: totalScore,
+                percent: pct,
+                submittedAt: Date.now(),
+                examinerName: SimState.lobbyPlayerName || 'Examiner'
+              };
+            }
+
             await _fbDb.ref(`rooms/${SimState.roomId}/submissions/${stNum}`).set({
               isSubmitted: true,
               earnedScore: currentScore,
@@ -8296,7 +8489,10 @@
         }
       }
 
-      renderStationGradingBanner(SimState.currentIdx);
+      renderStationGradingBanner(activeIdx);
+      if (typeof renderExaminerChecklistSubmitBar === 'function') {
+        renderExaminerChecklistSubmitBar(activeIdx);
+      }
       if (typeof showPleToast === 'function') {
         showPleToast('บันทึกและส่งผลการประเมินคะแนนเรียบร้อยแล้ว', 'success');
       }
@@ -8305,20 +8501,32 @@
 
     async function unlockStationAssessmentForEdit() {
       SimState.isStationSubmitted = false;
-      const currSt = SimState.stations && SimState.stations[SimState.currentIdx];
-      const stNum = currSt ? currSt.stationNumber : (SimState.currentIdx + 1);
+      const activeIdx = (SimState._isLocalReview && typeof SimState._localReviewStationIdx === 'number')
+        ? SimState._localReviewStationIdx
+        : SimState.currentIdx;
+      const currSt = SimState.stations && SimState.stations[activeIdx];
+      const stNum = currSt ? currSt.stationNumber : (activeIdx + 1);
 
       if (SimState.isLobby && SimState.roomId && typeof _fbDb !== 'undefined') {
         try {
           if (SimState.examMode === 'cohort_breakout' && SimState.myBreakoutTableId) {
             const tableId = SimState.myBreakoutTableId;
+            if (SimState.cachedRoom?.breakouts?.[tableId]?.scores?.[stNum]) {
+              SimState.cachedRoom.breakouts[tableId].scores[stNum].isSubmitted = false;
+            }
             await _fbDb.ref(`rooms/${SimState.roomId}/breakouts/${tableId}/scores/${stNum}/isSubmitted`).set(false);
             await _fbDb.ref(`rooms/${SimState.roomId}/breakoutSubmissions/st_${stNum}/${tableId}/isSubmitted`).set(false);
           } else if (SimState.examMode === 'carousel_rotation') {
             const assignedStationNum = SimState.myCarouselStation || stNum;
             const r = (SimState.cachedRoom && SimState.cachedRoom.currentStationIdx !== undefined) ? SimState.cachedRoom.currentStationIdx : 0;
+            if (SimState.cachedRoom?.carouselSubmissions?.[`round_${r}`]?.[`st_${assignedStationNum}`]) {
+              SimState.cachedRoom.carouselSubmissions[`round_${r}`][`st_${assignedStationNum}`].isSubmitted = false;
+            }
             await _fbDb.ref(`rooms/${SimState.roomId}/carouselSubmissions/round_${r}/st_${assignedStationNum}/isSubmitted`).set(false);
           } else {
+            if (SimState.cachedRoom?.submissions?.[stNum]) {
+              SimState.cachedRoom.submissions[stNum].isSubmitted = false;
+            }
             await _fbDb.ref(`rooms/${SimState.roomId}/submissions/${stNum}/isSubmitted`).set(false);
           }
         } catch (e) {
@@ -8326,7 +8534,10 @@
         }
       }
 
-      renderStationGradingBanner(SimState.currentIdx);
+      renderStationGradingBanner(activeIdx);
+      if (typeof renderExaminerChecklistSubmitBar === 'function') {
+        renderExaminerChecklistSubmitBar(activeIdx);
+      }
       if (typeof showPleToast === 'function') {
         showPleToast('ปลดล็อกเพื่อแก้ไขคะแนน สามารถติ๊ก Checklist เพิ่มเติมได้', 'info');
       }
@@ -9544,12 +9755,19 @@
         if (typeof removeLocalReviewBanner === 'function') removeLocalReviewBanner();
       }
       SimState.currentIdx = idx;
-      SimState.isStationGradingPhase = false;
-      SimState.isStationSubmitted = false;
+      const isGradingOrTimeUp = (SimState.timerValue <= 0) || SimState.isStationGradingPhase;
+      if (isGradingOrTimeUp && SimState.isLobby && (SimState.role === 'examiner' || SimState.myBreakoutRole === 'examiner')) {
+        SimState.isStationGradingPhase = true;
+      } else if (!SimState._isSoloReview && SimState.timerValue > 0) {
+        SimState.isStationGradingPhase = false;
+        SimState.isStationSubmitted = false;
+      }
       const gradingBannerEl = document.getElementById('station-grading-phase-banner');
       if (gradingBannerEl) {
         if (SimState._isSoloReview) {
           renderSoloReviewPersistentBar();
+        } else if (SimState.isStationGradingPhase) {
+          renderStationGradingBanner(idx);
         } else {
           gradingBannerEl.style.display = 'none';
           gradingBannerEl.innerHTML = '';
@@ -9931,6 +10149,9 @@
       }
 
       // (Station chat is already switched at the top of renderStation)
+      if (typeof renderExaminerChecklistSubmitBar === 'function') {
+        renderExaminerChecklistSubmitBar(idx);
+      }
     }
 
     function getExamChecklistItemImage(item, globalIdx, c) {
@@ -10603,6 +10824,11 @@
       if (liveScoreEl) {
         liveScoreEl.textContent = `คะแนนปัจจุบัน: ${formatScore(currentScore)} / ${formatScore(totalScore)} คะแนน`;
       }
+      const liveChecklistScoreEl = document.getElementById('live-checklist-submit-score-display');
+      if (liveChecklistScoreEl) {
+        const pct = totalScore > 0 ? Math.round((currentScore / totalScore) / 0.01) : 0;
+        liveChecklistScoreEl.textContent = `คะแนนปัจจุบัน: ${formatScore(currentScore)} / ${formatScore(totalScore)} คะแนน (${pct}%)`;
+      }
       if (totalScore > 0) {
         const pct = Math.round((currentScore / totalScore) * 100);
         document.getElementById('exam-pct').textContent = `${pct}%`;
@@ -10838,6 +11064,12 @@
       if (typeof setupExaminerLiveSubmissionListener === 'function') {
         setupExaminerLiveSubmissionListener(st.stationNumber, c, { isReview: true });
       }
+      if (typeof renderStationGradingBanner === 'function') {
+        renderStationGradingBanner(targetStationIdx);
+      }
+      if (typeof renderExaminerChecklistSubmitBar === 'function') {
+        renderExaminerChecklistSubmitBar(targetStationIdx);
+      }
       renderLocalReviewBanner();
       renderMiniMap(false);
     }
@@ -10876,6 +11108,13 @@
       if (liveFeedbackTextarea) {
         const revFb = (partId && SimState.cachedRoom?.participantScores?.[partId]?.stationFeedbacks?.[assignedStationNum]) || '';
         liveFeedbackTextarea.value = revFb;
+      }
+
+      if (typeof renderStationGradingBanner === 'function') {
+        renderStationGradingBanner(assignedStationNum - 1);
+      }
+      if (typeof renderExaminerChecklistSubmitBar === 'function') {
+        renderExaminerChecklistSubmitBar(assignedStationNum - 1);
       }
 
       renderCarouselReviewBanner(roundIdx, partName);
@@ -10919,6 +11158,12 @@
           liveFeedbackTextarea.value = curFb;
         }
         renderCarouselCandidateSwitcher();
+        if (typeof renderStationGradingBanner === 'function') {
+          renderStationGradingBanner(assignedStationNum - 1);
+        }
+        if (typeof renderExaminerChecklistSubmitBar === 'function') {
+          renderExaminerChecklistSubmitBar(assignedStationNum - 1);
+        }
       } else {
         renderStation(SimState.currentIdx);
       }

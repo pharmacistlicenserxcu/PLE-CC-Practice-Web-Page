@@ -7,9 +7,9 @@
   <meta name="description" content="ระบบจำลองสอบ OSPE 16 สถานีเสมือนจริง พร้อมจับเวลา 4 นาที ติ๊ก Checklist และคำนวณผลคะแนน Leaderboard">
   <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>💊</text></svg>">
   <link rel="stylesheet" href="style.css?v=v_20261018_010000">
-  <script src="case-data-offline.js?v=v_20261019_150024"></script>
-  <script src="case-details-offline.js?v=v_20261019_150024"></script>
-  <script src="app.js?v=v_20261019_150024"></script>
+  <script src="case-data-offline.js?v=v_20261019_150230"></script>
+  <script src="case-details-offline.js?v=v_20261019_150230"></script>
+  <script src="app.js?v=v_20261019_150230"></script>
   <script src="scratchpad.js?v=20261004_201700"></script>
   <style>
     /* Simulation Source and Topic Selector */
@@ -11230,8 +11230,9 @@
 
           for (let attempt = 0; attempt < maxAttempts; attempt++) {
             const currentEntry = this._geminiKeyPool[this._currentKeyIdx];
-            const API_KEY = localStorage.getItem('_gemini_api_key') || currentEntry.key;
-            const ENDPOINT = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${API_KEY}`;
+            const customKey = localStorage.getItem('_gemini_api_key');
+            const API_KEY = (customKey && attempt === 0) ? customKey : currentEntry.key;
+            const ENDPOINT = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3.8-flash:generateContent?key=${API_KEY}`;
 
             try {
               const controller = new AbortController();
@@ -11262,7 +11263,7 @@
 
               if (!res.ok) {
                 const errBody = await res.text().catch(() => '');
-                if (res.status === 404 || res.status === 429 || res.status >= 500 || errBody.includes('RESOURCE_EXHAUSTED')) {
+                if (res.status === 429 || res.status >= 500 || errBody.includes('RESOURCE_EXHAUSTED')) {
                   this._currentKeyIdx = (this._currentKeyIdx + 1) % this._geminiKeyPool.length;
                   continue;
                 }
@@ -11639,8 +11640,9 @@ ${caseContext || '(ยังไม่มีข้อมูลเคส)'}
 
         for (let attempt = 0; attempt < maxAttempts; attempt++) {
           const currentEntry = this._geminiKeyPool[this._currentKeyIdx];
-          const API_KEY = localStorage.getItem('_gemini_api_key') || currentEntry.key;
-          const ENDPOINT = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${API_KEY}`;
+          const customKey = localStorage.getItem('_gemini_api_key');
+          const API_KEY = (customKey && attempt === 0) ? customKey : currentEntry.key;
+          const ENDPOINT = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3.8-flash:generateContent?key=${API_KEY}`;
 
           try {
             const controller = new AbortController();
@@ -11672,11 +11674,15 @@ ${caseContext || '(ยังไม่มีข้อมูลเคส)'}
             if (!res.ok) {
               const errBody = await res.text().catch(() => '');
               console.warn(`Gemini API key [${this._currentKeyIdx} - ${currentEntry.email}] failed:`, res.status, errBody);
-              if (res.status === 404 || res.status === 429 || res.status >= 500 || errBody.includes('RESOURCE_EXHAUSTED')) {
+              if (res.status === 429 || errBody.includes('RESOURCE_EXHAUSTED')) {
                 // Advance key in pool and try next key
                 this._currentKeyIdx = (this._currentKeyIdx + 1) % this._geminiKeyPool.length;
                 lastError = new Error('QUOTA_EXHAUSTED');
                 continue; // Retry with next key immediately
+              } else if (res.status >= 500) {
+                this._currentKeyIdx = (this._currentKeyIdx + 1) % this._geminiKeyPool.length;
+                lastError = new Error('SERVER_HIGH_DEMAND');
+                continue;
               }
               throw new Error(`Gemini API HTTP ${res.status}: ${errBody}`);
             }
@@ -11705,7 +11711,7 @@ ${caseContext || '(ยังไม่มีข้อมูลเคส)'}
               this._currentKeyIdx = (this._currentKeyIdx + 1) % this._geminiKeyPool.length;
               continue;
             }
-            if (err.message !== 'QUOTA_EXHAUSTED' && !err.message?.includes('429')) {
+            if (err.message !== 'QUOTA_EXHAUSTED' && err.message !== 'SERVER_HIGH_DEMAND' && !err.message?.includes('429')) {
               break; // Fatal non-quota error
             }
           }
@@ -11718,6 +11724,8 @@ ${caseContext || '(ยังไม่มีข้อมูลเคส)'}
           this.renderAIMessage('⏳ AI ตอบกลับไม่ทันเวลา (Timeout) กรุณาส่งข้อความอีกครั้งครับ');
         } else if (lastError?.message === 'QUOTA_EXHAUSTED' || (lastError?.message && lastError.message.includes('429'))) {
           this.renderAIMessage('⚠️ โควต้า API ทุก Key ในระบบใช้งานเต็มชั่วคราวครับ พรุ่งนี้ระบบจะรีเซ็ตอัตโนมัติครับ');
+        } else if (lastError?.message === 'SERVER_HIGH_DEMAND') {
+          this.renderAIMessage('⏳ เซิร์ฟเวอร์ AI มีผู้ใช้งานหนาแน่นชั่วคราว (High Demand) กรุณาลองส่งข้อความใหม่อีกครั้งครับ');
         } else {
           this.renderAIMessage(`⚠️ เชื่อมต่อ AI ไม่สำเร็จ: ${lastError?.message || 'โปรดตรวจสอบการเชื่อมต่อ'}`);
         }
@@ -17560,7 +17568,7 @@ ${caseContext || '(ยังไม่มีข้อมูลเคส)'}
       <div style="display: flex; align-items: center; gap: 4px;">
         <button type="button" id="btn-ai-chat-toggle"
           onclick="toggleAIChatMode()"
-          title="เปิด/ปิด Gemini AI ติวเตอร์และผู้ป่วยจำลอง (gemini-2.0-flash)"
+          title="เปิด/ปิด Gemini AI ติวเตอร์และผู้ป่วยจำลอง (gemini-3.8-flash)"
           style="background: none; border: 1.5px solid var(--border-color, #e2e8f0);
                  font-size: 0.73rem; cursor: pointer; color: var(--text-muted);
                  line-height: 1; padding: 0.22rem 0.6rem; border-radius: 7px;

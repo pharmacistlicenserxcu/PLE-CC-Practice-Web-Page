@@ -10151,10 +10151,7 @@
       const isPatient = sectionKey === 'patientInfo';
       const icon = isPatient ? '👤' : '📦';
       const sectionTitle = isPatient ? 'ข้อมูลผู้ป่วย' : 'สิ่งที่มีให้ในสถานี';
-      const sectionSubtitle = isPatient ? 'ประวัติผู้ป่วยและค่า Lab' : 'ใบสั่งยา อุปกรณ์ และสื่อที่ผู้เข้าสอบจะได้รับ';
-      const themeColor = isPatient ? '#16a34a' : '#7c3aed';
-      const themeBg = isPatient ? 'rgba(22, 163, 74, 0.12)' : 'rgba(124, 58, 237, 0.12)';
-      const themeBorder = isPatient ? '#86efac' : '#ddd6fe';
+      const sectionBody = isPatient ? 'ประวัติผู้ป่วยและค่า Lab เปิดบนหน้าจอคุณแล้ว' : 'ใบสั่งยา อุปกรณ์ และสื่อ เปิดบนหน้าจอคุณแล้ว';
       const targetAccordionId = isPatient ? 'exam-patient-accordion' : 'exam-equipment-accordion';
 
       if (!document.getElementById('examinee-gated-modal-styles')) {
@@ -10166,7 +10163,7 @@
             to { opacity: 1; }
           }
           @keyframes plePopIn {
-            from { opacity: 0; transform: scale(0.88) translateY(12px); }
+            from { opacity: 0; transform: scale(0.92) translateY(8px); }
             to { opacity: 1; transform: scale(1) translateY(0); }
           }
         `;
@@ -10195,73 +10192,57 @@
       overlay.innerHTML = `
         <div style="
           background: var(--surface, #ffffff);
-          border: 2.5px solid ${themeColor};
-          border-radius: 20px;
-          box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.4), 0 0 0 1px rgba(0,0,0,0.05);
-          max-width: 460px;
+          border: 1.5px solid var(--border-dark, #D0CCC2);
+          border-radius: 18px;
+          box-shadow: 0 20px 48px rgba(0, 0, 0, 0.14), 0 2px 8px rgba(0, 0, 0, 0.05);
+          max-width: 420px;
           width: 100%;
-          padding: 1.85rem 1.65rem;
+          padding: 1.6rem 1.8rem;
           text-align: center;
-          animation: plePopIn 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-          font-family: var(--font-body, inherit);
+          animation: plePopIn 0.22s cubic-bezier(0.16, 1, 0.3, 1);
+          font-family: var(--font-body, 'Bai Jamjuree', sans-serif);
           box-sizing: border-box;
         ">
-          <div style="
-            width: 76px;
-            height: 76px;
-            margin: 0 auto 1rem auto;
-            border-radius: 50%;
-            background: ${themeBg};
-            border: 2px solid ${themeBorder};
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 2.4rem;
-            box-shadow: 0 6px 16px ${themeBg};
-          ">
-            ${icon}
-          </div>
-
-          <div style="display: inline-flex; align-items: center; gap: 0.35rem; padding: 0.28rem 0.95rem; border-radius: 9999px; background: rgba(34, 197, 94, 0.14); color: #15803d; font-size: 0.82rem; font-weight: 700; margin-bottom: 0.65rem;">
-            <span>🔔 ผู้ประเมินส่งข้อมูลให้คุณแล้ว</span>
+          <div style="display: inline-flex; align-items: center; gap: 0.35rem; padding: 0.28rem 0.95rem; border-radius: 9999px; background: #DCFCE7; color: #15803D; border: 1px solid #86EFAC; font-size: 0.8rem; font-weight: 700; margin-bottom: 0.85rem;">
+            <span>🔔 ผู้ประเมินส่งข้อมูลแล้ว</span>
           </div>
 
           <h3 style="
-            font-family: var(--font-title, inherit);
+            font-family: var(--font-title, 'Bai Jamjuree', sans-serif);
             font-size: 1.35rem;
             font-weight: 800;
-            color: var(--text-primary, #0f172a);
-            margin: 0 0 0.35rem 0;
-            line-height: 1.3;
+            color: var(--text-primary, #1C2320);
+            margin: 0 0 0.5rem 0;
+            line-height: 1.35;
           ">
-            เปิด${sectionTitle}
+            ${icon} ${sectionTitle}
           </h3>
 
           <div style="
-            font-size: 0.92rem;
-            color: var(--text-secondary, #475569);
-            margin-bottom: 1.5rem;
-            line-height: 1.5;
+            font-size: 0.94rem;
+            color: var(--text-secondary, #555C54);
+            margin-bottom: 1.45rem;
+            line-height: 1.55;
           ">
-            <strong style="color:var(--text-primary);">${sectionSubtitle}</strong><br>
-            ข้อมูลถูกเปิดบนหน้าจอของคุณแล้ว สามารถเริ่มตรวจสอบและดำเนินการได้ทันที
+            ${sectionBody}
           </div>
 
           <button type="button" id="btn-examinee-gated-ack" style="
             width: 100%;
-            padding: 0.85rem 1.5rem;
+            padding: 0.72rem 1.5rem;
             border-radius: 9999px;
             border: none;
-            background: ${themeColor};
+            background: #16A34A;
             color: #ffffff;
-            font-family: var(--font-title, inherit);
-            font-size: 1.05rem;
-            font-weight: 800;
+            font-family: var(--font-title, 'Bai Jamjuree', sans-serif);
+            font-size: 1rem;
+            font-weight: 700;
             cursor: pointer;
-            box-shadow: 0 4px 14px ${themeBg};
-            transition: transform 0.15s ease, box-shadow 0.15s ease;
+            box-shadow: 0 4px 14px rgba(22, 163, 74, 0.25);
+            transition: transform 0.15s ease, box-shadow 0.15s ease, background-color 0.15s ease;
+            outline: none;
           ">
-            ✓ รับทราบ / ดูข้อมูลทันที
+            ✓ รับทราบ
           </button>
         </div>
       `;
@@ -10286,8 +10267,20 @@
       const ackBtn = overlay.querySelector('#btn-examinee-gated-ack');
       if (ackBtn && typeof ackBtn.addEventListener === 'function') {
         ackBtn.addEventListener('click', dismissAndScroll);
-        ackBtn.addEventListener('mouseenter', () => { ackBtn.style.transform = 'scale(1.02)'; });
-        ackBtn.addEventListener('mouseleave', () => { ackBtn.style.transform = 'scale(1)'; });
+        ackBtn.addEventListener('mouseenter', () => {
+          ackBtn.style.transform = 'scale(1.02)';
+          ackBtn.style.backgroundColor = '#15803d';
+        });
+        ackBtn.addEventListener('mouseleave', () => {
+          ackBtn.style.transform = 'scale(1)';
+          ackBtn.style.backgroundColor = '#16a34a';
+        });
+        ackBtn.addEventListener('focus', () => {
+          ackBtn.style.boxShadow = '0 0 0 3px rgba(34, 197, 94, 0.4)';
+        });
+        ackBtn.addEventListener('blur', () => {
+          ackBtn.style.boxShadow = '0 4px 14px rgba(22, 163, 74, 0.25)';
+        });
       }
 
       if (typeof overlay.addEventListener === 'function') {

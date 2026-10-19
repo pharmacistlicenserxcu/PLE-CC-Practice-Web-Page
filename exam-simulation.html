@@ -6,7 +6,7 @@
   <title>ระบบจำลองสอบ OSPE เสมือนจริง | RxCU</title>
   <meta name="description" content="ระบบจำลองสอบ OSPE 16 สถานีเสมือนจริง พร้อมจับเวลา 4 นาที ติ๊ก Checklist และคำนวณผลคะแนน Leaderboard">
   <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>💊</text></svg>">
-  <link rel="stylesheet" href="style.css?v=v_20261019_213500">
+  <link rel="stylesheet" href="style.css?v=v_20261019_214500">
   <script src="case-data-offline.js?v=v_20261019_203754"></script>
   <script src="case-details-offline.js?v=v_20261019_203754"></script>
   <script src="app.js?v=v_20261019_203754"></script>
@@ -402,10 +402,10 @@
       box-shadow: 0 4px 18px rgba(0, 0, 0, 0.06), 0 1px 3px rgba(0, 0, 0, 0.04) !important;
       text-align: center !important;
       transition: border-color 0.3s ease, box-shadow 0.3s ease !important;
-      isolation: isolate !important;
       --tc: var(--primary, #0E7490);
       box-sizing: border-box !important;
       display: block !important;
+      overflow: visible !important;
     }
 
     #exam-sticky-timer-bar.warn {
@@ -532,6 +532,8 @@
     #exam-sticky-timer-bar .mwrap {
       position: relative !important;
       display: inline-block !important;
+      overflow: visible !important;
+      z-index: 1010 !important;
     }
 
     #exam-sticky-timer-bar #btn-timer-more-menu,
@@ -568,13 +570,15 @@
       top: calc(100% + 8px) !important;
       width: 230px !important;
       padding: 8px !important;
-      z-index: 1005 !important;
+      z-index: 99999 !important;
       background: var(--surface, #FFFFFF) !important;
       border: 1.5px solid var(--border-dark, #D0CCC2) !important;
       border-radius: 14px !important;
-      box-shadow: 0 16px 36px rgba(0, 0, 0, 0.16), 0 2px 6px rgba(0, 0, 0, 0.05) !important;
+      box-shadow: 0 16px 36px rgba(0, 0, 0, 0.22), 0 2px 8px rgba(0, 0, 0, 0.1) !important;
       text-align: left !important;
       box-sizing: border-box !important;
+      max-height: calc(100vh - 120px) !important;
+      overflow-y: auto !important;
     }
 
     #exam-sticky-timer-bar #timer-more-menu[hidden],
@@ -2702,7 +2706,7 @@
         </div>
 
         <!-- ALWAYS STICKY TIMER BAR (Pinned at top) -->
-        <div id="exam-sticky-timer-bar" class="exam-sticky-timer-bar card">
+        <div id="exam-sticky-timer-bar" class="exam-sticky-timer-bar">
           <!-- Giant Prominent Countdown Timer -->
           <div class="time" id="exam-timer">04:00</div>
           <div class="cap" id="exam-timer-label">เวลาที่เหลือ · สถานีนี้</div>

@@ -2803,7 +2803,18 @@
                   <button class="btn outline" id="btn-prev-station" onclick="prevStation()" style="padding: 5px 12px; font-size: 12.5px;">← ก่อนหน้า</button>
                   <button class="btn primary" id="btn-next-station" onclick="nextStation()" style="padding: 5px 12px; font-size: 12.5px;">ถัดไป →</button>
                 </div>
-                <div style="display: flex; gap: 6px; align-items: center;">
+                <div style="display: flex; gap: 6px; align-items: center; flex-wrap: wrap;">
+                  <div class="layout-toggle-container" id="exam-layout-toggle-wrap" style="display: inline-flex; align-items: center; background: var(--bg-secondary); padding: 2px; border-radius: var(--radius-sm); border: 1px solid var(--border);">
+                    <span style="font-size: 0.72rem; font-weight: 600; color: var(--text-secondary); padding: 0 0.35rem;">มุมมอง:</span>
+                    <button type="button" class="btn-layout-segment" id="btn-exam-layout-split" onclick="setExamLayoutModeExplicit('split')" title="มุมมองแบ่ง 2 ฝั่งล็อกจอ (โจทย์ซ้าย / Checklist ขวา มี scrollbar แยกในกรอบ)" style="display: inline-flex; align-items: center; gap: 0.25rem; padding: 0.25rem 0.6rem; font-size: 0.76rem; font-weight: 600; border-radius: var(--radius-xs, 4px); border: none; cursor: pointer; transition: all 0.2s;">
+                      <span>◫</span>
+                      <span>แบ่ง 2 ฝั่ง</span>
+                    </button>
+                    <button type="button" class="btn-layout-segment" id="btn-exam-layout-classic" onclick="setExamLayoutModeExplicit('classic')" title="มุมมองหน้าแบบยาวต่อเนื่อง (เลื่อนทั้งหน้าจอเหมือนเอกสารปกติ)" style="display: inline-flex; align-items: center; gap: 0.25rem; padding: 0.25rem 0.6rem; font-size: 0.76rem; font-weight: 600; border-radius: var(--radius-xs, 4px); border: none; cursor: pointer; transition: all 0.2s;">
+                      <span>☰</span>
+                      <span>แบบยาว</span>
+                    </button>
+                  </div>
                   <button class="btn danger" id="btn-finish-exam" onclick="finishExamSimulation()" style="padding: 5px 12px; font-size: 12.5px;">🏁 สิ้นสุดการสอบ</button>
                 </div>
               </div>
@@ -2828,8 +2839,8 @@
 
         <div class="exam-layout">
           
-          <!-- Full-Width Content Pane: Case info -->
-          <div class="exam-content-pane" id="exam-left-pane" style="width: 100%;">
+          <!-- Left Content Pane: Case info, Patient profile & Equipment -->
+          <div class="exam-content-pane" id="exam-left-pane">
 
             <h3 class="viewer-section-title" style="margin-top: 0;">สถานการณ์</h3>
             <div id="exam-scenario-content" style="margin-bottom: 2rem;">
@@ -2957,6 +2968,10 @@
                 🛑 ออกจากการสอบจำลอง
               </button>
             </div>
+          </div>
+
+          <!-- Right Sidebar Pane: Assessment Rubric, Controls, Notes & Checklist -->
+          <div class="exam-sidebar-pane" id="exam-right-pane">
 
             <!-- Examiner Gated Section Release Controls Panel -->
             <div id="examiner-gated-controls-panel" style="display: none; margin-bottom: 1.5rem; background: var(--surface); border: 1.5px solid var(--border-dark); border-radius: var(--radius-md); padding: 0.9rem 1.15rem; box-shadow: var(--shadow-sm);">
@@ -4965,6 +4980,7 @@
     });
 
     document.addEventListener('DOMContentLoaded', () => {
+      applyExamLayoutMode();
       initServerTimeOffset();
       initOnlineConnectionWatcher();
       initOtpBoxes();
@@ -6310,7 +6326,7 @@
           const isInitialLoad = !SimState.lastReceivedBellSignal;
           SimState.lastReceivedBellSignal = room.bellSignal;
           if (!isInitialLoad && !isHost) {
-            playStationTimeoutAlarm('bell');
+            playStationTransitionBell(3.0);
           }
         }
 
@@ -7036,7 +7052,7 @@
             if (typeof closeManualTimeoutOverlay === 'function') closeManualTimeoutOverlay();
             renderStation(targetIdx);
             if (stationChanged) {
-              playStationTimeoutAlarm('bell');
+              playStationTransitionBell(3.0);
             }
             if (SimState.examMode === 'carousel_rotation' && SimState.role === 'examiner') {
               renderCarouselCandidateSwitcher();
@@ -7853,7 +7869,9 @@
 
     function showManualTimeoutPopup() {
       closeManualTimeoutOverlay(false);
-      playTimeoutSound();
+      if (!_activeTimeoutAudio && !_activeTransitionBellAudio) {
+        playTimeoutSound();
+      }
 
       const canAdvance = isSingleMasterStationController();
       const activeIdx = (SimState.isLobby && SimState.cachedRoom && SimState.cachedRoom.currentStationIdx !== undefined)
@@ -8522,14 +8540,15 @@
           const isLastStation = (SimState.stations.length > 0 && expiredIdx >= SimState.stations.length - 1);
 
           if (currentTimeoutMode === 'auto' && !isLastStation) {
-            playStationTimeoutAlarm(SimState.alarmSound || 'school-bell');
+            playStationTransitionBell(3.0);
             if (isSingleMasterStationController()) {
               setTimeout(() => {
                 nextStation(expiredIdx);
-              }, 1200);
+              }, 400);
             }
           } else {
             enterStationGradingPhase(expiredIdx);
+            showManualTimeoutPopup();
           }
         }
       };
@@ -9000,12 +9019,13 @@
           const soloTimeoutMode = SimState.timeoutTransitionMode || 'auto';
 
           if (soloTimeoutMode === 'auto' && !isLastStation) {
-            playStationTimeoutAlarm(SimState.alarmSound || 'school-bell');
+            playStationTransitionBell(3.0);
             setTimeout(() => {
               nextStation(SimState.currentIdx);
-            }, 1200);
+            }, 400);
           } else {
             enterStationGradingPhase(SimState.currentIdx);
+            showManualTimeoutPopup();
           }
         }
       }, 1000);
@@ -9416,7 +9436,91 @@
       return 240; // default 4 นาที
     }
 
-    // ─── Render station ───────────────────────────────────────
+    function getExamLayoutPreference() {
+      const saved = localStorage.getItem('ple_ospe_split_layout_mode');
+      if (saved === 'split' || saved === 'classic') return saved;
+      return window.innerWidth >= 992 ? 'split' : 'classic';
+    }
+
+    function applyExamLayoutMode(mode = null) {
+      const activeMode = mode || getExamLayoutPreference();
+      const examLayout = document.querySelector('.exam-layout');
+      const wrapEl = document.getElementById('exam-layout-toggle-wrap');
+      const splitBtn = document.getElementById('btn-exam-layout-split');
+      const classicBtn = document.getElementById('btn-exam-layout-classic');
+      const leftPane = document.getElementById('exam-left-pane');
+      const rightPane = document.getElementById('exam-right-pane');
+
+      if (!examLayout) return;
+
+      const isExaminee = (SimState.role === 'examinee' || SimState.role === 'participant');
+
+      if (isExaminee) {
+        examLayout.classList.remove('split-scroll-layout');
+        examLayout.classList.remove('classic-scroll-layout');
+        examLayout.classList.remove('examiner-layout');
+        examLayout.classList.add('is-examinee-view');
+        if (wrapEl) wrapEl.style.display = 'none';
+        if (leftPane) leftPane.style.width = '100%';
+        if (rightPane) rightPane.style.display = 'none';
+        return;
+      }
+
+      examLayout.classList.remove('is-examinee-view');
+      if (wrapEl) wrapEl.style.display = 'inline-flex';
+      if (leftPane) leftPane.style.width = '';
+      if (rightPane) rightPane.style.display = '';
+
+      if (activeMode === 'split') {
+        examLayout.classList.add('split-scroll-layout');
+        examLayout.classList.remove('classic-scroll-layout');
+        examLayout.classList.add('examiner-layout');
+        if (splitBtn) {
+          splitBtn.style.background = 'var(--surface)';
+          splitBtn.style.color = 'var(--primary)';
+          splitBtn.style.boxShadow = 'var(--shadow-sm)';
+          splitBtn.style.fontWeight = '700';
+        }
+        if (classicBtn) {
+          classicBtn.style.background = 'transparent';
+          classicBtn.style.color = 'var(--text-secondary)';
+          classicBtn.style.boxShadow = 'none';
+          classicBtn.style.fontWeight = '600';
+        }
+      } else {
+        examLayout.classList.remove('split-scroll-layout');
+        examLayout.classList.add('classic-scroll-layout');
+        examLayout.classList.remove('examiner-layout');
+        if (splitBtn) {
+          splitBtn.style.background = 'transparent';
+          splitBtn.style.color = 'var(--text-secondary)';
+          splitBtn.style.boxShadow = 'none';
+          splitBtn.style.fontWeight = '600';
+        }
+        if (classicBtn) {
+          classicBtn.style.background = 'var(--surface)';
+          classicBtn.style.color = 'var(--primary)';
+          classicBtn.style.boxShadow = 'var(--shadow-sm)';
+          classicBtn.style.fontWeight = '700';
+        }
+      }
+    }
+    window.applyExamLayoutMode = applyExamLayoutMode;
+
+    function setExamLayoutModeExplicit(mode) {
+      localStorage.setItem('ple_ospe_split_layout_mode', mode);
+      applyExamLayoutMode(mode);
+    }
+    window.setExamLayoutModeExplicit = setExamLayoutModeExplicit;
+
+    function toggleExamLayoutMode() {
+      const current = getExamLayoutPreference();
+      const nextMode = (current === 'split') ? 'classic' : 'split';
+      setExamLayoutModeExplicit(nextMode);
+    }
+    window.toggleExamLayoutMode = toggleExamLayoutMode;
+
+    // Render station
     function renderStation(idx) {
       if (!SimState.stations || !SimState.stations[idx]) {
         console.warn('renderStation: station not found at index', idx);
@@ -9610,11 +9714,8 @@
       const badge = document.getElementById('exam-station-badge');
       badge.className = 'station-badge ' + (c.category || 'rest').toLowerCase();
       
-      // Examiner layout
-      const examLayout = document.querySelector('.exam-layout');
-      if (examLayout) {
-        examLayout.classList.toggle('examiner-layout', SimState.role === 'examiner');
-      }
+      // Configure dynamic layout (Split vs Classic Continuous)
+      applyExamLayoutMode();
 
       const progressCard = document.getElementById('exam-progress-card');
       const noticeCard = document.getElementById('exam-examinee-notice');
@@ -10573,7 +10674,7 @@
       // In Standard/Breakout lobby modes, examinees cannot change stations directly
       if (SimState.isLobby && !SimState.isHost && SimState.role !== 'examiner') return;
 
-      playStationTimeoutAlarm('bell');
+      playStationTransitionBell(3.0);
 
       const targetSt = SimState.stations[targetIdx];
       if (targetSt && targetSt.case && !targetSt.isRest) {
@@ -16858,7 +16959,126 @@ ${caseContext || '(ยังไม่มีข้อมูลเคส)'}
       } catch (e) {}
     }
 
+    let _activeTransitionBellAudio = null;
+    let _lastTransitionBellTimestamp = 0;
+
+    function playSynthesizedSchoolBell(durationSec = 3.0) {
+      try {
+        const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+        if (!AudioContextClass) return;
+        if (!_unlockedAudioCtx) {
+          _unlockedAudioCtx = new AudioContextClass();
+        }
+        const ctx = _unlockedAudioCtx;
+        if (ctx.state === 'suspended') ctx.resume().catch(() => {});
+        const now = ctx.currentTime;
+
+        const masterGain = ctx.createGain();
+        masterGain.connect(ctx.destination);
+
+        const sustainTime = Math.max(0.5, durationSec - 0.45);
+        masterGain.gain.setValueAtTime(0.42, now);
+        masterGain.gain.setValueAtTime(0.42, now + sustainTime);
+        masterGain.gain.exponentialRampToValueAtTime(0.0001, now + durationSec);
+
+        // Clapper tremolo LFO (rapid 22 strikes/sec simulating an authentic electric school bell clapper)
+        const lfo = ctx.createOscillator();
+        lfo.type = 'sawtooth';
+        lfo.frequency.setValueAtTime(22, now);
+
+        const lfoGain = ctx.createGain();
+        lfoGain.gain.setValueAtTime(0.35, now);
+        lfo.connect(lfoGain.gain);
+
+        const bellTones = [
+          { freq: 784, type: 'triangle', gain: 0.35 },
+          { freq: 1568, type: 'sine', gain: 0.28 },
+          { freq: 2352, type: 'sine', gain: 0.16 },
+          { freq: 3136, type: 'sine', gain: 0.08 }
+        ];
+
+        bellTones.forEach(tone => {
+          const osc = ctx.createOscillator();
+          const g = ctx.createGain();
+          osc.type = tone.type;
+          osc.frequency.setValueAtTime(tone.freq, now);
+          osc.frequency.linearRampToValueAtTime(tone.freq * 1.002, now + durationSec);
+          g.gain.setValueAtTime(tone.gain, now);
+
+          osc.connect(g);
+          g.connect(masterGain);
+          osc.start(now);
+          osc.stop(now + durationSec + 0.05);
+        });
+
+        lfo.start(now);
+        lfo.stop(now + sustainTime);
+      } catch (e) {
+        console.warn('Synthesized school bell error:', e);
+      }
+    }
+    window.playSynthesizedSchoolBell = playSynthesizedSchoolBell;
+
+    function playStationTransitionBell(durationSec = 3.0, force = false) {
+      const nowMs = Date.now();
+      if (!force && (nowMs - _lastTransitionBellTimestamp < 2000)) {
+        return;
+      }
+      _lastTransitionBellTimestamp = nowMs;
+
+      // 1. Play authentic MP3 school bell or selected track
+      try {
+        let soundKey = SimState.alarmSound || localStorage.getItem('ple_ospe_alarm_sound') || 'school-bell';
+        if (soundKey === 'random') {
+          const playableKeys = Object.keys(ALARM_SOUND_MAP).filter(k => k !== 'random' && ALARM_SOUND_MAP[k]?.file);
+          soundKey = playableKeys[Math.floor(Math.random() * playableKeys.length)] || 'school-bell';
+        }
+        const soundObj = ALARM_SOUND_MAP[soundKey] || ALARM_SOUND_MAP['school-bell'];
+        if (soundObj && soundObj.file) {
+          const audio = new Audio(soundObj.file);
+          audio.currentTime = 0;
+          audio.volume = 1.0;
+          _activeTransitionBellAudio = audio;
+
+          audio.play().then(() => {
+            const sustainMs = Math.max(500, Math.round((durationSec - 0.4) * 1000));
+            setTimeout(() => {
+              if (_activeTransitionBellAudio === audio) {
+                let vol = audio.volume;
+                const fadeInterval = setInterval(() => {
+                  vol = Math.max(0, vol - 0.125);
+                  try { audio.volume = vol; } catch (e) {}
+                  if (vol <= 0.05) {
+                    clearInterval(fadeInterval);
+                    try { audio.pause(); audio.currentTime = 0; } catch (e) {}
+                    if (_activeTransitionBellAudio === audio) _activeTransitionBellAudio = null;
+                  }
+                }, 50);
+              }
+            }, sustainMs);
+          }).catch(err => {
+            console.warn('MP3 transition bell play prevented, relying on Web Audio synth:', err);
+          });
+        }
+      } catch (e) {
+        console.warn('Transition bell audio error, falling back to synth:', e);
+      }
+
+      // 2. Layered Web Audio Synthesizer (Ensures 100% audibility across all browsers)
+      playSynthesizedSchoolBell(durationSec);
+    }
+    window.playStationTransitionBell = playStationTransitionBell;
+
     function playStationTimeoutAlarm(type = 'alarm', soundOverride = null) {
+      if (type === 'bell') {
+        playStationTransitionBell(3.0);
+        return;
+      }
+      if (type !== 'alarm' && ALARM_SOUND_MAP[type]) {
+        soundOverride = type;
+        type = 'alarm';
+      }
+
       if (type === 'alarm') {
         // Stop any running sound first
         stopTimeoutAlarmSound();
@@ -16911,31 +17131,8 @@ ${caseContext || '(ยังไม่มีข้อมูลเคส)'}
         }
       }
 
-      // Bell chime for manual station changes or host calls
-      try {
-        const AudioContextClass = window.AudioContext || window.webkitAudioContext;
-        if (!AudioContextClass) return;
-        if (!_unlockedAudioCtx) {
-          _unlockedAudioCtx = new AudioContextClass();
-        }
-        const ctx = _unlockedAudioCtx;
-        if (ctx.state === 'suspended') ctx.resume().catch(() => {});
-        const now = ctx.currentTime;
-        [523.25, 659.25, 783.99, 1046.50].forEach((freq, idx) => {
-          const osc = ctx.createOscillator();
-          const gain = ctx.createGain();
-          osc.type = 'triangle';
-          osc.frequency.setValueAtTime(freq, now + idx * 0.08);
-          gain.gain.setValueAtTime(0.35, now + idx * 0.08);
-          gain.gain.exponentialRampToValueAtTime(0.0001, now + idx * 0.08 + 1.2);
-          osc.connect(gain);
-          gain.connect(ctx.destination);
-          osc.start(now + idx * 0.08);
-          osc.stop(now + idx * 0.08 + 1.25);
-        });
-      } catch (e) {
-        console.warn('Bell chime error:', e);
-      }
+      // Fallback bell chime
+      playStationTransitionBell(3.0);
     }
     window.playStationTimeoutAlarm = playStationTimeoutAlarm;
 

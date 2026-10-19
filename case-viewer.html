@@ -999,11 +999,24 @@
         </div>
       </header>
 
-      <!-- Role / Practice Mode Selector (no-print) -->
-      <div id="mode-selector" class="role-selector-container no-print">
-        <button class="role-btn active" id="role-btn-solo" onclick="setViewerRole('solo')">👤 ฝึกคนเดียว</button>
-        <button class="role-btn" id="role-btn-examinee" onclick="setViewerRole('examinee')">✍️ เป็นคนสอบ</button>
-        <button class="role-btn" id="role-btn-examiner" onclick="setViewerRole('examiner')">🔎 เป็นคนตรวจ</button>
+      <!-- Role / Practice Mode Selector and Layout Mode Toggle (no-print) -->
+      <div class="viewer-controls-bar no-print" style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.75rem; margin-bottom: 1.25rem;">
+        <div id="mode-selector" class="role-selector-container" style="margin-bottom: 0;">
+          <button class="role-btn active" id="role-btn-solo" onclick="setViewerRole('solo')">👤 ฝึกคนเดียว</button>
+          <button class="role-btn" id="role-btn-examinee" onclick="setViewerRole('examinee')">✍️ เป็นคนสอบ</button>
+          <button class="role-btn" id="role-btn-examiner" onclick="setViewerRole('examiner')">🔎 เป็นคนตรวจ</button>
+        </div>
+        <div class="layout-toggle-container" id="viewer-layout-toggle-wrap" style="display: inline-flex; align-items: center; background: var(--bg-secondary); padding: 3px; border-radius: var(--radius-md); border: 1px solid var(--border);">
+          <span style="font-size: 0.78rem; font-weight: 600; color: var(--text-secondary); padding: 0 0.4rem;">มุมมอง:</span>
+          <button type="button" class="btn-layout-segment" id="btn-viewer-layout-split" onclick="setViewerLayoutModeExplicit('split')" title="มุมมองแบ่ง 2 ฝั่งล็อกจอ (โจทย์ซ้าย / Checklist ขวา มี scrollbar แยกในกรอบ)" style="display: inline-flex; align-items: center; gap: 0.35rem; padding: 0.35rem 0.75rem; font-size: 0.82rem; font-weight: 600; border-radius: var(--radius-sm); border: none; cursor: pointer; transition: all 0.2s;">
+            <span>◫</span>
+            <span>แบ่ง 2 ฝั่ง</span>
+          </button>
+          <button type="button" class="btn-layout-segment" id="btn-viewer-layout-classic" onclick="setViewerLayoutModeExplicit('classic')" title="มุมมองหน้าแบบยาวต่อเนื่อง (เลื่อนทั้งหน้าจอเหมือนเอกสารปกติ)" style="display: inline-flex; align-items: center; gap: 0.35rem; padding: 0.35rem 0.75rem; font-size: 0.82rem; font-weight: 600; border-radius: var(--radius-sm); border: none; cursor: pointer; transition: all 0.2s;">
+            <span>☰</span>
+            <span>แบบยาว</span>
+          </button>
+        </div>
       </div>
 
       <!-- Viewer Grid Split Layout -->
@@ -1211,6 +1224,7 @@
     }
 
     document.addEventListener('DOMContentLoaded', () => {
+      applyViewerLayoutMode();
       if (activeCaseId) {
         // ดึงบทบาทจาก URL ถ้ามี (mode หรือ role)
         const modeParam = getUrlParam('mode') || getUrlParam('role');
@@ -2090,6 +2104,80 @@
       }
     }
 
+    function getViewerLayoutPreference() {
+      const saved = localStorage.getItem('ple_ospe_split_layout_mode');
+      if (saved === 'split' || saved === 'classic') return saved;
+      return window.innerWidth >= 992 ? 'split' : 'classic';
+    }
+
+    function applyViewerLayoutMode(mode = null) {
+      const activeMode = mode || getViewerLayoutPreference();
+      const grid = document.querySelector('.viewer-grid');
+      const wrapEl = document.getElementById('viewer-layout-toggle-wrap');
+      const splitBtn = document.getElementById('btn-viewer-layout-split');
+      const classicBtn = document.getElementById('btn-viewer-layout-classic');
+
+      if (!grid) return;
+
+      if (currentRole === 'examinee') {
+        grid.classList.remove('split-scroll-layout');
+        grid.classList.remove('classic-scroll-layout');
+        grid.classList.remove('examiner-layout');
+        if (wrapEl) wrapEl.style.display = 'none';
+        return;
+      }
+
+      if (wrapEl) wrapEl.style.display = 'inline-flex';
+
+      if (activeMode === 'split') {
+        grid.classList.add('split-scroll-layout');
+        grid.classList.remove('classic-scroll-layout');
+        grid.classList.add('examiner-layout');
+        if (splitBtn) {
+          splitBtn.style.background = 'var(--surface)';
+          splitBtn.style.color = 'var(--primary)';
+          splitBtn.style.boxShadow = 'var(--shadow-sm)';
+          splitBtn.style.fontWeight = '700';
+        }
+        if (classicBtn) {
+          classicBtn.style.background = 'transparent';
+          classicBtn.style.color = 'var(--text-secondary)';
+          classicBtn.style.boxShadow = 'none';
+          classicBtn.style.fontWeight = '600';
+        }
+      } else {
+        grid.classList.remove('split-scroll-layout');
+        grid.classList.add('classic-scroll-layout');
+        grid.classList.remove('examiner-layout');
+        if (splitBtn) {
+          splitBtn.style.background = 'transparent';
+          splitBtn.style.color = 'var(--text-secondary)';
+          splitBtn.style.boxShadow = 'none';
+          splitBtn.style.fontWeight = '600';
+        }
+        if (classicBtn) {
+          classicBtn.style.background = 'var(--surface)';
+          classicBtn.style.color = 'var(--primary)';
+          classicBtn.style.boxShadow = 'var(--shadow-sm)';
+          classicBtn.style.fontWeight = '700';
+        }
+      }
+    }
+    window.applyViewerLayoutMode = applyViewerLayoutMode;
+
+    function setViewerLayoutModeExplicit(mode) {
+      localStorage.setItem('ple_ospe_split_layout_mode', mode);
+      applyViewerLayoutMode(mode);
+    }
+    window.setViewerLayoutModeExplicit = setViewerLayoutModeExplicit;
+
+    function toggleViewerLayoutMode() {
+      const current = getViewerLayoutPreference();
+      const nextMode = (current === 'split') ? 'classic' : 'split';
+      setViewerLayoutModeExplicit(nextMode);
+    }
+    window.toggleViewerLayoutMode = toggleViewerLayoutMode;
+
     // ฟังก์ชันจัดการบทบาทการซ้อมสอบ (Solo / Examinee / Examiner)
     function setViewerRole(role) {
       currentRole = role;
@@ -2112,12 +2200,8 @@
       // เคลียร์/หยุด ตัวจับเวลาเก่าก่อน
       stopViewerTimer();
 
-      // จัดการการขยายหน้า Checklist เต็มจอ (Full-width)
-      if (role === 'examiner') {
-        grid.classList.add('examiner-layout');
-      } else {
-        grid.classList.remove('examiner-layout');
-      }
+      // ปรับแต่งโครงสร้างเลย์เอาต์ (Split vs Classic Continuous) ตามการตั้งค่าของผู้ใช้
+      applyViewerLayoutMode();
 
       if (role === 'solo') {
         chkSection.style.display = 'block';

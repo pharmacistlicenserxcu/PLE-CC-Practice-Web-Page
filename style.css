@@ -2525,46 +2525,148 @@ ol.ordered-list li,
   border-color: var(--border);
 }
 
-/* --- Examiner Split View Layout (Toggled via JS) --- */
-.viewer-grid.examiner-layout {
+/* --- Balanced Dual-Pane Split Layout with Independent Scrollbars --- */
+.viewer-grid.split-scroll-layout,
+.exam-layout.split-scroll-layout {
   display: grid !important;
-  grid-template-columns: 1fr 1fr !important;
-  gap: 1.5rem !important;
-  align-items: start !important;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) !important;
+  gap: 1.25rem !important;
+  align-items: stretch !important;
+  height: calc(100vh - 130px) !important;
+  max-height: calc(100vh - 130px) !important;
+  overflow: hidden !important;
+  box-sizing: border-box !important;
 }
 
-@media (max-width: 992px) {
-  .viewer-grid.examiner-layout {
+.viewer-grid.split-scroll-layout #left-pane,
+.viewer-grid.split-scroll-layout #right-pane,
+.exam-layout.split-scroll-layout #exam-left-pane,
+.exam-layout.split-scroll-layout #exam-right-pane {
+  display: block !important;
+  width: 100% !important;
+  height: 100% !important;
+  max-height: 100% !important;
+  overflow-y: auto !important;
+  overflow-x: hidden !important;
+  background-color: var(--surface) !important;
+  border: 1px solid var(--border) !important;
+  border-radius: var(--radius-lg) !important;
+  padding: 1.5rem 1.75rem !important;
+  box-shadow: var(--shadow-sm) !important;
+  box-sizing: border-box !important;
+  scrollbar-width: thin;
+  scrollbar-color: var(--border-dark) transparent;
+}
+
+.viewer-grid.split-scroll-layout #left-pane::-webkit-scrollbar,
+.viewer-grid.split-scroll-layout #right-pane::-webkit-scrollbar,
+.exam-layout.split-scroll-layout #exam-left-pane::-webkit-scrollbar,
+.exam-layout.split-scroll-layout #exam-right-pane::-webkit-scrollbar {
+  width: 7px;
+}
+
+.viewer-grid.split-scroll-layout #left-pane::-webkit-scrollbar-thumb,
+.viewer-grid.split-scroll-layout #right-pane::-webkit-scrollbar-thumb,
+.exam-layout.split-scroll-layout #exam-left-pane::-webkit-scrollbar-thumb,
+.exam-layout.split-scroll-layout #exam-right-pane::-webkit-scrollbar-thumb {
+  background-color: var(--border-dark);
+  border-radius: 9999px;
+}
+
+/* Examinee view in exam simulation: left pane spans full width */
+.exam-layout.split-scroll-layout.is-examinee-view {
+  grid-template-columns: 1fr !important;
+}
+.exam-layout.split-scroll-layout.is-examinee-view #exam-right-pane {
+  display: none !important;
+}
+
+/* --- Continuous Long-Page Layout (หน้าแบบยาวๆ) --- */
+.viewer-grid.classic-scroll-layout,
+.exam-layout.classic-scroll-layout {
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 1.5rem !important;
+  width: 100% !important;
+  height: auto !important;
+  max-height: none !important;
+  overflow: visible !important;
+}
+
+.viewer-grid.classic-scroll-layout #left-pane,
+.viewer-grid.classic-scroll-layout #right-pane,
+.exam-layout.classic-scroll-layout #exam-left-pane,
+.exam-layout.classic-scroll-layout #exam-right-pane {
+  display: block !important;
+  width: 100% !important;
+  height: auto !important;
+  max-height: none !important;
+  overflow: visible !important;
+  background-color: var(--surface) !important;
+  border: 1px solid var(--border) !important;
+  border-radius: var(--radius-lg) !important;
+  padding: 1.75rem 2rem !important;
+  box-shadow: var(--shadow-sm) !important;
+}
+
+/* Responsive Fallback: On screens under 992px, automatically stack */
+@media (max-width: 991px) {
+  .viewer-grid.split-scroll-layout,
+  .exam-layout.split-scroll-layout {
     display: flex !important;
     flex-direction: column !important;
+    height: auto !important;
+    max-height: none !important;
+    overflow: visible !important;
+    gap: 1.25rem !important;
+  }
+
+  .viewer-grid.split-scroll-layout #left-pane,
+  .viewer-grid.split-scroll-layout #right-pane,
+  .exam-layout.split-scroll-layout #exam-left-pane,
+  .exam-layout.split-scroll-layout #exam-right-pane {
+    height: auto !important;
+    max-height: none !important;
+    overflow: visible !important;
   }
 }
 
-.viewer-grid.examiner-layout #left-pane {
-  display: block !important;
-  width: 100% !important;
-  border: 1px solid var(--border);
-  border-radius: var(--radius-lg);
-  background: var(--surface);
+/* Backwards compatibility for examiner-layout */
+.viewer-grid.examiner-layout:not(.classic-scroll-layout) {
+  display: grid !important;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) !important;
+  gap: 1.25rem !important;
+  align-items: stretch !important;
+  height: calc(100vh - 130px) !important;
+  max-height: calc(100vh - 130px) !important;
+  overflow: hidden !important;
 }
 
-.viewer-grid.examiner-layout #right-pane {
+.viewer-grid.examiner-layout:not(.classic-scroll-layout) #left-pane,
+.viewer-grid.examiner-layout:not(.classic-scroll-layout) #right-pane {
   display: block !important;
   width: 100% !important;
-  flex: none !important;
-  max-width: 100% !important;
+  height: 100% !important;
+  max-height: 100% !important;
+  overflow-y: auto !important;
+  overflow-x: hidden !important;
+  background-color: var(--surface) !important;
+  border: 1px solid var(--border) !important;
+  border-radius: var(--radius-lg) !important;
+  padding: 1.5rem 1.75rem !important;
+  box-shadow: var(--shadow-sm) !important;
 }
 
-.viewer-grid.examiner-layout .checklist-container,
-.exam-layout.examiner-layout #exam-checklist-container,
-.exam-layout.examiner-layout .checklist-container {
+.viewer-grid .checklist-container,
+.exam-layout #exam-checklist-container,
+.exam-layout .checklist-container {
   display: flex !important;
   flex-direction: column !important;
   gap: 0.75rem !important;
 }
 
-.viewer-grid.examiner-layout .checklist-group-title,
-.exam-layout.examiner-layout .checklist-group-title {
+.viewer-grid .checklist-group-title,
+.exam-layout .checklist-group-title {
   margin-top: 1rem !important;
   border-left: 4px solid var(--primary);
   padding-left: 0.5rem;
@@ -2608,14 +2710,21 @@ ol.ordered-list li,
   .viewer-grid, .exam-layout {
     display: block !important;
     width: 100% !important;
+    height: auto !important;
+    max-height: none !important;
+    overflow: visible !important;
     margin: 0 !important;
     padding: 0 !important;
   }
 
-  .viewer-pane, .exam-content-pane, .exam-sidebar-pane {
+  .viewer-pane, .exam-content-pane, .exam-sidebar-pane,
+  #left-pane, #right-pane, #exam-left-pane, #exam-right-pane {
     box-shadow: none !important;
     border: none !important;
     background: transparent !important;
+    height: auto !important;
+    max-height: none !important;
+    overflow: visible !important;
     padding: 0 !important;
     margin: 0 !important;
     width: 100% !important;

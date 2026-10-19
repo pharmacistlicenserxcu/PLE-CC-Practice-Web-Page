@@ -7,7 +7,7 @@
  * Version: ple-cc2-ospe-v1.3.3 (Fast-Timeout Network-First for Navigation)
  */
 
-const CACHE_NAME = 'ple-cc2-ospe-v1.3.7';
+const CACHE_NAME = 'ple-cc2-ospe-v1.3.8';
 const ASSETS = [
   './',
   './index.html',

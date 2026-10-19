@@ -1,12 +1,12 @@
 /**
  * PLE-CC2 OSPE Practice System — Offline Case List Metadata (Auto-Generated)
- * Version: v_20261019_150230
- * Generated on 2026-10-19 15:02:30
+ * Version: v_20261019_190531
+ * Generated on 2026-10-19 19:05:31
  */
 
 const OFFLINE_DATA = {
-  "version": "v_20261019_150230",
-  "generatedAt": "2026-10-19 15:02:30",
+  "version": "v_20261019_190531",
+  "generatedAt": "2026-10-19 19:05:31",
   "totalCases": 406,
   "cases": [
     {
@@ -2639,8 +2639,8 @@ const OFFLINE_DATA = {
       "author": "คณะทำงานคลังข้อสอบร่วมสมรรถนะเภสัชกรรม (ระบบกลาง)",
       "createdDate": "30/09/2026",
       "source": "Practice RxCU84 Clinic ครั้งที่ 1",
-      "isActive": true,
-      "caseStatus": "Active",
+      "isActive": false,
+      "caseStatus": "Unactive",
       "linkedNextCase": "",
       "linkedFromCase": ""
     },
@@ -2656,8 +2656,8 @@ const OFFLINE_DATA = {
       "author": "คณะทำงานคลังข้อสอบร่วมสมรรถนะเภสัชกรรม (ระบบกลาง)",
       "createdDate": "30/09/2026",
       "source": "Practice RxCU84 Clinic ครั้งที่ 1",
-      "isActive": true,
-      "caseStatus": "Active",
+      "isActive": false,
+      "caseStatus": "Unactive",
       "linkedNextCase": "",
       "linkedFromCase": ""
     },
@@ -2673,8 +2673,8 @@ const OFFLINE_DATA = {
       "author": "คณะทำงานคลังข้อสอบร่วมสมรรถนะเภสัชกรรม (ระบบกลาง)",
       "createdDate": "30/09/2026",
       "source": "Practice RxCU84 Clinic ครั้งที่ 1",
-      "isActive": true,
-      "caseStatus": "Active",
+      "isActive": false,
+      "caseStatus": "Unactive",
       "linkedNextCase": "",
       "linkedFromCase": ""
     },
@@ -2690,8 +2690,8 @@ const OFFLINE_DATA = {
       "author": "คณะทำงานคลังข้อสอบร่วมสมรรถนะเภสัชกรรม (ระบบกลาง)",
       "createdDate": "30/09/2026",
       "source": "Practice RxCU84 Clinic ครั้งที่ 1",
-      "isActive": true,
-      "caseStatus": "Active",
+      "isActive": false,
+      "caseStatus": "Unactive",
       "linkedNextCase": "",
       "linkedFromCase": ""
     },
@@ -2707,8 +2707,8 @@ const OFFLINE_DATA = {
       "author": "คณะทำงานคลังข้อสอบร่วมสมรรถนะเภสัชกรรม (ระบบกลาง)",
       "createdDate": "30/09/2026",
       "source": "Practice RxCU84 Clinic ครั้งที่ 1",
-      "isActive": true,
-      "caseStatus": "Active",
+      "isActive": false,
+      "caseStatus": "Unactive",
       "linkedNextCase": "",
       "linkedFromCase": ""
     },
@@ -2724,8 +2724,8 @@ const OFFLINE_DATA = {
       "author": "คณะทำงานคลังข้อสอบร่วมสมรรถนะเภสัชกรรม (ระบบกลาง)",
       "createdDate": "30/09/2026",
       "source": "Practice RxCU84 Clinic ครั้งที่ 1",
-      "isActive": true,
-      "caseStatus": "Active",
+      "isActive": false,
+      "caseStatus": "Unactive",
       "linkedNextCase": "",
       "linkedFromCase": ""
     },
@@ -2741,8 +2741,8 @@ const OFFLINE_DATA = {
       "author": "คณะทำงานคลังข้อสอบร่วมสมรรถนะเภสัชกรรม (ระบบกลาง)",
       "createdDate": "30/09/2026",
       "source": "Practice RxCU84 Clinic ครั้งที่ 1",
-      "isActive": true,
-      "caseStatus": "Active",
+      "isActive": false,
+      "caseStatus": "Unactive",
       "linkedNextCase": "",
       "linkedFromCase": ""
     },
@@ -2758,8 +2758,8 @@ const OFFLINE_DATA = {
       "author": "คณะทำงานคลังข้อสอบร่วมสมรรถนะเภสัชกรรม (ระบบกลาง)",
       "createdDate": "30/09/2026",
       "source": "Practice RxCU84 Clinic ครั้งที่ 1",
-      "isActive": true,
-      "caseStatus": "Active",
+      "isActive": false,
+      "caseStatus": "Unactive",
       "linkedNextCase": "",
       "linkedFromCase": ""
     },
@@ -2775,8 +2775,8 @@ const OFFLINE_DATA = {
       "author": "คณะทำงานคลังข้อสอบร่วมสมรรถนะเภสัชกรรม (ระบบกลาง)",
       "createdDate": "30/09/2026",
       "source": "Practice RxCU84 Clinic ครั้งที่ 1",
-      "isActive": true,
-      "caseStatus": "Active",
+      "isActive": false,
+      "caseStatus": "Unactive",
       "linkedNextCase": "",
       "linkedFromCase": ""
     },
@@ -2792,8 +2792,8 @@ const OFFLINE_DATA = {
       "author": "คณะทำงานคลังข้อสอบร่วมสมรรถนะเภสัชกรรม (ระบบกลาง)",
       "createdDate": "30/09/2026",
       "source": "Practice RxCU84 Clinic ครั้งที่ 1",
-      "isActive": true,
-      "caseStatus": "Active",
+      "isActive": false,
+      "caseStatus": "Unactive",
       "linkedNextCase": "",
       "linkedFromCase": ""
     },
@@ -2809,8 +2809,8 @@ const OFFLINE_DATA = {
       "author": "คณะทำงานคลังข้อสอบร่วมสมรรถนะเภสัชกรรม (ระบบกลาง)",
       "createdDate": "30/09/2026",
       "source": "Practice RxCU84 Clinic ครั้งที่ 1",
-      "isActive": true,
-      "caseStatus": "Active",
+      "isActive": false,
+      "caseStatus": "Unactive",
       "linkedNextCase": "",
       "linkedFromCase": ""
     },
@@ -2826,8 +2826,8 @@ const OFFLINE_DATA = {
       "author": "คณะทำงานคลังข้อสอบร่วมสมรรถนะเภสัชกรรม (ระบบกลาง)",
       "createdDate": "30/09/2026",
       "source": "Practice RxCU84 Clinic ครั้งที่ 1",
-      "isActive": true,
-      "caseStatus": "Active",
+      "isActive": false,
+      "caseStatus": "Unactive",
       "linkedNextCase": "",
       "linkedFromCase": ""
     },
@@ -2843,8 +2843,8 @@ const OFFLINE_DATA = {
       "author": "คณะทำงานคลังข้อสอบร่วมสมรรถนะเภสัชกรรม (ระบบกลาง)",
       "createdDate": "30/09/2026",
       "source": "Practice RxCU84 Clinic ครั้งที่ 1",
-      "isActive": true,
-      "caseStatus": "Active",
+      "isActive": false,
+      "caseStatus": "Unactive",
       "linkedNextCase": "",
       "linkedFromCase": ""
     },
@@ -2860,8 +2860,8 @@ const OFFLINE_DATA = {
       "author": "คณะทำงานคลังข้อสอบร่วมสมรรถนะเภสัชกรรม (ระบบกลาง)",
       "createdDate": "30/09/2026",
       "source": "Practice RxCU84 Clinic ครั้งที่ 1",
-      "isActive": true,
-      "caseStatus": "Active",
+      "isActive": false,
+      "caseStatus": "Unactive",
       "linkedNextCase": "",
       "linkedFromCase": ""
     },
@@ -2877,8 +2877,8 @@ const OFFLINE_DATA = {
       "author": "คณะทำงานคลังข้อสอบร่วมสมรรถนะเภสัชกรรม (ระบบกลาง)",
       "createdDate": "30/09/2026",
       "source": "Practice RxCU84 Clinic ครั้งที่ 1",
-      "isActive": true,
-      "caseStatus": "Active",
+      "isActive": false,
+      "caseStatus": "Unactive",
       "linkedNextCase": "",
       "linkedFromCase": ""
     },
@@ -2894,8 +2894,8 @@ const OFFLINE_DATA = {
       "author": "คณะทำงานคลังข้อสอบร่วมสมรรถนะเภสัชกรรม (ระบบกลาง)",
       "createdDate": "30/09/2026",
       "source": "Practice RxCU84 Clinic ครั้งที่ 1",
-      "isActive": true,
-      "caseStatus": "Active",
+      "isActive": false,
+      "caseStatus": "Unactive",
       "linkedNextCase": "",
       "linkedFromCase": ""
     },
@@ -2911,8 +2911,8 @@ const OFFLINE_DATA = {
       "author": "คณะทำงานคลังข้อสอบร่วมสมรรถนะเภสัชกรรม (ระบบกลาง)",
       "createdDate": "30/09/2026",
       "source": "Practice RxCU84 Clinic ครั้งที่ 1",
-      "isActive": true,
-      "caseStatus": "Active",
+      "isActive": false,
+      "caseStatus": "Unactive",
       "linkedNextCase": "",
       "linkedFromCase": ""
     },
@@ -2928,8 +2928,8 @@ const OFFLINE_DATA = {
       "author": "คณะทำงานคลังข้อสอบร่วมสมรรถนะเภสัชกรรม (ระบบกลาง)",
       "createdDate": "30/09/2026",
       "source": "Practice RxCU84 Clinic ครั้งที่ 1",
-      "isActive": true,
-      "caseStatus": "Active",
+      "isActive": false,
+      "caseStatus": "Unactive",
       "linkedNextCase": "",
       "linkedFromCase": ""
     },
@@ -2945,8 +2945,8 @@ const OFFLINE_DATA = {
       "author": "คณะทำงานคลังข้อสอบร่วมสมรรถนะเภสัชกรรม (ระบบกลาง)",
       "createdDate": "30/09/2026",
       "source": "Practice RxCU84 Clinic ครั้งที่ 1",
-      "isActive": true,
-      "caseStatus": "Active",
+      "isActive": false,
+      "caseStatus": "Unactive",
       "linkedNextCase": "",
       "linkedFromCase": ""
     },
@@ -2962,8 +2962,8 @@ const OFFLINE_DATA = {
       "author": "คณะทำงานคลังข้อสอบร่วมสมรรถนะเภสัชกรรม (ระบบกลาง)",
       "createdDate": "30/09/2026",
       "source": "Practice RxCU84 Clinic ครั้งที่ 1",
-      "isActive": true,
-      "caseStatus": "Active",
+      "isActive": false,
+      "caseStatus": "Unactive",
       "linkedNextCase": "",
       "linkedFromCase": ""
     },
@@ -2979,8 +2979,8 @@ const OFFLINE_DATA = {
       "author": "คณะทำงานคลังข้อสอบร่วมสมรรถนะเภสัชกรรม (ระบบกลาง)",
       "createdDate": "30/09/2026",
       "source": "Practice RxCU84 Clinic ครั้งที่ 1",
-      "isActive": true,
-      "caseStatus": "Active",
+      "isActive": false,
+      "caseStatus": "Unactive",
       "linkedNextCase": "",
       "linkedFromCase": ""
     },
@@ -2996,8 +2996,8 @@ const OFFLINE_DATA = {
       "author": "คณะทำงานคลังข้อสอบร่วมสมรรถนะเภสัชกรรม (ระบบกลาง)",
       "createdDate": "30/09/2026",
       "source": "Practice RxCU84 Clinic ครั้งที่ 1",
-      "isActive": true,
-      "caseStatus": "Active",
+      "isActive": false,
+      "caseStatus": "Unactive",
       "linkedNextCase": "",
       "linkedFromCase": ""
     },
@@ -3013,8 +3013,8 @@ const OFFLINE_DATA = {
       "author": "คณะทำงานคลังข้อสอบร่วมสมรรถนะเภสัชกรรม (ระบบกลาง)",
       "createdDate": "30/09/2026",
       "source": "Practice RxCU84 Clinic ครั้งที่ 1",
-      "isActive": true,
-      "caseStatus": "Active",
+      "isActive": false,
+      "caseStatus": "Unactive",
       "linkedNextCase": "",
       "linkedFromCase": ""
     },
@@ -3030,8 +3030,8 @@ const OFFLINE_DATA = {
       "author": "คณะทำงานคลังข้อสอบร่วมสมรรถนะเภสัชกรรม (ระบบกลาง)",
       "createdDate": "30/09/2026",
       "source": "Practice RxCU84 Clinic ครั้งที่ 1",
-      "isActive": true,
-      "caseStatus": "Active",
+      "isActive": false,
+      "caseStatus": "Unactive",
       "linkedNextCase": "",
       "linkedFromCase": ""
     },
@@ -3047,8 +3047,8 @@ const OFFLINE_DATA = {
       "author": "คณะทำงานคลังข้อสอบร่วมสมรรถนะเภสัชกรรม (ระบบกลาง)",
       "createdDate": "30/09/2026",
       "source": "Practice RxCU84 Clinic ครั้งที่ 1",
-      "isActive": true,
-      "caseStatus": "Active",
+      "isActive": false,
+      "caseStatus": "Unactive",
       "linkedNextCase": "",
       "linkedFromCase": ""
     },
@@ -3064,8 +3064,8 @@ const OFFLINE_DATA = {
       "author": "คณะทำงานคลังข้อสอบร่วมสมรรถนะเภสัชกรรม (ระบบกลาง)",
       "createdDate": "30/09/2026",
       "source": "Practice RxCU84 Clinic ครั้งที่ 1",
-      "isActive": true,
-      "caseStatus": "Active",
+      "isActive": false,
+      "caseStatus": "Unactive",
       "linkedNextCase": "",
       "linkedFromCase": ""
     },
@@ -3081,8 +3081,8 @@ const OFFLINE_DATA = {
       "author": "คณะทำงานคลังข้อสอบร่วมสมรรถนะเภสัชกรรม (ระบบกลาง)",
       "createdDate": "30/09/2026",
       "source": "Practice RxCU84 Clinic ครั้งที่ 1",
-      "isActive": true,
-      "caseStatus": "Active",
+      "isActive": false,
+      "caseStatus": "Unactive",
       "linkedNextCase": "",
       "linkedFromCase": ""
     },
@@ -3098,8 +3098,8 @@ const OFFLINE_DATA = {
       "author": "คณะทำงานคลังข้อสอบร่วมสมรรถนะเภสัชกรรม (ระบบกลาง)",
       "createdDate": "30/09/2026",
       "source": "Practice RxCU84 Clinic ครั้งที่ 1",
-      "isActive": true,
-      "caseStatus": "Active",
+      "isActive": false,
+      "caseStatus": "Unactive",
       "linkedNextCase": "",
       "linkedFromCase": ""
     },
@@ -3115,8 +3115,8 @@ const OFFLINE_DATA = {
       "author": "คณะทำงานคลังข้อสอบร่วมสมรรถนะเภสัชกรรม (ระบบกลาง)",
       "createdDate": "30/09/2026",
       "source": "Practice RxCU84 Clinic ครั้งที่ 1",
-      "isActive": true,
-      "caseStatus": "Active",
+      "isActive": false,
+      "caseStatus": "Unactive",
       "linkedNextCase": "",
       "linkedFromCase": ""
     },
@@ -3132,8 +3132,8 @@ const OFFLINE_DATA = {
       "author": "คณะทำงานคลังข้อสอบร่วมสมรรถนะเภสัชกรรม (ระบบกลาง)",
       "createdDate": "30/09/2026",
       "source": "Practice RxCU84 Clinic ครั้งที่ 1",
-      "isActive": true,
-      "caseStatus": "Active",
+      "isActive": false,
+      "caseStatus": "Unactive",
       "linkedNextCase": "",
       "linkedFromCase": ""
     },
@@ -3149,8 +3149,8 @@ const OFFLINE_DATA = {
       "author": "คณะทำงานคลังข้อสอบร่วมสมรรถนะเภสัชกรรม (ระบบกลาง)",
       "createdDate": "30/09/2026",
       "source": "Practice RxCU84 Clinic ครั้งที่ 1",
-      "isActive": true,
-      "caseStatus": "Active",
+      "isActive": false,
+      "caseStatus": "Unactive",
       "linkedNextCase": "",
       "linkedFromCase": ""
     },
@@ -3183,8 +3183,8 @@ const OFFLINE_DATA = {
       "author": "คณะทำงานคลังข้อสอบร่วมสมรรถนะเภสัชกรรม (ระบบกลาง)",
       "createdDate": "30/09/2026",
       "source": "Practice RxCU84 Clinic ครั้งที่ 1",
-      "isActive": true,
-      "caseStatus": "Active",
+      "isActive": false,
+      "caseStatus": "Unactive",
       "linkedNextCase": "",
       "linkedFromCase": ""
     },
@@ -3200,8 +3200,8 @@ const OFFLINE_DATA = {
       "author": "คณะทำงานคลังข้อสอบร่วมสมรรถนะเภสัชกรรม (ระบบกลาง)",
       "createdDate": "30/09/2026",
       "source": "Practice RxCU84 Clinic ครั้งที่ 1",
-      "isActive": true,
-      "caseStatus": "Active",
+      "isActive": false,
+      "caseStatus": "Unactive",
       "linkedNextCase": "",
       "linkedFromCase": ""
     },
@@ -3217,8 +3217,8 @@ const OFFLINE_DATA = {
       "author": "คณะทำงานคลังข้อสอบร่วมสมรรถนะเภสัชกรรม (ระบบกลาง)",
       "createdDate": "30/09/2026",
       "source": "Practice RxCU84 Clinic ครั้งที่ 1",
-      "isActive": true,
-      "caseStatus": "Active",
+      "isActive": false,
+      "caseStatus": "Unactive",
       "linkedNextCase": "",
       "linkedFromCase": ""
     },
@@ -3234,8 +3234,8 @@ const OFFLINE_DATA = {
       "author": "คณะทำงานคลังข้อสอบร่วมสมรรถนะเภสัชกรรม (ระบบกลาง)",
       "createdDate": "30/09/2026",
       "source": "Practice RxCU84 Clinic ครั้งที่ 1",
-      "isActive": true,
-      "caseStatus": "Active",
+      "isActive": false,
+      "caseStatus": "Unactive",
       "linkedNextCase": "",
       "linkedFromCase": ""
     },
@@ -3251,8 +3251,8 @@ const OFFLINE_DATA = {
       "author": "คณะทำงานคลังข้อสอบร่วมสมรรถนะเภสัชกรรม (ระบบกลาง)",
       "createdDate": "30/09/2026",
       "source": "Practice RxCU84 Clinic ครั้งที่ 1",
-      "isActive": true,
-      "caseStatus": "Active",
+      "isActive": false,
+      "caseStatus": "Unactive",
       "linkedNextCase": "",
       "linkedFromCase": ""
     },
@@ -3268,8 +3268,8 @@ const OFFLINE_DATA = {
       "author": "คณะทำงานคลังข้อสอบร่วมสมรรถนะเภสัชกรรม (ระบบกลาง)",
       "createdDate": "30/09/2026",
       "source": "Practice RxCU84 Clinic ครั้งที่ 1",
-      "isActive": true,
-      "caseStatus": "Active",
+      "isActive": false,
+      "caseStatus": "Unactive",
       "linkedNextCase": "",
       "linkedFromCase": ""
     },
@@ -3319,8 +3319,8 @@ const OFFLINE_DATA = {
       "author": "คณะทำงานคลังข้อสอบร่วมสมรรถนะเภสัชกรรม (ระบบกลาง)",
       "createdDate": "30/09/2026",
       "source": "Practice RxCU84 Clinic ครั้งที่ 1",
-      "isActive": true,
-      "caseStatus": "Active",
+      "isActive": false,
+      "caseStatus": "Unactive",
       "linkedNextCase": "",
       "linkedFromCase": ""
     },

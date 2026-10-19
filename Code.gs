@@ -979,6 +979,7 @@ function getCaseContentViaDocsRestApi(docId, targetCaseId) {
   for (const { title, content, inlineObjects, lists } of sections) {
     let recording = false, currentSection = 'METADATA', caseSource = '', caseDurationMin = 0;
     let scenario = '', contentHtml = '', patientInfoHtml = '', equipmentHtml = '', noteHtml = '';
+    let patientInfoGated = false, equipmentGated = false;
     const checklist = []; let currentGroup = ''; let isCurrentSubsetSequence = false;
 
     // Check if section contains equations
@@ -1005,7 +1006,7 @@ function getCaseContentViaDocsRestApi(docId, targetCaseId) {
         const text = getParaTxt_(para, currentTabEqs);
         const cm = text.match(/^#+\s*[\[{]([A-Z0-9\-]+)[\]}]/) || text.match(/^[\[{]([A-Z0-9\-]+)[\]}]/);
         if (cm) {
-          if (cm[1].trim() === cleanTarget) { recording = true; currentSection = 'METADATA'; caseSource = ''; caseStatus = 'Active'; }
+          if (cm[1].trim() === cleanTarget) { recording = true; currentSection = 'METADATA'; caseSource = ''; caseStatus = 'Active'; patientInfoGated = false; equipmentGated = false; }
           else if (recording) break;
           continue;
         }
@@ -1032,8 +1033,8 @@ function getCaseContentViaDocsRestApi(docId, targetCaseId) {
         const cleanHeader = text.replace(/^[*_#\s]+/, '').trim();
         const lowerH = cleanHeader.toLowerCase();
         const isHeaderCandidate = isHeading_(para) || /^#+\s*/.test(text.trim()) || /^\*\*#+/.test(text.trim());
-        const isColonLabel = /^(?:สถานการณ์|โจทย์|ข้อมูลผู้ป่วย|ประวัติผู้ป่วย|สิ่งที่มีให้|อุปกรณ์|Checklist|เกณฑ์ประเมิน|ข้อมูลผู้ตรวจ|เฉลย|หมายเหตุ)\s*:/i.test(cleanHeader);
-        const exactLabels = ['สถานการณ์', 'โจทย์', 'ข้อมูลผู้ป่วย', 'ประวัติผู้ป่วย', 'สิ่งที่มีให้', 'สิ่งที่มีให้ในสถานี', 'อุปกรณ์', 'checklist', 'เกณฑ์ประเมิน', 'เกณฑ์การให้คะแนน', 'สมรรถนะ', 'ข้อมูลผู้ตรวจ', 'เฉลย', 'หมายเหตุ', 'บทบาทผู้ป่วยจำลอง', 'ข้อมูลเคส', 'metadata'];
+        const isColonLabel = /^(?:สถานการณ์|โจทย์|ข้อมูลผู้ป่วย|ประวัติผู้ป่วย|สิ่งที่มีให้|อุปกรณ์|Checklist|เกณฑ์ประเมิน|ข้อมูลผู้ตรวจ|เฉลย|หมายเหตุ)(?:\s*\(\s*ส่งโดยผู้ประเมิน\s*\))?\s*:/i.test(cleanHeader);
+        const exactLabels = ['สถานการณ์', 'โจทย์', 'ข้อมูลผู้ป่วย', 'ข้อมูลผู้ป่วย (ส่งโดยผู้ประเมิน)', 'ประวัติผู้ป่วย', 'สิ่งที่มีให้', 'สิ่งที่มีให้ในสถานี', 'สิ่งที่มีให้ในสถานี (ส่งโดยผู้ประเมิน)', 'อุปกรณ์', 'checklist', 'เกณฑ์ประเมิน', 'เกณฑ์การให้คะแนน', 'สมรรถนะ', 'ข้อมูลผู้ตรวจ', 'เฉลย', 'หมายเหตุ', 'บทบาทผู้ป่วยจำลอง', 'ข้อมูลเคส', 'metadata'];
         const isExactLabel = exactLabels.indexOf(lowerH) !== -1;
         const isValidHeader = isHeaderCandidate || isColonLabel || isExactLabel;
 
@@ -1052,8 +1053,10 @@ function getCaseContentViaDocsRestApi(docId, targetCaseId) {
             matchedSec = 'SCENARIO';
           } else if (['ข้อมูลผู้ป่วย', 'ประวัติผู้ป่วย', 'ข้อมูลคนไข้', 'patient info'].some(function(x) { return lowerH.startsWith(x) || lowerH === x; })) {
             matchedSec = 'PATIENT_INFO';
+            if (cleanHeader.includes('ส่งโดยผู้ประเมิน')) patientInfoGated = true;
           } else if (['สิ่งที่มีให้ในสถานี', 'สิ่งที่มีให้', 'อุปกรณ์ในสถานี', 'อุปกรณ์', 'equipment'].some(function(x) { return lowerH.startsWith(x) || lowerH === x; })) {
             matchedSec = 'EQUIPMENT';
+            if (cleanHeader.includes('ส่งโดยผู้ประเมิน')) equipmentGated = true;
           } else if (['checklist', 'เกณฑ์ประเมิน', 'เกณฑ์การให้คะแนน', 'สมรรถนะ'].some(function(x) { return lowerH.startsWith(x) || lowerH === x; })) {
             matchedSec = 'CHECKLIST';
           } else if (['ข้อมูลผู้ตรวจ', 'เฉลย', 'หมายเหตุ', 'บทบาทผู้ป่วยจำลอง', 'notes', 'key'].some(function(x) { return lowerH.startsWith(x) || lowerH === x; })) {
@@ -1163,6 +1166,8 @@ function getCaseContentViaDocsRestApi(docId, targetCaseId) {
         contentHtml: wrapListItemsInHtml_(contentHtml),
         patientInfoHtml: wrapListItemsInHtml_(patientInfoHtml),
         equipmentHtml: wrapListItemsInHtml_(equipmentHtml),
+        patientInfoGated: patientInfoGated,
+        equipmentGated: equipmentGated,
         checklist: checklist,
         noteHtml: wrapListItemsInHtml_(noteHtml),
         source: formatSourceName(cleanTarget, caseSource),
@@ -1426,6 +1431,8 @@ function getCaseContentFromDoc(docId, targetCaseId) {
     let noteHtml = '';
     let contentHtml = '';
     let equipmentHtml = '';
+    let patientInfoGated = false;
+    let equipmentGated = false;
     
     const checklist = [];
     let currentGroup = 'ทั่วไป';
@@ -1479,6 +1486,8 @@ function getCaseContentFromDoc(docId, targetCaseId) {
             recording = true;
             hasFoundCase = true;
             currentSection = 'METADATA';
+            patientInfoGated = false;
+            equipmentGated = false;
             continue;
           } else if (recording) {
             // เจอเคสถัดไปแล้ว หยุดบันทึกแล้ว return ทันที
@@ -1489,6 +1498,8 @@ function getCaseContentFromDoc(docId, targetCaseId) {
               checklist: checklist,
               noteHtml: noteHtml,
               equipmentHtml: equipmentHtml,
+              patientInfoGated: patientInfoGated,
+              equipmentGated: equipmentGated,
               durationMin: caseDurationMin2 || 4
             };
           }
@@ -1521,8 +1532,14 @@ function getCaseContentFromDoc(docId, targetCaseId) {
           let matchedSec = null;
           if (cleanHeader.includes('ข้อมูลเคส')) matchedSec = 'METADATA';
           else if (cleanHeader.includes('โจทย์') || cleanHeader.includes('สถานการณ์')) matchedSec = 'SCENARIO';
-          else if (cleanHeader.includes('ข้อมูลผู้ป่วย')) matchedSec = 'PATIENT_INFO';
-          else if (cleanHeader.includes('สิ่งที่มีให้') || (cleanHeader.includes('อุปกรณ์') && !cleanHeader.includes('กลุ่ม') && !cleanHeader.includes('ทักษะ'))) matchedSec = 'EQUIPMENT';
+          else if (cleanHeader.includes('ข้อมูลผู้ป่วย')) {
+            matchedSec = 'PATIENT_INFO';
+            if (cleanHeader.includes('ส่งโดยผู้ประเมิน')) patientInfoGated = true;
+          }
+          else if (cleanHeader.includes('สิ่งที่มีให้') || (cleanHeader.includes('อุปกรณ์') && !cleanHeader.includes('กลุ่ม') && !cleanHeader.includes('ทักษะ'))) {
+            matchedSec = 'EQUIPMENT';
+            if (cleanHeader.includes('ส่งโดยผู้ประเมิน')) equipmentGated = true;
+          }
           else if (cleanHeader.includes('Checklist') || cleanHeader.toLowerCase().includes('checklist') || cleanHeader.includes('ทักษะ') || cleanHeader.includes('รายการ') || cleanHeader.includes('เกณฑ์') || cleanHeader.includes('ประเมิน') || cleanHeader.includes('สมรรถนะ')) matchedSec = 'CHECKLIST';
           else if (cleanHeader.includes('หมายเหตุ') || cleanHeader.includes('เฉลย') || cleanHeader.includes('ข้อมูลผู้ตรวจ')) matchedSec = 'NOTE';
 
@@ -1676,6 +1693,8 @@ function getCaseContentFromDoc(docId, targetCaseId) {
         checklist: checklist,
         noteHtml: noteHtml,
         equipmentHtml: equipmentHtml,
+        patientInfoGated: patientInfoGated,
+        equipmentGated: equipmentGated,
         durationMin: caseDurationMin2 || 4
       };
     }
@@ -1718,8 +1737,11 @@ function checkTableTemplate(table, targetCaseId) {
 function parseTableTemplateToCaseData(table, targetCaseId) {
   let scenario = '';
   let patientInfoHtml = '';
+  let equipmentHtml = '';
   let noteHtml = '';
   let contentHtml = '';
+  let patientInfoGated = false;
+  let equipmentGated = false;
   const checklist = [];
   
   const numRows = table.getNumRows();
@@ -1738,6 +1760,11 @@ function parseTableTemplateToCaseData(table, targetCaseId) {
     }
     else if (keyText.includes('ข้อมูลผู้ป่วย') || keyText.includes('patient info')) {
       patientInfoHtml = parseCellToHtml(valCell);
+      if (keyText.includes('ส่งโดยผู้ประเมิน')) patientInfoGated = true;
+    }
+    else if (keyText.includes('สิ่งที่มีให้ในสถานี') || keyText.includes('สิ่งที่มีให้') || keyText.includes('อุปกรณ์')) {
+      equipmentHtml = parseCellToHtml(valCell);
+      if (keyText.includes('ส่งโดยผู้ประเมิน')) equipmentGated = true;
     }
     else if (keyText.includes('checklist') || keyText.includes('เกณฑ์ประเมิน')) {
       const text = valCell.getText();
@@ -1786,6 +1813,9 @@ function parseTableTemplateToCaseData(table, targetCaseId) {
   return {
     scenario: scenario,
     patientInfoHtml: patientInfoHtml,
+    equipmentHtml: equipmentHtml,
+    patientInfoGated: patientInfoGated,
+    equipmentGated: equipmentGated,
     contentHtml: contentHtml,
     checklist: checklist,
     noteHtml: noteHtml

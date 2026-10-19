@@ -1140,9 +1140,9 @@
   </div><!-- /.page-viewport -->
 </div><!-- /.app-shell -->
 
-  <script src="case-data-offline.js?v=v_20261019_150230"></script>
-  <script src="case-details-offline.js?v=v_20261019_150230"></script>
-  <script src="app.js?v=v_20261019_150230"></script>
+  <script src="case-data-offline.js?v=v_20261019_190531"></script>
+  <script src="case-details-offline.js?v=v_20261019_190531"></script>
+  <script src="app.js?v=v_20261019_190531"></script>
   <script src="scratchpad.js?v=20261004_234400"></script>
   <script src="station-chat.js?v=v_20261019_150000"></script>
 
@@ -1777,6 +1777,7 @@
       const cleanPatient = stripSectionHeaders(c.patientInfoHtml);
       const patientTitleEl = document.getElementById('patient-section-title');
       const patientContentEl = document.getElementById('case-patient-content');
+      const patGated = (typeof isPatientInfoGated === 'function') ? isPatientInfoGated(c) : Boolean(c.patientInfoGated || (c.patientInfoHtml && /ข้อมูลผู้ป่วย\s*\(\s*ส่งโดยผู้ประเมิน\s*\)/.test(c.patientInfoHtml)));
       
       const hasPatientInfo = Boolean(
         cleanPatient && cleanPatient.trim() && (
@@ -1785,10 +1786,35 @@
         )
       );
       if (hasPatientInfo) {
-        if (patientTitleEl) patientTitleEl.style.display = 'block';
+        if (patientTitleEl) {
+          patientTitleEl.style.display = 'flex';
+          patientTitleEl.style.alignItems = 'center';
+          patientTitleEl.style.justifyContent = 'space-between';
+          patientTitleEl.style.flexWrap = 'wrap';
+          patientTitleEl.style.gap = '0.5rem';
+          if (patGated) {
+            const isPatUnlocked = Boolean(window._viewerGatedUnlocked && window._viewerGatedUnlocked[caseId + '_patient']);
+            const toggleBtnHtml = (!isExaminer)
+              ? `<button type="button" onclick="window.toggleViewerGatedSection('${escapeHtml(caseId)}', 'patient')" style="padding:3px 10px; font-size:0.78rem; font-weight:700; border-radius:999px; border:1px solid #d97706; background:${isPatUnlocked ? '#fef3c7' : '#d97706'}; color:${isPatUnlocked ? '#92400e' : '#ffffff'}; cursor:pointer; font-family:var(--font-body);">${isPatUnlocked ? '🙈 ซ่อนข้อมูล (จำลองผู้เข้าสอบ)' : '🔓 กดเพื่อเปิดดูข้อมูลผู้ป่วย'}</button>`
+              : `<span style="font-size:0.75rem; font-weight:700; padding:2px 8px; border-radius:999px; background:#fef3c7; color:#92400e; border:1px solid #fde68a;">🔒 ผู้เข้าสอบจะเห็นเมื่อผู้ประเมินกดส่ง</span>`;
+            patientTitleEl.innerHTML = `<span>ข้อมูลผู้ป่วย (ส่งโดยผู้ประเมิน)</span>${toggleBtnHtml}`;
+          } else {
+            patientTitleEl.textContent = 'ข้อมูลผู้ป่วย';
+          }
+        }
         if (patientContentEl) {
-          patientContentEl.style.display = 'block';
-          patientContentEl.innerHTML = cleanPatient;
+          const isPatUnlocked = Boolean(window._viewerGatedUnlocked && window._viewerGatedUnlocked[caseId + '_patient']);
+          if (patGated && !isExaminer && !isPatUnlocked) {
+            patientContentEl.style.display = 'block';
+            patientContentEl.innerHTML = `<div style="padding:1rem; border:1.5px dashed #f59e0b; border-radius:10px; background:rgba(245, 158, 11, 0.08); text-align:center; color:var(--text-secondary); font-size:0.9rem;">
+              <div style="font-weight:700; color:#d97706; margin-bottom:0.35rem;">🔒 ข้อมูลผู้ป่วย (ส่งโดยผู้ประเมิน)</div>
+              <div style="margin-bottom:0.65rem;">ในห้องสอบจริง ข้อมูลส่วนนี้จะถูกซ่อนไว้จนกว่าผู้ประเมินจะกดส่งให้</div>
+              <button type="button" onclick="window.toggleViewerGatedSection('${escapeHtml(caseId)}', 'patient')" style="padding:0.45rem 1rem; border-radius:8px; border:none; background:#d97706; color:#fff; font-weight:700; cursor:pointer; font-family:var(--font-body);">🔓 กดเพื่อเปิดดูข้อมูลผู้ป่วย</button>
+            </div>`;
+          } else {
+            patientContentEl.style.display = 'block';
+            patientContentEl.innerHTML = cleanPatient;
+          }
         }
       } else {
         if (patientTitleEl) patientTitleEl.style.display = 'none';
@@ -1799,22 +1825,49 @@
       }
       
       // Render Equipment
+      const eqTitleEl = document.getElementById('equipment-section-title');
+      const eqContent = document.getElementById('case-equipment-content');
+      const eqGated = (typeof isEquipmentGated === 'function') ? isEquipmentGated(c) : Boolean(c.equipmentGated || (c.equipmentHtml && /(?:สิ่งที่มีให้ในสถานี|สิ่งที่มีให้)\s*\(\s*ส่งโดยผู้ประเมิน\s*\)/.test(c.equipmentHtml)));
       if (c.equipmentHtml) {
-        document.getElementById('equipment-section-title').style.display = 'block';
-        const eqContent = document.getElementById('case-equipment-content');
-        eqContent.style.display = 'block';
+        if (eqTitleEl) {
+          eqTitleEl.style.display = 'flex';
+          eqTitleEl.style.alignItems = 'center';
+          eqTitleEl.style.justifyContent = 'space-between';
+          eqTitleEl.style.flexWrap = 'wrap';
+          eqTitleEl.style.gap = '0.5rem';
+          if (eqGated) {
+            const isEqUnlocked = Boolean(window._viewerGatedUnlocked && window._viewerGatedUnlocked[caseId + '_equipment']);
+            const toggleBtnHtml = (!isExaminer)
+              ? `<button type="button" onclick="window.toggleViewerGatedSection('${escapeHtml(caseId)}', 'equipment')" style="padding:3px 10px; font-size:0.78rem; font-weight:700; border-radius:999px; border:1px solid #7c3aed; background:${isEqUnlocked ? '#ede9fe' : '#7c3aed'}; color:${isEqUnlocked ? '#5b21b6' : '#ffffff'}; cursor:pointer; font-family:var(--font-body);">${isEqUnlocked ? '🙈 ซ่อนสิ่งที่มีให้ (จำลองผู้เข้าสอบ)' : '🔓 กดเพื่อเปิดดูสิ่งที่มีให้ในสถานี'}</button>`
+              : `<span style="font-size:0.75rem; font-weight:700; padding:2px 8px; border-radius:999px; background:#ede9fe; color:#5b21b6; border:1px solid #ddd6fe;">🔒 ผู้เข้าสอบจะเห็นเมื่อผู้ประเมินกดส่ง</span>`;
+            eqTitleEl.innerHTML = `<span>สิ่งที่มีให้ในสถานี (ส่งโดยผู้ประเมิน)</span>${toggleBtnHtml}`;
+          } else {
+            eqTitleEl.textContent = 'สิ่งที่มีให้ในสถานี';
+          }
+        }
         let rawEq = stripSectionHeaders(c.equipmentHtml).trim();
+        let formattedEq = rawEq;
         if (rawEq.startsWith('<li')) {
           const isNumbered = /^\s*<li[^>]*>\s*(\d+[\.\)]|\(\d+\))/i.test(rawEq);
           const tag = isNumbered ? 'ol' : 'ul';
           const listClass = isNumbered ? 'ordered-list' : 'bullet-list';
-          eqContent.innerHTML = `<${tag} class="${listClass}">${rawEq}</${tag}>`;
+          formattedEq = `<${tag} class="${listClass}">${rawEq}</${tag}>`;
+        }
+        const isEqUnlocked = Boolean(window._viewerGatedUnlocked && window._viewerGatedUnlocked[caseId + '_equipment']);
+        if (eqGated && !isExaminer && !isEqUnlocked) {
+          eqContent.style.display = 'block';
+          eqContent.innerHTML = `<div style="padding:1rem; border:1.5px dashed #8b5cf6; border-radius:10px; background:rgba(139, 92, 246, 0.08); text-align:center; color:var(--text-secondary); font-size:0.9rem;">
+            <div style="font-weight:700; color:#7c3aed; margin-bottom:0.35rem;">🔒 สิ่งที่มีให้ในสถานี (ส่งโดยผู้ประเมิน)</div>
+            <div style="margin-bottom:0.65rem;">ในห้องสอบจริง ข้อมูลส่วนนี้จะถูกซ่อนไว้จนกว่าผู้ประเมินจะกดส่งให้</div>
+            <button type="button" onclick="window.toggleViewerGatedSection('${escapeHtml(caseId)}', 'equipment')" style="padding:0.45rem 1rem; border-radius:8px; border:none; background:#7c3aed; color:#fff; font-weight:700; cursor:pointer; font-family:var(--font-body);">🔓 กดเพื่อเปิดดูสิ่งที่มีให้ในสถานี</button>
+          </div>`;
         } else {
-          eqContent.innerHTML = rawEq;
+          eqContent.style.display = 'block';
+          eqContent.innerHTML = formattedEq;
         }
       } else {
-        document.getElementById('equipment-section-title').style.display = 'none';
-        document.getElementById('case-equipment-content').style.display = 'none';
+        if (eqTitleEl) eqTitleEl.style.display = 'none';
+        if (eqContent) eqContent.style.display = 'none';
       }
       
       // Render Note/Examiner (with YouTube rich media & print handler)
@@ -2388,8 +2441,10 @@
           ? getFormattedCasePatientHtml(c)
           : (c.patientInfoHtml || document.getElementById('case-patient-content')?.innerHTML || '');
         if (patientHtml && patientHtml.trim() !== '') {
+          const patGated = (typeof isPatientInfoGated === 'function') ? isPatientInfoGated(c) : Boolean(c.patientInfoGated);
+          const patHeaderLabel = patGated ? '👤 ข้อมูลผู้ป่วย (ส่งโดยผู้ประเมิน)' : '👤 ข้อมูลผู้ป่วย';
           html += `<div style="margin-bottom:1rem;">
-            <h4 style="margin:0 0 0.3rem 0; font-size:1rem; font-family:var(--font-title); border-left:3px solid #06b6d4; padding-left:0.5rem;">👤 ข้อมูลผู้ป่วย</h4>
+            <h4 style="margin:0 0 0.3rem 0; font-size:1rem; font-family:var(--font-title); border-left:3px solid #06b6d4; padding-left:0.5rem;">${patHeaderLabel}</h4>
             <div style="font-size:0.9rem; line-height:1.5;">${patientHtml}</div>
           </div>`;
         }
@@ -2398,8 +2453,10 @@
           ? getFormattedCaseEquipmentHtml(c)
           : (c.equipmentHtml || document.getElementById('case-equipment-content')?.innerHTML || '');
         if (equipHtml && equipHtml.trim() !== '') {
+          const eqGated = (typeof isEquipmentGated === 'function') ? isEquipmentGated(c) : Boolean(c.equipmentGated);
+          const eqHeaderLabel = eqGated ? '📦 สิ่งที่มีให้ในสถานี (ส่งโดยผู้ประเมิน)' : '📦 สิ่งที่มีให้ในสถานี';
           html += `<div style="margin-bottom:1rem;">
-            <h4 style="margin:0 0 0.3rem 0; font-size:1rem; font-family:var(--font-title); border-left:3px solid #8b5cf6; padding-left:0.5rem;">📦 สิ่งที่มีให้ในสถานี</h4>
+            <h4 style="margin:0 0 0.3rem 0; font-size:1rem; font-family:var(--font-title); border-left:3px solid #8b5cf6; padding-left:0.5rem;">${eqHeaderLabel}</h4>
             <div style="font-size:0.9rem; line-height:1.5;">${equipHtml}</div>
           </div>`;
         }
@@ -2440,6 +2497,15 @@
       paper.innerHTML = html;
     }
 
+    window.toggleViewerGatedSection = function(caseId, sectionType) {
+      if (!window._viewerGatedUnlocked) window._viewerGatedUnlocked = {};
+      const key = caseId + '_' + sectionType;
+      window._viewerGatedUnlocked[key] = !window._viewerGatedUnlocked[key];
+      if (AppState.currentCase) {
+        renderCaseDetail(AppState.currentCase);
+      }
+    };
+
     function buildSingleCasePrintHtml(mode, hideTitle, splitKey) {
       const c = AppState.currentCase || {};
       const cat = (c.category || 'CLINIC').toUpperCase();
@@ -2468,8 +2534,10 @@
           ? getFormattedCasePatientHtml(c)
           : (c.patientInfoHtml || document.getElementById('case-patient-content')?.innerHTML || '');
         if (patientHtml && patientHtml.trim() !== '') {
+          const patGated = (typeof isPatientInfoGated === 'function') ? isPatientInfoGated(c) : Boolean(c.patientInfoGated);
+          const patHeaderLabel = patGated ? '👤 ข้อมูลผู้ป่วย (ส่งโดยผู้ประเมิน)' : '👤 ข้อมูลผู้ป่วย';
           html += `<div style="margin-bottom:1.25rem;">
-            <h3 style="margin:0 0 0.4rem 0; font-size:1.1rem; font-family:var(--font-title); border-left:4px solid #06b6d4; padding-left:0.5rem;">👤 ข้อมูลผู้ป่วย</h3>
+            <h3 style="margin:0 0 0.4rem 0; font-size:1.1rem; font-family:var(--font-title); border-left:4px solid #06b6d4; padding-left:0.5rem;">${patHeaderLabel}</h3>
             <div style="font-size:0.95rem; line-height:1.5;">${patientHtml}</div>
           </div>`;
         }
@@ -2478,8 +2546,10 @@
           ? getFormattedCaseEquipmentHtml(c)
           : (c.equipmentHtml || document.getElementById('case-equipment-content')?.innerHTML || '');
         if (equipHtml && equipHtml.trim() !== '') {
+          const eqGated = (typeof isEquipmentGated === 'function') ? isEquipmentGated(c) : Boolean(c.equipmentGated);
+          const eqHeaderLabel = eqGated ? '📦 สิ่งที่มีให้ในสถานี (ส่งโดยผู้ประเมิน)' : '📦 สิ่งที่มีให้ในสถานี';
           html += `<div style="margin-bottom:1.25rem;">
-            <h3 style="margin:0 0 0.4rem 0; font-size:1.1rem; font-family:var(--font-title); border-left:4px solid #8b5cf6; padding-left:0.5rem;">📦 สิ่งที่มีให้ในสถานี</h3>
+            <h3 style="margin:0 0 0.4rem 0; font-size:1.1rem; font-family:var(--font-title); border-left:4px solid #8b5cf6; padding-left:0.5rem;">${eqHeaderLabel}</h3>
             <div style="font-size:0.95rem; line-height:1.5;">${equipHtml}</div>
           </div>`;
         }

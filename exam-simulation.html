@@ -7,9 +7,9 @@
   <meta name="description" content="ระบบจำลองสอบ OSPE 16 สถานีเสมือนจริง พร้อมจับเวลา 4 นาที ติ๊ก Checklist และคำนวณผลคะแนน Leaderboard">
   <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>💊</text></svg>">
   <link rel="stylesheet" href="style.css?v=v_20261018_010000">
-  <script src="case-data-offline.js?v=v_20261019_150230"></script>
-  <script src="case-details-offline.js?v=v_20261019_150230"></script>
-  <script src="app.js?v=v_20261019_150230"></script>
+  <script src="case-data-offline.js?v=v_20261019_190531"></script>
+  <script src="case-details-offline.js?v=v_20261019_190531"></script>
+  <script src="app.js?v=v_20261019_190531"></script>
   <script src="scratchpad.js?v=20261004_201700"></script>
   <style>
     /* Simulation Source and Topic Selector */
@@ -2617,7 +2617,20 @@
               </div>
             </div>
 
-            
+            <!-- Locked Patient Info Placeholder Card (For Examinee / Solo when gated) -->
+            <div id="exam-patient-locked-card" style="display: none; margin-bottom: 1.5rem; padding: 1.15rem 1.25rem; border: 1.5px dashed #f59e0b; border-radius: var(--radius-md); background: rgba(245, 158, 11, 0.08); text-align: center;">
+              <div style="font-family: var(--font-title); font-weight: 700; color: #d97706; font-size: 0.98rem; margin-bottom: 0.35rem; display: flex; align-items: center; justify-content: center; gap: 0.4rem;">
+                <span>🔒 ข้อมูลผู้ป่วย (ส่งโดยผู้ประเมิน)</span>
+              </div>
+              <div id="exam-patient-locked-desc" style="font-size: 0.86rem; color: var(--text-secondary); line-height: 1.5;">
+                ข้อมูลผู้ป่วยจะแสดงเมื่อผู้ประเมินกดเปิดให้คุณดูระหว่างการสอบ
+              </div>
+              <div id="exam-patient-solo-unlock-wrap" style="display: none; margin-top: 0.75rem;">
+                <button type="button" onclick="window.unlockGatedSectionSolo('patientInfo')" style="padding: 0.45rem 1.1rem; border-radius: 8px; border: none; background: #d97706; color: #ffffff; font-weight: 700; font-size: 0.85rem; cursor: pointer; font-family: var(--font-body); box-shadow: 0 2px 6px rgba(217, 119, 6, 0.25);">
+                  🔓 กดเพื่อเปิดดูข้อมูลผู้ป่วย (โหมดฝึกซ้อมคนเดียว)
+                </button>
+              </div>
+            </div>
 
             <!-- Equipment Collapsible Accordion -->
             <div class="patient-accordion" id="exam-equipment-accordion" style="display: none; margin-bottom: 1.5rem; border: 1px solid var(--border); border-radius: var(--radius-md); overflow: hidden;">
@@ -2660,6 +2673,20 @@
               </div>
             </div>
 
+            <!-- Locked Equipment Placeholder Card (For Examinee / Solo when gated) -->
+            <div id="exam-equipment-locked-card" style="display: none; margin-bottom: 1.5rem; padding: 1.15rem 1.25rem; border: 1.5px dashed #8b5cf6; border-radius: var(--radius-md); background: rgba(139, 92, 246, 0.08); text-align: center;">
+              <div style="font-family: var(--font-title); font-weight: 700; color: #7c3aed; font-size: 0.98rem; margin-bottom: 0.35rem; display: flex; align-items: center; justify-content: center; gap: 0.4rem;">
+                <span>🔒 สิ่งที่มีให้ในสถานี (ส่งโดยผู้ประเมิน)</span>
+              </div>
+              <div id="exam-equipment-locked-desc" style="font-size: 0.86rem; color: var(--text-secondary); line-height: 1.5;">
+                สิ่งที่มีให้ในสถานีจะแสดงเมื่อผู้ประเมินกดส่งให้คุณระหว่างการสอบ
+              </div>
+              <div id="exam-equipment-solo-unlock-wrap" style="display: none; margin-top: 0.75rem;">
+                <button type="button" onclick="window.unlockGatedSectionSolo('equipment')" style="padding: 0.45rem 1.1rem; border-radius: 8px; border: none; background: #7c3aed; color: #ffffff; font-weight: 700; font-size: 0.85rem; cursor: pointer; font-family: var(--font-body); box-shadow: 0 2px 6px rgba(124, 58, 237, 0.25);">
+                  🔓 กดเพื่อเปิดดูสิ่งที่มีให้ในสถานี (โหมดฝึกซ้อมคนเดียว)
+                </button>
+              </div>
+            </div>
 
             <!-- Added margin top for checklist section -->
             <div style="margin-top: 2rem;"></div>
@@ -2671,6 +2698,19 @@
               <button type="button" class="btn" id="btn-examinee-notice-abort" onclick="abortExamSimulation()" style="padding: 6px 14px; font-size: 0.82rem; font-weight: 600; background: rgba(239,68,68,0.1); color: var(--danger); border: 1px solid rgba(239,68,68,0.3); border-radius: var(--radius-sm); cursor: pointer;">
                 🛑 ออกจากการสอบจำลอง
               </button>
+            </div>
+
+            <!-- Examiner Gated Section Release Controls Panel -->
+            <div id="examiner-gated-controls-panel" style="display: none; margin-bottom: 1.5rem; background: var(--surface); border: 1.5px solid #f59e0b; border-radius: var(--radius-md); padding: 1rem 1.25rem; box-shadow: var(--shadow-sm);">
+              <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.75rem; border-bottom: 1px solid var(--border); padding-bottom: 0.5rem; flex-wrap: wrap; gap: 0.4rem;">
+                <div style="font-family: var(--font-title); font-weight: 700; color: #d97706; font-size: 0.95rem; display: flex; align-items: center; gap: 0.4rem;">
+                  <span>🎛️ ควบคุมการส่งข้อมูลให้ผู้เข้าสอบ (Examiner Release Control)</span>
+                </div>
+                <span style="background: rgba(245, 158, 11, 0.14); color: #b45309; font-size: 0.75rem; font-weight: 700; padding: 2px 8px; border-radius: 999px;">กดปุ่มเพื่อเปิด/ซ่อนหน้าจอผู้เข้าสอบแบบเรียลไทม์</span>
+              </div>
+              <div id="examiner-gated-controls-list" style="display: flex; flex-direction: column; gap: 0.65rem;">
+                <!-- Dynamically populated gated section toggle rows -->
+              </div>
             </div>
 
             <!-- Examiner Live Examinee Submission Panel (For Written / Fill-in-the-Blank stations) -->
@@ -8562,6 +8602,11 @@
       // Render patientInfoHtml — convert inner ##Header markers to styled headings while stripping section tag
       const rawPatient = stripSectionHeaders(c.patientInfoHtml || '');
       const patientAccordion = document.getElementById('exam-patient-accordion');
+      const patientTitleEl = document.getElementById('exam-patient-title');
+      const patGated = (typeof isPatientInfoGated === 'function') ? isPatientInfoGated(c) : Boolean(c.patientInfoGated || (c.patientInfoHtml && /ข้อมูลผู้ป่วย\s*\(\s*ส่งโดยผู้ประเมิน\s*\)/.test(c.patientInfoHtml)));
+      if (patientTitleEl) {
+        patientTitleEl.textContent = patGated ? '📊 ข้อมูลผู้ป่วย (ส่งโดยผู้ประเมิน)' : '📊 ข้อมูลผู้ป่วย';
+      }
       const hasPatientInfo = Boolean(
         rawPatient && rawPatient.trim() && (
           rawPatient.replace(/<[^>]*>/g, '').trim().length > 0 ||
@@ -8585,10 +8630,15 @@
 
       // Render Equipment accordion
       const equipAccordion = document.getElementById('exam-equipment-accordion');
+      const equipTitleEl = document.getElementById('exam-equipment-title');
+      const eqGated = (typeof isEquipmentGated === 'function') ? isEquipmentGated(c) : Boolean(c.equipmentGated || (c.equipmentHtml && /(?:สิ่งที่มีให้ในสถานี|สิ่งที่มีให้)\s*\(\s*ส่งโดยผู้ประเมิน\s*\)/.test(c.equipmentHtml)));
+      if (equipTitleEl) {
+        equipTitleEl.innerHTML = eqGated ? '&#129514; สิ่งที่มีให้ในสถานี (ส่งโดยผู้ประเมิน)' : '&#129514; สิ่งที่มีให้ในสถานี';
+      }
       if (c.equipmentHtml) {
         if (equipAccordion) equipAccordion.style.display = 'block';
         const eqContent = document.getElementById('exam-equipment-content');
-        let rawEq = (c.equipmentHtml || '').trim();
+        let rawEq = stripSectionHeaders(c.equipmentHtml || '').trim();
         if (rawEq.startsWith('<li')) {
           const isNumbered = /^\s*<li[^>]*>\s*(\d+[\.\)]|\(\d+\))/i.test(rawEq);
           const tag = isNumbered ? 'ol' : 'ul';
@@ -8602,6 +8652,13 @@
         toggleEquipmentAccordion();
       } else {
         if (equipAccordion) equipAccordion.style.display = 'none';
+        const eqContent = document.getElementById('exam-equipment-content');
+        if (eqContent) eqContent.innerHTML = '';
+      }
+
+      // Setup Gated Section Release Controls & Realtime Sync
+      if (typeof setupStationRevealsSync === 'function') {
+        setupStationRevealsSync(st.stationNumber, c);
       }
 
       
@@ -9939,6 +9996,11 @@
       const rawPatient = stripSectionHeadersLocal(c.patientInfoHtml || '');
       const patientAccordion = document.getElementById('exam-patient-accordion');
       const patientContentEl = document.getElementById('exam-patient-content');
+      const patientTitleEl = document.getElementById('exam-patient-title');
+      const patGated = (typeof isPatientInfoGated === 'function') ? isPatientInfoGated(c) : Boolean(c.patientInfoGated || (c.patientInfoHtml && /ข้อมูลผู้ป่วย\s*\(\s*ส่งโดยผู้ประเมิน\s*\)/.test(c.patientInfoHtml)));
+      if (patientTitleEl) {
+        patientTitleEl.textContent = patGated ? '📊 ข้อมูลผู้ป่วย (ส่งโดยผู้ประเมิน)' : '📊 ข้อมูลผู้ป่วย';
+      }
       const hasPatientInfo = Boolean(
         rawPatient && rawPatient.trim() && (
           rawPatient.replace(/<[^>]*>/g, '').trim().length > 0 ||
@@ -9959,9 +10021,14 @@
       // Update Equipment Accordion for reviewed station
       const equipAccordion = document.getElementById('exam-equipment-accordion');
       const eqContent = document.getElementById('exam-equipment-content');
+      const equipTitleEl = document.getElementById('exam-equipment-title');
+      const eqGated = (typeof isEquipmentGated === 'function') ? isEquipmentGated(c) : Boolean(c.equipmentGated || (c.equipmentHtml && /(?:สิ่งที่มีให้ในสถานี|สิ่งที่มีให้)\s*\(\s*ส่งโดยผู้ประเมิน\s*\)/.test(c.equipmentHtml)));
+      if (equipTitleEl) {
+        equipTitleEl.innerHTML = eqGated ? '&#129514; สิ่งที่มีให้ในสถานี (ส่งโดยผู้ประเมิน)' : '&#129514; สิ่งที่มีให้ในสถานี';
+      }
       if (c.equipmentHtml && eqContent) {
         if (equipAccordion) equipAccordion.style.display = 'block';
-        const rawEq = (c.equipmentHtml || '').trim();
+        const rawEq = stripSectionHeadersLocal(c.equipmentHtml || '').trim();
         if (rawEq.startsWith('<li')) {
           const isNumbered = /^\s*<li[^>]*>\s*(\d+[\.\)]|\(\d+\))/i.test(rawEq);
           const tag = isNumbered ? 'ol' : 'ul';
@@ -9973,6 +10040,10 @@
       } else {
         if (equipAccordion) equipAccordion.style.display = 'none';
         if (eqContent) eqContent.innerHTML = '';
+      }
+
+      if (typeof setupStationRevealsSync === 'function') {
+        setupStationRevealsSync(st.stationNumber, c);
       }
 
       // Update Examiner Notes for reviewed station
@@ -10000,6 +10071,310 @@
     window.renderLocalReviewBanner = renderLocalReviewBanner;
     window.renderCarouselReviewBanner = renderCarouselReviewBanner;
     window.updateReviewBannerLiveTimerDisplay = updateReviewBannerLiveTimerDisplay;
+
+    // ─── Gated Station Materials & Patient Info Release System (ส่งโดยผู้ประเมิน) ───
+    let _activeStationRevealsRef = null;
+    let _lastStationRevealsState = {};
+
+    function cleanupStationRevealsListener() {
+      if (_activeStationRevealsRef) {
+        try { _activeStationRevealsRef.off(); } catch (e) {}
+        _activeStationRevealsRef = null;
+      }
+    }
+    window.cleanupStationRevealsListener = cleanupStationRevealsListener;
+
+    function getStationRevealsFirebasePath(stationNum) {
+      if (!SimState.isLobby || !SimState.roomId || typeof _fbDb === 'undefined' || !_fbDb) return null;
+      if (SimState.examMode === 'cohort_breakout' && SimState.myBreakoutTableId) {
+        return `rooms/${SimState.roomId}/breakouts/${SimState.myBreakoutTableId}/stationReveals/st_${stationNum}`;
+      } else if (SimState.examMode === 'carousel_rotation') {
+        const roundIdx = (SimState._isLocalReview && typeof SimState._localReviewRound === 'number')
+          ? SimState._localReviewRound
+          : ((SimState.cachedRoom && SimState.cachedRoom.currentStationIdx !== undefined) ? SimState.cachedRoom.currentStationIdx : (SimState.currentIdx || 0));
+        const targetStNum = (SimState.role === 'examiner' && SimState.myCarouselStation) ? SimState.myCarouselStation : stationNum;
+        return `rooms/${SimState.roomId}/carouselPosts/st_${targetStNum}/stationReveals/round_${roundIdx}`;
+      } else {
+        return `rooms/${SimState.roomId}/stationReveals/st_${stationNum}`;
+      }
+    }
+    window.getStationRevealsFirebasePath = getStationRevealsFirebasePath;
+
+    function getStationRevealsLocalKey(stationNum) {
+      if (SimState.examMode === 'carousel_rotation') {
+        const roundIdx = (SimState._isLocalReview && typeof SimState._localReviewRound === 'number')
+          ? SimState._localReviewRound
+          : ((SimState.cachedRoom && SimState.cachedRoom.currentStationIdx !== undefined) ? SimState.cachedRoom.currentStationIdx : (SimState.currentIdx || 0));
+        return `st_${stationNum}_round_${roundIdx}`;
+      }
+      if (SimState.examMode === 'cohort_breakout' && SimState.myBreakoutTableId) {
+        return `${SimState.myBreakoutTableId}_st_${stationNum}`;
+      }
+      return `st_${stationNum}`;
+    }
+
+    function playGatedReleaseNotificationChime(isOpening) {
+      try {
+        const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+        if (!AudioContextClass) return;
+        const ctx = (typeof _unlockedAudioCtx !== 'undefined' && _unlockedAudioCtx) ? _unlockedAudioCtx : new AudioContextClass();
+        if (ctx.state === 'suspended') ctx.resume().catch(() => {});
+        const now = ctx.currentTime;
+        const freqs = isOpening ? [587.33, 880] : [587.33, 440];
+        freqs.forEach((f, idx) => {
+          const osc = ctx.createOscillator();
+          const gain = ctx.createGain();
+          osc.type = 'sine';
+          osc.frequency.setValueAtTime(f, now + idx * 0.11);
+          gain.gain.setValueAtTime(0.22, now + idx * 0.11);
+          gain.gain.exponentialRampToValueAtTime(0.0001, now + idx * 0.11 + 0.25);
+          osc.connect(gain);
+          gain.connect(ctx.destination);
+          osc.start(now + idx * 0.11);
+          osc.stop(now + idx * 0.11 + 0.26);
+        });
+      } catch (e) {}
+    }
+
+    function applyStationGatedVisibility(stationNum, c) {
+      if (!c) return;
+      if (!SimState.stationReveals) SimState.stationReveals = {};
+      const stateKey = getStationRevealsLocalKey(stationNum);
+      const rev = SimState.stationReveals[stateKey] || { patientInfo: false, equipment: false };
+
+      const patGated = (typeof isPatientInfoGated === 'function') ? isPatientInfoGated(c) : Boolean(c.patientInfoGated || (c.patientInfoHtml && /ข้อมูลผู้ป่วย\s*\(\s*ส่งโดยผู้ประเมิน\s*\)/.test(c.patientInfoHtml)));
+      const eqGated = (typeof isEquipmentGated === 'function') ? isEquipmentGated(c) : Boolean(c.equipmentGated || (c.equipmentHtml && /(?:สิ่งที่มีให้ในสถานี|สิ่งที่มีให้)\s*\(\s*ส่งโดยผู้ประเมิน\s*\)/.test(c.equipmentHtml)));
+
+      const patContentEl = document.getElementById('exam-patient-content');
+      const hasPatientContent = Boolean(patContentEl && patContentEl.innerHTML.trim() !== '');
+      const eqContentEl = document.getElementById('exam-equipment-content');
+      const hasEquipContent = Boolean(c.equipmentHtml && eqContentEl && eqContentEl.innerHTML.trim() !== '');
+
+      const patAccordion = document.getElementById('exam-patient-accordion');
+      const patLockedCard = document.getElementById('exam-patient-locked-card');
+      const patSoloWrap = document.getElementById('exam-patient-solo-unlock-wrap');
+
+      const eqAccordion = document.getElementById('exam-equipment-accordion');
+      const eqLockedCard = document.getElementById('exam-equipment-locked-card');
+      const eqSoloWrap = document.getElementById('exam-equipment-solo-unlock-wrap');
+
+      const isExaminerRole = (SimState.role === 'examiner');
+      const isSoloMode = (!SimState.isLobby || SimState.role === 'solo');
+
+      // 1. Patient Info Visibility
+      if (!hasPatientContent) {
+        if (patAccordion) patAccordion.style.display = 'none';
+        if (patLockedCard) patLockedCard.style.display = 'none';
+      } else if (!patGated || isExaminerRole || rev.patientInfo === true) {
+        if (patAccordion) patAccordion.style.display = 'block';
+        if (patLockedCard) patLockedCard.style.display = 'none';
+      } else {
+        if (patAccordion) patAccordion.style.display = 'none';
+        if (patLockedCard) patLockedCard.style.display = 'block';
+        if (patSoloWrap) patSoloWrap.style.display = isSoloMode ? 'block' : 'none';
+      }
+
+      // 2. Equipment Visibility
+      if (!hasEquipContent) {
+        if (eqAccordion) eqAccordion.style.display = 'none';
+        if (eqLockedCard) eqLockedCard.style.display = 'none';
+      } else if (!eqGated || isExaminerRole || rev.equipment === true) {
+        if (eqAccordion) eqAccordion.style.display = 'block';
+        if (eqLockedCard) eqLockedCard.style.display = 'none';
+      } else {
+        if (eqAccordion) eqAccordion.style.display = 'none';
+        if (eqLockedCard) eqLockedCard.style.display = 'block';
+        if (eqSoloWrap) eqSoloWrap.style.display = isSoloMode ? 'block' : 'none';
+      }
+
+      // 3. Examiner Controls Panel
+      const exControlPanel = document.getElementById('examiner-gated-controls-panel');
+      const exControlList = document.getElementById('examiner-gated-controls-list');
+      if (exControlPanel && exControlList) {
+        const showPatControl = Boolean(patGated && hasPatientContent);
+        const showEqControl = Boolean(eqGated && hasEquipContent);
+        if ((isExaminerRole || isSoloMode) && (showPatControl || showEqControl)) {
+          exControlPanel.style.display = 'block';
+          let controlsHtml = '';
+          if (showPatControl) {
+            const isOpen = Boolean(rev.patientInfo);
+            controlsHtml += `
+              <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:0.65rem;padding:0.65rem 0.85rem;background:var(--bg);border:1px solid ${isOpen ? '#86efac' : '#fde68a'};border-radius:var(--radius-sm);">
+                <div style="display:flex;align-items:center;gap:0.5rem;flex-wrap:wrap;">
+                  <strong style="font-size:0.9rem;color:var(--text-primary);">👤 ข้อมูลผู้ป่วย (ส่งโดยผู้ประเมิน)</strong>
+                  <span class="badge" style="background:${isOpen ? '#dcfce7' : '#fef3c7'};color:${isOpen ? '#15803d' : '#b45309'};font-weight:700;font-size:0.76rem;padding:2px 8px;border-radius:999px;">
+                    ${isOpen ? '🟢 เปิดให้ผู้เข้าสอบเห็นแล้ว' : '🔒 ซ่อนอยู่ (ผู้เข้าสอบยังไม่เห็น)'}
+                  </span>
+                </div>
+                <button type="button" id="btn-toggle-gated-patientInfo" onclick="window.toggleStationGatedSection('patientInfo')" style="padding:0.45rem 0.95rem;border-radius:8px;border:1px solid ${isOpen ? '#ef4444' : '#16a34a'};background:${isOpen ? 'rgba(239,68,68,0.1)' : '#16a34a'};color:${isOpen ? '#dc2626' : '#ffffff'};font-weight:700;font-size:0.84rem;cursor:pointer;font-family:var(--font-body);transition:all 0.15s;">
+                  ${isOpen ? '🙈 ซ่อนข้อมูลผู้ป่วยกลับ' : '📤 ส่งข้อมูลผู้ป่วยให้ผู้เข้าสอบ'}
+                </button>
+              </div>
+            `;
+          }
+          if (showEqControl) {
+            const isOpen = Boolean(rev.equipment);
+            controlsHtml += `
+              <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:0.65rem;padding:0.65rem 0.85rem;background:var(--bg);border:1px solid ${isOpen ? '#86efac' : '#ddd6fe'};border-radius:var(--radius-sm);">
+                <div style="display:flex;align-items:center;gap:0.5rem;flex-wrap:wrap;">
+                  <strong style="font-size:0.9rem;color:var(--text-primary);">📦 สิ่งที่มีให้ในสถานี (ส่งโดยผู้ประเมิน)</strong>
+                  <span class="badge" style="background:${isOpen ? '#dcfce7' : '#ede9fe'};color:${isOpen ? '#15803d' : '#6d28d9'};font-weight:700;font-size:0.76rem;padding:2px 8px;border-radius:999px;">
+                    ${isOpen ? '🟢 เปิดให้ผู้เข้าสอบเห็นแล้ว' : '🔒 ซ่อนอยู่ (ผู้เข้าสอบยังไม่เห็น)'}
+                  </span>
+                </div>
+                <button type="button" id="btn-toggle-gated-equipment" onclick="window.toggleStationGatedSection('equipment')" style="padding:0.45rem 0.95rem;border-radius:8px;border:1px solid ${isOpen ? '#ef4444' : '#7c3aed'};background:${isOpen ? 'rgba(239,68,68,0.1)' : '#7c3aed'};color:${isOpen ? '#dc2626' : '#ffffff'};font-weight:700;font-size:0.84rem;cursor:pointer;font-family:var(--font-body);transition:all 0.15s;">
+                  ${isOpen ? '🙈 ซ่อนสิ่งที่มีให้ในสถานีกลับ' : '📤 ส่งสิ่งที่มีให้ในสถานีให้ผู้เข้าสอบ'}
+                </button>
+              </div>
+            `;
+          }
+          exControlList.innerHTML = controlsHtml;
+        } else {
+          exControlPanel.style.display = 'none';
+          exControlList.innerHTML = '';
+        }
+      }
+    }
+    window.applyStationGatedVisibility = applyStationGatedVisibility;
+
+    function unlockGatedSectionSolo(sectionKey) {
+      const idx = (SimState._isLocalReview && typeof SimState._localReviewStationIdx === 'number')
+        ? SimState._localReviewStationIdx
+        : SimState.currentIdx;
+      const st = SimState.stations && SimState.stations[idx];
+      if (!st || !st.case) return;
+      const stationNum = st.stationNumber;
+      const stateKey = getStationRevealsLocalKey(stationNum);
+      if (!SimState.stationReveals) SimState.stationReveals = {};
+      if (!SimState.stationReveals[stateKey]) SimState.stationReveals[stateKey] = { patientInfo: false, equipment: false };
+      SimState.stationReveals[stateKey][sectionKey] = true;
+      applyStationGatedVisibility(stationNum, st.case);
+      const secLabel = sectionKey === 'patientInfo' ? 'ข้อมูลผู้ป่วย' : 'สิ่งที่มีให้ในสถานี';
+      if (typeof showPleToast === 'function') {
+        showPleToast(`🔓 เปิดดู "${secLabel}" เรียบร้อยแล้ว`, 'success');
+      }
+    }
+    window.unlockGatedSectionSolo = unlockGatedSectionSolo;
+
+    async function toggleStationGatedSection(sectionKey) {
+      const idx = (SimState._isLocalReview && typeof SimState._localReviewStationIdx === 'number')
+        ? SimState._localReviewStationIdx
+        : SimState.currentIdx;
+      const st = SimState.stations && SimState.stations[idx];
+      if (!st || !st.case) return;
+      const stationNum = st.stationNumber;
+      const stateKey = getStationRevealsLocalKey(stationNum);
+      if (!SimState.stationReveals) SimState.stationReveals = {};
+      const currentObj = SimState.stationReveals[stateKey] || { patientInfo: false, equipment: false };
+      const nextVal = !Boolean(currentObj[sectionKey]);
+      const updatedObj = {
+        patientInfo: sectionKey === 'patientInfo' ? nextVal : Boolean(currentObj.patientInfo),
+        equipment: sectionKey === 'equipment' ? nextVal : Boolean(currentObj.equipment),
+        updatedAt: Date.now(),
+        updatedBy: SimState.lobbyPlayerName || 'Examiner',
+        lastActionSection: sectionKey,
+        lastActionState: nextVal
+      };
+      SimState.stationReveals[stateKey] = updatedObj;
+      _lastStationRevealsState[stateKey] = {
+        patientInfo: updatedObj.patientInfo,
+        equipment: updatedObj.equipment
+      };
+
+      applyStationGatedVisibility(stationNum, st.case);
+
+      const secLabel = sectionKey === 'patientInfo' ? 'ข้อมูลผู้ป่วย' : 'สิ่งที่มีให้ในสถานี';
+      if (typeof showPleToast === 'function') {
+        if (nextVal) {
+          showPleToast(`✅ เปิด "${secLabel}" ให้ผู้เข้าสอบเห็นแล้ว`, 'success');
+        } else {
+          showPleToast(`🔒 ซ่อน "${secLabel}" จากหน้าจอผู้เข้าสอบแล้ว`, 'info');
+        }
+      }
+
+      const fbPath = getStationRevealsFirebasePath(stationNum);
+      if (fbPath && typeof _fbDb !== 'undefined' && _fbDb) {
+        try {
+          await _fbDb.ref(fbPath).set(updatedObj);
+        } catch (err) {
+          console.warn('Failed to sync stationReveals to Firebase:', err);
+        }
+      }
+    }
+    window.toggleStationGatedSection = toggleStationGatedSection;
+
+    function setupStationRevealsSync(stationNum, c) {
+      cleanupStationRevealsListener();
+      if (!c) return;
+      if (!SimState.stationReveals) SimState.stationReveals = {};
+      const stateKey = getStationRevealsLocalKey(stationNum);
+
+      // Apply immediate local state
+      applyStationGatedVisibility(stationNum, c);
+
+      const patGated = (typeof isPatientInfoGated === 'function') ? isPatientInfoGated(c) : Boolean(c.patientInfoGated || (c.patientInfoHtml && /ข้อมูลผู้ป่วย\s*\(\s*ส่งโดยผู้ประเมิน\s*\)/.test(c.patientInfoHtml)));
+      const eqGated = (typeof isEquipmentGated === 'function') ? isEquipmentGated(c) : Boolean(c.equipmentGated || (c.equipmentHtml && /(?:สิ่งที่มีให้ในสถานี|สิ่งที่มีให้)\s*\(\s*ส่งโดยผู้ประเมิน\s*\)/.test(c.equipmentHtml)));
+      if (!patGated && !eqGated) return;
+
+      const fbPath = getStationRevealsFirebasePath(stationNum);
+      if (!fbPath || typeof _fbDb === 'undefined' || !_fbDb) return;
+
+      let isInitialSnap = true;
+      _activeStationRevealsRef = _fbDb.ref(fbPath);
+      _activeStationRevealsRef.on('value', snap => {
+        const val = snap.val() || { patientInfo: false, equipment: false };
+        const prev = _lastStationRevealsState[stateKey] || { patientInfo: false, equipment: false };
+        const newPat = Boolean(val.patientInfo);
+        const newEq = Boolean(val.equipment);
+
+        SimState.stationReveals[stateKey] = {
+          patientInfo: newPat,
+          equipment: newEq,
+          updatedAt: val.updatedAt || 0,
+          updatedBy: val.updatedBy || ''
+        };
+        _lastStationRevealsState[stateKey] = { patientInfo: newPat, equipment: newEq };
+
+        applyStationGatedVisibility(stationNum, c);
+
+        // Notify Examinee when Examiner opens or closes a section in real time
+        const isCandidate = (SimState.role === 'examinee' || SimState.role === 'participant' || SimState.role === 'candidate');
+        if (!isInitialSnap && isCandidate) {
+          if (patGated && newPat !== Boolean(prev.patientInfo)) {
+            playGatedReleaseNotificationChime(newPat);
+            if (typeof showPleToast === 'function') {
+              showPleToast(
+                newPat ? '🔔 ผู้ประเมินได้เปิด "ข้อมูลผู้ป่วย" ให้คุณแล้ว' : '🔒 ผู้ประเมินได้ซ่อน "ข้อมูลผู้ป่วย" แล้ว',
+                newPat ? 'success' : 'info'
+              );
+            }
+            if (newPat) {
+              const acc = document.getElementById('exam-patient-accordion');
+              if (acc && typeof acc.scrollIntoView === 'function') {
+                try { acc.scrollIntoView({ behavior: 'smooth', block: 'nearest' }); } catch (e) {}
+              }
+            }
+          }
+          if (eqGated && newEq !== Boolean(prev.equipment)) {
+            playGatedReleaseNotificationChime(newEq);
+            if (typeof showPleToast === 'function') {
+              showPleToast(
+                newEq ? '🔔 ผู้ประเมินได้ส่ง "สิ่งที่มีให้ในสถานี" ให้คุณแล้ว' : '🔒 ผู้ประเมินได้ซ่อน "สิ่งที่มีให้ในสถานี" แล้ว',
+                newEq ? 'success' : 'info'
+              );
+            }
+            if (newEq) {
+              const acc = document.getElementById('exam-equipment-accordion');
+              if (acc && typeof acc.scrollIntoView === 'function') {
+                try { acc.scrollIntoView({ behavior: 'smooth', block: 'nearest' }); } catch (e) {}
+              }
+            }
+          }
+        }
+        isInitialSnap = false;
+      });
+    }
+    window.setupStationRevealsSync = setupStationRevealsSync;
 
     // ─── Live Fill-in-the-Blank Multiplayer Synchronization ───
     let _examineeBlankDebounceTimer = null;
@@ -13260,6 +13635,7 @@ ${caseContext || '(ยังไม่มีข้อมูลเคส)'}
       SimState.timerSyncInterval = null;
       SimState.timerRunning = false;
       SimState.isLobby = false;
+      if (typeof cleanupStationRevealsListener === 'function') cleanupStationRevealsListener();
 
       // Cleanup Station Chat & Unified Tools
       if (typeof StationChatController !== 'undefined') {
@@ -13349,6 +13725,7 @@ ${caseContext || '(ยังไม่มีข้อมูลเคส)'}
         SimState.timerSyncInterval = null;
         SimState.lobbyPollInterval = null;
         SimState.timerRunning = false;
+        if (typeof cleanupStationRevealsListener === 'function') cleanupStationRevealsListener();
 
         // Cleanup Station Chat & Unified Tools
         if (typeof StationChatController !== 'undefined') {
@@ -14769,6 +15146,7 @@ ${caseContext || '(ยังไม่มีข้อมูลเคส)'}
         try { _fbRoomRef.off(); } catch (e) {}
         _fbRoomRef = null;
       }
+      if (typeof cleanupStationRevealsListener === 'function') cleanupStationRevealsListener();
 
       // 3. Clear all stored session keys completely
       clearCohortSession();
@@ -14785,6 +15163,7 @@ ${caseContext || '(ยังไม่มีข้อมูลเคส)'}
       SimState.stations = [];
       SimState.studentScores = {};
       SimState.stationFeedbacks = {};
+      SimState.stationReveals = {};
       try { sessionStorage.removeItem('ospe_stationFeedbacks'); } catch (e) {}
       const liveFeedbackEl = document.getElementById('exam-live-feedback-textarea');
       if (liveFeedbackEl) liveFeedbackEl.value = '';
@@ -16647,6 +17026,8 @@ ${caseContext || '(ยังไม่มีข้อมูลเคส)'}
               `;
 
               // 2. ข้อมูลผู้ป่วย (Patient Info)
+              const shPGated = (typeof isPatientInfoGated === 'function') ? isPatientInfoGated(currCase) : Boolean(currCase && currCase.patientInfoGated);
+              const shEGated = (typeof isEquipmentGated === 'function') ? isEquipmentGated(currCase) : Boolean(currCase && currCase.equipmentGated);
               const rawPatient = stripSecHeaders(currCase.patientInfoHtml || '');
               const hasPatientInfo = Boolean(
                 rawPatient && rawPatient.trim() && (
@@ -16662,7 +17043,7 @@ ${caseContext || '(ยังไม่มีข้อมูลเคส)'}
                 html += `
                   <div class="sh-candidate-section" style="margin-bottom: 1.5rem;">
                     <h3 class="viewer-section-title" style="font-size: 1.15rem; margin: 0.5rem 0 0.75rem 0; border-left: 4px solid #0284c7; padding-left: 0.65rem; color: #0284c7; font-family: var(--font-title); font-weight: 700;">
-                      ข้อมูลผู้ป่วย
+                      ข้อมูลผู้ป่วย${shPGated ? ' (ส่งโดยผู้ประเมิน)' : ''}
                     </h3>
                     <div class="case-html-body" style="font-size: 1rem; line-height: 1.7; color: var(--text-primary); background: var(--surface); padding: 1.25rem; border-radius: var(--radius-md); border: 1px solid var(--border);">
                       ${processedPatient}
@@ -16674,7 +17055,7 @@ ${caseContext || '(ยังไม่มีข้อมูลเคส)'}
                 html += `
                   <div class="sh-candidate-section" style="margin-bottom: 1.5rem;">
                     <h3 class="viewer-section-title" style="font-size: 1.15rem; margin: 0.5rem 0 0.75rem 0; border-left: 4px solid #0284c7; padding-left: 0.65rem; color: #0284c7; font-family: var(--font-title); font-weight: 700;">
-                      ข้อมูลผู้ป่วย
+                      ข้อมูลผู้ป่วย${shPGated ? ' (ส่งโดยผู้ประเมิน)' : ''}
                     </h3>
                     <div class="case-html-body" style="font-size: 1rem; line-height: 1.7; color: var(--text-primary); background: var(--surface); padding: 1.25rem; border-radius: var(--radius-md); border: 1px solid var(--border);">
                       ${patientParas}
@@ -16696,7 +17077,7 @@ ${caseContext || '(ยังไม่มีข้อมูลเคส)'}
                 html += `
                   <div class="sh-candidate-section" style="margin-bottom: 1.5rem;">
                     <h3 class="viewer-section-title" style="font-size: 1.15rem; margin: 0.5rem 0 0.75rem 0; border-left: 4px solid #16a34a; padding-left: 0.65rem; color: #16a34a; font-family: var(--font-title); font-weight: 700;">
-                      สิ่งที่มีให้ในสถานี
+                      สิ่งที่มีให้ในสถานี${shEGated ? ' (ส่งโดยผู้ประเมิน)' : ''}
                     </h3>
                     <div class="case-html-body" style="font-size: 1rem; line-height: 1.7; color: var(--text-primary); background: var(--surface); padding: 1.25rem; border-radius: var(--radius-md); border: 1px solid var(--border);">
                       ${eqFormatted}
@@ -16708,7 +17089,7 @@ ${caseContext || '(ยังไม่มีข้อมูลเคส)'}
                 html += `
                   <div class="sh-candidate-section" style="margin-bottom: 1.5rem;">
                     <h3 class="viewer-section-title" style="font-size: 1.15rem; margin: 0.5rem 0 0.75rem 0; border-left: 4px solid #16a34a; padding-left: 0.65rem; color: #16a34a; font-family: var(--font-title); font-weight: 700;">
-                      สิ่งที่มีให้ในสถานี
+                      สิ่งที่มีให้ในสถานี${shEGated ? ' (ส่งโดยผู้ประเมิน)' : ''}
                     </h3>
                     <div class="case-html-body" style="font-size: 1rem; line-height: 1.7; color: var(--text-primary); background: var(--surface); padding: 1.25rem; border-radius: var(--radius-md); border: 1px solid var(--border);">
                       ${eqParas}
@@ -16761,6 +17142,12 @@ ${caseContext || '(ยังไม่มีข้อมูลเคส)'}
           return numA - numB;
         });
 
+        const currStObj = SimState.stations && SimState.stations[SimState.currentIdx];
+        const currStCase = currStObj ? (currStObj.case || {}) : {};
+        const currStNum = currStObj ? currStObj.stationNumber : (SimState.currentIdx + 1);
+        const stPGated = (typeof isPatientInfoGated === 'function') ? isPatientInfoGated(currStCase) : Boolean(currStCase && currStCase.patientInfoGated);
+        const stEGated = (typeof isEquipmentGated === 'function') ? isEquipmentGated(currStCase) : Boolean(currStCase && currStCase.equipmentGated);
+
         breakoutKeys.forEach(k => {
           const t = breakouts[k];
           const currScoreObj = t.scores ? (t.scores[SimState.currentIdx + 1] || t.scores[String(SimState.currentIdx + 1)]) : null;
@@ -16771,6 +17158,21 @@ ${caseContext || '(ยังไม่มีข้อมูลเคส)'}
             (Array.isArray(currScoreObj.checkedIds) && currScoreObj.checkedIds.length > 0)
           ));
           const scoreText = currScoreObj ? ` · ให้คะแนนแล้ว (${earned}/${max})` : '';
+
+          let revealBadgeHtml = '';
+          if (stPGated || stEGated) {
+            const tableRev = (t.stationReveals && t.stationReveals['st_' + currStNum]) || {};
+            const badges = [];
+            if (stPGated) {
+              const pOpen = Boolean(tableRev.patientInfo);
+              badges.push(`<span style="display:inline-flex;align-items:center;gap:0.2rem;padding:0.1rem 0.4rem;border-radius:4px;font-size:0.7rem;font-weight:700;background:${pOpen ? '#dcfce7' : '#fef3c7'};color:${pOpen ? '#15803d' : '#b45309'};border:1px solid ${pOpen ? '#86efac' : '#fde68a'};">${pOpen ? '📦 ส่งข้อมูลผู้ป่วยแล้ว' : '🔒 ยังไม่ส่งข้อมูลผู้ป่วย'}</span>`);
+            }
+            if (stEGated) {
+              const eOpen = Boolean(tableRev.equipment);
+              badges.push(`<span style="display:inline-flex;align-items:center;gap:0.2rem;padding:0.1rem 0.4rem;border-radius:4px;font-size:0.7rem;font-weight:700;background:${eOpen ? '#dcfce7' : '#fef3c7'};color:${eOpen ? '#15803d' : '#b45309'};border:1px solid ${eOpen ? '#86efac' : '#fde68a'};">${eOpen ? '📦 ส่งสิ่งที่มีให้แล้ว' : '🔒 ยังไม่ส่งสิ่งที่มีให้'}</span>`);
+            }
+            revealBadgeHtml = `<div style="display:flex;flex-wrap:wrap;gap:0.25rem;margin-top:0.35rem;">${badges.join('')}</div>`;
+          }
 
           const item = document.createElement('div');
           item.style.cssText = `background:var(--surface);border:1px solid ${isDone ? 'rgba(34,197,94,0.5)' : 'var(--border)'};border-radius:var(--radius-sm);padding:0.75rem;font-size:0.84rem;box-shadow:${isDone ? '0 1px 4px rgba(34,197,94,0.15)' : 'none'};`;
@@ -16789,6 +17191,7 @@ ${caseContext || '(ยังไม่มีข้อมูลเคส)'}
               <span style="color:var(--text-muted);">Candidate:</span>
               <strong style="color:#16a34a;">${escapeHtml(t.participantName || 'ยังไม่มี')}</strong>
             </div>
+            ${revealBadgeHtml}
             ${scoreText ? `<div style="color:var(--success);font-size:0.75rem;margin-top:0.35rem;font-weight:600;text-align:right;">${scoreText}</div>` : ''}
           `;
           matrixEl.appendChild(item);
@@ -17102,6 +17505,8 @@ ${caseContext || '(ยังไม่มีข้อมูลเคส)'}
       let patientHtml = stripSectionHeaders(c.patientInfoHtml);
       let equipmentHtml = c.equipmentHtml ? stripSectionHeaders(c.equipmentHtml).trim() : '';
       let noteHtml = c.noteHtml || (c.note ? `<p>${c.note}</p>` : '');
+      const previewPGated = (typeof isPatientInfoGated === 'function') ? isPatientInfoGated(c) : Boolean(c && c.patientInfoGated);
+      const previewEGated = (typeof isEquipmentGated === 'function') ? isEquipmentGated(c) : Boolean(c && c.equipmentGated);
 
       // Checklist rendering
       let checklistHtml = '';
@@ -17162,7 +17567,7 @@ ${caseContext || '(ยังไม่มีข้อมูลเคส)'}
         equipmentBlock = `
           <div class="sim-preview-box" style="background: var(--bg); border: 1px solid var(--border); border-radius: var(--radius-md); padding: 0.9rem 1.1rem;">
             <strong style="color: #d97706; font-size: 0.92rem; display: flex; align-items: center; gap: 0.4rem; margin-bottom: 0.45rem;">
-              📦 อุปกรณ์และสิ่งที่มีให้ในสถานี (Equipment)
+              📦 อุปกรณ์และสิ่งที่มีให้ในสถานี (Equipment)${previewEGated ? ' (ส่งโดยผู้ประเมิน)' : ''}
             </strong>
             <div class="case-rich-text" style="font-size: 0.9rem; line-height: 1.6;">${equipmentHtml}</div>
           </div>
@@ -17188,7 +17593,7 @@ ${caseContext || '(ยังไม่มีข้อมูลเคส)'}
         patientBlock = `
           <div class="sim-preview-box" style="background: var(--bg); border: 1px solid var(--border); border-radius: var(--radius-md); padding: 0.9rem 1.1rem;">
             <strong style="color: #0284c7; font-size: 0.92rem; display: flex; align-items: center; gap: 0.4rem; margin-bottom: 0.45rem;">
-              👤 ข้อมูลผู้ป่วย (Patient Profile)
+              👤 ข้อมูลผู้ป่วย (Patient Profile)${previewPGated ? ' (ส่งโดยผู้ประเมิน)' : ''}
             </strong>
             <div class="case-rich-text" style="font-size: 0.9rem; line-height: 1.6;">${patientHtml}</div>
           </div>

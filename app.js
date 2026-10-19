@@ -1168,6 +1168,22 @@ function stripSectionHeaders(str) {
 }
 window.stripSectionHeaders = stripSectionHeaders;
 
+function isPatientInfoGated(c) {
+  if (!c) return false;
+  if (c.patientInfoGated === true) return true;
+  if (c.patientInfoHtml && /ข้อมูลผู้ป่วย\s*\(\s*ส่งโดยผู้ประเมิน\s*\)/.test(c.patientInfoHtml)) return true;
+  return false;
+}
+window.isPatientInfoGated = isPatientInfoGated;
+
+function isEquipmentGated(c) {
+  if (!c) return false;
+  if (c.equipmentGated === true) return true;
+  if (c.equipmentHtml && /(?:สิ่งที่มีให้ในสถานี|สิ่งที่มีให้)\s*\(\s*ส่งโดยผู้ประเมิน\s*\)/.test(c.equipmentHtml)) return true;
+  return false;
+}
+window.isEquipmentGated = isEquipmentGated;
+
 function getFormattedCaseScenarioHtml(c) {
   if (!c) return '<p>ไม่มีข้อมูลสถานการณ์</p>';
   let raw = c.contentHtml || '';
@@ -2672,7 +2688,7 @@ if ('serviceWorker' in navigator && window.location.protocol !== 'file:') {
 const DB_NAME = 'RxCU_OSPE_DB';
 const DB_VERSION = 1;
 const STORE_NAME = 'case_details';
-const DB_VERSION_STR = 'v_20261019_150230'; // อัปเดตเวอร์ชันนี้เพื่อบังคับโหลดใหม่เมื่อมีเคสเพิ่มเติมในสคริปต์ออฟไลน์
+const DB_VERSION_STR = 'v_20261019_190531'; // อัปเดตเวอร์ชันนี้เพื่อบังคับโหลดใหม่เมื่อมีเคสเพิ่มเติมในสคริปต์ออฟไลน์
 
 function openIndexedDB() {
   return new Promise((resolve, reject) => {
@@ -3400,16 +3416,18 @@ async function executeBatchPrint() {
 
         const patientHtml = getFormattedCasePatientHtml(c);
         if (patientHtml) {
+          const patHeaderLabel = isPatientInfoGated(c) ? '👤 ข้อมูลผู้ป่วย (ส่งโดยผู้ประเมิน)' : '👤 ข้อมูลผู้ป่วย';
           html += `<div style="margin-bottom:1.25rem;">
-            <h3 style="margin:0 0 0.4rem 0; font-size:1.1rem; font-family:var(--font-title); border-left:4px solid #06b6d4; padding-left:0.5rem;">👤 ข้อมูลผู้ป่วย</h3>
+            <h3 style="margin:0 0 0.4rem 0; font-size:1.1rem; font-family:var(--font-title); border-left:4px solid #06b6d4; padding-left:0.5rem;">${patHeaderLabel}</h3>
             <div style="font-size:0.95rem; line-height:1.5;">${patientHtml}</div>
           </div>`;
         }
 
         const equipHtml = getFormattedCaseEquipmentHtml(c);
         if (equipHtml) {
+          const eqHeaderLabel = isEquipmentGated(c) ? '📦 สิ่งที่มีให้ในสถานี (ส่งโดยผู้ประเมิน)' : '📦 สิ่งที่มีให้ในสถานี';
           html += `<div style="margin-bottom:1.25rem;">
-            <h3 style="margin:0 0 0.4rem 0; font-size:1.1rem; font-family:var(--font-title); border-left:4px solid #8b5cf6; padding-left:0.5rem;">📦 สิ่งที่มีให้ในสถานี</h3>
+            <h3 style="margin:0 0 0.4rem 0; font-size:1.1rem; font-family:var(--font-title); border-left:4px solid #8b5cf6; padding-left:0.5rem;">${eqHeaderLabel}</h3>
             <div style="font-size:0.95rem; line-height:1.5;">${equipHtml}</div>
           </div>`;
         }

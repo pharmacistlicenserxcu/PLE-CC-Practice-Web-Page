@@ -1,12 +1,12 @@
 /**
  * PLE-CC2 OSPE Practice System — Offline Case List Metadata (Auto-Generated)
- * Version: v_20261019_181529
- * Generated on 2026-10-19 18:15:29
+ * Version: v_20261019_181832
+ * Generated on 2026-10-19 18:18:32
  */
 
 const OFFLINE_DATA = {
-  "version": "v_20261019_181529",
-  "generatedAt": "2026-10-19 18:15:29",
+  "version": "v_20261019_181832",
+  "generatedAt": "2026-10-19 18:18:32",
   "totalCases": 409,
   "cases": [
     {
@@ -3958,11 +3958,11 @@ const OFFLINE_DATA = {
     },
     {
       "caseId": "OSPE-CLW1M02",
-      "title": "การนับเม็ดยาและเขียนฉลากยา Mock RxCU84 Clinic Week 1",
+      "title": "OSPE-CLW1M02",
       "category": "Clinic",
-      "mainGroup": "การนับเม็ดยาและเขียนฉลากยา",
-      "subTopic": "",
-      "disease": "Cafegot",
+      "mainGroup": "Mock Exam 2569",
+      "subTopic": "🔒 ข้อสอบลับ (ต้องใช้รหัสผ่าน)",
+      "disease": "🔒 ล็อกด้วยรหัสผ่าน (Secret Mock)",
       "difficulty": 2,
       "docId": "1ZNKvEBVAUeVcJ2GSH4gGKujA8whv7zY0fH4pXVEJa4g",
       "author": "",
@@ -3971,15 +3971,18 @@ const OFFLINE_DATA = {
       "isActive": true,
       "caseStatus": "Active",
       "linkedNextCase": "",
-      "linkedFromCase": ""
+      "linkedFromCase": "",
+      "durationMin": 4,
+      "isProtected": true,
+      "hasPassword": true
     },
     {
       "caseId": "OSPE-CLW1M03",
-      "title": "เปิดหนังสือ Mock RxCU84 Clinic Week 1",
+      "title": "OSPE-CLW1M03",
       "category": "Clinic",
-      "mainGroup": "การค้นข้อมูลและประสานงาน",
-      "subTopic": "",
-      "disease": "เปิดหนังสือ",
+      "mainGroup": "Mock Exam 2569",
+      "subTopic": "🔒 ข้อสอบลับ (ต้องใช้รหัสผ่าน)",
+      "disease": "🔒 ล็อกด้วยรหัสผ่าน (Secret Mock)",
       "difficulty": 2,
       "docId": "1ZNKvEBVAUeVcJ2GSH4gGKujA8whv7zY0fH4pXVEJa4g",
       "author": "",
@@ -3988,15 +3991,18 @@ const OFFLINE_DATA = {
       "isActive": true,
       "caseStatus": "Active",
       "linkedNextCase": "",
-      "linkedFromCase": ""
+      "linkedFromCase": "",
+      "durationMin": 4,
+      "isProtected": true,
+      "hasPassword": true
     },
     {
       "caseId": "OSPE-CLW1M04",
-      "title": "Special precaution Mock RxCU84 Clinic Week 1",
+      "title": "OSPE-CLW1M04",
       "category": "Clinic",
-      "mainGroup": "Special precaution",
-      "subTopic": "",
-      "disease": "ยา Warfarin",
+      "mainGroup": "Mock Exam 2569",
+      "subTopic": "🔒 ข้อสอบลับ (ต้องใช้รหัสผ่าน)",
+      "disease": "🔒 ล็อกด้วยรหัสผ่าน (Secret Mock)",
       "difficulty": 2,
       "docId": "1ZNKvEBVAUeVcJ2GSH4gGKujA8whv7zY0fH4pXVEJa4g",
       "author": "",
@@ -4005,15 +4011,18 @@ const OFFLINE_DATA = {
       "isActive": true,
       "caseStatus": "Active",
       "linkedNextCase": "",
-      "linkedFromCase": ""
+      "linkedFromCase": "",
+      "durationMin": 4,
+      "isProtected": true,
+      "hasPassword": true
     },
     {
       "caseId": "OSPE-CLW1M05",
-      "title": "การระบุรูปแบบยาเตรียมและปัญหาความไม่คงตัวของตำรับยา (Dosage Forms & Drug Instabilities)",
+      "title": "OSPE-CLW1M05",
       "category": "Product",
-      "mainGroup": "Product",
-      "subTopic": "",
-      "disease": "Dosage Forms & Drug Instabilities",
+      "mainGroup": "Mock Exam 2569",
+      "subTopic": "🔒 ข้อสอบลับ (ต้องใช้รหัสผ่าน)",
+      "disease": "🔒 ล็อกด้วยรหัสผ่าน (Secret Mock)",
       "difficulty": 2,
       "docId": "1ZNKvEBVAUeVcJ2GSH4gGKujA8whv7zY0fH4pXVEJa4g",
       "author": "Maxnum",
@@ -4022,15 +4031,18 @@ const OFFLINE_DATA = {
       "isActive": true,
       "caseStatus": "Active",
       "linkedNextCase": "",
-      "linkedFromCase": ""
+      "linkedFromCase": "",
+      "durationMin": 4,
+      "isProtected": true,
+      "hasPassword": true
     },
     {
       "caseId": "OSPE-CLW1M06",
-      "title": "การจำแนกประเภทของยาตามกฎหมาย",
+      "title": "OSPE-CLW1M06",
       "category": "SAP",
-      "mainGroup": "กฎหมายทางยา",
-      "subTopic": "",
-      "disease": "พ.ร.บ. ยา พ.ศ. 2510 และฉบับแก้ไขเพิ่มเติม",
+      "mainGroup": "Mock Exam 2569",
+      "subTopic": "🔒 ข้อสอบลับ (ต้องใช้รหัสผ่าน)",
+      "disease": "🔒 ล็อกด้วยรหัสผ่าน (Secret Mock)",
       "difficulty": 2,
       "docId": "1ZNKvEBVAUeVcJ2GSH4gGKujA8whv7zY0fH4pXVEJa4g",
       "author": "Maxnum",
@@ -4039,7 +4051,10 @@ const OFFLINE_DATA = {
       "isActive": true,
       "caseStatus": "Active",
       "linkedNextCase": "",
-      "linkedFromCase": ""
+      "linkedFromCase": "",
+      "durationMin": 4,
+      "isProtected": true,
+      "hasPassword": true
     },
     {
       "caseId": "OSPE-CLW2M01",

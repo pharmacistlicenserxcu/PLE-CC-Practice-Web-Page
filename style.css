@@ -1722,7 +1722,7 @@ ol.ordered-list li,
   width: 100%;
   background: var(--tc);
   border-radius: 9999px;
-  transition: width 0.3s linear, background 0.3s ease;
+  transition: width 1s linear, background 0.3s ease;
 }
 
 .exam-sticky-timer-bar .ctl {

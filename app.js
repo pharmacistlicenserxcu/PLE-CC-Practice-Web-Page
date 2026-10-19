@@ -3526,23 +3526,19 @@ function triggerNativePrint(orient, scale, mode, printAreaId, onDone) {
     );
     if (typeof onDone === 'function') onDone();
 
-    // DO NOT wipe print area immediately on iOS (AirPrint renders asynchronously in background)
-    setTimeout(() => {
-      const area = document.getElementById(printAreaId);
-      if (area && !document.body.classList.contains('is-printing')) {
-        area.innerHTML = '';
-      }
-    }, isIOS ? 30000 : 2000);
+    // Intentionally preserve printArea innerHTML. Print containers have class
+    // .print-only-block with display: none on screen, so preserving DOM content
+    // prevents premature wipeout and 0 KB PDF generation while the user interacts with print preview.
   };
 
   // 4. Listen for desktop/browser native afterprint event
   window.addEventListener('afterprint', cleanup, { once: true });
 
-  // 5. Call window.print() after layout cycle, with fallback cleanup timer
+  // 5. Call window.print() after layout cycle
   setTimeout(() => {
     window.print();
-    // Fallback timer: unlock screen UI after 4 seconds on iOS, 1.5 seconds on desktop
-    setTimeout(cleanup, isIOS ? 4000 : 1500);
+    // Safety fallback: generous 120-second timeout solely in case afterprint is dropped
+    setTimeout(cleanup, 120000);
   }, isIOS ? 350 : 150);
 }
 window.triggerNativePrint = triggerNativePrint;

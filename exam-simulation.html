@@ -6,10 +6,10 @@
   <title>ระบบจำลองสอบ OSPE เสมือนจริง | RxCU</title>
   <meta name="description" content="ระบบจำลองสอบ OSPE 16 สถานีเสมือนจริง พร้อมจับเวลา 4 นาที ติ๊ก Checklist และคำนวณผลคะแนน Leaderboard">
   <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>💊</text></svg>">
-  <link rel="stylesheet" href="style.css?v=v_20261019_214500">
+  <link rel="stylesheet" href="style.css?v=v_20261019_225500">
   <script src="case-data-offline.js?v=v_20261019_203754"></script>
   <script src="case-details-offline.js?v=v_20261019_203754"></script>
-  <script src="app.js?v=v_20261019_203754"></script>
+  <script src="app.js?v=v_20261019_225500"></script>
   <script src="scratchpad.js?v=20261004_201700"></script>
   <style>
     /* Simulation Source and Topic Selector */
@@ -468,10 +468,10 @@
     #exam-sticky-timer-bar .bar #timer-fuse-fill {
       display: block !important;
       height: 100% !important;
-      width: 100% !important;
-      background: var(--tc) !important;
+      width: 100%;
+      background: var(--tc);
       border-radius: 9999px !important;
-      transition: width 0.3s linear, background 0.3s ease !important;
+      transition: width 1s linear, background 0.3s ease !important;
     }
 
     #exam-sticky-timer-bar #timer-ctl-row,
@@ -8623,23 +8623,32 @@
         const frac = Math.max(0, Math.min(1, SimState.timerValue / totalSecs));
         const pct = (frac * 100).toFixed(1);
         fuseFill.style.width = `${pct}%`;
-        
+        if (typeof fuseFill.style.setProperty === 'function') {
+          fuseFill.style.setProperty('width', `${pct}%`, 'important');
+        }
+
+        let fuseBg = 'linear-gradient(90deg, #0e7490, #0891b2, #06b6d4)';
+        let fuseShadow = 'none';
+
         if (SimState.timerValue <= 30) {
           // Critical Danger: Flashing / Glowing Red-Crimson
-          fuseFill.style.background = 'linear-gradient(90deg, #ef4444, #dc2626, #b91c1c)';
-          fuseFill.style.boxShadow = '0 0 10px rgba(239, 68, 68, 0.8)';
+          fuseBg = 'linear-gradient(90deg, #ef4444, #dc2626, #b91c1c)';
+          fuseShadow = '0 0 10px rgba(239, 68, 68, 0.8)';
         } else if (SimState.timerValue <= 60) {
           // Warning: Amber / Orange
-          fuseFill.style.background = 'linear-gradient(90deg, #f59e0b, #d97706, #ea580c)';
-          fuseFill.style.boxShadow = '0 0 8px rgba(245, 158, 11, 0.6)';
+          fuseBg = 'linear-gradient(90deg, #f59e0b, #d97706, #ea580c)';
+          fuseShadow = '0 0 8px rgba(245, 158, 11, 0.6)';
         } else if (SimState.timerValue <= 120) {
           // Medium: Emerald Green / Cyan / Blue
-          fuseFill.style.background = 'linear-gradient(90deg, #10b981, #06b6d4, #3b82f6)';
-          fuseFill.style.boxShadow = '0 0 6px rgba(16, 185, 129, 0.5)';
-        } else {
-          fuseFill.style.background = 'linear-gradient(90deg, #0e7490, #0891b2, #06b6d4)';
-          fuseFill.style.boxShadow = 'none';
+          fuseBg = 'linear-gradient(90deg, #10b981, #06b6d4, #3b82f6)';
+          fuseShadow = '0 0 6px rgba(16, 185, 129, 0.5)';
         }
+
+        fuseFill.style.background = fuseBg;
+        if (typeof fuseFill.style.setProperty === 'function') {
+          fuseFill.style.setProperty('background', fuseBg, 'important');
+        }
+        fuseFill.style.boxShadow = fuseShadow;
       }
 
       const hostAdjustWrap = document.getElementById('sticky-host-time-adjust-wrap');

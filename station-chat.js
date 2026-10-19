@@ -873,8 +873,9 @@
 
         for (let attempt = 0; attempt < maxAttempts; attempt++) {
           const currentEntry = this._geminiKeyPool[this._currentKeyIdx];
-          const API_KEY = localStorage.getItem('_gemini_api_key') || currentEntry.key;
-          const ENDPOINT = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${API_KEY}`;
+          const customKey = localStorage.getItem('_gemini_api_key');
+          const API_KEY = (customKey && attempt === 0) ? customKey : currentEntry.key;
+          const ENDPOINT = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3.8-flash:generateContent?key=${API_KEY}`;
 
           try {
             const controller = new AbortController();
@@ -905,7 +906,7 @@
 
             if (!res.ok) {
               const errBody = await res.text().catch(() => '');
-              if (res.status === 404 || res.status === 429 || res.status >= 500 || errBody.includes('RESOURCE_EXHAUSTED')) {
+              if (res.status === 429 || res.status >= 500 || errBody.includes('RESOURCE_EXHAUSTED')) {
                 this._currentKeyIdx = (this._currentKeyIdx + 1) % this._geminiKeyPool.length;
                 continue;
               }
@@ -1229,8 +1230,9 @@ ${caseContext || '(ยังไม่มีข้อมูลเคส)'}
 
       for (let attempt = 0; attempt < maxAttempts; attempt++) {
         const currentEntry = this._geminiKeyPool[this._currentKeyIdx];
-        const API_KEY = localStorage.getItem('_gemini_api_key') || currentEntry.key;
-        const ENDPOINT = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${API_KEY}`;
+        const customKey = localStorage.getItem('_gemini_api_key');
+        const API_KEY = (customKey && attempt === 0) ? customKey : currentEntry.key;
+        const ENDPOINT = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3.8-flash:generateContent?key=${API_KEY}`;
 
         try {
           const controller = new AbortController();
@@ -1262,9 +1264,13 @@ ${caseContext || '(ยังไม่มีข้อมูลเคส)'}
           if (!res.ok) {
             const errBody = await res.text().catch(() => '');
             console.warn(`Gemini API key [${this._currentKeyIdx} - ${currentEntry.email}] failed:`, res.status, errBody);
-            if (res.status === 404 || res.status === 429 || res.status >= 500 || errBody.includes('RESOURCE_EXHAUSTED')) {
+            if (res.status === 429 || errBody.includes('RESOURCE_EXHAUSTED')) {
               this._currentKeyIdx = (this._currentKeyIdx + 1) % this._geminiKeyPool.length;
               lastError = new Error('QUOTA_EXHAUSTED');
+              continue;
+            } else if (res.status >= 500) {
+              this._currentKeyIdx = (this._currentKeyIdx + 1) % this._geminiKeyPool.length;
+              lastError = new Error('SERVER_HIGH_DEMAND');
               continue;
             }
             throw new Error(`Gemini API HTTP ${res.status}: ${errBody}`);
@@ -1294,7 +1300,7 @@ ${caseContext || '(ยังไม่มีข้อมูลเคส)'}
             this._currentKeyIdx = (this._currentKeyIdx + 1) % this._geminiKeyPool.length;
             continue;
           }
-          if (err.message !== 'QUOTA_EXHAUSTED' && !err.message?.includes('429')) {
+          if (err.message !== 'QUOTA_EXHAUSTED' && err.message !== 'SERVER_HIGH_DEMAND' && !err.message?.includes('429')) {
             break;
           }
         }
@@ -1306,6 +1312,8 @@ ${caseContext || '(ยังไม่มีข้อมูลเคส)'}
         this.renderAIMessage('⏳ AI ตอบกลับไม่ทันเวลา (Timeout) กรุณาส่งข้อความอีกครั้งครับ');
       } else if (lastError?.message === 'QUOTA_EXHAUSTED' || (lastError?.message && lastError.message.includes('429'))) {
         this.renderAIMessage('⚠️ โควต้า API ทุก Key ในระบบใช้งานเต็มชั่วคราวครับ พรุ่งนี้ระบบจะรีเซ็ตอัตโนมัติครับ');
+      } else if (lastError?.message === 'SERVER_HIGH_DEMAND') {
+        this.renderAIMessage('⏳ เซิร์ฟเวอร์ AI มีผู้ใช้งานหนาแน่นชั่วคราว (High Demand) กรุณาลองส่งข้อความใหม่อีกครั้งครับ');
       } else {
         this.renderAIMessage(`⚠️ เชื่อมต่อ AI ไม่สำเร็จ: ${lastError?.message || 'โปรดตรวจสอบการเชื่อมต่อ'}`);
       }

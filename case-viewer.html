@@ -84,12 +84,13 @@
 
     /* Timer card inside case viewer */
     .viewer-timer-display {
-      font-size: 3.5rem;
-      font-weight: 700;
+      font-size: 1.35rem;
+      font-weight: 800;
       font-family: var(--font-mono);
       color: var(--success);
-      margin-bottom: 0.5rem;
-      letter-spacing: -1px;
+      margin-bottom: 0;
+      line-height: 1;
+      letter-spacing: 0.5px;
       transition: color 0.3s;
     }
     .viewer-timer-display.warn {
@@ -999,12 +1000,21 @@
         </div>
       </header>
 
-      <!-- Role / Practice Mode Selector and Layout Mode Toggle (no-print) -->
+      <!-- Role / Practice Mode Selector, Timer, and Layout Mode Toggle (no-print) -->
       <div class="viewer-controls-bar no-print" style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.75rem; margin-bottom: 1.25rem;">
-        <div id="mode-selector" class="role-selector-container" style="margin-bottom: 0;">
-          <button class="role-btn active" id="role-btn-solo" onclick="setViewerRole('solo')">👤 ฝึกคนเดียว</button>
-          <button class="role-btn" id="role-btn-examinee" onclick="setViewerRole('examinee')">✍️ เป็นคนสอบ</button>
-          <button class="role-btn" id="role-btn-examiner" onclick="setViewerRole('examiner')">🔎 เป็นคนตรวจ</button>
+        <div style="display: flex; align-items: center; gap: 0.75rem; flex-wrap: wrap;">
+          <div id="mode-selector" class="role-selector-container" style="margin-bottom: 0;">
+            <button class="role-btn active" id="role-btn-solo" onclick="setViewerRole('solo')">👤 ฝึกคนเดียว</button>
+            <button class="role-btn" id="role-btn-examinee" onclick="setViewerRole('examinee')">✍️ เป็นคนสอบ</button>
+            <button class="role-btn" id="role-btn-examiner" onclick="setViewerRole('examiner')">🔎 เป็นคนตรวจ</button>
+          </div>
+          <div id="viewer-timer-card" style="display: inline-flex; align-items: center; gap: 0.5rem; background: var(--surface); border: 1.5px solid var(--border); border-radius: var(--radius-md); padding: 0.35rem 0.75rem; box-shadow: var(--shadow-sm);">
+            <div class="viewer-timer-display" id="viewer-timer">04:00</div>
+            <div style="display: inline-flex; align-items: center; gap: 0.35rem;">
+              <button class="btn btn-secondary" style="padding: 0.25rem 0.55rem; font-size: 0.78rem; font-weight: 600; border-radius: var(--radius-xs, 4px);" id="viewer-timer-btn" onclick="toggleViewerTimer()">⏱️ เริ่มจับเวลา</button>
+              <button class="btn btn-ghost" style="padding: 0.25rem 0.45rem; font-size: 0.82rem; border: 1px solid var(--border); border-radius: var(--radius-xs, 4px); cursor: pointer;" onclick="resetViewerTimer()" title="รีเซ็ตเวลา">🔄</button>
+            </div>
+          </div>
         </div>
         <div class="layout-toggle-container" id="viewer-layout-toggle-wrap" style="display: inline-flex; align-items: center; background: var(--bg-secondary); padding: 3px; border-radius: var(--radius-md); border: 1px solid var(--border);">
           <span style="font-size: 0.78rem; font-weight: 600; color: var(--text-secondary); padding: 0 0.4rem;">มุมมอง:</span>
@@ -1071,15 +1081,6 @@
         <!-- Right Pane: Score Progress & Interactive Checklist -->
         <section class="viewer-pane" id="right-pane" style="min-height: auto;">
           
-          <!-- Timer Card (For Examinee and Examiner/SP Roles) -->
-          <div id="viewer-timer-card" style="display: none; background: var(--bg-primary); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 1.5rem; margin-bottom: 1.5rem; text-align: center;">
-            <div id="viewer-timer-label" style="font-size: 0.85rem; font-weight: 700; color: var(--text-secondary); text-transform: uppercase; margin-bottom: 0.25rem;">ตัวจับเวลาสถานีปฏิบัติการ</div>
-            <div class="viewer-timer-display" id="viewer-timer">04:00</div>
-            <div style="display: flex; gap: 0.5rem; justify-content: center;">
-              <button class="btn btn-secondary" style="padding: 0.35rem 0.75rem; font-size: 0.8rem;" id="viewer-timer-btn" onclick="toggleViewerTimer()">⏸️ พักการจับเวลา</button>
-              <button class="btn btn-secondary" style="padding: 0.35rem 0.75rem; font-size: 0.8rem;" onclick="resetViewerTimer()">🔄 เริ่มต้นใหม่</button>
-            </div>
-          </div>
 
           <!-- Score Tracker Progress Card -->
           <div class="progress-card" id="viewer-progress-card">
@@ -2207,7 +2208,7 @@
         chkSection.style.display = 'block';
         noticeSection.style.display = 'none';
         progressCard.style.display = 'block';
-        timerCard.style.display = 'block';
+        timerCard.style.display = 'inline-flex';
         if (noteWrap) noteWrap.style.display = 'block';
         if (docTabs) docTabs.style.display = 'flex';
         resetViewerTimer();
@@ -2222,21 +2223,21 @@
         chkSection.style.display = 'none';
         noticeSection.style.display = 'block';
         progressCard.style.display = 'none';
-        timerCard.style.display = 'block';
+        timerCard.style.display = 'inline-flex';
         if (noteWrap) noteWrap.style.display = 'none';
         if (docTabs) docTabs.style.display = 'none'; // ซ่อนแท็บเอกสารกันเปิดดูเฉลย
         switchViewerTab('content');      // บังคับแสดงหน้าโจทย์
         
         resetViewerTimer();
         // ไม่เล่นอัตโนมัติตามแผนใหม่: ค้างที่ 04:00 และเปลี่ยนข้อความปุ่ม
-        document.getElementById('viewer-timer-btn').textContent = '▶️ เริ่มจับเวลา';
+        document.getElementById('viewer-timer-btn').textContent = '⏱️ เริ่มจับเวลา';
       } 
       else if (role === 'examiner') {
         // ตรวจ/ผู้ประเมิน: แสดง Checklist, ข้อความการแสดง, และปุ่มจับเวลา
         chkSection.style.display = 'block';
         noticeSection.style.display = 'none';
         progressCard.style.display = 'block';
-        timerCard.style.display = 'block';
+        timerCard.style.display = 'inline-flex';
         if (noteWrap) noteWrap.style.display = 'block';
         if (docTabs) docTabs.style.display = 'flex';
         
@@ -2373,9 +2374,12 @@
     }
 
     function resetViewerTimer() {
+      stopViewerTimer();
       const c = (typeof AppState !== 'undefined') && AppState.currentCase;
       viewerTimerVal = c ? parseCaseDurationSec(c) : 240;
       updateViewerTimerDisplay();
+      const btn = document.getElementById('viewer-timer-btn');
+      if (btn) btn.textContent = '⏱️ เริ่มจับเวลา';
     }
 
     function updateViewerTimerDisplay() {

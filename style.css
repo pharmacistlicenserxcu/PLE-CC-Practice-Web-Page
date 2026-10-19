@@ -2525,9 +2525,23 @@ ol.ordered-list li,
   border-color: var(--border);
 }
 
+/* Guard to ensure exam layout remains hidden when display:none or when in lobby/setup/monitor */
+.exam-layout[style*="display: none"],
+.exam-layout[style*="display:none"],
+.exam-layout.is-hidden,
+#lobby-waiting-screen:not([style*="display: none"]) ~ .exam-layout,
+.lobby-waiting-card:not([style*="display: none"]) ~ .exam-layout,
+.exam-screen:has(#lobby-waiting-screen:not([style*="display: none"])) .exam-layout,
+#super-host-monitor-view:not([style*="display: none"]) ~ .exam-layout,
+.exam-screen:has(#super-host-monitor-view:not([style*="display: none"])) .exam-layout,
+#exam-setup-view:not([style*="display: none"]) ~ .exam-layout,
+.exam-screen:has(#exam-setup-view:not([style*="display: none"])) .exam-layout {
+  display: none !important;
+}
+
 /* --- Balanced Dual-Pane Split Layout with Independent Scrollbars --- */
 .viewer-grid.split-scroll-layout,
-.exam-layout.split-scroll-layout {
+.exam-layout.split-scroll-layout:not(.is-hidden):not([style*="display: none"]):not([style*="display:none"]) {
   display: grid !important;
   grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) !important;
   gap: 1.25rem !important;
@@ -2583,7 +2597,7 @@ ol.ordered-list li,
 
 /* --- Continuous Long-Page Layout (หน้าแบบยาวๆ) --- */
 .viewer-grid.classic-scroll-layout,
-.exam-layout.classic-scroll-layout {
+.exam-layout.classic-scroll-layout:not(.is-hidden):not([style*="display: none"]):not([style*="display:none"]) {
   display: flex !important;
   flex-direction: column !important;
   gap: 1.5rem !important;

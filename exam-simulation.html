@@ -416,7 +416,13 @@
 
     #lobby-waiting-screen:not([style*="display: none"]) ~ #exam-sticky-timer-bar,
     .lobby-waiting-card:not([style*="display: none"]) ~ #exam-sticky-timer-bar,
-    .exam-screen:has(#lobby-waiting-screen:not([style*="display: none"])) #exam-sticky-timer-bar {
+    .exam-screen:has(#lobby-waiting-screen:not([style*="display: none"])) #exam-sticky-timer-bar,
+    #lobby-waiting-screen:not([style*="display: none"]) ~ .exam-layout,
+    .lobby-waiting-card:not([style*="display: none"]) ~ .exam-layout,
+    .exam-screen:has(#lobby-waiting-screen:not([style*="display: none"])) .exam-layout,
+    #super-host-monitor-view:not([style*="display: none"]) ~ .exam-layout,
+    .exam-screen:has(#super-host-monitor-view:not([style*="display: none"])) .exam-layout,
+    .exam-layout.is-hidden {
       display: none !important;
     }
 

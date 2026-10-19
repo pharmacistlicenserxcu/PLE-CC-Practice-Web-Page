@@ -1807,7 +1807,9 @@ ol.ordered-list li,
   display: inline-block;
 }
 
-.exam-sticky-timer-bar .menu {
+.exam-sticky-timer-bar .menu,
+.exam-sticky-timer-bar .timer-more-popover,
+#timer-more-menu {
   position: absolute;
   right: 0;
   top: calc(100% + 8px);
@@ -1821,11 +1823,15 @@ ol.ordered-list li,
   text-align: left;
 }
 
-.exam-sticky-timer-bar .menu[hidden] {
+.exam-sticky-timer-bar .menu[hidden],
+.exam-sticky-timer-bar .timer-more-popover[hidden],
+#timer-more-menu[hidden] {
   display: none !important;
 }
 
-.exam-sticky-timer-bar .menu button.menu-item {
+.exam-sticky-timer-bar .menu button.menu-item,
+.exam-sticky-timer-bar .timer-more-popover button.menu-item,
+#timer-more-menu button.menu-item {
   display: flex;
   align-items: center;
   width: 100%;
@@ -1843,15 +1849,21 @@ ol.ordered-list li,
   transition: background-color 0.12s ease;
 }
 
-.exam-sticky-timer-bar .menu button.menu-item:hover {
+.exam-sticky-timer-bar .menu button.menu-item:hover,
+.exam-sticky-timer-bar .timer-more-popover button.menu-item:hover,
+#timer-more-menu button.menu-item:hover {
   background: var(--bg-secondary, #ECEAE4);
 }
 
-.exam-sticky-timer-bar .menu button.menu-item.dg {
+.exam-sticky-timer-bar .menu button.menu-item.dg,
+.exam-sticky-timer-bar .timer-more-popover button.menu-item.dg,
+#timer-more-menu button.menu-item.dg {
   color: var(--danger, #DC2626);
 }
 
-.exam-sticky-timer-bar .menu button.menu-item.dg:hover {
+.exam-sticky-timer-bar .menu button.menu-item.dg:hover,
+.exam-sticky-timer-bar .timer-more-popover button.menu-item.dg:hover,
+#timer-more-menu button.menu-item.dg:hover {
   background: #FEE2E2;
 }
 

@@ -4,10 +4,10 @@
  * ====================================================
  * จัดการ Caching ทรัพยากรระบบเพื่อเพิ่มความเร็วในการโหลด (Preloading) 
  * และสนับสนุนการเข้าใช้งานแบบออฟไลน์ (Offline Mode)
- * Version: ple-cc2-ospe-v1.3.3 (Fast-Timeout Network-First for Navigation)
+ * Version: ple-cc2-ospe-v1.4.4 (OSPE Flow, Solo Review & Room Sync Fixes)
  */
 
-const CACHE_NAME = 'ple-cc2-ospe-v1.4.3';
+const CACHE_NAME = 'ple-cc2-ospe-v1.4.4';
 const ASSETS = [
   './',
   './index.html',

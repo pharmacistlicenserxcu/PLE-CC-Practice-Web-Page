@@ -404,8 +404,20 @@
       transition: border-color 0.3s ease, box-shadow 0.3s ease !important;
       --tc: var(--primary, #0E7490);
       box-sizing: border-box !important;
-      display: block !important;
+      display: none;
       overflow: visible !important;
+    }
+
+    .checklist-card.is-submitted-locked .checklist-item,
+    .checklist-items-wrap.is-submitted-locked .checklist-item {
+      pointer-events: none;
+      opacity: 0.72;
+    }
+
+    #lobby-waiting-screen:not([style*="display: none"]) ~ #exam-sticky-timer-bar,
+    .lobby-waiting-card:not([style*="display: none"]) ~ #exam-sticky-timer-bar,
+    .exam-screen:has(#lobby-waiting-screen:not([style*="display: none"])) #exam-sticky-timer-bar {
+      display: none !important;
     }
 
     #exam-sticky-timer-bar.warn {
@@ -2706,7 +2718,7 @@
         </div>
 
         <!-- ALWAYS STICKY TIMER BAR (Pinned at top) -->
-        <div id="exam-sticky-timer-bar" class="exam-sticky-timer-bar">
+        <div id="exam-sticky-timer-bar" class="exam-sticky-timer-bar" style="display: none;">
           <!-- Giant Prominent Countdown Timer -->
           <div class="time" id="exam-timer">04:00</div>
           <div class="cap" id="exam-timer-label">เวลาที่เหลือ · สถานีนี้</div>
@@ -6156,11 +6168,18 @@
       document.getElementById('exam-setup-view').style.display = 'none';
       document.getElementById('exam-running-view').style.display = 'block';
       if (!SimState.hasDoneCountdown) {
+        if (SimState.timerInterval) clearInterval(SimState.timerInterval);
+        SimState.timerInterval = null;
+        SimState.timerRunning = false;
         document.querySelector('.exam-layout').style.display = 'none';
         const stickyTimer = document.getElementById('exam-sticky-timer-bar');
-        if (stickyTimer) stickyTimer.style.display = 'none';
+        if (stickyTimer) {
+          stickyTimer.style.setProperty('display', 'none', 'important');
+        }
         const stickyHeader = document.getElementById('exam-sticky-top-header');
-        if (stickyHeader) stickyHeader.style.display = 'none';
+        if (stickyHeader) {
+          stickyHeader.style.setProperty('display', 'none', 'important');
+        }
         document.getElementById('lobby-waiting-screen').style.display = 'block';
       } else {
         document.getElementById('lobby-waiting-screen').style.display = 'none';
@@ -7077,11 +7096,8 @@
               }
               if (myTable.isSubmitted) {
                 SimState.myBreakoutSubmitted = true;
-                const totalSt = SimState.stations.length || SimState.totalStations || 1;
-                if (!SimState.isHost && SimState.role !== 'examiner' && SimState.currentIdx >= totalSt - 1) {
-                  if (!SimState.isExamFinished && !SimState.isFinishingExam) {
-                    finishExamSimulation();
-                  }
+                if (SimState.isStationGradingPhase) {
+                  renderStationGradingBanner(SimState.currentIdx);
                 }
               }
             }
@@ -8017,6 +8033,14 @@
 
       if (isExaminer) {
         const isSubmitted = Boolean(SimState.isStationSubmitted);
+        const checklistCont = document.getElementById('exam-checklist-container');
+        if (checklistCont) {
+          checklistCont.classList.toggle('is-submitted-locked', isSubmitted);
+        }
+
+        const isLastSt = (SimState.stations.length > 0 && SimState.currentIdx >= SimState.stations.length - 1);
+        const isCohort = (SimState.examMode === 'cohort_breakout');
+
         if (isSubmitted) {
           banner.innerHTML = `
             <div class="examiner-submit-bar">
@@ -8024,7 +8048,9 @@
                 <span class="status-badge" style="background: rgba(22,163,74,0.12); color: #15803d; border-color: rgba(22,163,74,0.3);">
                   ✅ ส่งผลคะแนนสถานีที่ ${stNum} เรียบร้อยแล้ว (${formatScore(currentScore)} / ${formatScore(totalScore)})
                 </span>
-                <span class="score-summary-text" style="color: var(--text-secondary); font-size: 0.82rem;">คะแนนถูกส่งไปยังส่วนกลางแล้ว คุณสามารถปลดล็อกเพื่อแก้ไขหากต้องการ</span>
+                <span class="score-summary-text" style="color: var(--text-secondary); font-size: 0.82rem;">
+                  ${isLastSt && isCohort ? 'บันทึกคะแนนสถานีสุดท้ายเรียบร้อยแล้ว · รอ Super Host สรุปผลการสอบร่วมกัน (สามารถกดปลดล็อกหากต้องการแก้ไขคะแนน)' : 'คะแนนถูกส่งไปยังส่วนกลางแล้ว คุณสามารถปลดล็อกเพื่อแก้ไขหากต้องการ'}
+                </span>
               </div>
               <div class="submit-bar-actions" style="display: flex; gap: 0.5rem; align-items: center;">
                 <button id="btn-unlock-station-assessment" class="btn btn-outline" style="font-size: 0.8rem; padding: 0.4rem 0.8rem;" onclick="unlockStationAssessmentForEdit()">
@@ -8049,16 +8075,22 @@
           `;
         }
       } else if (isCandidate) {
-        const isSubmitted = Boolean(SimState.isStationSubmitted);
+        const isSubmitted = Boolean(SimState.isStationSubmitted || SimState.myBreakoutSubmitted);
+        const isLastSt = (SimState.stations.length > 0 && SimState.currentIdx >= SimState.stations.length - 1);
         if (isSubmitted) {
           banner.innerHTML = `
             <div class="candidate-wait-bar">
               <div class="candidate-wait-info">
                 <span style="font-size: 1.15rem;">✅</span>
-                <span style="font-weight: 700; color: #15803d;">อาจารย์ผู้ประเมินส่งผลคะแนนสถานีนี้เรียบร้อยแล้ว</span>
-                <span style="font-size: 0.85rem; color: var(--text-secondary);">(คะแนนของคุณ: ${formatScore(currentScore)} / ${formatScore(totalScore)})</span>
+                <div>
+                  <div style="font-weight: 700; color: #15803d;">
+                    ${isLastSt ? 'อาจารย์ผู้ประเมินส่งผลคะแนนสถานีสุดท้ายเรียบร้อยแล้ว' : 'อาจารย์ผู้ประเมินส่งผลคะแนนสถานีนี้เรียบร้อยแล้ว'}
+                    <span style="font-size: 0.85rem; color: var(--text-secondary); font-weight: normal; margin-left: 0.4rem;">(คะแนนของคุณ: ${formatScore(currentScore)} / ${formatScore(totalScore)})</span>
+                  </div>
+                  ${isLastSt ? '<div style="font-size: 0.82rem; color: var(--primary); margin-top: 0.25rem;">⏱️ กรุณารอสักครู่ Super Host กำลังจะสรุปผลและประกาศผลสอบร่วมกัน</div>' : ''}
+                </div>
               </div>
-              <span class="status-pill success">บันทึกเรียบร้อย</span>
+              <span class="status-pill success">${isLastSt ? 'รอประกาศผล' : 'บันทึกเรียบร้อย'}</span>
             </div>
           `;
         } else {
@@ -8073,6 +8105,10 @@
           `;
         }
       } else if (isSolo) {
+        if (SimState._isSoloReview) {
+          renderSoloReviewPersistentBar();
+          return;
+        }
         const isLastSt = (SimState.currentIdx >= SimState.stations.length - 1);
         banner.innerHTML = `
           <div class="solo-grading-bar">
@@ -8080,7 +8116,7 @@
               <span>⏱️ <strong>หมดเวลาทำข้อสอบแล้ว</strong> · คุณสามารถตรวจทาน Checklist และข้อสอบได้ตามต้องการ</span>
             </div>
             <div class="solo-bar-actions">
-              <button class="btn btn-outline" style="font-size: 0.85rem; padding: 0.45rem 0.85rem;" onclick="hideSoloGradingBanner()">
+              <button class="btn btn-outline" style="font-size: 0.85rem; padding: 0.45rem 0.85rem;" onclick="enterSoloReviewMode()">
                 📝 ตรวจทาน Checklist
               </button>
               <button class="btn btn-primary" style="font-size: 0.85rem; padding: 0.45rem 1rem;" onclick="${isLastSt ? 'finishExamSimulation()' : 'nextStation()'}">
@@ -8104,9 +8140,55 @@
     }
     window.renderStationGradingBanner = renderStationGradingBanner;
 
-    function hideSoloGradingBanner() {
+    function enterSoloReviewMode() {
+      SimState._isSoloReview = true;
+      SimState.timerRunning = false;
+      SimState.timerValue = 0;
+      if (SimState.timerInterval) clearInterval(SimState.timerInterval);
+      SimState.timerInterval = null;
+      updateTimerDisplay();
+      renderSoloReviewPersistentBar();
+      if (typeof showPleToast === 'function') {
+        showPleToast('เข้าสู่โหมดตรวจทานข้อสอบ สามารถกดเลื่อนดูข้อต่างๆ และกดสรุปผลคะแนนได้ที่แถบด้านบน', 'info');
+      }
+    }
+    window.enterSoloReviewMode = enterSoloReviewMode;
+
+    function renderSoloReviewPersistentBar() {
       const banner = document.getElementById('station-grading-phase-banner');
-      if (banner) banner.style.display = 'none';
+      if (!banner) return;
+      banner.style.display = 'block';
+      const totalStations = (SimState.stations && SimState.stations.length) || 1;
+      const isLastSt = (SimState.currentIdx >= totalStations - 1);
+      const isFirstSt = (SimState.currentIdx === 0);
+      banner.innerHTML = `
+        <div class="solo-review-persistent-bar" style="background: var(--surface); border: 1.5px solid var(--border); border-left: 4px solid var(--primary); border-radius: var(--radius-md); padding: 0.65rem 1rem; margin-bottom: 0.85rem; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.65rem; box-shadow: var(--shadow-sm);">
+          <div style="display: flex; align-items: center; gap: 0.65rem; flex-wrap: wrap;">
+            <span class="badge" style="background: rgba(14, 165, 233, 0.12); color: #0284c7; font-weight: 700; border: 1px solid rgba(14, 165, 233, 0.3);">
+              📝 โหมดตรวจทานข้อสอบ
+            </span>
+            <span style="font-size: 0.88rem; color: var(--text-primary); font-weight: 600;">
+              สถานีที่ ${SimState.currentIdx + 1} จาก ${totalStations} · เวลาสิ้นสุดแล้ว (00:00)
+            </span>
+          </div>
+          <div style="display: flex; gap: 0.5rem; align-items: center; flex-wrap: wrap;">
+            <button type="button" class="btn btn-outline" style="font-size: 0.82rem; padding: 0.35rem 0.75rem;" onclick="prevStation()" ${isFirstSt ? 'disabled' : ''}>
+              ◀ ก่อนหน้า
+            </button>
+            <button type="button" class="btn btn-outline" style="font-size: 0.82rem; padding: 0.35rem 0.75rem;" onclick="nextStation()" ${isLastSt ? 'disabled' : ''}>
+              ถัดไป ▶
+            </button>
+            <button type="button" class="btn btn-primary" style="font-size: 0.82rem; padding: 0.4rem 0.95rem; font-weight: 700; background: #10b981; border-color: #10b981; color: white;" onclick="finishExamSimulation()">
+              🏁 สรุปผลคะแนน
+            </button>
+          </div>
+        </div>
+      `;
+    }
+    window.renderSoloReviewPersistentBar = renderSoloReviewPersistentBar;
+
+    function hideSoloGradingBanner() {
+      enterSoloReviewMode();
     }
     window.hideSoloGradingBanner = hideSoloGradingBanner;
 
@@ -8436,7 +8518,19 @@
           }
           SimState._expiredForStationKey = expiryKey;
 
-          enterStationGradingPhase(expiredIdx);
+          const currentTimeoutMode = SimState.timeoutTransitionMode || (roomRefObj && roomRefObj.timeoutTransitionMode) || 'auto';
+          const isLastStation = (SimState.stations.length > 0 && expiredIdx >= SimState.stations.length - 1);
+
+          if (currentTimeoutMode === 'auto' && !isLastStation) {
+            playStationTimeoutAlarm(SimState.alarmSound || 'school-bell');
+            if (isSingleMasterStationController()) {
+              setTimeout(() => {
+                nextStation(expiredIdx);
+              }, 1200);
+            }
+          } else {
+            enterStationGradingPhase(expiredIdx);
+          }
         }
       };
 
@@ -8456,6 +8550,7 @@
         SimState.isStationGradingPhase = false;
         SimState.isStationSubmitted = false;
         SimState.myBreakoutSubmitted = false;
+        SimState._isSoloReview = false;
         const gradingBanner = document.getElementById('station-grading-phase-banner');
         if (gradingBanner) {
           gradingBanner.style.display = 'none';
@@ -8851,6 +8946,14 @@
 
     // ─── Timer ───────────────────────────────────────────────
     function startTimer() {
+      if (SimState._isSoloReview) {
+        SimState.timerRunning = false;
+        SimState.timerValue = 0;
+        if (SimState.timerInterval) clearInterval(SimState.timerInterval);
+        SimState.timerInterval = null;
+        updateTimerDisplay();
+        return;
+      }
       if (SimState.timerInterval) clearInterval(SimState.timerInterval);
       const curSt = SimState.stations && SimState.stations[SimState.currentIdx];
       const dur = parseCaseDurationSec(curSt && curSt.case);
@@ -8892,7 +8995,18 @@
           SimState.timerRunning = false;
           clearInterval(SimState.timerInterval);
           SimState.timerInterval = null;
-          enterStationGradingPhase(SimState.currentIdx);
+
+          const isLastStation = (SimState.stations.length > 0 && SimState.currentIdx >= SimState.stations.length - 1);
+          const soloTimeoutMode = SimState.timeoutTransitionMode || 'auto';
+
+          if (soloTimeoutMode === 'auto' && !isLastStation) {
+            playStationTimeoutAlarm(SimState.alarmSound || 'school-bell');
+            setTimeout(() => {
+              nextStation(SimState.currentIdx);
+            }, 1200);
+          } else {
+            enterStationGradingPhase(SimState.currentIdx);
+          }
         }
       }, 1000);
     }
@@ -9186,32 +9300,40 @@
         
         cell.textContent = isDone && !isCurrent && !isReviewingThis ? '✓' : st.stationNumber;
         
-        if (isSolo || (isHost && !SimState.cachedRoom?.isSuperHost)) {
-          // Solo mode or Standard Room Host: can jump freely
+        if (isSolo) {
+          // Solo mode: can jump freely (jumpToStation keeps timer paused at 00:00 if in review mode)
           cell.style.cursor = 'pointer';
           cell.title = st.isRest ? 'พักระหว่างสถานี' : (st.case && st.case.title ? st.case.title : 'สถานี ' + st.stationNumber);
           cell.addEventListener('click', () => jumpToStation(idx));
-        } else if (isExaminer && isStandardOrCohort) {
-          // Examiner in Standard Room or Cohort Breakout: Local Review mode for past/current stations!
-          if (idx <= SimState.currentIdx) {
+        } else if (isStandardOrCohort && (isExaminer || isHost || SimState.myBreakoutRole === 'examiner')) {
+          // Examiner or Standard Room Host: Local Review mode for past stations
+          if (idx < SimState.currentIdx) {
             cell.style.cursor = 'pointer';
             if (isReviewingThis) {
               cell.title = `สถานีที่ ${st.stationNumber} (กำลังตรวจย้อนหลัง - คลิกเพื่อกลับสู่สถานีจริง)`;
               cell.addEventListener('click', () => exitExaminerLocalReview());
-            } else if (isCurrent) {
-              cell.title = `สถานีที่ ${st.stationNumber} (สถานีสอบสดปัจจุบัน)`;
-              cell.addEventListener('click', () => { if (SimState._isLocalReview) exitExaminerLocalReview(); });
             } else {
               cell.title = `🔍 คลิกเพื่อตรวจย้อนหลังสถานีที่ ${st.stationNumber}`;
               cell.addEventListener('click', () => enterStationLocalReview(idx));
             }
+          } else if (idx === SimState.currentIdx) {
+            cell.style.cursor = 'pointer';
+            cell.title = `สถานีที่ ${st.stationNumber} (สถานีสอบสดปัจจุบัน)`;
+            cell.addEventListener('click', () => { if (SimState._isLocalReview) exitExaminerLocalReview(); });
           } else {
-            cell.style.cursor = 'not-allowed';
-            cell.style.opacity = '0.45';
-            cell.title = `🔒 สถานีที่ ${st.stationNumber} (ยังไม่ถึงรอบการสอบ)`;
+            // Future station (idx > currentIdx)
+            if (isHost) {
+              cell.style.cursor = 'pointer';
+              cell.title = `⏭️ ข้ามไปยังสถานีที่ ${st.stationNumber}`;
+              cell.addEventListener('click', () => jumpToStation(idx));
+            } else {
+              cell.style.cursor = 'not-allowed';
+              cell.style.opacity = '0.45';
+              cell.title = `🔒 สถานีที่ ${st.stationNumber} (ยังไม่ถึงรอบการสอบ)`;
+            }
           }
         } else if (isHost) {
-          // Super Host in Breakout/Carousel
+          // Super Host in Carousel
           cell.style.cursor = 'pointer';
           cell.addEventListener('click', () => jumpToStation(idx));
         } else {
@@ -9316,14 +9438,27 @@
       SimState.isStationSubmitted = false;
       const gradingBannerEl = document.getElementById('station-grading-phase-banner');
       if (gradingBannerEl) {
-        gradingBannerEl.style.display = 'none';
-        gradingBannerEl.innerHTML = '';
-      }
-      document.querySelectorAll('.interactive-blank-input, .case-blank-input').forEach(inp => {
-        if (!inp.dataset.submitted) {
-          inp.disabled = false;
+        if (SimState._isSoloReview) {
+          renderSoloReviewPersistentBar();
+        } else {
+          gradingBannerEl.style.display = 'none';
+          gradingBannerEl.innerHTML = '';
         }
-      });
+      }
+      if (!SimState._isSoloReview) {
+        document.querySelectorAll('.interactive-blank-input, .case-blank-input').forEach(inp => {
+          if (!inp.dataset.submitted) {
+            inp.disabled = false;
+          }
+        });
+        if (window.Scratchpad && typeof window.Scratchpad.setReadOnly === 'function') {
+          try { window.Scratchpad.setReadOnly(false); } catch (e) {}
+        }
+      } else {
+        document.querySelectorAll('.interactive-blank-input, .case-blank-input').forEach(inp => {
+          inp.disabled = true;
+        });
+      }
       const st = SimState.stations[idx];
       const c = st.case || {};
 
@@ -9655,6 +9790,17 @@
         if (finishBtn) finishBtn.style.display = 'block';
       }
 
+      if (SimState._isSoloReview) {
+        if (finishBtn) {
+          finishBtn.style.display = 'inline-block';
+          finishBtn.textContent = '🏁 สรุปผลคะแนน';
+          finishBtn.style.background = '#10b981';
+          finishBtn.style.borderColor = '#10b981';
+          finishBtn.style.color = '#ffffff';
+          finishBtn.onclick = finishExamSimulation;
+        }
+      }
+
       document.getElementById('btn-prev-station').disabled = idx === 0;
       const nextBtn = document.getElementById('btn-next-station');
       if (idx === SimState.stations.length - 1) {
@@ -9668,9 +9814,8 @@
         nextBtn.onclick = nextStation;
       }
 
-      
       // Timer per station (solo only, lobby handled separately)
-      if (!SimState.isLobby) {
+      if (!SimState.isLobby && !SimState._isSoloReview) {
         startTimer();
       } else if (SimState.role === 'examiner' && !SimState.timerInterval) {
         // We only rely on startLocalCountdown triggered by syncLobbyStatus,
@@ -9971,6 +10116,12 @@
     }
 
     function toggleExamChecklistItem(stationNum, itemId, itemScore) {
+      if (SimState.isStationSubmitted) {
+        if (typeof showPleToast === 'function') {
+          showPleToast('คะแนนสถานีนี้ถูกส่งแล้ว หากต้องการแก้ไขกรุณากด "ปลดล็อกเพื่อแก้ไขคะแนน"', 'warn');
+        }
+        return;
+      }
       if (!SimState.studentScores[stationNum]) SimState.studentScores[stationNum] = [];
       const currentChecked = SimState.studentScores[stationNum];
       const clickedEl = document.querySelector(`.checklist-item[data-id="${itemId}"]`);
@@ -10394,6 +10545,19 @@
       }
       stopTimeoutAlarmSound();
       if (typeof closeManualTimeoutOverlay === 'function') closeManualTimeoutOverlay();
+
+      if (SimState._isSoloReview) {
+        SimState.currentIdx = targetIdx;
+        SimState.timerRunning = false;
+        SimState.timerValue = 0;
+        if (SimState.timerInterval) clearInterval(SimState.timerInterval);
+        SimState.timerInterval = null;
+        updateTimerDisplay();
+        renderStation(targetIdx);
+        renderSoloReviewPersistentBar();
+        return;
+      }
+
       SimState.isStationGradingPhase = false;
       SimState.isStationSubmitted = false;
       const gradingBanner = document.getElementById('station-grading-phase-banner');
@@ -10474,6 +10638,15 @@
     function nextStation(expectedFromIdx = null) {
       if (!SimState.stations || SimState.stations.length === 0) return;
 
+      if (SimState._isSoloReview) {
+        if (SimState.currentIdx < SimState.stations.length - 1) {
+          jumpToStation(SimState.currentIdx + 1);
+        } else {
+          finishExamSimulation();
+        }
+        return;
+      }
+
       // If Examiner is in Local Review mode (non-carousel) and manually clicks Next, step through Local Review instead of moving the live room!
       if (SimState._isLocalReview && SimState.examMode !== 'carousel_rotation' && (expectedFromIdx === null || expectedFromIdx === undefined || typeof expectedFromIdx === 'object')) {
         const revIdx = typeof SimState._localReviewStationIdx === 'number' ? SimState._localReviewStationIdx : SimState.currentIdx;
@@ -10504,7 +10677,13 @@
 
     function prevStation() {
       if (!SimState.stations || SimState.stations.length === 0) return;
-      if (SimState.isLobby && SimState.role === 'examiner' && SimState.examMode !== 'carousel_rotation') {
+      if (SimState._isSoloReview) {
+        if (SimState.currentIdx > 0) {
+          jumpToStation(SimState.currentIdx - 1);
+        }
+        return;
+      }
+      if (SimState.isLobby && (SimState.role === 'examiner' || SimState.myBreakoutRole === 'examiner' || SimState.isHost) && SimState.examMode !== 'carousel_rotation') {
         const baseIdx = (SimState._isLocalReview && typeof SimState._localReviewStationIdx === 'number')
           ? SimState._localReviewStationIdx
           : SimState.currentIdx;
@@ -14632,6 +14811,7 @@ ${caseContext || '(ยังไม่มีข้อมูลเคส)'}
       SimState.isStationGradingPhase = false;
       SimState.isStationSubmitted = false;
       SimState.myBreakoutSubmitted = false;
+      SimState._isSoloReview = false;
       const gradingBanner = document.getElementById('station-grading-phase-banner');
       if (gradingBanner) {
         gradingBanner.style.display = 'none';
@@ -14674,9 +14854,13 @@ ${caseContext || '(ยังไม่มีข้อมูลเคส)'}
       const lobbyWaiting = document.getElementById('lobby-waiting-screen');
       if (lobbyWaiting) lobbyWaiting.style.display = 'none';
       const stickyTimer = document.getElementById('exam-sticky-timer-bar');
-      if (stickyTimer) stickyTimer.style.display = 'none';
+      if (stickyTimer) {
+        stickyTimer.style.setProperty('display', 'none', 'important');
+      }
       const stickyHeader = document.getElementById('exam-sticky-top-header');
-      if (stickyHeader) stickyHeader.style.display = 'none';
+      if (stickyHeader) {
+        stickyHeader.style.setProperty('display', 'none', 'important');
+      }
 
       // Remove URL query params without page reload
       try {
@@ -18175,6 +18359,9 @@ ${caseContext || '(ยังไม่มีข้อมูลเคส)'}
 
       const nextBtn = document.getElementById('sh-next-btn');
       if (nextBtn) {
+        const isTimerRunning = Boolean(SimState.timerRunning && SimState.timerValue > 0);
+        const timeoutMode = SimState.timeoutTransitionMode || room.timeoutTransitionMode || 'auto';
+
         if (room.examMode === 'cohort_breakout') {
           const breakouts = room.breakouts || {};
           const activeKeys = Object.keys(breakouts).filter(k => breakouts[k].participantId || breakouts[k].participantName);
@@ -18183,41 +18370,66 @@ ${caseContext || '(ยังไม่มีข้อมูลเคส)'}
           const subCount = activeKeys.filter(k => breakouts[k].scores?.[currStNum]?.isSubmitted).length;
           const allReady = (subCount === totalActive);
 
-          if (SimState.currentIdx >= SimState.stations.length - 1) {
-            nextBtn.textContent = `🏁 จบการสอบ (${subCount}/${totalActive} โต๊ะส่งแล้ว)`;
-            nextBtn.onclick = () => finishExamSimulation();
-          } else {
-            nextBtn.textContent = `⏭️ สถานีถัดไป (${subCount}/${totalActive} โต๊ะส่งแล้ว)`;
-            nextBtn.onclick = () => nextStation();
-          }
-          if (allReady) {
-            nextBtn.style.background = '#10b981';
-            nextBtn.style.borderColor = '#10b981';
-          } else {
+          if (isTimerRunning) {
+            if (SimState.currentIdx >= SimState.stations.length - 1) {
+              nextBtn.textContent = '🏁 จบการสอบ (สถานีสุดท้าย)';
+              nextBtn.onclick = () => finishExamSimulation();
+            } else {
+              nextBtn.textContent = (timeoutMode === 'auto') ? '⏭️ สถานีถัดไป (เปลี่ยนอัตโนมัติเมื่อหมดเวลา)' : `⏭️ สถานีถัดไป (สถานีที่ ${currStNum + 1})`;
+              nextBtn.onclick = () => nextStation();
+            }
             nextBtn.style.background = '';
             nextBtn.style.borderColor = '';
+          } else {
+            if (SimState.currentIdx >= SimState.stations.length - 1) {
+              nextBtn.textContent = `🏁 จบการสอบ (${subCount}/${totalActive} โต๊ะส่งแล้ว)`;
+              nextBtn.onclick = () => finishExamSimulation();
+            } else {
+              nextBtn.textContent = `⏭️ สถานีถัดไป (${subCount}/${totalActive} โต๊ะส่งแล้ว)`;
+              nextBtn.onclick = () => nextStation();
+            }
+            if (allReady) {
+              nextBtn.style.background = '#10b981';
+              nextBtn.style.borderColor = '#10b981';
+            } else {
+              nextBtn.style.background = '';
+              nextBtn.style.borderColor = '';
+            }
           }
         } else if (room.examMode === 'carousel_rotation') {
           const posts = room.carouselPosts || {};
           const activePosts = Object.values(posts).filter(p => !p.isRest);
+          const totalActive = activePosts.length || 1;
           const roundSubs = room.carouselSubmissions?.[`round_${r}`] || {};
           const submittedPosts = activePosts.filter(p => Boolean(roundSubs['st_' + p.stationNumber]?.isSubmitted));
           const subCount = submittedPosts.length;
           const allReady = (subCount === totalActive);
 
-          if (SimState.currentIdx >= SimState.stations.length - 1) {
-            nextBtn.textContent = `🏁 จบการสอบ (${subCount}/${totalActive} ฐานส่งแล้ว)`;
-            nextBtn.onclick = () => finishExamSimulation();
-          } else {
-            nextBtn.textContent = `⏭️ สั่นกริ่งเปลี่ยนสถานี (${subCount}/${totalActive} ฐานส่งแล้ว)`;
-            nextBtn.onclick = () => nextStation();
-          }
-          if (allReady) {
-            nextBtn.style.background = '#10b981';
-            nextBtn.style.borderColor = '#10b981';
-          } else {
+          if (isTimerRunning) {
+            if (SimState.currentIdx >= SimState.stations.length - 1) {
+              nextBtn.textContent = '🏁 จบการสอบ (รอบสุดท้าย)';
+              nextBtn.onclick = () => finishExamSimulation();
+            } else {
+              nextBtn.textContent = `⏭️ สั่นกริ่งเปลี่ยนสถานี (รอบที่ ${r + 2})`;
+              nextBtn.onclick = () => nextStation();
+            }
             nextBtn.style.background = '';
             nextBtn.style.borderColor = '';
+          } else {
+            if (SimState.currentIdx >= SimState.stations.length - 1) {
+              nextBtn.textContent = `🏁 จบการสอบ (${subCount}/${totalActive} ฐานส่งแล้ว)`;
+              nextBtn.onclick = () => finishExamSimulation();
+            } else {
+              nextBtn.textContent = `⏭️ สั่นกริ่งเปลี่ยนสถานี (${subCount}/${totalActive} ฐานส่งแล้ว)`;
+              nextBtn.onclick = () => nextStation();
+            }
+            if (allReady) {
+              nextBtn.style.background = '#10b981';
+              nextBtn.style.borderColor = '#10b981';
+            } else {
+              nextBtn.style.background = '';
+              nextBtn.style.borderColor = '';
+            }
           }
         } else {
           if (SimState.currentIdx >= SimState.stations.length - 1) {

@@ -1641,96 +1641,223 @@ ol.ordered-list li,
   display: none !important;
 }
 
-/* Timer row & Fuse Bar ("ชนวนระเบิด") */
+/* ══════════════════════════════════════════════════════════════
+   PROMINENT STICKY TIMER & 3-POINT CONTROLS (OSPE Simulator)
+   ══════════════════════════════════════════════════════════════ */
 .exam-sticky-timer-bar {
   position: -webkit-sticky;
   position: sticky;
   top: 0 !important;
-  z-index: 1000;
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-md);
-  padding: 8px 14px;
-  padding-top: max(8px, env(safe-area-inset-top, 0px));
+  z-index: 1000 !important;
+  background: var(--surface, #FFFFFF) !important;
+  border: 1px solid var(--border, #E4E2DA);
+  border-radius: 16px;
+  padding: 16px 18px 14px;
+  padding-top: max(14px, env(safe-area-inset-top, 0px)) !important;
   margin-bottom: 0.75rem;
-  box-shadow: var(--shadow-md);
-  transition: box-shadow 0.2s ease, border-color 0.2s ease;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.06), 0 1px 3px rgba(0, 0, 0, 0.04);
+  text-align: center;
+  transition: border-color 0.3s ease, box-shadow 0.3s ease;
+  isolation: isolate;
+  --tc: var(--primary, #0E7490);
+}
+
+.exam-sticky-timer-bar.warn {
+  --tc: var(--warning, #D97706);
+  border-color: #FDE68A;
+}
+
+.exam-sticky-timer-bar.crit {
+  --tc: var(--danger, #DC2626);
+  border-color: #FECACA;
+}
+
+.exam-sticky-timer-bar.crit:not(.stopped) #exam-timer,
+.exam-sticky-timer-bar.crit:not(.stopped) .time {
+  animation: timerPulse 1s ease-in-out infinite;
+}
+
+@keyframes timerPulse {
+  50% { opacity: 0.55; }
+}
+
+.exam-sticky-timer-bar .time,
+.exam-sticky-timer-bar #exam-timer {
+  font-family: var(--font-mono, 'IBM Plex Mono', monospace) !important;
+  font-size: clamp(3.2rem, 11vw, 5.2rem) !important;
+  font-weight: 700 !important;
+  color: var(--tc) !important;
+  letter-spacing: -0.02em !important;
+  margin: 0 !important;
+  line-height: 1 !important;
+  font-variant-numeric: tabular-nums;
+  transition: color 0.3s ease;
+}
+
+.exam-sticky-timer-bar .cap,
+.exam-sticky-timer-bar #exam-timer-label {
+  font-family: var(--font-body, 'Bai Jamjuree', sans-serif);
+  font-size: 0.85rem;
+  font-weight: 500;
+  color: var(--text-muted, #475569);
+  margin: 4px 0 12px 0;
+}
+
+.exam-sticky-timer-bar .bar,
+.exam-sticky-timer-bar .timer-fuse-track {
+  height: 7px;
+  background: var(--bg-secondary, #ECEAE4);
+  border-radius: 9999px;
+  overflow: hidden;
+  max-width: 520px;
+  margin: 0 auto;
+  position: relative;
+}
+
+.exam-sticky-timer-bar .bar #timer-fuse-fill,
+.exam-sticky-timer-bar .timer-fuse-track #timer-fuse-fill,
+.exam-sticky-timer-bar .timer-fuse-fill {
+  display: block;
+  height: 100%;
+  width: 100%;
+  background: var(--tc);
+  border-radius: 9999px;
+  transition: width 0.3s linear, background 0.3s ease;
+}
+
+.exam-sticky-timer-bar .ctl {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 14px;
+}
+
+.exam-sticky-timer-bar .btn.main {
+  background: var(--primary, #0E7490);
+  border: 1.5px solid var(--primary, #0E7490);
+  color: #ffffff;
+  min-height: 42px;
+  padding: 0 20px;
+  border-radius: 9999px;
+  font-family: var(--font-body, 'Bai Jamjuree', sans-serif);
+  font-size: 0.92rem;
+  font-weight: 700;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  box-shadow: 0 4px 14px rgba(14, 116, 144, 0.28);
+  cursor: pointer;
+  transition: transform 0.15s ease, background-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.exam-sticky-timer-bar .btn.main:hover {
+  transform: scale(1.02);
+  background: #0891B2;
+}
+
+.exam-sticky-timer-bar .btn.main:active {
+  transform: scale(0.98);
+}
+
+.exam-sticky-timer-bar .score,
+.exam-sticky-timer-bar .score-chip {
+  font-family: var(--font-mono, 'IBM Plex Mono', monospace);
+  font-size: 0.86rem;
+  font-weight: 600;
+  color: var(--text-secondary, #555C54);
+  background: var(--bg-secondary, #ECEAE4);
+  border-radius: 9999px;
+  padding: 5px 14px;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.exam-sticky-timer-bar .btn.sq {
+  width: 42px;
+  height: 42px;
+  min-height: 42px;
+  padding: 0;
+  border-radius: 50%;
+  border: 1.5px solid var(--border-dark, #D0CCC2);
+  background: var(--surface, #FFFFFF);
+  color: var(--text-primary, #1C2320);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.3rem;
+  font-weight: 800;
+  cursor: pointer;
+  transition: transform 0.15s ease, background-color 0.15s ease, border-color 0.15s ease;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+}
+
+.exam-sticky-timer-bar .btn.sq:hover {
+  border-color: var(--primary, #0E7490);
+  color: var(--primary, #0E7490);
+  background: var(--bg-secondary, #ECEAE4);
+  transform: scale(1.05);
+}
+
+.exam-sticky-timer-bar .mwrap {
+  position: relative;
+  display: inline-block;
+}
+
+.exam-sticky-timer-bar .menu {
+  position: absolute;
+  right: 0;
+  top: calc(100% + 8px);
+  width: 220px;
+  padding: 6px;
+  z-index: 1005;
+  background: var(--surface, #FFFFFF);
+  border: 1.5px solid var(--border-dark, #D0CCC2);
+  border-radius: 14px;
+  box-shadow: 0 16px 36px rgba(0, 0, 0, 0.15), 0 2px 6px rgba(0, 0, 0, 0.05);
+  text-align: left;
+}
+
+.exam-sticky-timer-bar .menu[hidden] {
+  display: none !important;
+}
+
+.exam-sticky-timer-bar .menu button.menu-item {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  text-align: left;
+  min-height: 38px;
+  padding: 0 12px;
+  border: 0;
+  background: none;
+  color: var(--text-primary, #1C2320);
+  border-radius: 8px;
+  font-family: var(--font-body, 'Bai Jamjuree', sans-serif);
+  font-size: 0.88rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.12s ease;
+}
+
+.exam-sticky-timer-bar .menu button.menu-item:hover {
+  background: var(--bg-secondary, #ECEAE4);
+}
+
+.exam-sticky-timer-bar .menu button.menu-item.dg {
+  color: var(--danger, #DC2626);
+}
+
+.exam-sticky-timer-bar .menu button.menu-item.dg:hover {
+  background: #FEE2E2;
 }
 
 .exam-sticky-top-header {
   background: var(--bg);
   margin-bottom: 1.25rem;
-}
-
-.timer-row {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 12px;
-  flex-wrap: wrap;
-  margin: 0;
-}
-
-.timer-fuse-col {
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-  flex: 1;
-  min-width: 260px;
-}
-
-.timer-readout-wrap {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  flex-wrap: wrap;
-}
-
-.timer-action-btns {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-}
-
-.timer-fuse-track {
-  width: 100%;
-  height: 6px;
-  background: var(--bg-secondary);
-  border-radius: 4px;
-  overflow: hidden;
-  margin-top: 2px;
-  position: relative;
-}
-
-.timer-fuse-track #timer-fuse-fill,
-.timer-fuse-fill {
-  height: 100%;
-  width: 100%;
-  background: linear-gradient(90deg, #6366f1, #8b5cf6, #3b82f6, #06b6d4);
-  border-radius: 4px;
-  transition: width 0.3s linear, background 0.4s ease;
-  box-shadow: 0 0 6px rgba(99, 102, 241, 0.4);
-}
-
-.timer-readout {
-  display: flex;
-  align-items: baseline;
-  gap: 8px;
-}
-
-.timer-readout #exam-timer {
-  font-family: var(--font-mono);
-  font-size: 28px;
-  font-weight: 700;
-  letter-spacing: -0.01em;
-  line-height: 1;
-  color: var(--primary);
-  transition: color 0.3s ease;
-}
-
-.timer-readout small {
-  font-size: 11.5px;
-  color: var(--text-secondary);
 }
 
 .score-chip {
@@ -4685,75 +4812,69 @@ body.is-printing #ospe-results-print-area {
     gap: 0.75rem !important;
   }
 
-  /* Compact Sticky Timer Bar for Mobile & iPad */
+  /* Prominent Sticky Timer Bar for Mobile & iPad */
   .exam-sticky-timer-bar {
     position: -webkit-sticky !important;
     position: sticky !important;
     top: 0 !important;
-    top: env(safe-area-inset-top, 0px) !important;
     z-index: 1000 !important;
-    padding: 6px 10px !important;
-    padding-top: max(6px, env(safe-area-inset-top, 0px)) !important;
-    margin-bottom: 6px !important;
-    border-radius: var(--radius-sm) !important;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08) !important;
-    background: var(--surface) !important;
+    padding: 10px 12px 10px !important;
+    padding-top: max(10px, env(safe-area-inset-top, 0px)) !important;
+    margin-bottom: 8px !important;
+    border-radius: 14px !important;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08) !important;
+    background: var(--surface, #FFFFFF) !important;
+    text-align: center !important;
   }
 
-  .exam-sticky-timer-bar .timer-row {
-    flex-direction: row !important;
-    align-items: center !important;
-    justify-content: space-between !important;
-    gap: 6px !important;
-    flex-wrap: nowrap !important;
-  }
-
-  .exam-sticky-timer-bar .timer-fuse-col {
-    min-width: 0 !important;
-    flex: 1 1 auto !important;
-  }
-
-  .exam-sticky-timer-bar .timer-readout-wrap {
-    gap: 6px !important;
-    flex-wrap: nowrap !important;
-  }
-
-  .exam-sticky-timer-bar .timer-readout #exam-timer {
-    font-size: 21px !important;
+  .exam-sticky-timer-bar .time,
+  .exam-sticky-timer-bar #exam-timer {
+    font-size: clamp(2.8rem, 13vw, 4rem) !important;
+    line-height: 1 !important;
     letter-spacing: -0.02em !important;
   }
 
+  .exam-sticky-timer-bar .cap,
   .exam-sticky-timer-bar #exam-timer-label {
-    display: none !important;
+    display: block !important;
+    font-size: 0.76rem !important;
+    margin: 2px 0 8px 0 !important;
   }
 
-  .exam-sticky-timer-bar .timer-action-btns {
-    gap: 8px !important;
-  }
-
-  .exam-sticky-timer-bar .timer-action-btns .btn {
-    padding: 6px 10px !important;
-    min-height: 38px !important;
-    font-size: 12px !important;
-    border-radius: var(--radius-sm) !important;
-    white-space: nowrap !important;
-  }
-
+  .exam-sticky-timer-bar .bar,
   .exam-sticky-timer-bar .timer-fuse-track {
-    height: 4px !important;
-    margin-top: 2px !important;
+    height: 6px !important;
+    max-width: 340px !important;
+    margin: 0 auto 10px auto !important;
   }
 
+  .exam-sticky-timer-bar .ctl {
+    display: flex !important;
+    justify-content: center !important;
+    align-items: center !important;
+    gap: 8px !important;
+    margin-top: 10px !important;
+    flex-wrap: wrap !important;
+  }
+
+  .exam-sticky-timer-bar .btn.main {
+    min-height: 40px !important;
+    padding: 0 16px !important;
+    font-size: 0.88rem !important;
+    min-width: 120px !important;
+  }
+
+  .exam-sticky-timer-bar .score,
   .exam-sticky-timer-bar .score-chip {
-    padding: 3px 8px !important;
-    font-size: 11px !important;
-    gap: 4px !important;
-    flex-shrink: 0 !important;
-    white-space: nowrap !important;
+    padding: 4px 10px !important;
+    font-size: 0.8rem !important;
   }
 
-  .exam-sticky-timer-bar .score-chip strong {
-    font-size: 12px !important;
+  .exam-sticky-timer-bar .btn.sq {
+    width: 40px !important;
+    height: 40px !important;
+    min-height: 40px !important;
+    font-size: 1.2rem !important;
   }
 
   /* Control Tab & Blister Rail on Mobile */

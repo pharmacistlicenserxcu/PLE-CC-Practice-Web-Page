@@ -394,7 +394,7 @@
       html, body {
         padding: 0 !important;
         margin: 0 !important;
-        overflow-x: hidden !important;
+        overflow-x: clip !important;
         max-width: 100vw !important;
         width: 100% !important;
       }
@@ -405,12 +405,12 @@
         min-height: 100vh !important;
         max-width: 100vw !important;
         width: 100% !important;
-        overflow-x: hidden !important;
+        overflow-x: clip !important;
       }
       .page-viewport {
         width: 100% !important;
         max-width: 100vw !important;
-        overflow-x: hidden !important;
+        overflow-x: clip !important;
       }
       .main-section {
         padding: 0.6rem 0 !important;
@@ -2469,47 +2469,55 @@
         </div>
 
         <!-- ALWAYS STICKY TIMER BAR (Pinned at top) -->
-        <div id="exam-sticky-timer-bar" class="exam-sticky-timer-bar">
-          <div class="timer-row">
-            
-            <!-- Left: Timer Display + Attached Controls + Multi-color Fuse Bar -->
-            <div class="timer-fuse-col">
-              <div class="timer-readout-wrap">
-                <div class="timer-readout">
-                  <span id="exam-timer">04:00</span>
-                  <small id="exam-timer-label">เวลาที่เหลือ · สถานีนี้</small>
-                </div>
+        <div id="exam-sticky-timer-bar" class="exam-sticky-timer-bar card">
+          <!-- Giant Prominent Countdown Timer -->
+          <div class="time" id="exam-timer">04:00</div>
+          <div class="cap" id="exam-timer-label">เวลาที่เหลือ · สถานีนี้</div>
 
-                <!-- Attached controls right next to timer -->
-                <div class="timer-action-btns">
-                  <button class="btn ghost btn-sm" id="timer-toggle-btn" onclick="toggleTimer()" style="font-size: 1.05rem; padding: 0.25rem 0.5rem;" title="พัก / เล่นตัวจับเวลาต่อ">⏸️</button>
-                  <button class="btn outline btn-sm" id="timer-reset-btn" onclick="resetTimer()" style="font-size: 1.05rem; padding: 0.25rem 0.5rem;" title="เริ่มต้นใหม่">🔄</button>
-                  <button type="button" class="btn btn-sm" id="btn-sticky-abort-exam" onclick="abortExamSimulation()" style="color: var(--danger); font-weight: 600; background: rgba(239,68,68,0.08); border: 1px solid rgba(239,68,68,0.25); font-size: 1.05rem; padding: 0.25rem 0.5rem;" title="ยุติการสอบและกลับสู่หน้าตั้งค่า">🛑</button>
-                  <div id="sticky-host-time-adjust-wrap" style="display: none; align-items: center; gap: 0.25rem; margin-left: 0.25rem;">
-                    <span style="font-size: 0.72rem; color: var(--text-muted); font-weight: 600;">ทดเวลา:</span>
-                    <button type="button" class="btn outline btn-sm" style="padding: 0.2rem 0.45rem; font-size: 0.75rem;" onclick="adjustCohortTimer(60)" title="ทดเวลา +1 นาที">+1น</button>
-                    <button type="button" class="btn outline btn-sm" style="padding: 0.2rem 0.45rem; font-size: 0.75rem;" onclick="adjustCohortTimer(30)" title="ทดเวลา +30 วินาที">+30วิ</button>
-                    <button type="button" class="btn outline btn-sm" style="padding: 0.2rem 0.45rem; font-size: 0.75rem;" onclick="adjustCohortTimer(-30)" title="ลดเวลา 30 วินาที">-30วิ</button>
-                  </div>
-                </div>
-              </div>
+          <!-- Multi-color Fuse Progress Bar -->
+          <div class="bar" id="timer-fuse-track">
+            <div id="timer-fuse-fill"></div>
+          </div>
 
-              <!-- Multi-color Fuse/Bomb Progress Bar Strip ("ชนวนระเบิด") -->
-              <div class="timer-fuse-track">
-                <div id="timer-fuse-fill"></div>
-              </div>
-            </div>
+          <!-- 3-Point Control Row: [ ⏸ หยุดเวลา ]  คะแนน 0 / 10  [ ··· ] -->
+          <div class="ctl" id="timer-ctl-row">
+            <!-- 1. Primary Toggle Action -->
+            <button type="button" class="btn main" id="timer-toggle-btn" onclick="toggleTimer()" title="พัก / เล่นตัวจับเวลาต่อ">
+              <span id="timer-toggle-icon">⏸</span>
+              <span id="timer-toggle-text">หยุดเวลา</span>
+            </button>
 
-            <!-- Right: Score Chip Indicator with Quick Reset Button -->
-            <div class="score-chip" id="exam-progress-card" style="display: flex; align-items: center; gap: 0.45rem;">
+            <!-- 2. Score Badge -->
+            <div class="score mono" id="exam-progress-card">
               <span>คะแนน</span>
               <strong id="exam-score">0 / 0</strong>
-              <em id="exam-pct">0%</em>
-              <button type="button" class="btn btn-ghost" id="btn-quick-reset-score" onclick="resetCurrentStationChecklist()" title="รีเซ็ตคะแนนสถานีนี้" style="display: inline-flex; align-items: center; justify-content: center; width: 22px; height: 22px; padding: 0; border: none; background: transparent; cursor: pointer; font-size: 0.8rem; opacity: 0.7; transition: opacity 0.2s;" onmouseover="this.style.opacity='1';" onmouseout="this.style.opacity='0.7';">
-                🔄
-              </button>
-              <div id="exam-bar-fill" class="progress-bar-fill" style="display:none;"></div>
+              <em id="exam-pct" style="display: none;">0%</em>
             </div>
+
+            <!-- 3. Three-Dots Menu Wrap -->
+            <div class="mwrap" id="timer-more-menu-wrap">
+              <button type="button" class="btn sq" id="btn-timer-more-menu" onclick="toggleTimerMoreMenu(event)" aria-label="เครื่องมือเพิ่มเติม" aria-expanded="false" title="เครื่องมือเพิ่มเติม">
+                ⋯
+              </button>
+              <div id="timer-more-menu" class="card menu" hidden onclick="event.stopPropagation()">
+                <!-- Host Time Adjust Controls -->
+                <div id="sticky-host-time-adjust-wrap" style="display: none;">
+                  <button type="button" class="menu-item" onclick="adjustCohortTimer(60); closeTimerMoreMenu();">＋ เพิ่ม 1 นาที</button>
+                  <button type="button" class="menu-item" onclick="adjustCohortTimer(30); closeTimerMoreMenu();">＋ เพิ่ม 30 วินาที</button>
+                  <button type="button" class="menu-item" onclick="adjustCohortTimer(-30); closeTimerMoreMenu();">－ ลด 30 วินาที</button>
+                  <hr style="border:0; border-top:1px solid var(--border, #E4E2DA); margin:6px 0;">
+                </div>
+                <!-- Station Reset & Quick Score Reset -->
+                <button type="button" class="menu-item" id="timer-reset-btn" onclick="resetTimer(); closeTimerMoreMenu();">🔄 เริ่มเวลาใหม่</button>
+                <button type="button" class="menu-item" id="btn-quick-reset-score" onclick="resetCurrentStationChecklist(); closeTimerMoreMenu();">🔄 รีเซ็ตคะแนนสถานีนี้</button>
+                <hr style="border:0; border-top:1px solid var(--border, #E4E2DA); margin:6px 0;">
+                <!-- Abort Exam -->
+                <button type="button" class="menu-item dg" id="btn-sticky-abort-exam" onclick="abortExamSimulation(); closeTimerMoreMenu();">🏁 ยุติการสอบ</button>
+              </div>
+            </div>
+            
+            <!-- Backward-compatible hidden placeholder -->
+            <div id="exam-bar-fill" class="progress-bar-fill" style="display: none;"></div>
           </div>
         </div>
 
@@ -8116,7 +8124,15 @@
       const dur = parseCaseDurationSec(curSt && curSt.case);
       SimState.timerValue = dur;
       SimState.timerRunning = true;
-      document.getElementById('timer-toggle-btn').textContent = '⏸️';
+      const toggleIcon = document.getElementById('timer-toggle-icon');
+      const toggleText = document.getElementById('timer-toggle-text');
+      if (toggleIcon && toggleText) {
+        toggleIcon.textContent = '⏸';
+        toggleText.textContent = 'หยุดเวลา';
+      } else {
+        const tb = document.getElementById('timer-toggle-btn');
+        if (tb) tb.textContent = '⏸️';
+      }
       updateTimerDisplay();
       
       if (SimState.isLobby) {
@@ -8165,7 +8181,16 @@
       }
       SimState.timerRunning = !SimState.timerRunning;
       const toggleBtn = document.getElementById('timer-toggle-btn');
-      if (toggleBtn) toggleBtn.textContent = SimState.timerRunning ? '⏸️' : '▶️';
+      if (toggleBtn) {
+        const toggleIcon = document.getElementById('timer-toggle-icon');
+        const toggleText = document.getElementById('timer-toggle-text');
+        if (toggleIcon && toggleText) {
+          toggleIcon.textContent = SimState.timerRunning ? '⏸' : '▶';
+          toggleText.textContent = SimState.timerRunning ? 'หยุดเวลา' : 'เริ่มเวลา';
+        } else {
+          toggleBtn.textContent = SimState.timerRunning ? '⏸️' : '▶️';
+        }
+      }
       const shToggleBtn = document.getElementById('sh-timer-toggle-btn');
       if (shToggleBtn) shToggleBtn.textContent = SimState.timerRunning ? '⏸️' : '▶️';
 
@@ -8204,6 +8229,37 @@
           }
         }
       }
+    }
+
+    function toggleTimerMoreMenu(e) {
+      if (e && typeof e.stopPropagation === 'function') e.stopPropagation();
+      const menu = document.getElementById('timer-more-menu');
+      const btn = document.getElementById('btn-timer-more-menu');
+      if (!menu) return;
+      const isHidden = menu.hidden;
+      menu.hidden = !isHidden;
+      if (btn) btn.setAttribute('aria-expanded', isHidden ? 'true' : 'false');
+    }
+    window.toggleTimerMoreMenu = toggleTimerMoreMenu;
+
+    function closeTimerMoreMenu() {
+      const menu = document.getElementById('timer-more-menu');
+      const btn = document.getElementById('btn-timer-more-menu');
+      if (menu) menu.hidden = true;
+      if (btn) btn.setAttribute('aria-expanded', 'false');
+    }
+    window.closeTimerMoreMenu = closeTimerMoreMenu;
+
+    if (typeof document.addEventListener === 'function') {
+      document.addEventListener('click', (e) => {
+        const menu = document.getElementById('timer-more-menu');
+        const btn = document.getElementById('btn-timer-more-menu');
+        if (menu && !menu.hidden) {
+          if (!menu.contains(e.target) && e.target !== btn) {
+            closeTimerMoreMenu();
+          }
+        }
+      });
     }
 
     function resetTimer() {
@@ -8297,11 +8353,15 @@
       const seconds = SimState.timerValue % 60;
       const displayStr = `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
       const timerEl = document.getElementById('exam-timer');
+      const stickyBar = document.getElementById('exam-sticky-timer-bar');
       if (timerEl) {
         timerEl.textContent = displayStr;
-        timerEl.className = 'timer-display';
-        if (SimState.timerValue < 10) timerEl.classList.add('danger');
-        else if (SimState.timerValue < 60) timerEl.classList.add('warn');
+        timerEl.className = 'time';
+        if (stickyBar) {
+          stickyBar.classList.toggle('warn', SimState.timerValue <= 60 && SimState.timerValue > 30);
+          stickyBar.classList.toggle('crit', SimState.timerValue <= 30);
+          stickyBar.classList.toggle('stopped', !SimState.timerRunning || SimState.timerValue === 0);
+        }
       }
 
       const shTimerEl = document.getElementById('sh-timer-display');
@@ -8336,6 +8396,8 @@
           fuseFill.style.background = 'linear-gradient(90deg, #10b981, #06b6d4, #3b82f6)';
           fuseFill.style.boxShadow = '0 0 6px rgba(16, 185, 129, 0.5)';
         } else {
+          fuseFill.style.background = 'linear-gradient(90deg, #0e7490, #0891b2, #06b6d4)';
+          fuseFill.style.boxShadow = 'none';
         }
       }
 
@@ -8351,7 +8413,7 @@
         } else {
           canAdjust = (SimState.role === 'examiner') || (SimState.isHost && !isCandidate);
         }
-        hostAdjustWrap.style.display = canAdjust ? 'inline-flex' : 'none';
+        hostAdjustWrap.style.display = canAdjust ? 'block' : 'none';
       }
       const shAdjustWrap = document.getElementById('sh-host-time-adjust-controls');
       if (shAdjustWrap) {

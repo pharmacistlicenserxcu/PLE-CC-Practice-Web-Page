@@ -1745,7 +1745,7 @@
       }
     });
 
-    // ค้นหาข้อมูลเคสจาก Offline Database ทั้งส่วนสรุปและรายละเอียดแบบครบถ้วน (รองรับรหัสแบบมี/ไม่มี OSPE- และพิมพ์เล็ก/ใหญ่)
+    // ค้นหาข้อมูลเคสจาก Offline Database ทั้งส่วนสรุปและรายละเอียดแบบครบถ้วน (รองรับรหัสแบบมี/ไม่มี OSPE- พิมพ์เล็ก/ใหญ่ และเลขนำหน้าศูนย์ 09/009)
     function getOfflineCase(caseId) {
       if (!caseId) return null;
       const cleanId = caseId.trim();
@@ -1755,26 +1755,47 @@
       const upperOspeId = ospeId.toUpperCase();
       const upperRawId = rawId.toUpperCase();
 
+      const altIds = [];
+      const numMatch = upperRawId.match(/^([A-Z]+)0{0,}(\d+)$/);
+      if (numMatch) {
+        const pfx = numMatch[1];
+        const n = parseInt(numMatch[2], 10);
+        const pad1 = String(n);
+        const pad2 = String(n).padStart(2, '0');
+        const pad3 = String(n).padStart(3, '0');
+        [pad1, pad2, pad3].forEach(p => {
+          altIds.push(pfx + p, 'OSPE-' + pfx + p);
+        });
+      }
+
       let baseCase = {};
       if (typeof OFFLINE_DATA !== 'undefined' && OFFLINE_DATA.cases) {
-        baseCase = OFFLINE_DATA.cases.find(c => 
-          c.caseId === cleanId || 
-          c.caseId === ospeId || 
-          c.caseId === rawId || 
-          c.caseId === upperId || 
-          c.caseId === upperOspeId || 
-          c.caseId === upperRawId
-        ) || {};
+        baseCase = OFFLINE_DATA.cases.find(c => {
+          if (!c.caseId) return false;
+          const u = c.caseId.toUpperCase();
+          return u === cleanId.toUpperCase() || 
+                 u === ospeId.toUpperCase() || 
+                 u === rawId.toUpperCase() || 
+                 altIds.includes(u);
+        }) || {};
       }
 
       const detailsMap = (typeof OFFLINE_CASE_DETAILS !== 'undefined' && OFFLINE_CASE_DETAILS) || window.OFFLINE_CASE_DETAILS;
       if (detailsMap) {
-        const details = detailsMap[cleanId] || 
-                        detailsMap[ospeId] || 
-                        detailsMap[rawId] || 
-                        detailsMap[upperId] || 
-                        detailsMap[upperOspeId] || 
-                        detailsMap[upperRawId];
+        let details = detailsMap[cleanId] || 
+                      detailsMap[ospeId] || 
+                      detailsMap[rawId] || 
+                      detailsMap[upperId] || 
+                      detailsMap[upperOspeId] || 
+                      detailsMap[upperRawId];
+        if (!details && altIds.length > 0) {
+          for (const alt of altIds) {
+            if (detailsMap[alt]) {
+              details = detailsMap[alt];
+              break;
+            }
+          }
+        }
         if (details) {
           const merged = Object.assign({}, baseCase);
           Object.keys(details).forEach(k => {

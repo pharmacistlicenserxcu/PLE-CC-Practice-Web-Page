@@ -655,9 +655,12 @@ def check_table_template(table, target_case_id):
 def parse_table_template_to_case_data(table, target_case_id, inline_objects, lists_dict=None, tab_equations=None):
     scenario = ''
     patient_info_html = ''
+    equipment_html = ''
     note_html = ''
     content_html = ''
     checklist = []
+    patient_info_gated = False
+    equipment_gated = False
     
     for row in table.get('tableRows', []):
         cells = row.get('tableCells', [])
@@ -672,6 +675,12 @@ def parse_table_template_to_case_data(table, target_case_id, inline_objects, lis
             scenario = val_text.strip()
         elif any(x in key_text for x in ['ข้อมูลผู้ป่วย', 'patient info']):
             patient_info_html = parse_cell_to_html(val_cell, inline_objects, lists_dict, tab_equations)
+            if 'ส่งโดยผู้ประเมิน' in key_text:
+                patient_info_gated = True
+        elif any(x in key_text for x in ['สิ่งที่มีให้ในสถานี', 'สิ่งที่มีให้', 'อุปกรณ์']):
+            equipment_html = parse_cell_to_html(val_cell, inline_objects, lists_dict, tab_equations)
+            if 'ส่งโดยผู้ประเมิน' in key_text:
+                equipment_gated = True
         elif any(x in key_text for x in ['เฉลย', 'หมายเหตุ', 'notes', 'ข้อมูลผู้ตรวจ']):
             note_html = parse_cell_to_html(val_cell, inline_objects, lists_dict, tab_equations)
         elif any(x in key_text for x in ['checklist', 'เกณฑ์ประเมิน']):
@@ -769,13 +778,19 @@ def parse_table_template_to_case_data(table, target_case_id, inline_objects, lis
                     elif checklist and img_html:
                         checklist[-1]['imageHtml'] = (checklist[-1].get('imageHtml') or "") + img_html
     checklist = resolve_checklist_subsets_py(checklist)
-    return {
+    res_data = {
         "scenario": scenario,
         "patientInfoHtml": wrap_list_items_in_html(patient_info_html),
         "contentHtml": wrap_list_items_in_html(content_html),
+        "equipmentHtml": wrap_list_items_in_html(equipment_html),
         "checklist": checklist,
         "noteHtml": wrap_list_items_in_html(note_html)
     }
+    if patient_info_gated:
+        res_data["patientInfoGated"] = True
+    if equipment_gated:
+        res_data["equipmentGated"] = True
+    return res_data
 
 def get_all_tab_sections(doc_data):
     sections = []
@@ -818,6 +833,8 @@ def get_case_content_from_doc(doc_data, target_case_id, doc_equations=None):
         case_password = ''
         case_status = 'Active'
         case_duration_min = None
+        patient_info_gated = False
+        equipment_gated = False
         
         recording = False
         has_found_case = False
@@ -865,6 +882,8 @@ def get_case_content_from_doc(doc_data, target_case_id, doc_equations=None):
                         case_source = ""
                         case_password = ""
                         case_duration_min = None
+                        patient_info_gated = False
+                        equipment_gated = False
                         continue
                     elif recording:
                         res_obj = {
@@ -880,6 +899,10 @@ def get_case_content_from_doc(doc_data, target_case_id, doc_equations=None):
                         }
                         if case_duration_min:
                             res_obj["durationMin"] = case_duration_min
+                        if patient_info_gated:
+                            res_obj["patientInfoGated"] = True
+                        if equipment_gated:
+                            res_obj["equipmentGated"] = True
                         return res_obj
                 
                 if not recording:
@@ -919,13 +942,17 @@ def get_case_content_from_doc(doc_data, target_case_id, doc_equations=None):
                     clean_sec_header = re.sub(r"[\s\x0b\u00a0\u200b\u2003]*:\s*$", "", clean_sec_header).strip()
                     lower_h = clean_sec_header.lower()
                     
-                    # Strictly match ONLY the 5 official sections (no loose alternatives):
+                    # Strictly match ONLY the 5 official sections (plus gated suffix (ส่งโดยผู้ประเมิน)):
                     if clean_sec_header == 'สถานการณ์':
                         new_section = 'SCENARIO'
-                    elif clean_sec_header == 'ข้อมูลผู้ป่วย':
+                    elif re.match(r"^ข้อมูลผู้ป่วย(?:\s{0,}\(\s{0,}ส่งโดยผู้ประเมิน\s{0,}\))?$", clean_sec_header):
                         new_section = 'PATIENT_INFO'
-                    elif clean_sec_header == 'สิ่งที่มีให้ในสถานี':
+                        if 'ส่งโดยผู้ประเมิน' in clean_sec_header:
+                            patient_info_gated = True
+                    elif re.match(r"^(?:สิ่งที่มีให้ในสถานี|สิ่งที่มีให้|สิ่งที่ให้ในสถานี|สิ่งที่ให้|อุปกรณ์ในสถานี|อุปกรณ์|equipment)(?:\s{0,}\(\s{0,}ส่งโดยผู้ประเมิน\s{0,}\))?$", clean_sec_header, re.IGNORECASE):
                         new_section = 'EQUIPMENT'
+                        if 'ส่งโดยผู้ประเมิน' in clean_sec_header:
+                            equipment_gated = True
                     elif lower_h == 'checklist':
                         new_section = 'CHECKLIST'
                     elif clean_sec_header in ['ข้อมูลผู้ตรวจ', 'ข้อมูลผุ้ตรวจ']:
@@ -1079,6 +1106,10 @@ def get_case_content_from_doc(doc_data, target_case_id, doc_equations=None):
             }
             if case_duration_min:
                 res_obj["durationMin"] = case_duration_min
+            if patient_info_gated:
+                res_obj["patientInfoGated"] = True
+            if equipment_gated:
+                res_obj["equipmentGated"] = True
             return res_obj
             
     return None

@@ -1249,15 +1249,36 @@ async function fetchCaseDetail(caseId, forceLive = false) {
   const ospeId = cleanId.startsWith('OSPE-') ? cleanId : ('OSPE-' + cleanId);
   const rawId = cleanId.replace(/^OSPE-/i, '');
 
+  const altIds = [];
+  const numMatch = rawId.toUpperCase().match(/^([A-Z]+)0{0,}(\d+)$/);
+  if (numMatch) {
+    const pfx = numMatch[1];
+    const n = parseInt(numMatch[2], 10);
+    const pad1 = String(n);
+    const pad2 = String(n).padStart(2, '0');
+    const pad3 = String(n).padStart(3, '0');
+    [pad1, pad2, pad3].forEach(p => {
+      altIds.push(pfx + p, 'OSPE-' + pfx + p);
+    });
+  }
+
   // 1. Check local OFFLINE_CASE_DETAILS if loaded and not forceLive (0ms instant resolution)
   const offlineDict = (typeof OFFLINE_CASE_DETAILS !== 'undefined' && OFFLINE_CASE_DETAILS) || window.OFFLINE_CASE_DETAILS;
   if (!forceLive && offlineDict) {
-    const det = offlineDict[cleanId] || 
-                offlineDict[ospeId] || 
-                offlineDict[rawId] || 
-                offlineDict[cleanId.toUpperCase()] || 
-                offlineDict[ospeId.toUpperCase()] ||
-                offlineDict[rawId.toUpperCase()];
+    let det = offlineDict[cleanId] || 
+              offlineDict[ospeId] || 
+              offlineDict[rawId] || 
+              offlineDict[cleanId.toUpperCase()] || 
+              offlineDict[ospeId.toUpperCase()] ||
+              offlineDict[rawId.toUpperCase()];
+    if (!det && altIds.length > 0) {
+      for (const alt of altIds) {
+        if (offlineDict[alt]) {
+          det = offlineDict[alt];
+          break;
+        }
+      }
+    }
     if (det) {
       if (det.isEncrypted) {
         const curVer = (typeof DB_VERSION_STR !== 'undefined' ? DB_VERSION_STR : '') || (typeof OFFLINE_DATA !== 'undefined' ? OFFLINE_DATA.version : '');
@@ -1290,7 +1311,11 @@ async function fetchCaseDetail(caseId, forceLive = false) {
         }
         return det;
       }
-      const idx = AppState.cases.findIndex(c => c.caseId && (c.caseId.trim() === cleanId || c.caseId.trim() === ospeId || c.caseId.trim() === rawId));
+      const idx = AppState.cases.findIndex(c => {
+        if (!c.caseId) return false;
+        const u = c.caseId.trim().toUpperCase();
+        return u === cleanId.toUpperCase() || u === ospeId.toUpperCase() || u === rawId.toUpperCase() || altIds.includes(u);
+      });
       if (idx !== -1) {
         const merged = Object.assign({}, AppState.cases[idx]);
         Object.keys(det).forEach(k => {
@@ -2688,7 +2713,7 @@ if ('serviceWorker' in navigator && window.location.protocol !== 'file:') {
 const DB_NAME = 'RxCU_OSPE_DB';
 const DB_VERSION = 1;
 const STORE_NAME = 'case_details';
-const DB_VERSION_STR = 'v_20261019_203754'; // อัปเดตเวอร์ชันนี้เพื่อบังคับโหลดใหม่เมื่อมีเคสเพิ่มเติมในสคริปต์ออฟไลน์
+const DB_VERSION_STR = 'v_20261020_182804'; // อัปเดตเวอร์ชันนี้เพื่อบังคับโหลดใหม่เมื่อมีเคสเพิ่มเติมในสคริปต์ออฟไลน์
 
 function openIndexedDB() {
   return new Promise((resolve, reject) => {

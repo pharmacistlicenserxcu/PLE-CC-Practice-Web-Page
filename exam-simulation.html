@@ -2821,7 +2821,7 @@
                       <span>แบบยาว</span>
                     </button>
                   </div>
-                  <button class="btn danger" id="btn-finish-exam" onclick="finishExamSimulation()" style="padding: 5px 12px; font-size: 12.5px;">🏁 สิ้นสุดการสอบ</button>
+                  <button class="btn btn-danger" id="btn-finish-exam" onclick="finishExamSimulation()" style="padding: 5px 12px; font-size: 12.5px;">🏁 สิ้นสุดการสอบ</button>
                 </div>
               </div>
             </div>
@@ -10128,15 +10128,17 @@
 
       document.getElementById('btn-prev-station').disabled = idx === 0;
       const nextBtn = document.getElementById('btn-next-station');
-      if (idx === SimState.stations.length - 1) {
-        nextBtn.textContent = 'สิ้นสุดการสอบ 🏁';
-        nextBtn.className = 'btn btn-primary btn-danger';
-        nextBtn.onclick = finishExamSimulation;
-      } else {
+      if (nextBtn) {
         nextBtn.textContent = 'ถัดไป →';
-        const nextCat = SimState.stations[idx + 1]?.case?.category || 'clinic';
-        nextBtn.className = 'btn btn-primary btn-' + nextCat.toLowerCase();
         nextBtn.onclick = nextStation;
+        if (idx >= SimState.stations.length - 1) {
+          nextBtn.disabled = true;
+          nextBtn.className = 'btn outline';
+        } else {
+          nextBtn.disabled = false;
+          const nextCat = SimState.stations[idx + 1]?.case?.category || 'clinic';
+          nextBtn.className = 'btn btn-primary btn-' + nextCat.toLowerCase();
+        }
       }
 
       // Timer per station (solo only, lobby handled separately)

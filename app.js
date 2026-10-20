@@ -1996,14 +1996,16 @@ function renderCaseList() {
   
   AppState.filteredCases.forEach(c => {
     const isProtected = Boolean(c.isProtected || c.hasPassword);
-    const sourceBadge = c.source ? `<span class="case-card-tag" style="background: rgba(99, 102, 241, 0.12); color: var(--primary); font-weight: 600; border: 1px solid rgba(99, 102, 241, 0.25);">🏷️ ${c.source}</span>` : '';
+    const sourceBadge = c.source ? `<span class="case-card-tag" style="background: rgba(14, 116, 144, 0.10); color: var(--primary); font-weight: 600; border: 1px solid rgba(14, 116, 144, 0.25);">🏷️ ${c.source}</span>` : '';
     const lockBadge = isProtected ? `<span class="case-card-tag" style="background: rgba(239, 68, 68, 0.12); color: #ef4444; font-weight: 700; border: 1px solid rgba(239, 68, 68, 0.25);">🔒 ข้อสอบลับ</span>` : '';
     const durMin = Math.round(parseCaseDurationSec(c) / 60);
     const durationBadge = `<span class="case-card-tag" style="background: rgba(16, 185, 129, 0.12); color: #047857; border: 1px solid rgba(16, 185, 129, 0.3); font-weight: 600;">⏱ ${durMin} นาที</span>`;
     const displayTitle = isProtected ? `🔒 ${c.caseId}` : c.title;
 
     const card = document.createElement('div');
-    card.className = 'case-card';
+    const catKey = (c.category || 'clinic').toLowerCase();
+    card.className = `case-card case-cat-${catKey}`;
+    card.dataset.category = catKey;
     card.setAttribute('tabindex', '0');
     card.setAttribute('role', 'button');
     card.setAttribute('aria-label', `เปิดเคส ${c.caseId}: ${displayTitle}`);

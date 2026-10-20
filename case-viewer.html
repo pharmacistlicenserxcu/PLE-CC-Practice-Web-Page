@@ -6,7 +6,7 @@
   <title>ระบบตรวจวิเคราะห์เคส OSPE | RxCU</title>
   <meta name="description" content="ระบบตรวจวิเคราะห์เคส OSPE สำหรับฝึกทักษะการซักประวัติ ตรวจรักษา และประเมินเกณฑ์ Checklist">
   <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>💊</text></svg>">
-  <link rel="stylesheet" href="style.css?v=v_20261018_010000">
+  <link rel="stylesheet" href="style.css?v=v_20261020_230000">
   
   <style>
     /* สไตล์เพิ่มเติมสำหรับหน้าดูเคส */
@@ -445,7 +445,7 @@
       display: inline-flex;
       align-items: center;
       gap: 8px;
-      background: linear-gradient(135deg, var(--primary) 0%, #312e81 100%);
+      background: linear-gradient(135deg, var(--primary) 0%, #155E75 100%);
       color: #fff;
       border: 1.5px solid rgba(255,255,255,0.25);
       padding: 10px 18px;
@@ -454,15 +454,15 @@
       font-weight: 700;
       font-size: 0.92rem;
       cursor: pointer;
-      box-shadow: 0 8px 24px -4px rgba(79, 70, 229, 0.45);
+      box-shadow: 0 8px 24px -4px rgba(14, 116, 144, 0.42);
       transition: all 0.22s cubic-bezier(0.16, 1, 0.3, 1);
     }
     .unified-tools-fab:hover, .st-chat-trigger-btn:hover {
       transform: translateY(-2px) scale(1.03);
-      box-shadow: 0 12px 28px -4px rgba(79, 70, 229, 0.55);
+      box-shadow: 0 12px 28px -4px rgba(14, 116, 144, 0.52);
     }
     .unified-tools-fab.active {
-      background: linear-gradient(135deg, #1e1b4b 0%, #312e81 100%);
+      background: linear-gradient(135deg, #083344 0%, #155E75 100%);
       border-color: rgba(255,255,255,0.5);
     }
     .st-chat-badge {
@@ -504,7 +504,7 @@
       text-align: left;
     }
     .unified-tool-item:hover {
-      background: rgba(99, 102, 241, 0.09);
+      background: rgba(14, 116, 144, 0.09);
       border-color: var(--primary);
       transform: translateX(-2px);
     }
@@ -1031,7 +1031,7 @@
       transition: all 0.15s ease;
     }
     .st-chat-quick-chip:hover {
-      background: rgba(99, 102, 241, 0.12);
+      background: rgba(14, 116, 144, 0.12);
       border-color: var(--primary);
       color: var(--primary);
     }
@@ -1076,7 +1076,7 @@
       flex-shrink: 0;
       transition: background 0.15s ease, transform 0.1s ease;
     }
-    .st-chat-send-btn:hover { background: #4338ca; transform: scale(1.04); }
+    .st-chat-send-btn:hover { background: var(--primary-hover, #0891B2); transform: scale(1.04); }
     .st-chat-send-btn:active { transform: scale(0.96); }
     .st-chat-empty-hint {
       text-align: center;
@@ -1127,7 +1127,7 @@
         transform: translateX(-50%) !important;
         padding: 9px 20px !important;
         font-size: 0.88rem !important;
-        box-shadow: 0 10px 28px rgba(79, 70, 229, 0.45), 0 2px 8px rgba(0,0,0,0.18) !important;
+        box-shadow: 0 10px 28px rgba(14, 116, 144, 0.42), 0 2px 8px rgba(0,0,0,0.18) !important;
         backdrop-filter: blur(12px) !important;
         -webkit-backdrop-filter: blur(12px) !important;
         z-index: 10000 !important;
@@ -1279,13 +1279,19 @@
     </div>
     <div class="titles" style="display: flex; align-items: center; justify-content: center; gap: 8px; min-width: 0;">
       <div class="app-name" id="topbar-case-title" style="font-size: 13.5px; max-width: 480px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-weight: 700;">โหลดเคส...</div>
-      <div class="app-sub badge" id="topbar-case-meta" style="font-size: 11px; padding: 2px 8px; border-radius: 999px; background: rgba(99, 102, 241, 0.12); color: var(--primary); font-weight: 600; white-space: nowrap; flex-shrink: 0; margin: 0;"></div>
+      <div class="app-sub badge" id="topbar-case-meta" style="font-size: 11px; padding: 2px 8px; border-radius: 999px; background: rgba(14, 116, 144, 0.12); color: var(--primary); font-weight: 600; white-space: nowrap; flex-shrink: 0; margin: 0;"></div>
     </div>
     <div class="topbar-right">
-      <a href="handbook-library.html" class="icon-btn" title="📖 คู่มือทักษะสภาฯ">📖</a>
-      <a href="video-library.html" class="icon-btn" title="🎬 คลิปเทคนิค">🎬</a>
-      <button type="button" class="icon-btn" onclick="goToReportCase(event)" title="แจ้งปัญหาเคสนี้" id="report-case-direct-link" style="color: #dc2626; border-color: #fca5a5; background: #fef2f2; cursor: pointer;">🚨</button>
-      <button class="icon-btn" onclick="toggleFullscreen()" title="เต็มจอ">
+      <a href="handbook-library.html" class="icon-btn" title="คู่มือทักษะสภาฯ" aria-label="คู่มือทักษะสภาฯ">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>
+      </a>
+      <a href="video-library.html" class="icon-btn" title="คลิปเทคนิค" aria-label="คลิปเทคนิค">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="23 7 16 12 23 17 23 7"/><rect x="1" y="5" width="15" height="14" rx="2" ry="2"/></svg>
+      </a>
+      <button type="button" class="icon-btn" onclick="goToReportCase(event)" title="แจ้งปัญหาเคสนี้" aria-label="แจ้งปัญหาเคสนี้" id="report-case-direct-link" style="color: #dc2626; border-color: #fca5a5; background: #fef2f2; cursor: pointer;">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+      </button>
+      <button class="icon-btn" onclick="toggleFullscreen()" title="เต็มจอ" aria-label="เต็มจอ">
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 3 21 3 21 9"/><polyline points="9 21 3 21 3 15"/><line x1="21" y1="3" x2="14" y2="10"/><line x1="3" y1="21" x2="10" y2="14"/></svg>
       </button>
     </div>
@@ -1512,11 +1518,11 @@
           <div id="checklist-and-notes-section" class="no-print">
             <!-- Checklist Group Header with Reset Icon -->
             <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.75rem;">
-              <h3 class="viewer-section-title" style="margin: 0; border-left-color: var(--success);">
+              <h3 class="viewer-section-title accent-success" style="margin: 0;">
                 รายการทักษะประเมิน
               </h3>
-              <button type="button" class="btn btn-ghost" id="btn-reset-case-checklist" onclick="resetChecklistProgress()" title="รีเซ็ตการติ๊ก Checklist (ล้างคะแนนข้อนี้)" style="display: inline-flex; align-items: center; justify-content: center; width: 32px; height: 32px; padding: 0; border-radius: 50%; border: 1px solid var(--border); background: var(--surface); color: var(--text-secondary); cursor: pointer; transition: all 0.2s;" onmouseover="this.style.color='var(--primary)'; this.style.borderColor='var(--primary)';" onmouseout="this.style.color='var(--text-secondary)'; this.style.borderColor='var(--border)';">
-                🔄
+              <button type="button" class="btn btn-ghost" id="btn-reset-case-checklist" onclick="resetChecklistProgress()" title="รีเซ็ตการติ๊ก Checklist (ล้างคะแนนข้อนี้)" aria-label="รีเซ็ตการติ๊ก Checklist" style="display: inline-flex; align-items: center; justify-content: center; width: 36px; height: 36px; padding: 0; border-radius: 50%; border: 1px solid var(--border); background: var(--surface); color: var(--text-secondary); cursor: pointer; transition: all 0.2s;" onmouseover="this.style.color='var(--primary)'; this.style.borderColor='var(--primary)';" onmouseout="this.style.color='var(--text-secondary)'; this.style.borderColor='var(--border)';">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg>
               </button>
             </div>
             
@@ -1531,7 +1537,8 @@
               ⏩ ไปยังสถานีต่อเนื่อง (ถัดไป)
             </button>
             <button class="btn btn-secondary" style="width: 100%; padding: 0.65rem 1rem; font-size: 0.88rem; font-weight: 600; display: inline-flex; align-items: center; justify-content: center; gap: 0.5rem;" onclick="openSingleCasePrintModal()">
-              🖨️ พิมพ์เคสข้อสอบ (Print Case)
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>
+              <span>พิมพ์เคสข้อสอบ (Print Case)</span>
             </button>
           </div>
 
@@ -2199,7 +2206,7 @@
         ? diseaseTags.map(t => `<span class="case-card-tag" style="background: rgba(14, 165, 233, 0.08); color: #0284c7; border: 1px solid rgba(14, 165, 233, 0.25);">🩺 ${escapeHtml(t)}</span>`).join('') 
         : `<span class="case-card-tag">โรค/หัวข้อ: ${escapeHtml(c.disease || c.mainGroup || 'ความรู้หลัก')}</span>`;
       const authorVal = (c.author && c.author !== 'undefined') ? c.author : 'ไม่ระบุ';
-      const sourceVal = c.source ? `<span class="case-card-tag" style="background: rgba(99, 102, 241, 0.12); color: var(--primary); font-weight: 600; border: 1px solid rgba(99, 102, 241, 0.25);">🏷️ แหล่งที่มา: ${c.source}</span>` : '';
+      const sourceVal = c.source ? `<span class="case-card-tag" style="background: rgba(14, 116, 144, 0.12); color: var(--primary); font-weight: 600; border: 1px solid rgba(99, 102, 241, 0.25);">🏷️ แหล่งที่มา: ${c.source}</span>` : '';
       metaContainer.innerHTML += `
         ${diseaseBadges}
         ${sourceVal}

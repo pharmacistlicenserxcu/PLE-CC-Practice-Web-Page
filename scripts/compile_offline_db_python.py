@@ -670,20 +670,20 @@ def parse_table_template_to_case_data(table, target_case_id, inline_objects, lis
         val_cell = cells[1]
         val_text = get_cell_text(val_cell, tab_equations)
         
-        if any(x in key_text for x in ['โจทย์', 'scenario', 'สถานการณ์']):
+        if 'สถานการณ์' in key_text:
             content_html = parse_cell_to_html(val_cell, inline_objects, lists_dict, tab_equations)
             scenario = val_text.strip()
-        elif any(x in key_text for x in ['ข้อมูลผู้ป่วย', 'patient info']):
+        elif 'ข้อมูลผู้ป่วย' in key_text:
             patient_info_html = parse_cell_to_html(val_cell, inline_objects, lists_dict, tab_equations)
             if 'ส่งโดยผู้ประเมิน' in key_text:
                 patient_info_gated = True
-        elif any(x in key_text for x in ['สิ่งที่มีให้ในสถานี', 'สิ่งที่มีให้', 'อุปกรณ์']):
+        elif 'สิ่งที่มีให้ในสถานี' in key_text:
             equipment_html = parse_cell_to_html(val_cell, inline_objects, lists_dict, tab_equations)
             if 'ส่งโดยผู้ประเมิน' in key_text:
                 equipment_gated = True
-        elif any(x in key_text for x in ['เฉลย', 'หมายเหตุ', 'notes', 'ข้อมูลผู้ตรวจ']):
+        elif 'ข้อมูลผู้ตรวจ' in key_text:
             note_html = parse_cell_to_html(val_cell, inline_objects, lists_dict, tab_equations)
-        elif any(x in key_text for x in ['checklist', 'เกณฑ์ประเมิน']):
+        elif 'checklist' in key_text:
             current_group = 'ทั่วไป'
             is_current_subset_sequence = False
             for element in val_cell.get('content', []):
@@ -922,7 +922,7 @@ def get_case_content_from_doc(doc_data, target_case_id, doc_equations=None):
                     clean_sec_header.startswith('กลุ่ม:') or
                     (is_markdown_header and 'กลุ่ม:' in text_strip)
                 )
-                if is_explicit_group or ((text_strip.startswith('###') or is_heading_style) and current_section == 'CHECKLIST' and not any(x in lower_h for x in ['เฉลย', 'หมายเหตุ', 'ข้อมูลผู้ตรวจ', 'บทบาทผู้ป่วยจำลอง'])):
+                if is_explicit_group or ((text_strip.startswith('###') or is_heading_style) and current_section == 'CHECKLIST' and clean_sec_header != 'ข้อมูลผู้ตรวจ'):
                     current_section = 'CHECKLIST'
                     g_match = re.search(r"\(กลุ่ม:\s*([^)]+)\)", text_strip) or re.search(r"กลุ่ม:\s*(.*)$", text_strip)
                     if g_match:
@@ -949,13 +949,13 @@ def get_case_content_from_doc(doc_data, target_case_id, doc_equations=None):
                         new_section = 'PATIENT_INFO'
                         if 'ส่งโดยผู้ประเมิน' in clean_sec_header:
                             patient_info_gated = True
-                    elif re.match(r"^(?:สิ่งที่มีให้ในสถานี|สิ่งที่มีให้|สิ่งที่ให้ในสถานี|สิ่งที่ให้|อุปกรณ์ในสถานี|อุปกรณ์|equipment)(?:\s{0,}\(\s{0,}ส่งโดยผู้ประเมิน\s{0,}\))?$", clean_sec_header, re.IGNORECASE):
+                    elif re.match(r"^สิ่งที่มีให้ในสถานี(?:\s{0,}\(\s{0,}ส่งโดยผู้ประเมิน\s{0,}\))?$", clean_sec_header):
                         new_section = 'EQUIPMENT'
                         if 'ส่งโดยผู้ประเมิน' in clean_sec_header:
                             equipment_gated = True
                     elif lower_h == 'checklist':
                         new_section = 'CHECKLIST'
-                    elif clean_sec_header in ['ข้อมูลผู้ตรวจ', 'ข้อมูลผุ้ตรวจ']:
+                    elif clean_sec_header == 'ข้อมูลผู้ตรวจ':
                         new_section = 'NOTE'
                     elif clean_sec_header in ['ข้อมูลเคส', 'metadata']:
                         new_section = 'METADATA'

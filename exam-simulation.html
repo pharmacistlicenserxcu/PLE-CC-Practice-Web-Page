@@ -7,9 +7,9 @@
   <meta name="description" content="ระบบจำลองสอบ OSPE 16 สถานีเสมือนจริง พร้อมจับเวลา 4 นาที ติ๊ก Checklist และคำนวณผลคะแนน Leaderboard">
   <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>💊</text></svg>">
   <link rel="stylesheet" href="style.css?v=v_20261019_225500">
-  <script src="case-data-offline.js?v=v_20261020_222112"></script>
-  <script src="case-details-offline.js?v=v_20261020_222112"></script>
-  <script src="app.js?v=v_20261020_222112"></script>
+  <script src="case-data-offline.js?v=v_20261021_151719"></script>
+  <script src="case-details-offline.js?v=v_20261021_151719"></script>
+  <script src="app.js?v=v_20261021_151719"></script>
   <script src="scratchpad.js?v=20261004_201700"></script>
   <style>
     /* Simulation Source and Topic Selector */
@@ -9789,6 +9789,7 @@
       }
       const st = SimState.stations[idx];
       const c = st.case || {};
+      if (typeof sanitizeAndSplitTrappedEquipment === 'function') sanitizeAndSplitTrappedEquipment(c);
 
       // Switch the station chat FIRST so chat history, AI context, avatar and voice always
       // follow the active station, even if rendering code below throws on a malformed case.
@@ -9861,8 +9862,9 @@
       function stripSectionHeaders(str) {
         if (!str) return '';
         return str
-          .replace(/<p[^>]*>(?:\s*<[^>]+>)*\s*#+\s*(?:สถานการณ์|โจทย์|ข้อมูลผู้ป่วย|สิ่งที่มีให้|อุปกรณ์|Checklist|เกณฑ์ประเมิน|ข้อมูลผู้ตรวจ|เฉลย|หมายเหตุ|ข้อมูลเคส)[^<]*(?:<\/[^>]+>)*\s*<\/p>/gi, '')
-          .replace(/^#+\s*(?:สถานการณ์|โจทย์|ข้อมูลผู้ป่วย|สิ่งที่มีให้|อุปกรณ์|Checklist|เกณฑ์ประเมิน|ข้อมูลผู้ตรวจ|เฉลย|หมายเหตุ|ข้อมูลเคส)[^\n]*\n?/gim, '');
+          .replace(/<p[^>]*>(?:\s*<[^>]+>)*\s*(?:#+\s*)?(?:สถานการณ์|โจทย์|ข้อมูลผู้ป่วย|สิ่งที่มีให้ในสถานี|สิ่งที่มีให้|อุปกรณ์|Checklist|เกณฑ์ประเมิน|ข้อมูลผู้ตรวจ|เฉลย|หมายเหตุ|ข้อมูลเคส)(?:\s*\([^)]*\))?[^<]*(?:<\/[^>]+>)*\s*<\/p>/gi, '')
+          .replace(/<h[1-6][^>]*>(?:\s*<[^>]+>)*\s*(?:#+\s*)?(?:สถานการณ์|โจทย์|ข้อมูลผู้ป่วย|สิ่งที่มีให้ในสถานี|สิ่งที่มีให้|อุปกรณ์|Checklist|เกณฑ์ประเมิน|ข้อมูลผู้ตรวจ|เฉลย|หมายเหตุ|ข้อมูลเคส)(?:\s*\([^)]*\))?[^<]*(?:<\/[^>]+>)*\s*<\/h[1-6]>/gi, '')
+          .replace(/^(?:#+\s*)?(?:สถานการณ์|โจทย์|ข้อมูลผู้ป่วย|สิ่งที่มีให้ในสถานี|สิ่งที่มีให้|อุปกรณ์|Checklist|เกณฑ์ประเมิน|ข้อมูลผู้ตรวจ|เฉลย|หมายเหตุ|ข้อมูลเคส)(?:\s*\([^)]*\))?[^\n]*\n?/gim, '');
       }
 
       const rawScenario = stripSectionHeaders(c.contentHtml || (c.scenario ? `<p>${c.scenario}</p>` : ''));
@@ -19308,8 +19310,9 @@ ${caseContext || '(ยังไม่มีข้อมูลเคส)'}
       function stripSectionHeaders(str) {
         if (!str) return '';
         return str
-          .replace(/<p[^>]*>(?:\s*<[^>]+>)*\s*#+\s*(?:สถานการณ์|โจทย์|ข้อมูลผู้ป่วย|สิ่งที่มีให้|อุปกรณ์|Checklist|เกณฑ์ประเมิน|ข้อมูลผู้ตรวจ|เฉลย|หมายเหตุ|ข้อมูลเคส)[^<]*(?:<\/[^>]+>)*\s*<\/p>/gi, '')
-          .replace(/^#+\s*(?:สถานการณ์|โจทย์|ข้อมูลผู้ป่วย|สิ่งที่มีให้|อุปกรณ์|Checklist|เกณฑ์ประเมิน|ข้อมูลผู้ตรวจ|เฉลย|หมายเหตุ|ข้อมูลเคส)[^\n]*\n?/gim, '');
+          .replace(/<p[^>]*>(?:\s*<[^>]+>)*\s*(?:#+\s*)?(?:สถานการณ์|โจทย์|ข้อมูลผู้ป่วย|สิ่งที่มีให้ในสถานี|สิ่งที่มีให้|อุปกรณ์|Checklist|เกณฑ์ประเมิน|ข้อมูลผู้ตรวจ|เฉลย|หมายเหตุ|ข้อมูลเคส)(?:\s*\([^)]*\))?[^<]*(?:<\/[^>]+>)*\s*<\/p>/gi, '')
+          .replace(/<h[1-6][^>]*>(?:\s*<[^>]+>)*\s*(?:#+\s*)?(?:สถานการณ์|โจทย์|ข้อมูลผู้ป่วย|สิ่งที่มีให้ในสถานี|สิ่งที่มีให้|อุปกรณ์|Checklist|เกณฑ์ประเมิน|ข้อมูลผู้ตรวจ|เฉลย|หมายเหตุ|ข้อมูลเคส)(?:\s*\([^)]*\))?[^<]*(?:<\/[^>]+>)*\s*<\/h[1-6]>/gi, '')
+          .replace(/^(?:#+\s*)?(?:สถานการณ์|โจทย์|ข้อมูลผู้ป่วย|สิ่งที่มีให้ในสถานี|สิ่งที่มีให้|อุปกรณ์|Checklist|เกณฑ์ประเมิน|ข้อมูลผู้ตรวจ|เฉลย|หมายเหตุ|ข้อมูลเคส)(?:\s*\([^)]*\))?[^\n]*\n?/gim, '');
       }
 
       let scenarioHtml = stripSectionHeaders(c.contentHtml || (c.scenario ? `<p>${c.scenario}</p>` : ''));

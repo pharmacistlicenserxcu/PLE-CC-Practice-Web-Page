@@ -1562,9 +1562,9 @@
   </div><!-- /.page-viewport -->
 </div><!-- /.app-shell -->
 
-  <script src="case-data-offline.js?v=v_20261020_222112"></script>
-  <script src="case-details-offline.js?v=v_20261020_222112"></script>
-  <script src="app.js?v=v_20261020_222112"></script>
+  <script src="case-data-offline.js?v=v_20261021_151719"></script>
+  <script src="case-details-offline.js?v=v_20261021_151719"></script>
+  <script src="app.js?v=v_20261021_151719"></script>
   <script src="scratchpad.js?v=20261004_234400"></script>
   <script src="station-chat.js?v=v_20261019_150000"></script>
 
@@ -2076,6 +2076,8 @@
     }
 
     function renderCaseDetail(c) {
+      if (!c) return;
+      if (typeof sanitizeAndSplitTrappedEquipment === 'function') sanitizeAndSplitTrappedEquipment(c);
       const caseId = c.caseId || activeCaseId || '';
 
       // หากเคสที่ถูก decrypt หรือโหลดมาไม่มี durationMin ให้ดึงจาก baseCase หรือ OFFLINE_DATA
@@ -2217,8 +2219,9 @@
       function stripSectionHeaders(str) {
         if (!str) return '';
         return str
-          .replace(/<p[^>]*>(?:\s*<[^>]+>)*\s*#+\s*(?:สถานการณ์|โจทย์|ข้อมูลผู้ป่วย|สิ่งที่มีให้|อุปกรณ์|Checklist|เกณฑ์ประเมิน|ข้อมูลผู้ตรวจ|เฉลย|หมายเหตุ|ข้อมูลเคส)[^<]*(?:<\/[^>]+>)*\s*<\/p>/gi, '')
-          .replace(/^#+\s*(?:สถานการณ์|โจทย์|ข้อมูลผู้ป่วย|สิ่งที่มีให้|อุปกรณ์|Checklist|เกณฑ์ประเมิน|ข้อมูลผู้ตรวจ|เฉลย|หมายเหตุ|ข้อมูลเคส)[^\n]*\n?/gim, '');
+          .replace(/<p[^>]*>(?:\s*<[^>]+>)*\s*(?:#+\s*)?(?:สถานการณ์|โจทย์|ข้อมูลผู้ป่วย|สิ่งที่มีให้ในสถานี|สิ่งที่มีให้|อุปกรณ์|Checklist|เกณฑ์ประเมิน|ข้อมูลผู้ตรวจ|เฉลย|หมายเหตุ|ข้อมูลเคส)(?:\s*\([^)]*\))?[^<]*(?:<\/[^>]+>)*\s*<\/p>/gi, '')
+          .replace(/<h[1-6][^>]*>(?:\s*<[^>]+>)*\s*(?:#+\s*)?(?:สถานการณ์|โจทย์|ข้อมูลผู้ป่วย|สิ่งที่มีให้ในสถานี|สิ่งที่มีให้|อุปกรณ์|Checklist|เกณฑ์ประเมิน|ข้อมูลผู้ตรวจ|เฉลย|หมายเหตุ|ข้อมูลเคส)(?:\s*\([^)]*\))?[^<]*(?:<\/[^>]+>)*\s*<\/h[1-6]>/gi, '')
+          .replace(/^(?:#+\s*)?(?:สถานการณ์|โจทย์|ข้อมูลผู้ป่วย|สิ่งที่มีให้ในสถานี|สิ่งที่มีให้|อุปกรณ์|Checklist|เกณฑ์ประเมิน|ข้อมูลผู้ตรวจ|เฉลย|หมายเหตุ|ข้อมูลเคส)(?:\s*\([^)]*\))?[^\n]*\n?/gim, '');
       }
 
       // Render Scenario & Patient Info

@@ -1163,13 +1163,33 @@ window.buildPrintChecklistTable = buildPrintChecklistTable;
 function stripSectionHeaders(str) {
   if (!str) return '';
   return str
-    .replace(/<p[^>]*>(?:\s*<[^>]+>)*\s*#+\s*(?:สถานการณ์|โจทย์|ข้อมูลผู้ป่วย|สิ่งที่มีให้|อุปกรณ์|Checklist|เกณฑ์ประเมิน|ข้อมูลผู้ตรวจ|เฉลย|หมายเหตุ|ข้อมูลเคส)[^<]*(?:<\/[^>]+>)*\s*<\/p>/gi, '')
-    .replace(/^#+\s*(?:สถานการณ์|โจทย์|ข้อมูลผู้ป่วย|สิ่งที่มีให้|อุปกรณ์|Checklist|เกณฑ์ประเมิน|ข้อมูลผู้ตรวจ|เฉลย|หมายเหตุ|ข้อมูลเคส)[^\n]*\n?/gim, '');
+    .replace(/<p[^>]*>(?:\s*<[^>]+>)*\s*(?:#+\s*)?(?:สถานการณ์|โจทย์|ข้อมูลผู้ป่วย|สิ่งที่มีให้ในสถานี|สิ่งที่มีให้|อุปกรณ์|Checklist|เกณฑ์ประเมิน|ข้อมูลผู้ตรวจ|เฉลย|หมายเหตุ|ข้อมูลเคส)(?:\s*\([^)]*\))?[^<]*(?:<\/[^>]+>)*\s*<\/p>/gi, '')
+    .replace(/<h[1-6][^>]*>(?:\s*<[^>]+>)*\s*(?:#+\s*)?(?:สถานการณ์|โจทย์|ข้อมูลผู้ป่วย|สิ่งที่มีให้ในสถานี|สิ่งที่มีให้|อุปกรณ์|Checklist|เกณฑ์ประเมิน|ข้อมูลผู้ตรวจ|เฉลย|หมายเหตุ|ข้อมูลเคส)(?:\s*\([^)]*\))?[^<]*(?:<\/[^>]+>)*\s*<\/h[1-6]>/gi, '')
+    .replace(/^(?:#+\s*)?(?:สถานการณ์|โจทย์|ข้อมูลผู้ป่วย|สิ่งที่มีให้ในสถานี|สิ่งที่มีให้|อุปกรณ์|Checklist|เกณฑ์ประเมิน|ข้อมูลผู้ตรวจ|เฉลย|หมายเหตุ|ข้อมูลเคส)(?:\s*\([^)]*\))?[^\n]*\n?/gim, '');
 }
+window.stripSectionHeaders = stripSectionHeaders;
+
+function sanitizeAndSplitTrappedEquipment(c) {
+  if (!c) return;
+  if (!c.equipmentHtml && c.patientInfoHtml && /(?:สิ่งที่มีให้ในสถานี|สิ่งที่มีให้)/i.test(c.patientInfoHtml)) {
+    const eqRegex = /<p[^>]*>(?:\s*<[^>]+>)*\s*(?:#+\s*)?(?:สิ่งที่มีให้ในสถานี|สิ่งที่มีให้)(?:\s*\(\s*ส่งโดยผู้ประเมิน\s*\))?[^<]*(?:<\/[^>]+>)*\s*<\/p>/i;
+    const match = c.patientInfoHtml.search(eqRegex);
+    if (match !== -1) {
+      const equipPart = c.patientInfoHtml.slice(match);
+      if (/(?:ส่งโดยผู้ประเมิน)/i.test(equipPart.slice(0, 300))) {
+        c.equipmentGated = true;
+      }
+      c.equipmentHtml = equipPart;
+      c.patientInfoHtml = c.patientInfoHtml.slice(0, match);
+    }
+  }
+}
+window.sanitizeAndSplitTrappedEquipment = sanitizeAndSplitTrappedEquipment;
 window.stripSectionHeaders = stripSectionHeaders;
 
 function isPatientInfoGated(c) {
   if (!c) return false;
+  sanitizeAndSplitTrappedEquipment(c);
   if (c.patientInfoGated === true) return true;
   if (c.patientInfoHtml && /ข้อมูลผู้ป่วย\s*\(\s*ส่งโดยผู้ประเมิน\s*\)/.test(c.patientInfoHtml)) return true;
   return false;
@@ -1178,6 +1198,7 @@ window.isPatientInfoGated = isPatientInfoGated;
 
 function isEquipmentGated(c) {
   if (!c) return false;
+  sanitizeAndSplitTrappedEquipment(c);
   if (c.equipmentGated === true) return true;
   if (c.equipmentHtml && /(?:สิ่งที่มีให้ในสถานี|สิ่งที่มีให้)\s*\(\s*ส่งโดยผู้ประเมิน\s*\)/.test(c.equipmentHtml)) return true;
   return false;
@@ -1186,6 +1207,7 @@ window.isEquipmentGated = isEquipmentGated;
 
 function getFormattedCaseScenarioHtml(c) {
   if (!c) return '<p>ไม่มีข้อมูลสถานการณ์</p>';
+  sanitizeAndSplitTrappedEquipment(c);
   let raw = c.contentHtml || '';
   if (!raw && c.scenario) {
     raw = /<[a-z][\s\S]*>/i.test(c.scenario) ? c.scenario : `<p>${c.scenario.replace(/\r?\n/g, '<br>')}</p>`;
@@ -1202,6 +1224,7 @@ window.getFormattedCaseScenarioHtml = getFormattedCaseScenarioHtml;
 
 function getFormattedCasePatientHtml(c) {
   if (!c) return '';
+  sanitizeAndSplitTrappedEquipment(c);
   let raw = c.patientInfoHtml || '';
   if (!raw && typeof document !== 'undefined' && document.getElementById('case-patient-content')) {
     raw = document.getElementById('case-patient-content').innerHTML;
@@ -1220,6 +1243,7 @@ window.getFormattedCasePatientHtml = getFormattedCasePatientHtml;
 
 function getFormattedCaseEquipmentHtml(c) {
   if (!c) return '';
+  sanitizeAndSplitTrappedEquipment(c);
   let raw = c.equipmentHtml || '';
   if (!raw && typeof document !== 'undefined' && document.getElementById('case-equipment-content')) {
     raw = document.getElementById('case-equipment-content').innerHTML;
@@ -2715,7 +2739,7 @@ if ('serviceWorker' in navigator && window.location.protocol !== 'file:') {
 const DB_NAME = 'RxCU_OSPE_DB';
 const DB_VERSION = 1;
 const STORE_NAME = 'case_details';
-const DB_VERSION_STR = 'v_20261020_222112'; // อัปเดตเวอร์ชันนี้เพื่อบังคับโหลดใหม่เมื่อมีเคสเพิ่มเติมในสคริปต์ออฟไลน์
+const DB_VERSION_STR = 'v_20261021_151719'; // อัปเดตเวอร์ชันนี้เพื่อบังคับโหลดใหม่เมื่อมีเคสเพิ่มเติมในสคริปต์ออฟไลน์
 
 function openIndexedDB() {
   return new Promise((resolve, reject) => {

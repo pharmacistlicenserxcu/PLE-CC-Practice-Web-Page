@@ -646,11 +646,11 @@ function initApiConfig() {
   // No-op
 }
 
-// Helper ตรวจสอบความพร้อมของเคส (Active vs Unactive)
+// Helper ตรวจสอบความพร้อมของเคส (Active vs Inactive / Unactive)
 function isCaseActive(c) {
   if (!c) return false;
   if (c.isActive === false || c.isActive === 'FALSE' || String(c.isActive).toUpperCase() === 'FALSE') return false;
-  if (c.caseStatus && (String(c.caseStatus).toLowerCase() === 'unactive' || String(c.caseStatus).toLowerCase() === 'inactive')) return false;
+  if (c.caseStatus && ['inactive', 'unactive'].includes(String(c.caseStatus).trim().toLowerCase())) return false;
   // Realtime kill-switch: ตรวจสอบ Set ที่ sync จาก Google Sheet แบบ realtime
   if (typeof realtimeInactiveSet !== 'undefined' && realtimeInactiveSet.has && c.caseId && realtimeInactiveSet.has(c.caseId)) return false;
   return true;

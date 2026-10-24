@@ -549,7 +549,7 @@ const OFFLINE_DATA = {
       "createdDate": "26/07/2026",
       "source": "ข้อสอบจริง ปี 2554",
       "isActive": false,
-      "caseStatus": "Unactive",
+      "caseStatus": "Inactive",
       "linkedNextCase": "",
       "linkedFromCase": ""
     },
@@ -940,7 +940,7 @@ const OFFLINE_DATA = {
       "createdDate": "03/08/2026",
       "source": "ข้อสอบจริง ปี 2555",
       "isActive": false,
-      "caseStatus": "Unactive",
+      "caseStatus": "Inactive",
       "linkedNextCase": "",
       "linkedFromCase": ""
     },
@@ -1603,7 +1603,7 @@ const OFFLINE_DATA = {
       "createdDate": "16/07/2026 (วันที่เขียน)",
       "source": "ข้อสอบจริง ปี 2560",
       "isActive": false,
-      "caseStatus": "Unactive",
+      "caseStatus": "Inactive",
       "linkedNextCase": "",
       "linkedFromCase": ""
     },
@@ -1858,7 +1858,7 @@ const OFFLINE_DATA = {
       "createdDate": "02/08/2026",
       "source": "ข้อสอบจริง ปี 2561",
       "isActive": false,
-      "caseStatus": "Unactive",
+      "caseStatus": "Inactive",
       "linkedNextCase": "",
       "linkedFromCase": ""
     },
@@ -1875,7 +1875,7 @@ const OFFLINE_DATA = {
       "createdDate": "02/08/2026",
       "source": "ข้อสอบจริง ปี 2561",
       "isActive": false,
-      "caseStatus": "Unactive",
+      "caseStatus": "Inactive",
       "linkedNextCase": "",
       "linkedFromCase": ""
     },
@@ -2045,7 +2045,7 @@ const OFFLINE_DATA = {
       "createdDate": "3/8/69",
       "source": "ข้อสอบจริง ปี 2566",
       "isActive": false,
-      "caseStatus": "Unactive",
+      "caseStatus": "Inactive",
       "linkedNextCase": "",
       "linkedFromCase": ""
     },
@@ -2062,7 +2062,7 @@ const OFFLINE_DATA = {
       "createdDate": "3/8/69",
       "source": "ข้อสอบจริง ปี 2566",
       "isActive": false,
-      "caseStatus": "Unactive",
+      "caseStatus": "Inactive",
       "linkedNextCase": "",
       "linkedFromCase": ""
     },
@@ -2079,7 +2079,7 @@ const OFFLINE_DATA = {
       "createdDate": "3/8/69",
       "source": "ข้อสอบจริง ปี 2566",
       "isActive": false,
-      "caseStatus": "Unactive",
+      "caseStatus": "Inactive",
       "linkedNextCase": "",
       "linkedFromCase": ""
     },
@@ -2181,7 +2181,7 @@ const OFFLINE_DATA = {
       "createdDate": "3/8/69",
       "source": "ข้อสอบจริง ปี 2568",
       "isActive": false,
-      "caseStatus": "Unactive",
+      "caseStatus": "Inactive",
       "linkedNextCase": "",
       "linkedFromCase": ""
     },
@@ -2198,7 +2198,7 @@ const OFFLINE_DATA = {
       "createdDate": "3/8/69",
       "source": "ข้อสอบจริง ปี 2568",
       "isActive": false,
-      "caseStatus": "Unactive",
+      "caseStatus": "Inactive",
       "linkedNextCase": "",
       "linkedFromCase": ""
     },
@@ -2232,7 +2232,7 @@ const OFFLINE_DATA = {
       "createdDate": "3/8/69",
       "source": "ข้อสอบจริง ปี 2568",
       "isActive": false,
-      "caseStatus": "Unactive",
+      "caseStatus": "Inactive",
       "linkedNextCase": "",
       "linkedFromCase": ""
     },
@@ -2640,7 +2640,7 @@ const OFFLINE_DATA = {
       "createdDate": "30/09/2026",
       "source": "Practice RxCU84 Clinic ครั้งที่ 1",
       "isActive": false,
-      "caseStatus": "Unactive",
+      "caseStatus": "Inactive",
       "linkedNextCase": "",
       "linkedFromCase": ""
     },
@@ -2657,7 +2657,7 @@ const OFFLINE_DATA = {
       "createdDate": "30/09/2026",
       "source": "Practice RxCU84 Clinic ครั้งที่ 1",
       "isActive": false,
-      "caseStatus": "Unactive",
+      "caseStatus": "Inactive",
       "linkedNextCase": "",
       "linkedFromCase": ""
     },
@@ -2674,7 +2674,7 @@ const OFFLINE_DATA = {
       "createdDate": "30/09/2026",
       "source": "Practice RxCU84 Clinic ครั้งที่ 1",
       "isActive": false,
-      "caseStatus": "Unactive",
+      "caseStatus": "Inactive",
       "linkedNextCase": "",
       "linkedFromCase": ""
     },
@@ -2691,7 +2691,7 @@ const OFFLINE_DATA = {
       "createdDate": "30/09/2026",
       "source": "Practice RxCU84 Clinic ครั้งที่ 1",
       "isActive": false,
-      "caseStatus": "Unactive",
+      "caseStatus": "Inactive",
       "linkedNextCase": "",
       "linkedFromCase": ""
     },
@@ -2708,7 +2708,7 @@ const OFFLINE_DATA = {
       "createdDate": "30/09/2026",
       "source": "Practice RxCU84 Clinic ครั้งที่ 1",
       "isActive": false,
-      "caseStatus": "Unactive",
+      "caseStatus": "Inactive",
       "linkedNextCase": "",
       "linkedFromCase": ""
     },
@@ -2725,7 +2725,7 @@ const OFFLINE_DATA = {
       "createdDate": "30/09/2026",
       "source": "Practice RxCU84 Clinic ครั้งที่ 1",
       "isActive": false,
-      "caseStatus": "Unactive",
+      "caseStatus": "Inactive",
       "linkedNextCase": "",
       "linkedFromCase": ""
     },
@@ -2742,7 +2742,7 @@ const OFFLINE_DATA = {
       "createdDate": "30/09/2026",
       "source": "Practice RxCU84 Clinic ครั้งที่ 1",
       "isActive": false,
-      "caseStatus": "Unactive",
+      "caseStatus": "Inactive",
       "linkedNextCase": "",
       "linkedFromCase": ""
     },
@@ -2759,7 +2759,7 @@ const OFFLINE_DATA = {
       "createdDate": "30/09/2026",
       "source": "Practice RxCU84 Clinic ครั้งที่ 1",
       "isActive": false,
-      "caseStatus": "Unactive",
+      "caseStatus": "Inactive",
       "linkedNextCase": "",
       "linkedFromCase": ""
     },
@@ -2776,7 +2776,7 @@ const OFFLINE_DATA = {
       "createdDate": "30/09/2026",
       "source": "Practice RxCU84 Clinic ครั้งที่ 1",
       "isActive": false,
-      "caseStatus": "Unactive",
+      "caseStatus": "Inactive",
       "linkedNextCase": "",
       "linkedFromCase": ""
     },
@@ -2793,7 +2793,7 @@ const OFFLINE_DATA = {
       "createdDate": "30/09/2026",
       "source": "Practice RxCU84 Clinic ครั้งที่ 1",
       "isActive": false,
-      "caseStatus": "Unactive",
+      "caseStatus": "Inactive",
       "linkedNextCase": "",
       "linkedFromCase": ""
     },
@@ -2810,7 +2810,7 @@ const OFFLINE_DATA = {
       "createdDate": "30/09/2026",
       "source": "Practice RxCU84 Clinic ครั้งที่ 1",
       "isActive": false,
-      "caseStatus": "Unactive",
+      "caseStatus": "Inactive",
       "linkedNextCase": "",
       "linkedFromCase": ""
     },
@@ -2827,7 +2827,7 @@ const OFFLINE_DATA = {
       "createdDate": "30/09/2026",
       "source": "Practice RxCU84 Clinic ครั้งที่ 1",
       "isActive": false,
-      "caseStatus": "Unactive",
+      "caseStatus": "Inactive",
       "linkedNextCase": "",
       "linkedFromCase": ""
     },
@@ -2844,7 +2844,7 @@ const OFFLINE_DATA = {
       "createdDate": "30/09/2026",
       "source": "Practice RxCU84 Clinic ครั้งที่ 1",
       "isActive": false,
-      "caseStatus": "Unactive",
+      "caseStatus": "Inactive",
       "linkedNextCase": "",
       "linkedFromCase": ""
     },
@@ -2861,7 +2861,7 @@ const OFFLINE_DATA = {
       "createdDate": "30/09/2026",
       "source": "Practice RxCU84 Clinic ครั้งที่ 1",
       "isActive": false,
-      "caseStatus": "Unactive",
+      "caseStatus": "Inactive",
       "linkedNextCase": "",
       "linkedFromCase": ""
     },
@@ -2878,7 +2878,7 @@ const OFFLINE_DATA = {
       "createdDate": "30/09/2026",
       "source": "Practice RxCU84 Clinic ครั้งที่ 1",
       "isActive": false,
-      "caseStatus": "Unactive",
+      "caseStatus": "Inactive",
       "linkedNextCase": "",
       "linkedFromCase": ""
     },
@@ -2895,7 +2895,7 @@ const OFFLINE_DATA = {
       "createdDate": "30/09/2026",
       "source": "Practice RxCU84 Clinic ครั้งที่ 1",
       "isActive": false,
-      "caseStatus": "Unactive",
+      "caseStatus": "Inactive",
       "linkedNextCase": "",
       "linkedFromCase": ""
     },
@@ -2912,7 +2912,7 @@ const OFFLINE_DATA = {
       "createdDate": "30/09/2026",
       "source": "Practice RxCU84 Clinic ครั้งที่ 1",
       "isActive": false,
-      "caseStatus": "Unactive",
+      "caseStatus": "Inactive",
       "linkedNextCase": "",
       "linkedFromCase": ""
     },
@@ -2929,7 +2929,7 @@ const OFFLINE_DATA = {
       "createdDate": "30/09/2026",
       "source": "Practice RxCU84 Clinic ครั้งที่ 1",
       "isActive": false,
-      "caseStatus": "Unactive",
+      "caseStatus": "Inactive",
       "linkedNextCase": "",
       "linkedFromCase": ""
     },
@@ -2946,7 +2946,7 @@ const OFFLINE_DATA = {
       "createdDate": "30/09/2026",
       "source": "Practice RxCU84 Clinic ครั้งที่ 1",
       "isActive": false,
-      "caseStatus": "Unactive",
+      "caseStatus": "Inactive",
       "linkedNextCase": "",
       "linkedFromCase": ""
     },
@@ -2963,7 +2963,7 @@ const OFFLINE_DATA = {
       "createdDate": "30/09/2026",
       "source": "Practice RxCU84 Clinic ครั้งที่ 1",
       "isActive": false,
-      "caseStatus": "Unactive",
+      "caseStatus": "Inactive",
       "linkedNextCase": "",
       "linkedFromCase": ""
     },
@@ -2980,7 +2980,7 @@ const OFFLINE_DATA = {
       "createdDate": "30/09/2026",
       "source": "Practice RxCU84 Clinic ครั้งที่ 1",
       "isActive": false,
-      "caseStatus": "Unactive",
+      "caseStatus": "Inactive",
       "linkedNextCase": "",
       "linkedFromCase": ""
     },
@@ -2997,7 +2997,7 @@ const OFFLINE_DATA = {
       "createdDate": "30/09/2026",
       "source": "Practice RxCU84 Clinic ครั้งที่ 1",
       "isActive": false,
-      "caseStatus": "Unactive",
+      "caseStatus": "Inactive",
       "linkedNextCase": "",
       "linkedFromCase": ""
     },
@@ -3014,7 +3014,7 @@ const OFFLINE_DATA = {
       "createdDate": "30/09/2026",
       "source": "Practice RxCU84 Clinic ครั้งที่ 1",
       "isActive": false,
-      "caseStatus": "Unactive",
+      "caseStatus": "Inactive",
       "linkedNextCase": "",
       "linkedFromCase": ""
     },
@@ -3031,7 +3031,7 @@ const OFFLINE_DATA = {
       "createdDate": "30/09/2026",
       "source": "Practice RxCU84 Clinic ครั้งที่ 1",
       "isActive": false,
-      "caseStatus": "Unactive",
+      "caseStatus": "Inactive",
       "linkedNextCase": "",
       "linkedFromCase": ""
     },
@@ -3048,7 +3048,7 @@ const OFFLINE_DATA = {
       "createdDate": "30/09/2026",
       "source": "Practice RxCU84 Clinic ครั้งที่ 1",
       "isActive": false,
-      "caseStatus": "Unactive",
+      "caseStatus": "Inactive",
       "linkedNextCase": "",
       "linkedFromCase": ""
     },
@@ -3065,7 +3065,7 @@ const OFFLINE_DATA = {
       "createdDate": "30/09/2026",
       "source": "Practice RxCU84 Clinic ครั้งที่ 1",
       "isActive": false,
-      "caseStatus": "Unactive",
+      "caseStatus": "Inactive",
       "linkedNextCase": "",
       "linkedFromCase": ""
     },
@@ -3082,7 +3082,7 @@ const OFFLINE_DATA = {
       "createdDate": "30/09/2026",
       "source": "Practice RxCU84 Clinic ครั้งที่ 1",
       "isActive": false,
-      "caseStatus": "Unactive",
+      "caseStatus": "Inactive",
       "linkedNextCase": "",
       "linkedFromCase": ""
     },
@@ -3099,7 +3099,7 @@ const OFFLINE_DATA = {
       "createdDate": "30/09/2026",
       "source": "Practice RxCU84 Clinic ครั้งที่ 1",
       "isActive": false,
-      "caseStatus": "Unactive",
+      "caseStatus": "Inactive",
       "linkedNextCase": "",
       "linkedFromCase": ""
     },
@@ -3116,7 +3116,7 @@ const OFFLINE_DATA = {
       "createdDate": "30/09/2026",
       "source": "Practice RxCU84 Clinic ครั้งที่ 1",
       "isActive": false,
-      "caseStatus": "Unactive",
+      "caseStatus": "Inactive",
       "linkedNextCase": "",
       "linkedFromCase": ""
     },
@@ -3133,7 +3133,7 @@ const OFFLINE_DATA = {
       "createdDate": "30/09/2026",
       "source": "Practice RxCU84 Clinic ครั้งที่ 1",
       "isActive": false,
-      "caseStatus": "Unactive",
+      "caseStatus": "Inactive",
       "linkedNextCase": "",
       "linkedFromCase": ""
     },
@@ -3150,7 +3150,7 @@ const OFFLINE_DATA = {
       "createdDate": "30/09/2026",
       "source": "Practice RxCU84 Clinic ครั้งที่ 1",
       "isActive": false,
-      "caseStatus": "Unactive",
+      "caseStatus": "Inactive",
       "linkedNextCase": "",
       "linkedFromCase": ""
     },
@@ -3167,7 +3167,7 @@ const OFFLINE_DATA = {
       "createdDate": "30/09/2026",
       "source": "Practice RxCU84 Clinic ครั้งที่ 1",
       "isActive": false,
-      "caseStatus": "Unactive",
+      "caseStatus": "Inactive",
       "linkedNextCase": "",
       "linkedFromCase": ""
     },
@@ -3184,7 +3184,7 @@ const OFFLINE_DATA = {
       "createdDate": "30/09/2026",
       "source": "Practice RxCU84 Clinic ครั้งที่ 1",
       "isActive": false,
-      "caseStatus": "Unactive",
+      "caseStatus": "Inactive",
       "linkedNextCase": "",
       "linkedFromCase": ""
     },
@@ -3201,7 +3201,7 @@ const OFFLINE_DATA = {
       "createdDate": "30/09/2026",
       "source": "Practice RxCU84 Clinic ครั้งที่ 1",
       "isActive": false,
-      "caseStatus": "Unactive",
+      "caseStatus": "Inactive",
       "linkedNextCase": "",
       "linkedFromCase": ""
     },
@@ -3218,7 +3218,7 @@ const OFFLINE_DATA = {
       "createdDate": "30/09/2026",
       "source": "Practice RxCU84 Clinic ครั้งที่ 1",
       "isActive": false,
-      "caseStatus": "Unactive",
+      "caseStatus": "Inactive",
       "linkedNextCase": "",
       "linkedFromCase": ""
     },
@@ -3235,7 +3235,7 @@ const OFFLINE_DATA = {
       "createdDate": "30/09/2026",
       "source": "Practice RxCU84 Clinic ครั้งที่ 1",
       "isActive": false,
-      "caseStatus": "Unactive",
+      "caseStatus": "Inactive",
       "linkedNextCase": "",
       "linkedFromCase": ""
     },
@@ -3252,7 +3252,7 @@ const OFFLINE_DATA = {
       "createdDate": "30/09/2026",
       "source": "Practice RxCU84 Clinic ครั้งที่ 1",
       "isActive": false,
-      "caseStatus": "Unactive",
+      "caseStatus": "Inactive",
       "linkedNextCase": "",
       "linkedFromCase": ""
     },
@@ -3269,7 +3269,7 @@ const OFFLINE_DATA = {
       "createdDate": "30/09/2026",
       "source": "Practice RxCU84 Clinic ครั้งที่ 1",
       "isActive": false,
-      "caseStatus": "Unactive",
+      "caseStatus": "Inactive",
       "linkedNextCase": "",
       "linkedFromCase": ""
     },
@@ -3286,7 +3286,7 @@ const OFFLINE_DATA = {
       "createdDate": "30/09/2026",
       "source": "Practice RxCU84 Clinic ครั้งที่ 1",
       "isActive": false,
-      "caseStatus": "Unactive",
+      "caseStatus": "Inactive",
       "linkedNextCase": "",
       "linkedFromCase": ""
     },
@@ -3303,7 +3303,7 @@ const OFFLINE_DATA = {
       "createdDate": "30/09/2026",
       "source": "Practice RxCU84 Clinic ครั้งที่ 1",
       "isActive": false,
-      "caseStatus": "Unactive",
+      "caseStatus": "Inactive",
       "linkedNextCase": "",
       "linkedFromCase": ""
     },
@@ -3320,7 +3320,7 @@ const OFFLINE_DATA = {
       "createdDate": "30/09/2026",
       "source": "Practice RxCU84 Clinic ครั้งที่ 1",
       "isActive": false,
-      "caseStatus": "Unactive",
+      "caseStatus": "Inactive",
       "linkedNextCase": "",
       "linkedFromCase": ""
     },
@@ -3881,7 +3881,7 @@ const OFFLINE_DATA = {
       "createdDate": "30/09/2026",
       "source": "Practice RxCU84 Clinic ครั้งที่ 1",
       "isActive": false,
-      "caseStatus": "Unactive",
+      "caseStatus": "Inactive",
       "linkedNextCase": "",
       "linkedFromCase": ""
     },
@@ -3898,7 +3898,7 @@ const OFFLINE_DATA = {
       "createdDate": "30/09/2026",
       "source": "Practice RxCU84 Clinic ครั้งที่ 1",
       "isActive": false,
-      "caseStatus": "Unactive",
+      "caseStatus": "Inactive",
       "linkedNextCase": "",
       "linkedFromCase": ""
     },
@@ -3915,7 +3915,7 @@ const OFFLINE_DATA = {
       "createdDate": "30/09/2026",
       "source": "Practice RxCU84 Clinic ครั้งที่ 1",
       "isActive": false,
-      "caseStatus": "Unactive",
+      "caseStatus": "Inactive",
       "linkedNextCase": "",
       "linkedFromCase": ""
     },
@@ -3932,7 +3932,7 @@ const OFFLINE_DATA = {
       "createdDate": "30/09/2026",
       "source": "Practice RxCU84 Clinic ครั้งที่ 1",
       "isActive": false,
-      "caseStatus": "Unactive",
+      "caseStatus": "Inactive",
       "linkedNextCase": "",
       "linkedFromCase": ""
     },

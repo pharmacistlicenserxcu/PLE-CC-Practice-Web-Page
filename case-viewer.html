@@ -2182,8 +2182,9 @@
           metaContainer.innerHTML += `<span class="badge tag-badge">#${t}</span>`;
         });
       }
-      if (c.isActive === false || String(c.isActive).toUpperCase() === 'FALSE' || c.caseStatus === 'Unactive') {
-        metaContainer.innerHTML += `<span class="badge" style="background: #ffebee; color: #c62828; border: 1px solid #ef9a9a; font-weight: 600;">⚠️ Unactive (เคสอยู่ระหว่างปรับปรุง)</span>`;
+      const isInactiveCase = (c.isActive === false || String(c.isActive).toUpperCase() === 'FALSE' || ['inactive', 'unactive'].includes(String(c.caseStatus || '').trim().toLowerCase()));
+      if (isInactiveCase) {
+        metaContainer.innerHTML += `<span class="badge" style="background: #ffebee; color: #c62828; border: 1px solid #ef9a9a; font-weight: 600;">⚠️ Inactive (เคสอยู่ระหว่างปรับปรุง)</span>`;
       }
       if (c.linkedNextCase) {
         metaContainer.innerHTML += `<span class="badge tag-badge" style="background: var(--warning); color: var(--warning-dark);">🔗 มีสถานีต่อเนื่อง</span>`;

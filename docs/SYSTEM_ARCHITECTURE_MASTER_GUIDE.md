@@ -170,7 +170,7 @@ interface ChecklistItem {
 | # | Function Signature | Description & Conditions |
 |---|---|---|
 | 17 | `initApiConfig()` | Loads Google Apps Script Web App URL and fallback API endpoints from config or environment constants. |
-| 18 | `isCaseActive(c)` | Returns boolean `true` if `c.status === 'Active'` (excludes drafts/unactive cases from student view). |
+| 18 | `isCaseActive(c)` | Returns boolean `true` if `c.status === 'Active'` (excludes drafts/inactive cases from student view). |
 | 19 | `loadCasesData()` | Master case loader: reads Memory $\rightarrow$ IndexedDB $\rightarrow$ `case-data-offline.js` $\rightarrow$ Live GAS fallback. |
 | 20 | `fetchCaseDetail(caseId, forceLive = false)` | Fetches specific case details. If `forceLive === true` or missing offline, issues live `GET ?action=getCase&id=...` to GAS. |
 | 21 | `updateCurrentCaseFromDoc()` | Forces a fresh bypass of all caches by calling GAS `getCaseContentViaDocsRestApi`. Re-renders checklist, scenario, and equations immediately. |

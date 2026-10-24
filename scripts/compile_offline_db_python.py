@@ -973,7 +973,7 @@ def get_case_content_from_doc(doc_data, target_case_id, doc_equations=None):
                         m_stat = re.search(r"(?:case status|สถานะ(?:เคส)?)\s*:\s*(.*)$", text_strip, re.IGNORECASE)
                         if m_stat:
                             raw_s = m_stat.group(1).replace('*', '').strip().lower()
-                            case_status = 'Unactive' if ('unactive' in raw_s or 'inactive' in raw_s or 'draft' in raw_s) else 'Active'
+                            case_status = 'Inactive' if ('inactive' in raw_s or 'unactive' in raw_s or 'draft' in raw_s) else 'Active'
                     if 'password' in text_strip.lower() or 'รหัส' in text_strip:
                         m_pwd = re.search(r"(?:password|รหัส(?:ผ่าน)?)\s*:\s*(.*)$", text_strip, re.IGNORECASE)
                         if m_pwd:
@@ -1245,7 +1245,7 @@ def main():
                 "createdDate": r[created_date_idx].strip() if (created_date_idx != -1 and len(r) > created_date_idx) else "",
                 "source": format_source_name(case_id, raw_source),
                 "isActive": is_active_bool,
-                "caseStatus": "Active" if is_active_bool else "Unactive",
+                "caseStatus": "Active" if is_active_bool else "Inactive",
                 "linkedNextCase": linked_next,
                 "linkedFromCase": linked_from
             }
@@ -1395,7 +1395,7 @@ def main():
                     
                     # Keep Google Sheet as the 100% Single Source of Truth for isActive
                     c_details['isActive'] = meta.get('isActive', True)
-                    meta_status = "Active" if c_details['isActive'] else "Unactive"
+                    meta_status = "Active" if c_details['isActive'] else "Inactive"
                     c_details['caseStatus'] = meta_status
                     meta['caseStatus'] = meta_status
 

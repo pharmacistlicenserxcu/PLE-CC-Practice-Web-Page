@@ -1021,7 +1021,7 @@ function getCaseContentViaDocsRestApi(docId, targetCaseId) {
             const mStat = text.match(/(?:case status|สถานะ(?:เคส)?)\s*:\s*(.*)$/i);
             if (mStat) {
               const sVal = mStat[1].toLowerCase().replace(/\*/g, '').trim();
-              caseStatus = (sVal.includes('unactive') || sVal.includes('inactive')) ? 'Unactive' : 'Active';
+              caseStatus = (sVal.includes('inactive') || sVal.includes('unactive')) ? 'Inactive' : 'Active';
             }
           }
           if (text.includes('ระยะเวลา')) {
@@ -3091,8 +3091,8 @@ function scanDocForCases(docId) {
                 caseSource = valText;
               } else if (keyText.includes('case status') || keyText.includes('status') || keyText.includes('สถานะ')) {
                 const sVal = valText.toLowerCase().replace(/\*/g, '').trim();
-                if (sVal.includes('unactive') || sVal.includes('inactive') || sVal.includes('draft') || sVal.includes('pending')) {
-                  caseStatus = 'Unactive';
+                if (sVal.includes('inactive') || sVal.includes('unactive') || sVal.includes('draft') || sVal.includes('pending')) {
+                  caseStatus = 'Inactive';
                   isActive = 'FALSE';
                 } else {
                   caseStatus = 'Active';
@@ -3191,8 +3191,8 @@ function scanDocForCases(docId) {
                   caseSource = val.replace(/\*/g, '').trim();
                 } else if (key.includes('case status') || key.includes('status') || key.includes('สถานะ')) {
                   const sVal = val.toLowerCase().replace(/\*/g, '').trim();
-                  if (sVal.includes('unactive') || sVal.includes('inactive') || sVal.includes('draft') || sVal.includes('pending')) {
-                    caseStatus = 'Unactive';
+                  if (sVal.includes('inactive') || sVal.includes('unactive') || sVal.includes('draft') || sVal.includes('pending')) {
+                    caseStatus = 'Inactive';
                     isActive = 'FALSE';
                   } else {
                     caseStatus = 'Active';
@@ -4232,7 +4232,7 @@ function writeOspeTemplateToTargetDoc(targetDocId, tabName, passcode) {
     ]);
     addBullet('หมวด: ระบุ Clinic, Product, หรือ SAP');
     addBullet('Course Group: ระบุกลุ่มวิชา เช่น การบริบาลทางเภสัชกรรมผู้ป่วยนอก, การคุ้มครองผู้บริโภคและระบบยา, การผลิตยาและควบคุมคุณภาพ');
-    addBullet('Case status: Active = พร้อมให้นิสิตฝึกซ้อม / Unactive = ร่างอยู่');
+    addBullet('Case status: Active = พร้อมให้นิสิตฝึกซ้อม / Inactive (หรือ Unactive) = ร่างอยู่');
     addBullet('Linked Next Case: รหัสเคสสถานีถัดไป (เช่น OSPE-CL6602) เมื่อมีสถานีต่อเนื่อง');
     
     // Section 4

@@ -2790,6 +2790,53 @@ ol.ordered-list li,
     width: 100% !important;
   }
 
+  /* Interactive Fill-in-the-Blank Print Styling */
+  .btn-check-blank,
+  .blank-status-badge {
+    display: none !important;
+  }
+
+  .interactive-blank-wrapper {
+    display: inline-flex !important;
+    align-items: center !important;
+    border: 1.5px solid #0f172a !important;
+    background: #ffffff !important;
+    border-radius: 4px !important;
+    padding: 0.15rem 0.4rem !important;
+    margin: 0.15rem 0.25rem !important;
+    min-height: 26px !important;
+    box-shadow: none !important;
+    vertical-align: middle !important;
+    page-break-inside: avoid !important;
+  }
+
+  .interactive-blank-input {
+    border: none !important;
+    background: transparent !important;
+    color: #0f172a !important;
+    font-size: 9.5pt !important;
+    font-family: inherit !important;
+    padding: 0 0.2rem !important;
+    min-width: 140px !important;
+    outline: none !important;
+  }
+
+  .interactive-blank-input::placeholder {
+    color: #64748b !important;
+    font-style: italic !important;
+    font-size: 8.5pt !important;
+  }
+
+  .interactive-blank-examiner-badge {
+    display: inline-block !important;
+    border: 1px solid #7c3aed !important;
+    background: #f5f3ff !important;
+    padding: 2px 6px !important;
+    border-radius: 4px !important;
+    color: #5b21b6 !important;
+    font-size: 9pt !important;
+  }
+
   /* Printable Checklist Table Design */
   table.print-checklist-table {
     width: 100% !important;

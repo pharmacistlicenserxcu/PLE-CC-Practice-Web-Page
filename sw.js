@@ -7,7 +7,7 @@
  * Version: ple-cc2-ospe-v1.4.4 (OSPE Flow, Solo Review & Room Sync Fixes)
  */
 
-const CACHE_NAME = 'ple-cc2-ospe-v1.5.6';
+const CACHE_NAME = 'ple-cc2-ospe-v1.5.7';
 const ASSETS = [
   './',
   './index.html',

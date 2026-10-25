@@ -3160,7 +3160,7 @@
 
       if (mode === 'full' || mode === 'question') {
         const scenarioHtml = (typeof getFormattedCaseScenarioHtml === 'function') 
-          ? getFormattedCaseScenarioHtml(c) 
+          ? getFormattedCaseScenarioHtml(c, { isExaminer: (typeof currentRole !== 'undefined' && currentRole === 'examiner') }) 
           : (document.getElementById('case-scenario-content')?.innerHTML || c.contentHtml || (c.scenario ? `<p>${c.scenario.replace(/\r?\n/g, '<br>')}</p>` : '<p>ไม่มีข้อมูลสถานการณ์</p>'));
         
         html += `<div style="margin-bottom:1rem;">
@@ -3253,7 +3253,7 @@
 
       if (mode === 'full' || mode === 'question') {
         const scenarioHtml = (typeof getFormattedCaseScenarioHtml === 'function') 
-          ? getFormattedCaseScenarioHtml(c) 
+          ? getFormattedCaseScenarioHtml(c, { isExaminer: (typeof currentRole !== 'undefined' && currentRole === 'examiner') }) 
           : (document.getElementById('case-scenario-content')?.innerHTML || c.contentHtml || (c.scenario ? `<p>${c.scenario.replace(/\r?\n/g, '<br>')}</p>` : '<p>ไม่มีข้อมูลสถานการณ์</p>'));
 
         html += `<div style="margin-bottom:1.25rem;">

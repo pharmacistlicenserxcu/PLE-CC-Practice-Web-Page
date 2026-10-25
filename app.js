@@ -1205,7 +1205,7 @@ function isEquipmentGated(c) {
 }
 window.isEquipmentGated = isEquipmentGated;
 
-function getFormattedCaseScenarioHtml(c) {
+function getFormattedCaseScenarioHtml(c, options = {}) {
   if (!c) return '<p>ไม่มีข้อมูลสถานการณ์</p>';
   sanitizeAndSplitTrappedEquipment(c);
   let raw = c.contentHtml || '';
@@ -1218,6 +1218,12 @@ function getFormattedCaseScenarioHtml(c) {
   if (!raw) return '<p>ไม่มีข้อมูลสถานการณ์</p>';
 
   raw = stripSectionHeaders(raw);
+  if (typeof renderInteractiveBlanks === 'function' && /\[BLANK:/i.test(raw)) {
+    raw = renderInteractiveBlanks(raw, {
+      isExaminer: options.isExaminer || false,
+      caseId: c.caseId || ''
+    });
+  }
   return raw;
 }
 window.getFormattedCaseScenarioHtml = getFormattedCaseScenarioHtml;

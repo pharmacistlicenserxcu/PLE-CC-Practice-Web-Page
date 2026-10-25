@@ -1,12 +1,12 @@
 /**
  * PLE-CC2 OSPE Practice System — Offline Case List Metadata (Auto-Generated)
- * Version: v_20261025_144329
- * Generated on 2026-10-25 14:43:29
+ * Version: v_20261025_145059
+ * Generated on 2026-10-25 14:50:59
  */
 
 const OFFLINE_DATA = {
-  "version": "v_20261025_144329",
-  "generatedAt": "2026-10-25 14:43:29",
+  "version": "v_20261025_145059",
+  "generatedAt": "2026-10-25 14:50:59",
   "totalCases": 418,
   "cases": [
     {
@@ -3989,11 +3989,11 @@ const OFFLINE_DATA = {
     },
     {
       "caseId": "OSPE-CLW1M01",
-      "title": "การตรวจสอบใบสั่งยา Mock RxCU84 Clinic Week 1",
+      "title": "OSPE-CLW1M01",
       "category": "Clinic",
-      "mainGroup": "การตรวจสอบใบสั่งยา",
-      "subTopic": "",
-      "disease": "NCD, Pain management",
+      "mainGroup": "Mock Exam 2569",
+      "subTopic": "🔒 ข้อสอบลับ (ต้องใช้รหัสผ่าน)",
+      "disease": "🔒 ล็อกด้วยรหัสผ่าน (Secret Mock)",
       "difficulty": 2,
       "docId": "1ZNKvEBVAUeVcJ2GSH4gGKujA8whv7zY0fH4pXVEJa4g",
       "author": "",
@@ -4002,15 +4002,18 @@ const OFFLINE_DATA = {
       "isActive": true,
       "caseStatus": "Active",
       "linkedNextCase": "",
-      "linkedFromCase": ""
+      "linkedFromCase": "",
+      "durationMin": 4,
+      "isProtected": true,
+      "hasPassword": true
     },
     {
       "caseId": "OSPE-CLW1M02",
-      "title": "การนับเม็ดยาและเขียนฉลากยา Mock RxCU84 Clinic Week 1",
+      "title": "OSPE-CLW1M02",
       "category": "Clinic",
-      "mainGroup": "การนับเม็ดยาและเขียนฉลากยา",
-      "subTopic": "",
-      "disease": "Cafegot",
+      "mainGroup": "Mock Exam 2569",
+      "subTopic": "🔒 ข้อสอบลับ (ต้องใช้รหัสผ่าน)",
+      "disease": "🔒 ล็อกด้วยรหัสผ่าน (Secret Mock)",
       "difficulty": 2,
       "docId": "1ZNKvEBVAUeVcJ2GSH4gGKujA8whv7zY0fH4pXVEJa4g",
       "author": "",
@@ -4019,15 +4022,18 @@ const OFFLINE_DATA = {
       "isActive": true,
       "caseStatus": "Active",
       "linkedNextCase": "",
-      "linkedFromCase": ""
+      "linkedFromCase": "",
+      "durationMin": 4,
+      "isProtected": true,
+      "hasPassword": true
     },
     {
       "caseId": "OSPE-CLW1M03",
-      "title": "เปิดหนังสือ Mock RxCU84 Clinic Week 1",
+      "title": "OSPE-CLW1M03",
       "category": "Clinic",
-      "mainGroup": "การค้นข้อมูลและประสานงาน",
-      "subTopic": "",
-      "disease": "เปิดหนังสือ",
+      "mainGroup": "Mock Exam 2569",
+      "subTopic": "🔒 ข้อสอบลับ (ต้องใช้รหัสผ่าน)",
+      "disease": "🔒 ล็อกด้วยรหัสผ่าน (Secret Mock)",
       "difficulty": 2,
       "docId": "1ZNKvEBVAUeVcJ2GSH4gGKujA8whv7zY0fH4pXVEJa4g",
       "author": "",
@@ -4036,15 +4042,18 @@ const OFFLINE_DATA = {
       "isActive": true,
       "caseStatus": "Active",
       "linkedNextCase": "",
-      "linkedFromCase": ""
+      "linkedFromCase": "",
+      "durationMin": 4,
+      "isProtected": true,
+      "hasPassword": true
     },
     {
       "caseId": "OSPE-CLW1M04",
-      "title": "Special precaution Mock RxCU84 Clinic Week 1",
+      "title": "OSPE-CLW1M04",
       "category": "Clinic",
-      "mainGroup": "Special precaution",
-      "subTopic": "",
-      "disease": "ยา Warfarin",
+      "mainGroup": "Mock Exam 2569",
+      "subTopic": "🔒 ข้อสอบลับ (ต้องใช้รหัสผ่าน)",
+      "disease": "🔒 ล็อกด้วยรหัสผ่าน (Secret Mock)",
       "difficulty": 2,
       "docId": "1ZNKvEBVAUeVcJ2GSH4gGKujA8whv7zY0fH4pXVEJa4g",
       "author": "",
@@ -4053,15 +4062,18 @@ const OFFLINE_DATA = {
       "isActive": true,
       "caseStatus": "Active",
       "linkedNextCase": "",
-      "linkedFromCase": ""
+      "linkedFromCase": "",
+      "durationMin": 4,
+      "isProtected": true,
+      "hasPassword": true
     },
     {
       "caseId": "OSPE-CLW1M05",
-      "title": "การระบุรูปแบบยาเตรียมและปัญหาความไม่คงตัวของตำรับยา (Dosage Forms & Drug Instabilities)",
+      "title": "OSPE-CLW1M05",
       "category": "Product",
-      "mainGroup": "Product",
-      "subTopic": "",
-      "disease": "Dosage Forms & Drug Instabilities",
+      "mainGroup": "Mock Exam 2569",
+      "subTopic": "🔒 ข้อสอบลับ (ต้องใช้รหัสผ่าน)",
+      "disease": "🔒 ล็อกด้วยรหัสผ่าน (Secret Mock)",
       "difficulty": 2,
       "docId": "1ZNKvEBVAUeVcJ2GSH4gGKujA8whv7zY0fH4pXVEJa4g",
       "author": "Maxnum",
@@ -4070,15 +4082,18 @@ const OFFLINE_DATA = {
       "isActive": true,
       "caseStatus": "Active",
       "linkedNextCase": "",
-      "linkedFromCase": ""
+      "linkedFromCase": "",
+      "durationMin": 4,
+      "isProtected": true,
+      "hasPassword": true
     },
     {
       "caseId": "OSPE-CLW1M06",
-      "title": "การจำแนกประเภทของยาตามกฎหมาย",
+      "title": "OSPE-CLW1M06",
       "category": "SAP",
-      "mainGroup": "กฎหมายทางยา",
-      "subTopic": "",
-      "disease": "พ.ร.บ. ยา พ.ศ. 2510 และฉบับแก้ไขเพิ่มเติม",
+      "mainGroup": "Mock Exam 2569",
+      "subTopic": "🔒 ข้อสอบลับ (ต้องใช้รหัสผ่าน)",
+      "disease": "🔒 ล็อกด้วยรหัสผ่าน (Secret Mock)",
       "difficulty": 2,
       "docId": "1ZNKvEBVAUeVcJ2GSH4gGKujA8whv7zY0fH4pXVEJa4g",
       "author": "Maxnum",
@@ -4087,7 +4102,10 @@ const OFFLINE_DATA = {
       "isActive": true,
       "caseStatus": "Active",
       "linkedNextCase": "",
-      "linkedFromCase": ""
+      "linkedFromCase": "",
+      "durationMin": 4,
+      "isProtected": true,
+      "hasPassword": true
     },
     {
       "caseId": "OSPE-CLW2M01",
@@ -5145,11 +5163,11 @@ const OFFLINE_DATA = {
     },
     {
       "caseId": "OSPE-PD84M1W301B",
-      "title": "OSPE-PD84M1W301B",
+      "title": "Gel Base 1B",
       "category": "Product",
-      "mainGroup": "Mock Exam 2569",
-      "subTopic": "🔒 ข้อสอบลับ (ต้องใช้รหัสผ่าน)",
-      "disease": "🔒 ล็อกด้วยรหัสผ่าน (Secret Mock)",
+      "mainGroup": "Semisolid Dosage Form",
+      "subTopic": "",
+      "disease": "Gel Base",
       "difficulty": 2,
       "docId": "1Bjdz8c6-Gr5GIHGllXIvt0FLPeWTAdZy586vtVDOr24",
       "author": "RxCU84",
@@ -5158,10 +5176,7 @@ const OFFLINE_DATA = {
       "isActive": true,
       "caseStatus": "Active",
       "linkedNextCase": "",
-      "linkedFromCase": "",
-      "durationMin": 4,
-      "isProtected": true,
-      "hasPassword": true
+      "linkedFromCase": ""
     },
     {
       "caseId": "OSPE-PD84M1W302A",
@@ -5182,11 +5197,11 @@ const OFFLINE_DATA = {
     },
     {
       "caseId": "OSPE-PD84M1W302B",
-      "title": "OSPE-PD84M1W302B",
+      "title": "Suspension 2B",
       "category": "Product",
-      "mainGroup": "Mock Exam 2569",
-      "subTopic": "🔒 ข้อสอบลับ (ต้องใช้รหัสผ่าน)",
-      "disease": "🔒 ล็อกด้วยรหัสผ่าน (Secret Mock)",
+      "mainGroup": "Liquid Dosage Form",
+      "subTopic": "",
+      "disease": "Suspension",
       "difficulty": 2,
       "docId": "1Bjdz8c6-Gr5GIHGllXIvt0FLPeWTAdZy586vtVDOr24",
       "author": "RxCU84",
@@ -5195,10 +5210,7 @@ const OFFLINE_DATA = {
       "isActive": true,
       "caseStatus": "Active",
       "linkedNextCase": "",
-      "linkedFromCase": "",
-      "durationMin": 8,
-      "isProtected": true,
-      "hasPassword": true
+      "linkedFromCase": ""
     },
     {
       "caseId": "OSPE-PD84M1W303A",
@@ -5219,11 +5231,11 @@ const OFFLINE_DATA = {
     },
     {
       "caseId": "OSPE-PD84M1W303B",
-      "title": "OSPE-PD84M1W303B",
+      "title": "Mucilage 3B",
       "category": "Product",
-      "mainGroup": "Mock Exam 2569",
-      "subTopic": "🔒 ข้อสอบลับ (ต้องใช้รหัสผ่าน)",
-      "disease": "🔒 ล็อกด้วยรหัสผ่าน (Secret Mock)",
+      "mainGroup": "Semisolid Dosage Form",
+      "subTopic": "",
+      "disease": "Mucilage",
       "difficulty": 2,
       "docId": "1Bjdz8c6-Gr5GIHGllXIvt0FLPeWTAdZy586vtVDOr24",
       "author": "RxCU84",
@@ -5232,10 +5244,7 @@ const OFFLINE_DATA = {
       "isActive": true,
       "caseStatus": "Active",
       "linkedNextCase": "",
-      "linkedFromCase": "",
-      "durationMin": 4,
-      "isProtected": true,
-      "hasPassword": true
+      "linkedFromCase": ""
     },
     {
       "caseId": "OSPE-PD84W101",

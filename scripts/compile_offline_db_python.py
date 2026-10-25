@@ -387,15 +387,38 @@ def wrap_list_items_in_html(html_str):
     return "".join(out)
 
 def get_doc_equations_map(doc_id):
-    cache_dir = os.path.join(os.path.dirname(__file__), '..', '.cache')
-    os.makedirs(cache_dir, exist_ok=True)
-    cache_path = os.path.join(cache_dir, f'equations_{doc_id}.json')
-    
-    # 1. Try fetching fresh equations from live GAS Web App
+    cache_dirs = [
+        os.path.join(os.path.dirname(__file__), '..', '.cache'),
+        os.path.join(os.getcwd(), 'Website', 'PLE CC Webpage', '.cache'),
+        os.path.join(os.getcwd(), '.cache')
+    ]
+    cache_path = None
+    for cd in cache_dirs:
+        os.makedirs(cd, exist_ok=True)
+        cp = os.path.join(cd, f'equations_{doc_id}.json')
+        if os.path.exists(cp):
+            cache_path = cp
+            break
+    if not cache_path:
+        cache_path = os.path.join(cache_dirs[0], f'equations_{doc_id}.json')
+
+    # 1. Fallback to disk cache FIRST if available
+    if os.path.exists(cache_path):
+        try:
+            with open(cache_path, 'r', encoding='utf-8') as f:
+                eq_map = json.load(f)
+                if eq_map:
+                    total_loaded = sum(len(v) for v in eq_map.values())
+                    print(f"  [Notice] Loaded {total_loaded} cached equations from disk.")
+                    return eq_map
+        except Exception as e:
+            print(f"  [Warning] Failed loading cached equations from {cache_path}: {e}")
+
+    # 2. Try fetching fresh equations from live GAS Web App if cache absent
     try:
         url = f'https://script.google.com/macros/s/AKfycbyabU-EfF9Ob4zwi07DvovB3gxVyednn1HZ4OUyWIi4wQBczPCaaRDgyHlkaMvnM_AK/exec?action=getDocEquations&docId={doc_id}'
         req = urllib.request.Request(url, headers={'User-Agent': 'Mozilla/5.0'})
-        with urllib.request.urlopen(req, timeout=15) as resp:
+        with urllib.request.urlopen(req, timeout=90) as resp:
             data = json.loads(resp.read().decode('utf-8'))
             eq_map = data.get('data', {})
             if eq_map:
@@ -404,16 +427,6 @@ def get_doc_equations_map(doc_id):
                 return eq_map
     except Exception as e:
         print(f"  [Notice] Live GAS equation fetch failed ({e}), checking disk cache...")
-        
-    # 2. Fallback to disk cache if network fails
-    if os.path.exists(cache_path):
-        try:
-            with open(cache_path, 'r', encoding='utf-8') as f:
-                eq_map = json.load(f)
-                if eq_map:
-                    return eq_map
-        except Exception as e:
-            print(f"  [Warning] Failed loading cached equations from {cache_path}: {e}")
 
     return {}
 
@@ -446,6 +459,12 @@ def match_tab_equation(elements, el_idx, tab_equations):
             return '<span class="doc-equation">10mg/kg/dose=160mg</span>'
         if 'paracetamol' in context:
             return '<span class="doc-equation">10–15mg/kg/dose=160–240mg</span>'
+        if 'ปานกลาง' in context or 'crcl = 48' in context or '48 ml/min' in context or '48ml/min' in context:
+            return '<span class="doc-equation">CrCl=48mL/min</span>'
+        if '50 ml/min' in context or '50ml/min' in context or '<= 50' in context or '&le; 50' in context or '2.5 mg' in context:
+            return '<span class="doc-equation">CrCl&le;50mL/min</span>'
+        if '30-50' in context or '30–50' in context or 'ครึ่งหนึ่ง' in context:
+            return '<span class="doc-equation">CrCl=30–50mL/min</span>'
         return ''
     
     last_used = -1
@@ -499,6 +518,10 @@ def parse_paragraph_to_html(para, inline_objects=None, lists_dict=None, tab_equa
     img_count = sum(1 for el in elements if 'inlineObjectElement' in el)
     text_content = ''.join([el['textRun'].get('content', '') for el in elements if 'textRun' in el]).strip()
 
+    # Markdown divider line (e.g. --- or ___ or ***)
+    if re.match(r'^[\s\r\n]*(\-{3,}|_{3,}|\*{3,})[\s\r\n]*$', text_content):
+        return '<hr class="case-divider">'
+
     # If paragraph contains 2 or more images side-by-side without substantive text
     if img_count >= 2 and not text_content:
         img_htmls = []
@@ -524,8 +547,10 @@ def parse_paragraph_to_html(para, inline_objects=None, lists_dict=None, tab_equa
             html += get_image_base64_html(obj_id, inline_objects)
         elif 'equation' in el:
             html += match_tab_equation(elements, idx, tab_equations)
+        elif 'horizontalRule' in el:
+            html += '<hr class="case-divider">'
             
-    if not html.strip():
+    if not html.strip() and '<hr' not in html:
         return ""
         
     if 'bullet' in para:
@@ -995,7 +1020,10 @@ def get_case_content_from_doc(doc_data, target_case_id, doc_equations=None):
                     para_html = parse_paragraph_to_html(para, inline_objects, lists_dict, tab_eqs)
                     if para_html:
                         content_html += para_html
-                        scenario += text_strip.replace('\x0b', '\n') + '\n'
+                        if '<hr' in para_html:
+                            scenario += '\n---\n'
+                        else:
+                            scenario += text_strip.replace('\x0b', '\n') + '\n'
                 elif current_section == 'PATIENT_INFO':
                     para_html = parse_paragraph_to_html(para, inline_objects, lists_dict, tab_eqs)
                     if para_html:

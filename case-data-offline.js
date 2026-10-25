@@ -1,12 +1,12 @@
 /**
  * PLE-CC2 OSPE Practice System — Offline Case List Metadata (Auto-Generated)
- * Version: v_20261025_180446
- * Generated on 2026-10-25 18:04:46
+ * Version: v_20261025_191249
+ * Generated on 2026-10-25 19:12:49
  */
 
 const OFFLINE_DATA = {
-  "version": "v_20261025_180446",
-  "generatedAt": "2026-10-25 18:04:46",
+  "version": "v_20261025_191249",
+  "generatedAt": "2026-10-25 19:12:49",
   "totalCases": 417,
   "cases": [
     {
@@ -4006,11 +4006,11 @@ const OFFLINE_DATA = {
     },
     {
       "caseId": "OSPE-CLW1M03",
-      "title": "เปิดหนังสือ Mock RxCU84 Clinic Week 1",
+      "title": "OSPE-CLW1M03",
       "category": "Clinic",
-      "mainGroup": "การค้นข้อมูลและประสานงาน",
-      "subTopic": "",
-      "disease": "เปิดหนังสือ",
+      "mainGroup": "Mock Exam 2569",
+      "subTopic": "🔒 ข้อสอบลับ (ต้องใช้รหัสผ่าน)",
+      "disease": "🔒 ล็อกด้วยรหัสผ่าน (Secret Mock)",
       "difficulty": 2,
       "docId": "1ZNKvEBVAUeVcJ2GSH4gGKujA8whv7zY0fH4pXVEJa4g",
       "author": "",
@@ -4019,7 +4019,10 @@ const OFFLINE_DATA = {
       "isActive": true,
       "caseStatus": "Active",
       "linkedNextCase": "",
-      "linkedFromCase": ""
+      "linkedFromCase": "",
+      "durationMin": 4,
+      "isProtected": true,
+      "hasPassword": true
     },
     {
       "caseId": "OSPE-CLW1M04",

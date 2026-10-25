@@ -1218,6 +1218,9 @@ function getFormattedCaseScenarioHtml(c, options = {}) {
   if (!raw) return '<p>ไม่มีข้อมูลสถานการณ์</p>';
 
   raw = stripSectionHeaders(raw);
+  if (raw && !raw.includes('<hr') && /(?:<br\s*\/?>|\n|^)\s*(?:\-{3,}|_{3,}|\*{3,})\s*(?:<br\s*\/?>|\n|$)/.test(raw)) {
+    raw = raw.replace(/(?:<br\s*\/?>|\n|^)\s*(?:\-{3,}|_{3,}|\*{3,})\s*(?:<br\s*\/?>|\n|$)/g, '<hr class="case-divider">');
+  }
   if (typeof renderInteractiveBlanks === 'function' && /\[BLANK:/i.test(raw)) {
     raw = renderInteractiveBlanks(raw, {
       isExaminer: options.isExaminer || false,
@@ -2745,7 +2748,7 @@ if ('serviceWorker' in navigator && window.location.protocol !== 'file:') {
 const DB_NAME = 'RxCU_OSPE_DB';
 const DB_VERSION = 1;
 const STORE_NAME = 'case_details';
-const DB_VERSION_STR = 'v_20261025_180446'; // อัปเดตเวอร์ชันนี้เพื่อบังคับโหลดใหม่เมื่อมีเคสเพิ่มเติมในสคริปต์ออฟไลน์
+const DB_VERSION_STR = 'v_20261025_191249'; // อัปเดตเวอร์ชันนี้เพื่อบังคับโหลดใหม่เมื่อมีเคสเพิ่มเติมในสคริปต์ออฟไลน์
 
 function openIndexedDB() {
   return new Promise((resolve, reject) => {

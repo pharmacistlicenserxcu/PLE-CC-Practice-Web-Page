@@ -7590,3 +7590,30 @@ body.dark-mode .blank-status-badge.is-submitted {
     animation-iteration-count: 1 !important;
   }
 }
+
+
+/* Horizontal Divider for Case Scenario (Screen and Print) */
+hr.case-divider,
+#case-scenario-content hr,
+#exam-scenario-content hr,
+.ospe-print-modal hr {
+  border: none;
+  border-top: 1.5px solid var(--border, #cbd5e1);
+  margin: 1rem 0;
+  display: block;
+  width: 100%;
+}
+
+@media print {
+  hr.case-divider,
+  #case-scenario-content hr,
+  #exam-scenario-content hr,
+  .ospe-print-modal hr {
+    border: none !important;
+    border-top: 1.5px solid #94a3b8 !important;
+    margin: 0.7rem 0 !important;
+    display: block !important;
+    width: 100% !important;
+    page-break-after: avoid;
+  }
+}

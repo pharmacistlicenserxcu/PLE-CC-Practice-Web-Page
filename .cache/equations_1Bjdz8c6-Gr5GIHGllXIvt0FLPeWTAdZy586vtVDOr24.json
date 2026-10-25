@@ -107,5 +107,93 @@
       "directText": "1.52",
       "html": "<span class=\"doc-equation\"><span class=\"equation-fraction\"><span class=\"equation-num\">1.5</span><span class=\"equation-denom\">2</span></span></span>"
     }
+  ],
+  "MOCK CC2 Product Week 3 ชุด A": [
+    {
+      "index": 0,
+      "preText": "Precipitated Sulfur = 5 g x ",
+      "postText": "  = 3.0 g",
+      "directText": "60 mL100 mL",
+      "html": "<span class=\"doc-equation\"><span class=\"equation-fraction\"><span class=\"equation-num\">60 mL</span><span class=\"equation-denom\">100 mL</span></span></span>"
+    },
+    {
+      "index": 1,
+      "preText": "Glycerin = 3.5 mL x ",
+      "postText": "  = 2.1 mL",
+      "directText": "60 mL100 mL",
+      "html": "<span class=\"doc-equation\"><span class=\"equation-fraction\"><span class=\"equation-num\">60 mL</span><span class=\"equation-denom\">100 mL</span></span></span>"
+    },
+    {
+      "index": 2,
+      "preText": "Carbopol Gel Base = 50 g x ",
+      "postText": "  = 30.0 g",
+      "directText": "60 mL100 mL",
+      "html": "<span class=\"doc-equation\"><span class=\"equation-fraction\"><span class=\"equation-num\">60 mL</span><span class=\"equation-denom\">100 mL</span></span></span>"
+    },
+    {
+      "index": 3,
+      "preText": "Precipitated Sulfur: 5 g × ",
+      "postText": "  = 3.0 g",
+      "directText": "60 mL100 mL",
+      "html": "<span class=\"doc-equation\"><span class=\"equation-fraction\"><span class=\"equation-num\">60 mL</span><span class=\"equation-denom\">100 mL</span></span></span>"
+    },
+    {
+      "index": 4,
+      "preText": "Glycerin: 3.5 mL × ",
+      "postText": "  = 2.1 mL",
+      "directText": "60 mL100 mL",
+      "html": "<span class=\"doc-equation\"><span class=\"equation-fraction\"><span class=\"equation-num\">60 mL</span><span class=\"equation-denom\">100 mL</span></span></span>"
+    },
+    {
+      "index": 5,
+      "preText": "Carbopol Gel Base: 50 g × ",
+      "postText": "  = 30.0 g (ใช้เจลจากข้อ 1A ทั",
+      "directText": "60 mL100 mL",
+      "html": "<span class=\"doc-equation\"><span class=\"equation-fraction\"><span class=\"equation-num\">60 mL</span><span class=\"equation-denom\">100 mL</span></span></span>"
+    }
+  ],
+  "MOCK CC2 Product Week 3 ชุด B": [
+    {
+      "index": 0,
+      "preText": "bopol ได้ถูกต้อง คือ 160 mg x ",
+      "postText": " = 0.16 g",
+      "directText": "1 g1,000 mg",
+      "html": "<span class=\"doc-equation\"><span class=\"equation-fraction\"><span class=\"equation-num\">1 g</span><span class=\"equation-denom\">1,000 mg</span></span></span>"
+    },
+    {
+      "index": 1,
+      "preText": "Carbopol 940: 160 mg x ",
+      "postText": "  = 0.16 g",
+      "directText": "1 g1,000 mg",
+      "html": "<span class=\"doc-equation\"><span class=\"equation-fraction\"><span class=\"equation-num\">1 g</span><span class=\"equation-denom\">1,000 mg</span></span></span>"
+    },
+    {
+      "index": 2,
+      "preText": "Glycerin = 3.0 mL x ",
+      "postText": " = 2.4 mL",
+      "directText": "80 mL100 mL",
+      "html": "<span class=\"doc-equation\"><span class=\"equation-fraction\"><span class=\"equation-num\">80 mL</span><span class=\"equation-denom\">100 mL</span></span></span>"
+    },
+    {
+      "index": 3,
+      "preText": "Carbopol Gel Base = 40 g x ",
+      "postText": "   = 32.0 g",
+      "directText": "80 mL100 mL",
+      "html": "<span class=\"doc-equation\"><span class=\"equation-fraction\"><span class=\"equation-num\">80 mL</span><span class=\"equation-denom\">100 mL</span></span></span>"
+    },
+    {
+      "index": 4,
+      "preText": "Glycerin: 3.0 mL × ",
+      "postText": "  = 2.4 mL",
+      "directText": "80 mL100 mL",
+      "html": "<span class=\"doc-equation\"><span class=\"equation-fraction\"><span class=\"equation-num\">80 mL</span><span class=\"equation-denom\">100 mL</span></span></span>"
+    },
+    {
+      "index": 5,
+      "preText": "Carbopol Gel Base: 40 g × ",
+      "postText": "  = 32.0 g (ใช้เจลจากข้อ 1B ทั",
+      "directText": "80 mL100 mL",
+      "html": "<span class=\"doc-equation\"><span class=\"equation-fraction\"><span class=\"equation-num\">80 mL</span><span class=\"equation-denom\">100 mL</span></span></span>"
+    }
   ]
 }

@@ -1,12 +1,12 @@
 /**
  * PLE-CC2 OSPE Practice System — Offline Case List Metadata (Auto-Generated)
- * Version: v_20261025_191249
- * Generated on 2026-10-25 19:12:49
+ * Version: v_20261025_213522
+ * Generated on 2026-10-25 21:35:22
  */
 
 const OFFLINE_DATA = {
-  "version": "v_20261025_191249",
-  "generatedAt": "2026-10-25 19:12:49",
+  "version": "v_20261025_213522",
+  "generatedAt": "2026-10-25 21:35:22",
   "totalCases": 417,
   "cases": [
     {
@@ -3628,7 +3628,8 @@ const OFFLINE_DATA = {
       "isActive": true,
       "caseStatus": "Active",
       "linkedNextCase": "",
-      "linkedFromCase": ""
+      "linkedFromCase": "",
+      "durationMin": 4
     },
     {
       "caseId": "OSPE-CLSD16B",
@@ -3645,7 +3646,8 @@ const OFFLINE_DATA = {
       "isActive": true,
       "caseStatus": "Active",
       "linkedNextCase": "",
-      "linkedFromCase": ""
+      "linkedFromCase": "",
+      "durationMin": 4
     },
     {
       "caseId": "OSPE-CLSD17",
@@ -4006,11 +4008,11 @@ const OFFLINE_DATA = {
     },
     {
       "caseId": "OSPE-CLW1M03",
-      "title": "OSPE-CLW1M03",
+      "title": "เปิดหนังสือ Mock RxCU84 Clinic Week 1",
       "category": "Clinic",
-      "mainGroup": "Mock Exam 2569",
-      "subTopic": "🔒 ข้อสอบลับ (ต้องใช้รหัสผ่าน)",
-      "disease": "🔒 ล็อกด้วยรหัสผ่าน (Secret Mock)",
+      "mainGroup": "การค้นข้อมูลและประสานงาน",
+      "subTopic": "",
+      "disease": "เปิดหนังสือ",
       "difficulty": 2,
       "docId": "1ZNKvEBVAUeVcJ2GSH4gGKujA8whv7zY0fH4pXVEJa4g",
       "author": "",
@@ -4019,10 +4021,7 @@ const OFFLINE_DATA = {
       "isActive": true,
       "caseStatus": "Active",
       "linkedNextCase": "",
-      "linkedFromCase": "",
-      "durationMin": 4,
-      "isProtected": true,
-      "hasPassword": true
+      "linkedFromCase": ""
     },
     {
       "caseId": "OSPE-CLW1M04",

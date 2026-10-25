@@ -1,13 +1,13 @@
 /**
  * PLE-CC2 OSPE Practice System — Offline Case List Metadata (Auto-Generated)
- * Version: v_20261025_143645
- * Generated on 2026-10-25 14:36:45
+ * Version: v_20261025_144255
+ * Generated on 2026-10-25 14:42:55
  */
 
 const OFFLINE_DATA = {
-  "version": "v_20261025_143645",
-  "generatedAt": "2026-10-25 14:36:45",
-  "totalCases": 417,
+  "version": "v_20261025_144255",
+  "generatedAt": "2026-10-25 14:42:55",
+  "totalCases": 418,
   "cases": [
     {
       "caseId": "OSPE-CL4801",
@@ -5150,7 +5150,7 @@ const OFFLINE_DATA = {
       "caseId": "OSPE-PD84M1W301B",
       "title": "Gel Base 1B",
       "category": "Product",
-      "mainGroup": "เทคนิคพิเศษ",
+      "mainGroup": "Semisolid Dosage Form",
       "subTopic": "",
       "disease": "Gel Base",
       "difficulty": 2,
@@ -5165,9 +5165,29 @@ const OFFLINE_DATA = {
     },
     {
       "caseId": "OSPE-PD84M1W302A",
+      "title": "OSPE-PD84M1W302A",
+      "category": "Product",
+      "mainGroup": "Mock Exam 2569",
+      "subTopic": "🔒 ข้อสอบลับ (ต้องใช้รหัสผ่าน)",
+      "disease": "🔒 ล็อกด้วยรหัสผ่าน (Secret Mock)",
+      "difficulty": 2,
+      "docId": "1Bjdz8c6-Gr5GIHGllXIvt0FLPeWTAdZy586vtVDOr24",
+      "author": "RxCU84",
+      "createdDate": "25/10/2569",
+      "source": "Mock Exam 2569 (Week 3) ชุด A",
+      "isActive": true,
+      "caseStatus": "Active",
+      "linkedNextCase": "",
+      "linkedFromCase": "",
+      "durationMin": 8,
+      "isProtected": true,
+      "hasPassword": true
+    },
+    {
+      "caseId": "OSPE-PD84M1W302B",
       "title": "Suspension 2B",
       "category": "Product",
-      "mainGroup": "เทคนิคพิเศษ",
+      "mainGroup": "Liquid Dosage Form",
       "subTopic": "",
       "disease": "Suspension",
       "difficulty": 2,
@@ -5204,7 +5224,7 @@ const OFFLINE_DATA = {
       "caseId": "OSPE-PD84M1W303B",
       "title": "Mucilage 3B",
       "category": "Product",
-      "mainGroup": "เทคนิคพิเศษ",
+      "mainGroup": "Semisolid Dosage Form",
       "subTopic": "",
       "disease": "Mucilage",
       "difficulty": 2,

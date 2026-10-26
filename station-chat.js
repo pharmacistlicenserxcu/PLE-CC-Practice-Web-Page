@@ -366,7 +366,7 @@
       for (let attempt = 0; attempt < maxAttempts; attempt++) {
         const currentEntry = this._geminiKeyPool[this._currentKeyIdx];
         const API_KEY = localStorage.getItem('_gemini_api_key') || currentEntry.key;
-        const endpoint = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3.8-flash-tts:generateContent?key=${API_KEY}`;
+        const endpoint = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3.8-flash-lite-tts:generateContent?key=${API_KEY}`;
 
         try {
           const controller = new AbortController();
@@ -875,7 +875,8 @@
           const currentEntry = this._geminiKeyPool[this._currentKeyIdx];
           const customKey = localStorage.getItem('_gemini_api_key');
           const API_KEY = (customKey && attempt === 0) ? customKey : currentEntry.key;
-          const ENDPOINT = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3.8-flash:generateContent?key=${API_KEY}`;
+          const targetModel = attempt === 0 ? 'gemini-flash-lite-latest' : 'gemini-3.5-flash-lite';
+          const ENDPOINT = `https://generativelanguage.googleapis.com/v1beta/models/${targetModel}:generateContent?key=${API_KEY}`;
 
           try {
             const controller = new AbortController();
@@ -1232,7 +1233,8 @@ ${caseContext || '(ยังไม่มีข้อมูลเคส)'}
         const currentEntry = this._geminiKeyPool[this._currentKeyIdx];
         const customKey = localStorage.getItem('_gemini_api_key');
         const API_KEY = (customKey && attempt === 0) ? customKey : currentEntry.key;
-        const ENDPOINT = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3.8-flash:generateContent?key=${API_KEY}`;
+        const targetModel = attempt === 0 ? 'gemini-flash-lite-latest' : 'gemini-3.5-flash-lite';
+        const ENDPOINT = `https://generativelanguage.googleapis.com/v1beta/models/${targetModel}:generateContent?key=${API_KEY}`;
 
         try {
           const controller = new AbortController();
@@ -1693,9 +1695,50 @@ ${caseContext || '(ยังไม่มีข้อมูลเคส)'}
 
   window.handleStationChatTyping = function () {};
 
-  // Unified Action Menu Handlers
+  // Unified Action Menu Handlers & Draggable FAB
+  const UNIFIED_FAB_POS_KEY = 'ple_unified_tools_fab_pos_v1';
+
+  function positionUnifiedExamToolsMenu() {
+    const menu = document.getElementById('unified-exam-tools-menu');
+    const fab = document.getElementById('btn-unified-exam-tools');
+    if (!menu || !fab || window.innerWidth <= 768) {
+      if (menu) {
+        menu.style.top = '';
+        menu.style.left = '';
+        menu.style.bottom = '';
+        menu.style.right = '';
+      }
+      return;
+    }
+    const fabRect = fab.getBoundingClientRect();
+    const menuW = 290;
+    const menuH = 135;
+    const padding = 12;
+
+    if (fab.dataset.hasCustomPos === 'true') {
+      let top = fabRect.top - menuH - 8;
+      if (top < padding) top = fabRect.bottom + 8;
+      let left = fabRect.right - menuW;
+      if (left < padding) left = padding;
+      if (left + menuW > window.innerWidth - padding) left = window.innerWidth - padding - menuW;
+
+      menu.style.position = 'fixed';
+      menu.style.top = Math.round(top) + 'px';
+      menu.style.left = Math.round(left) + 'px';
+      menu.style.bottom = 'auto';
+      menu.style.right = 'auto';
+    } else {
+      menu.style.top = '';
+      menu.style.left = '';
+      menu.style.bottom = '';
+      menu.style.right = '';
+    }
+  }
+
   window.toggleUnifiedExamToolsMenu = function (e) {
     if (e) e.stopPropagation();
+    if (window.getSelection && window.getSelection().toString().trim().length > 0) return;
+
     const menu = document.getElementById('unified-exam-tools-menu');
     const fab = document.getElementById('btn-unified-exam-tools');
     if (!menu) return;
@@ -1708,12 +1751,118 @@ ${caseContext || '(ยังไม่มีข้อมูลเคส)'}
     }
 
     const isOpen = menu.style.display === 'flex';
-    menu.style.display = isOpen ? 'none' : 'flex';
-    if (fab) {
-      if (!isOpen) fab.classList.add('active');
-      else fab.classList.remove('active');
+    if (!isOpen) {
+      positionUnifiedExamToolsMenu();
+      menu.style.display = 'flex';
+      if (fab) fab.classList.add('active');
+    } else {
+      menu.style.display = 'none';
+      if (fab) fab.classList.remove('active');
     }
   };
+
+  function initUnifiedToolsFabDrag() {
+    const fab = document.getElementById('btn-unified-exam-tools');
+    if (!fab || fab.dataset.dragInit === 'true') return;
+    fab.dataset.dragInit = 'true';
+
+    try {
+      const saved = localStorage.getItem(UNIFIED_FAB_POS_KEY);
+      if (saved && window.innerWidth > 768) {
+        const pos = JSON.parse(saved);
+        if (pos && typeof pos.left === 'number' && typeof pos.top === 'number') {
+          const maxL = window.innerWidth - fab.offsetWidth - 8;
+          const maxT = window.innerHeight - fab.offsetHeight - 8;
+          const clampedL = Math.max(8, Math.min(maxL, pos.left));
+          const clampedT = Math.max(8, Math.min(maxT, pos.top));
+          fab.style.left = clampedL + 'px';
+          fab.style.top = clampedT + 'px';
+          fab.style.right = 'auto';
+          fab.style.bottom = 'auto';
+          fab.dataset.hasCustomPos = 'true';
+        }
+      }
+    } catch (_) {}
+
+    let isPointerDown = false;
+    let isDragging = false;
+    let startX = 0, startY = 0;
+    let startL = 0, startT = 0;
+    const dragThreshold = 6;
+    let suppressClick = false;
+
+    fab.addEventListener('pointerdown', (e) => {
+      if (window.innerWidth <= 768) return;
+      isPointerDown = true;
+      isDragging = false;
+      suppressClick = false;
+      startX = e.clientX;
+      startY = e.clientY;
+      const rect = fab.getBoundingClientRect();
+      startL = rect.left;
+      startT = rect.top;
+      try { fab.setPointerCapture(e.pointerId); } catch (_) {}
+    });
+
+    fab.addEventListener('pointermove', (e) => {
+      if (!isPointerDown) return;
+      const dx = e.clientX - startX;
+      const dy = e.clientY - startY;
+      const dist = Math.hypot(dx, dy);
+
+      if (!isDragging && dist > dragThreshold) {
+        isDragging = true;
+        suppressClick = true;
+        fab.classList.add('fab-dragging');
+        fab.style.transition = 'none';
+      }
+
+      if (isDragging) {
+        e.preventDefault();
+        const maxL = window.innerWidth - fab.offsetWidth - 8;
+        const maxT = window.innerHeight - fab.offsetHeight - 8;
+        const newL = Math.max(8, Math.min(maxL, startL + dx));
+        const newT = Math.max(8, Math.min(maxT, startT + dy));
+        fab.style.left = Math.round(newL) + 'px';
+        fab.style.top = Math.round(newT) + 'px';
+        fab.style.right = 'auto';
+        fab.style.bottom = 'auto';
+        fab.dataset.hasCustomPos = 'true';
+      }
+    });
+
+    const stopFabDrag = (e) => {
+      if (!isPointerDown) return;
+      isPointerDown = false;
+      try { fab.releasePointerCapture(e.pointerId); } catch (_) {}
+
+      if (isDragging) {
+        isDragging = false;
+        fab.classList.remove('fab-dragging');
+        fab.style.transition = '';
+        try {
+          const rect = fab.getBoundingClientRect();
+          localStorage.setItem(UNIFIED_FAB_POS_KEY, JSON.stringify({
+            left: Math.round(rect.left),
+            top: Math.round(rect.top)
+          }));
+        } catch (_) {}
+        positionUnifiedExamToolsMenu();
+        setTimeout(() => { suppressClick = false; }, 120);
+      }
+    };
+
+    fab.addEventListener('pointerup', stopFabDrag);
+    fab.addEventListener('pointercancel', stopFabDrag);
+
+    fab.addEventListener('click', (e) => {
+      if (suppressClick) {
+        e.stopImmediatePropagation();
+        e.preventDefault();
+        suppressClick = false;
+      }
+    }, true);
+  }
 
   window.closeUnifiedExamToolsMenu = function () {
     const menu = document.getElementById('unified-exam-tools-menu');
@@ -2027,11 +2176,13 @@ ${caseContext || '(ยังไม่มีข้อมูลเคส)'}
     document.addEventListener('DOMContentLoaded', () => {
       initStationChatDragAndResize();
       setupMobileChatDrag();
+      initUnifiedToolsFabDrag();
     });
   } else {
     setTimeout(() => {
       initStationChatDragAndResize();
       setupMobileChatDrag();
+      initUnifiedToolsFabDrag();
     }, 200);
   }
 
@@ -2045,6 +2196,21 @@ ${caseContext || '(ยังไม่มีข้อมูลเคส)'}
         drawer.style.bottom = '';
         drawer.style.width = '';
         drawer.classList.remove('dragging', 'resizing');
+      }
+      const fab = document.getElementById('btn-unified-exam-tools');
+      if (fab) {
+        fab.style.left = '';
+        fab.style.top = '';
+        fab.style.right = '';
+        fab.style.bottom = '';
+        delete fab.dataset.hasCustomPos;
+      }
+      const menu = document.getElementById('unified-exam-tools-menu');
+      if (menu) {
+        menu.style.left = '';
+        menu.style.top = '';
+        menu.style.right = '';
+        menu.style.bottom = '';
       }
     }
   });

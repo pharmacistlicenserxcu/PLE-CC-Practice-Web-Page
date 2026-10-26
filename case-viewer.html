@@ -465,6 +465,12 @@
       background: linear-gradient(135deg, #083344 0%, #155E75 100%);
       border-color: rgba(255,255,255,0.5);
     }
+    .unified-tools-fab.fab-dragging {
+      cursor: grabbing !important;
+      opacity: 0.92;
+      box-shadow: 0 16px 36px -4px rgba(14, 116, 144, 0.6);
+      user-select: none;
+    }
     .st-chat-badge {
       background: #ef4444;
       color: #fff;
@@ -1566,7 +1572,7 @@
   <script src="case-details-offline.js?v=v_20261026_140213"></script>
   <script src="app.js?v=v_20261026_140213"></script>
   <script src="scratchpad.js?v=20261004_234400"></script>
-  <script src="station-chat.js?v=v_20261019_150000"></script>
+  <script src="station-chat.js?v=v_20261026_140000"></script>
 
   <script>
     // ─ Fullscreen helper ─
@@ -3550,7 +3556,7 @@
       <div style="display: flex; align-items: center; gap: 4px;">
         <button type="button" id="btn-ai-chat-toggle"
           onclick="toggleAIChatMode()"
-          title="เปิด/ปิด Gemini AI ติวเตอร์และผู้ป่วยจำลอง (gemini-3.8-flash)"
+          title="เปิด/ปิด Gemini AI ติวเตอร์และผู้ป่วยจำลอง (Gemini Flash Lite)"
           style="background: none; border: 1.5px solid var(--border-color, #e2e8f0);
                  font-size: 0.73rem; cursor: pointer; color: var(--text-muted);
                  line-height: 1; padding: 0.22rem 0.6rem; border-radius: 7px;

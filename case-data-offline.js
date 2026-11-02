@@ -1,12 +1,12 @@
 /**
  * PLE-CC2 OSPE Practice System — Offline Case List Metadata (Auto-Generated)
- * Version: v_20261102_103917
- * Generated on 2026-11-02 10:39:17
+ * Version: v_20261102_105136
+ * Generated on 2026-11-02 10:51:36
  */
 
 const OFFLINE_DATA = {
-  "version": "v_20261102_103917",
-  "generatedAt": "2026-11-02 10:39:17",
+  "version": "v_20261102_105136",
+  "generatedAt": "2026-11-02 10:51:36",
   "totalCases": 433,
   "cases": [
     {
@@ -2731,11 +2731,11 @@ const OFFLINE_DATA = {
     },
     {
       "caseId": "OSPE-CL84DS01",
-      "title": "การประเมินและเลือกจ่ายยาในโรคต่อมทอนซิลอักเสบจากเชื้อแบคทีเรียในผู้ป่วยแพ้ยาเพนิซิลลินรุนแรง",
+      "title": "OSPE-CL84DS01",
       "category": "Clinic",
-      "mainGroup": "การซักประวัติและจ่ายยา",
-      "subTopic": "",
-      "disease": "ต่อมทอนซิลอักเสบจากเชื้อแบคทีเรีย (GAS Tonsillopharyngitis)",
+      "mainGroup": "Mock Exam 2569",
+      "subTopic": "🔒 ข้อสอบลับ (ต้องใช้รหัสผ่าน)",
+      "disease": "🔒 ล็อกด้วยรหัสผ่าน (Secret Mock)",
       "difficulty": 2,
       "docId": "1Bjdz8c6-Gr5GIHGllXIvt0FLPeWTAdZy586vtVDOr24",
       "author": "คณะทำงานคลังข้อสอบร่วมสมรรถนะเภสัชกรรม (ระบบกลาง)",
@@ -2744,15 +2744,17 @@ const OFFLINE_DATA = {
       "isActive": true,
       "caseStatus": "Active",
       "linkedNextCase": "",
-      "linkedFromCase": ""
+      "linkedFromCase": "",
+      "isProtected": true,
+      "hasPassword": true
     },
     {
       "caseId": "OSPE-CL84DS02",
-      "title": "การประเมินและเลือกจ่ายยาในโรคกระเพาะปัสสาวะอักเสบเฉียบพลันและคำเตือนยาเปลี่ยนสีปัสสาวะ",
+      "title": "OSPE-CL84DS02",
       "category": "Clinic",
-      "mainGroup": "การซักประวัติและจ่ายยา",
-      "subTopic": "",
-      "disease": "กระเพาะปัสสาวะอักเสบเฉียบพลัน (Acute Uncomplicated Cystitis)",
+      "mainGroup": "Mock Exam 2569",
+      "subTopic": "🔒 ข้อสอบลับ (ต้องใช้รหัสผ่าน)",
+      "disease": "🔒 ล็อกด้วยรหัสผ่าน (Secret Mock)",
       "difficulty": 2,
       "docId": "1Bjdz8c6-Gr5GIHGllXIvt0FLPeWTAdZy586vtVDOr24",
       "author": "คณะทำงานคลังข้อสอบร่วมสมรรถนะเภสัชกรรม (ระบบกลาง)",
@@ -2761,7 +2763,9 @@ const OFFLINE_DATA = {
       "isActive": true,
       "caseStatus": "Active",
       "linkedNextCase": "",
-      "linkedFromCase": ""
+      "linkedFromCase": "",
+      "isProtected": true,
+      "hasPassword": true
     },
     {
       "caseId": "OSPE-CL84DS03",
@@ -2784,11 +2788,11 @@ const OFFLINE_DATA = {
     },
     {
       "caseId": "OSPE-CL84DS04",
-      "title": "การประเมินและเลือกจ่ายยาในโรคปวดศีรษะไมเกรนในผู้ป่วยที่ได้รับยาต้านไวรัส HIV และมีประวัติแพ้ยากลุ่มซัลฟา",
+      "title": "OSPE-CL84DS04",
       "category": "Clinic",
-      "mainGroup": "การซักประวัติและจ่ายยา",
-      "subTopic": "",
-      "disease": "ปวดศีรษะไมเกรน (Acute Migraine with HIV ARV DDI & Sulfa Allergy)",
+      "mainGroup": "Mock Exam 2569",
+      "subTopic": "🔒 ข้อสอบลับ (ต้องใช้รหัสผ่าน)",
+      "disease": "🔒 ล็อกด้วยรหัสผ่าน (Secret Mock)",
       "difficulty": 2,
       "docId": "1Bjdz8c6-Gr5GIHGllXIvt0FLPeWTAdZy586vtVDOr24",
       "author": "คณะทำงานคลังข้อสอบร่วมสมรรถนะเภสัชกรรม (ระบบกลาง)",
@@ -2797,15 +2801,17 @@ const OFFLINE_DATA = {
       "isActive": true,
       "caseStatus": "Active",
       "linkedNextCase": "",
-      "linkedFromCase": ""
+      "linkedFromCase": "",
+      "isProtected": true,
+      "hasPassword": true
     },
     {
       "caseId": "OSPE-CL84DS05",
-      "title": "การประเมินและเลือกจ่ายยาในโรคอุจจาระร่วงติดเชื้อแบคทีเรียชนิดถ่ายเป็นมูกเลือด",
+      "title": "OSPE-CL84DS05",
       "category": "Clinic",
-      "mainGroup": "การซักประวัติและจ่ายยา",
-      "subTopic": "",
-      "disease": "อุจจาระร่วงติดเชื้อแบบบุกรุก (Bacillary Dysentery)",
+      "mainGroup": "Mock Exam 2569",
+      "subTopic": "🔒 ข้อสอบลับ (ต้องใช้รหัสผ่าน)",
+      "disease": "🔒 ล็อกด้วยรหัสผ่าน (Secret Mock)",
       "difficulty": 2,
       "docId": "1Bjdz8c6-Gr5GIHGllXIvt0FLPeWTAdZy586vtVDOr24",
       "author": "คณะทำงานคลังข้อสอบร่วมสมรรถนะเภสัชกรรม (ระบบกลาง)",
@@ -2814,15 +2820,17 @@ const OFFLINE_DATA = {
       "isActive": true,
       "caseStatus": "Active",
       "linkedNextCase": "",
-      "linkedFromCase": ""
+      "linkedFromCase": "",
+      "isProtected": true,
+      "hasPassword": true
     },
     {
       "caseId": "OSPE-CL84DS06",
-      "title": "การประเมินและเลือกจ่ายยาในโรคงูสวัดและการจัดการอาการปวดปลายประสาทในผู้ป่วยต่อมลูกหมากโต",
+      "title": "OSPE-CL84DS06",
       "category": "Clinic",
-      "mainGroup": "การซักประวัติและจ่ายยา",
-      "subTopic": "",
-      "disease": "โรคงูสวัดและปวดประสาท (Herpes Zoster & Neuropathic Pain with BPH)",
+      "mainGroup": "Mock Exam 2569",
+      "subTopic": "🔒 ข้อสอบลับ (ต้องใช้รหัสผ่าน)",
+      "disease": "🔒 ล็อกด้วยรหัสผ่าน (Secret Mock)",
       "difficulty": 2,
       "docId": "1Bjdz8c6-Gr5GIHGllXIvt0FLPeWTAdZy586vtVDOr24",
       "author": "คณะทำงานคลังข้อสอบร่วมสมรรถนะเภสัชกรรม (ระบบกลาง)",
@@ -2831,15 +2839,17 @@ const OFFLINE_DATA = {
       "isActive": true,
       "caseStatus": "Active",
       "linkedNextCase": "",
-      "linkedFromCase": ""
+      "linkedFromCase": "",
+      "isProtected": true,
+      "hasPassword": true
     },
     {
       "caseId": "OSPE-CL84DS07",
-      "title": "การประเมินและเลือกจ่ายยาในโรคท้องผูกในสตรีมีครรภ์ตามระยะเวลาการออกฤทธิ์",
+      "title": "OSPE-CL84DS07",
       "category": "Clinic",
-      "mainGroup": "การซักประวัติและจ่ายยา",
-      "subTopic": "",
-      "disease": "ท้องผูกในสตรีมีครรภ์ (Constipation in Pregnancy)",
+      "mainGroup": "Mock Exam 2569",
+      "subTopic": "🔒 ข้อสอบลับ (ต้องใช้รหัสผ่าน)",
+      "disease": "🔒 ล็อกด้วยรหัสผ่าน (Secret Mock)",
       "difficulty": 2,
       "docId": "1Bjdz8c6-Gr5GIHGllXIvt0FLPeWTAdZy586vtVDOr24",
       "author": "คณะทำงานคลังข้อสอบร่วมสมรรถนะเภสัชกรรม (ระบบกลาง)",
@@ -2848,15 +2858,17 @@ const OFFLINE_DATA = {
       "isActive": true,
       "caseStatus": "Active",
       "linkedNextCase": "",
-      "linkedFromCase": ""
+      "linkedFromCase": "",
+      "isProtected": true,
+      "hasPassword": true
     },
     {
       "caseId": "OSPE-CL84DS08",
-      "title": "การประเมินและเลือกจ่ายยาในโรคเวียนศีรษะบ้านหมุนในผู้สูงอายุและข้อห้ามใช้ยากลุ่มแอนติฮิสตามีน",
+      "title": "OSPE-CL84DS08",
       "category": "Clinic",
-      "mainGroup": "การซักประวัติและจ่ายยา",
-      "subTopic": "",
-      "disease": "เวียนศีรษะบ้านหมุนในผู้สูงอายุ (Geriatric Vertigo)",
+      "mainGroup": "Mock Exam 2569",
+      "subTopic": "🔒 ข้อสอบลับ (ต้องใช้รหัสผ่าน)",
+      "disease": "🔒 ล็อกด้วยรหัสผ่าน (Secret Mock)",
       "difficulty": 2,
       "docId": "1Bjdz8c6-Gr5GIHGllXIvt0FLPeWTAdZy586vtVDOr24",
       "author": "คณะทำงานคลังข้อสอบร่วมสมรรถนะเภสัชกรรม (ระบบกลาง)",
@@ -2865,7 +2877,9 @@ const OFFLINE_DATA = {
       "isActive": true,
       "caseStatus": "Active",
       "linkedNextCase": "",
-      "linkedFromCase": ""
+      "linkedFromCase": "",
+      "isProtected": true,
+      "hasPassword": true
     },
     {
       "caseId": "OSPE-CL84EE01",

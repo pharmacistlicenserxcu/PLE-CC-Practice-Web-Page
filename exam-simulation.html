@@ -4348,7 +4348,10 @@
             document.getElementById('otp-' + (i-1)).focus();
           }
           if (e.key === 'Enter') {
-            document.getElementById('lobby-submit-btn').click();
+            e.preventDefault();
+            e.stopPropagation();
+            const _btn = document.getElementById('lobby-submit-btn');
+            if (_btn && !_btn.disabled) _btn.click();
           }
         });
         box.addEventListener('paste', function(e) {
@@ -5275,13 +5278,20 @@
     window.insertRestStationsSmart = insertRestStationsSmart;
 
     // ─── Submit Lobby Form (Firebase) ────────────────────────────────────
+    let _isSubmittingLobbySetup = false;
     async function submitLobbySetup() {
+      if (_isSubmittingLobbySetup) return;
       const playerName = document.getElementById('lobby-player-name').value.trim();
       if (!playerName) { alert('กรุณากรอกชื่อผู้ใช้งาน'); return; }
       try {
         localStorage.setItem('ple_player_name', playerName);
       } catch (e) {}
       
+      _isSubmittingLobbySetup = true;
+      const _lobbySubmitBtn = document.getElementById('lobby-submit-btn');
+      const _lobbyJoinBtn = document.getElementById('lobby-join-btn');
+      if (_lobbySubmitBtn) _lobbySubmitBtn.disabled = true;
+      if (_lobbyJoinBtn) _lobbyJoinBtn.disabled = true;
       showGlobalLoader(true);
       SimState.lobbyPlayerName = playerName;
       
@@ -5599,13 +5609,14 @@
           const existingByName = playerName ? Object.values(roomData.players || {}).find(p => p.name && p.name.trim().toLowerCase() === playerName.trim().toLowerCase()) : null;
 
           // Prevent name collision in Lobby: if someone else in the room already has this name and it's not our tab's session
-          if (roomData.status === 'setup' && !existingById && existingByName) {
+          const isSamePersonRecent = existingByName && (Date.now() - (existingByName.joinedAt || 0) < 60000);
+          if (roomData.status === 'setup' && !existingById && existingByName && !isSamePersonRecent) {
             showGlobalLoader(false);
             alert(`ชื่อ "${playerName}" มีผู้ใช้งานอยู่ในห้องสอบนี้แล้ว กรุณาใช้ชื่ออื่นเพื่อไม่ให้ซ้ำกันครับ`);
             return;
           }
 
-          const isExistingMember = Boolean(existingById || existingByName);
+          const isExistingMember = Boolean(existingById || (existingByName && isSamePersonRecent));
 
           // If exam is in progress (running or countdown) and this is NOT an existing member: BLOCK!
           if ((roomData.status === 'running' || roomData.status === 'countdown') && !isExistingMember) {
@@ -5705,6 +5716,15 @@
             joinedAt: (existingById?.joinedAt || existingByName?.joinedAt || Date.now())
           };
           
+          // Clean up duplicate player entries with the same name before saving
+          if (roomData.players && typeof roomData.players === 'object') {
+            Object.keys(roomData.players).forEach(pKey => {
+              const p = roomData.players[pKey];
+              if (p && p.name && p.name.trim().toLowerCase() === playerName.trim().toLowerCase() && p.id !== myPlayerId) {
+                try { _fbDb.ref(`rooms/${roomIdInput}/players/${pKey}`).remove(); } catch (_) {}
+              }
+            });
+          }
           // Add/update this player into players collection
           await _fbDb.ref(`rooms/${roomIdInput}/players/${myPlayerId}`).set(newPlayer);
 
@@ -5758,6 +5778,12 @@
       } catch (e) {
         console.error(e);
         alert('ข้อผิดพลาดในการเชื่อมต่อ Lobby: ' + e.toString());
+      } finally {
+        _isSubmittingLobbySetup = false;
+        const _lobbySubmitBtn = document.getElementById('lobby-submit-btn');
+        const _lobbyJoinBtn = document.getElementById('lobby-join-btn');
+        if (_lobbySubmitBtn) _lobbySubmitBtn.disabled = false;
+        if (_lobbyJoinBtn) _lobbyJoinBtn.disabled = false;
         showGlobalLoader(false);
       }
     }
@@ -6426,7 +6452,7 @@
           if (stickyHeader) stickyHeader.style.display = 'none';
           
           // Sync current player's avatar & role in customizer
-          const mePlayer = playersList.find(p => p.id === SimState.myPlayerId || p.name === SimState.lobbyPlayerName);
+          const mePlayer = playersList.find(p => p.id && p.id === SimState.myPlayerId) || playersList.find(p => p.name === SimState.lobbyPlayerName);
           if (mePlayer) {
             if (mePlayer.emoji) {
               SimState.myEmoji = mePlayer.emoji;
@@ -6632,7 +6658,7 @@
             if (carouselPanel) carouselPanel.style.display = 'none';
             if (standardRoleSelector) {
               standardRoleSelector.style.display = 'block';
-              const meP = playersList.find(p => p.id === SimState.myPlayerId || p.name === SimState.lobbyPlayerName);
+              const meP = playersList.find(p => p.id && p.id === SimState.myPlayerId) || playersList.find(p => p.name === SimState.lobbyPlayerName);
               if (meP && meP.role) {
                 SimState.role = meP.role;
               }
@@ -6676,7 +6702,7 @@
           if (isStandardMode) {
             updateStandardRoleSelectorUI();
             // ── Standard Practice Mode (1 Examiner + Multiple Candidates) ──
-            const mePlayer = playersList.find(p => p.id === SimState.myPlayerId || p.name === SimState.lobbyPlayerName);
+            const mePlayer = playersList.find(p => p.id && p.id === SimState.myPlayerId) || playersList.find(p => p.name === SimState.lobbyPlayerName);
             const myRole = mePlayer?.role || SimState.role || 'examinee';
             const isExaminer = (myRole === 'examiner');
 
@@ -6724,7 +6750,7 @@
               if (readyContainer) readyContainer.style.display = 'block';
               if (startBtn) startBtn.style.display = 'none';
 
-              const meP = playersList.find(p => p.id === SimState.myPlayerId || p.name === SimState.lobbyPlayerName);
+              const meP = playersList.find(p => p.id && p.id === SimState.myPlayerId) || playersList.find(p => p.name === SimState.lobbyPlayerName);
               if (meP && meP.isReady !== undefined) {
                 SimState.isReady = !!meP.isReady;
               }
@@ -6779,7 +6805,7 @@
               if (readyContainer) readyContainer.style.display = 'block';
               if (startBtn) startBtn.style.display = 'none';
 
-              const mePlayer = playersList.find(p => p.id === SimState.myPlayerId || p.name === SimState.lobbyPlayerName);
+              const mePlayer = playersList.find(p => p.id && p.id === SimState.myPlayerId) || playersList.find(p => p.name === SimState.lobbyPlayerName);
               if (mePlayer && mePlayer.isReady !== undefined) {
                 SimState.isReady = !!mePlayer.isReady;
               }
@@ -6806,6 +6832,25 @@
             SimState.currentRoomId = room.roomId;
             SimState.currentExamSetRaw = room.examSet;
             await buildStationsFromRoom(room);
+          } else if (room.unlockedCaseDetails && typeof room.unlockedCaseDetails === 'object' && SimState.stations && SimState.stations.length > 0) {
+            let hasHydrated = false;
+            SimState.stations.forEach(st => {
+              if (st && st.case && !st.isRest) {
+                const cid = (st.case.caseId || '').trim();
+                const raw = cid.replace(/^OSPE-/i, '');
+                const ospe = cid.startsWith('OSPE-') ? cid : ('OSPE-' + cid);
+                const unlocked = room.unlockedCaseDetails[cid] || room.unlockedCaseDetails[raw] || room.unlockedCaseDetails[ospe];
+                if (unlocked && (!st.case.patientInfoHtml || !st.case.checklist || st.case.checklist.length === 0)) {
+                  Object.assign(st.case, unlocked);
+                  if (!SimState.unlockedCases) SimState.unlockedCases = {};
+                  SimState.unlockedCases[cid] = unlocked;
+                  hasHydrated = true;
+                }
+              }
+            });
+            if (hasHydrated && SimState.hasRenderedFirstStation && !SimState.isExamFinished) {
+              renderStation(SimState.currentIdx || 0);
+            }
           }
 
           // If the exam is already running, bypass countdown immediately on reconnect/refresh
@@ -6830,16 +6875,30 @@
             
             if (!SimState.countdownInterval) {
               let count = 3;
-              document.getElementById('lobby-countdown-number').textContent = count;
+              const cdNumEl = document.getElementById('lobby-countdown-number');
+              if (cdNumEl) {
+                cdNumEl.textContent = count;
+                cdNumEl.style.animation = 'none';
+                void cdNumEl.offsetWidth;
+                cdNumEl.style.animation = '';
+              }
               SimState.countdownInterval = setInterval(() => {
                 count--;
                 if (count > 0) {
-                  document.getElementById('lobby-countdown-number').textContent = count;
+                  if (cdNumEl) {
+                    cdNumEl.textContent = count;
+                    cdNumEl.style.animation = 'none';
+                    void cdNumEl.offsetWidth;
+                    cdNumEl.style.animation = '';
+                  }
                 } else {
                   clearInterval(SimState.countdownInterval);
                   SimState.countdownInterval = null;
                   SimState.hasDoneCountdown = true;
-                  document.getElementById('lobby-countdown-screen').style.display = 'none';
+                  const cdScreen = document.getElementById('lobby-countdown-screen');
+                  if (cdScreen) cdScreen.style.display = 'none';
+                  if (cdNumEl) cdNumEl.textContent = '';
+                  playStationTransitionBell(3.0);
                   
                   const latestRoomOnCd = SimState.cachedRoom || room;
                   if (latestRoomOnCd.isSuperHost && SimState.isHost) {
@@ -7355,8 +7414,9 @@
                 if (dec) {
                   st.case = Object.assign({}, st.case, dec);
                   SimState.unlockedCases[cleanId] = st.case;
-                  sessionStorage.setItem('sim_unlocked_' + cleanId, JSON.stringify(st.case));
-                  sessionStorage.setItem('ple_unlocked_' + cleanId, JSON.stringify(st.case));
+                  try {
+                    sessionStorage.setItem('sim_unlocked_' + cleanId, JSON.stringify(st.case));
+                  } catch (_) {}
                 }
               } catch (_) {}
             }
@@ -7477,12 +7537,12 @@
                       st.case.durationMin = encObj.durationMin;
                     }
                     SimState.unlockedCases[cleanId] = st.case;
-                    sessionStorage.setItem('sim_unlocked_' + cleanId, JSON.stringify(st.case));
-                    sessionStorage.setItem('ple_unlocked_' + cleanId, JSON.stringify(st.case));
-                    if (!cleanId.startsWith('OSPE-')) {
-                      sessionStorage.setItem('ple_unlocked_OSPE-' + cleanId, JSON.stringify(st.case));
-                    }
                     unlockedMap[cleanId] = st.case;
+                    try {
+                      sessionStorage.setItem('sim_unlocked_' + cleanId, JSON.stringify(st.case));
+                    } catch (storageErr) {
+                      console.warn('sessionStorage quota exceeded, keeping in memory:', cleanId);
+                    }
                   }
                 } catch(decErr) {
                   console.warn('Error decrypting case:', cleanId, decErr);
@@ -8512,6 +8572,8 @@
 
     async function unlockStationAssessmentForEdit() {
       SimState.isStationSubmitted = false;
+      const chkContUnlock = document.getElementById('exam-checklist-container');
+      if (chkContUnlock) chkContUnlock.classList.remove('is-submitted-locked');
       const activeIdx = (SimState._isLocalReview && typeof SimState._localReviewStationIdx === 'number')
         ? SimState._localReviewStationIdx
         : SimState.currentIdx;
@@ -8983,16 +9045,24 @@
         cdScreen.style.display = 'flex';
         let count = 3;
         cdNum.textContent = count;
+        cdNum.style.animation = 'none';
+        void cdNum.offsetWidth;
+        cdNum.style.animation = '';
 
         if (SimState.countdownInterval) clearInterval(SimState.countdownInterval);
         SimState.countdownInterval = setInterval(() => {
           count--;
           if (count > 0) {
             cdNum.textContent = count;
+            cdNum.style.animation = 'none';
+            void cdNum.offsetWidth;
+            cdNum.style.animation = '';
           } else {
             clearInterval(SimState.countdownInterval);
             SimState.countdownInterval = null;
             cdScreen.style.display = 'none';
+            cdNum.textContent = '';
+            playStationTransitionBell(3.0);
             document.querySelector('.exam-layout').style.display = 'flex';
             if (stickyTimer) stickyTimer.style.display = 'block';
             if (stickyHeader) stickyHeader.style.display = 'block';
@@ -9766,13 +9836,26 @@
         if (typeof removeLocalReviewBanner === 'function') removeLocalReviewBanner();
       }
       SimState.currentIdx = idx;
-      const isGradingOrTimeUp = (SimState.timerValue <= 0) || SimState.isStationGradingPhase;
-      if (isGradingOrTimeUp && SimState.isLobby && (SimState.role === 'examiner' || SimState.myBreakoutRole === 'examiner')) {
-        SimState.isStationGradingPhase = true;
-      } else if (!SimState._isSoloReview && SimState.timerValue > 0) {
-        SimState.isStationGradingPhase = false;
-        SimState.isStationSubmitted = false;
+      const currStForLock = SimState.stations && SimState.stations[idx];
+      const stNumForLock = currStForLock ? currStForLock.stationNumber : (idx + 1);
+      let currStationIsSub = false;
+      if (SimState.examMode === 'cohort_breakout' && SimState.myBreakoutTableId && SimState.cachedRoom?.breakouts) {
+        currStationIsSub = Boolean(SimState.cachedRoom.breakouts[SimState.myBreakoutTableId]?.scores?.[stNumForLock]?.isSubmitted || SimState.cachedRoom.breakoutSubmissions?.['st_' + stNumForLock]?.[SimState.myBreakoutTableId]?.isSubmitted);
+      } else if (SimState.examMode === 'carousel_rotation') {
+        const assignedStationNum = SimState.myCarouselStation || stNumForLock;
+        const r = (SimState.cachedRoom && SimState.cachedRoom.currentStationIdx !== undefined) ? SimState.cachedRoom.currentStationIdx : 0;
+        currStationIsSub = Boolean(SimState.cachedRoom?.carouselSubmissions?.[`round_${r}`]?.[`st_${assignedStationNum}`]?.isSubmitted);
+      } else if (SimState.isLobby) {
+        currStationIsSub = Boolean(SimState.cachedRoom?.submissions?.[stNumForLock]?.isSubmitted);
       }
+      SimState.isStationSubmitted = currStationIsSub;
+
+      if (!SimState._isSoloReview && SimState.timerValue > 0) {
+        SimState.isStationGradingPhase = false;
+      } else if (SimState.timerValue <= 0 && SimState.isLobby && (SimState.role === 'examiner' || SimState.myBreakoutRole === 'examiner')) {
+        SimState.isStationGradingPhase = true;
+      }
+
       const gradingBannerEl = document.getElementById('station-grading-phase-banner');
       if (gradingBannerEl) {
         if (SimState._isSoloReview) {
@@ -9783,6 +9866,10 @@
           gradingBannerEl.style.display = 'none';
           gradingBannerEl.innerHTML = '';
         }
+      }
+      const chkContainerForLock = document.getElementById('exam-checklist-container');
+      if (chkContainerForLock) {
+        chkContainerForLock.classList.toggle('is-submitted-locked', Boolean(SimState.isStationSubmitted));
       }
       if (!SimState._isSoloReview) {
         document.querySelectorAll('.interactive-blank-input, .case-blank-input').forEach(inp => {
@@ -10357,6 +10444,7 @@
     function renderExamChecklist(stationNum, c) {
       const chkContainer = document.getElementById('exam-checklist-container');
       chkContainer.innerHTML = '';
+      chkContainer.classList.toggle('is-submitted-locked', Boolean(SimState.isStationSubmitted));
       
       if (!c.checklist || c.checklist.length === 0) {
         chkContainer.innerHTML = '<p class="empty-state">ไม่มีรายการ Checklist ในเอกสารนี้</p>';
@@ -10908,6 +10996,8 @@
 
       SimState.isStationGradingPhase = false;
       SimState.isStationSubmitted = false;
+      const chkContGo = document.getElementById('exam-checklist-container');
+      if (chkContGo) chkContGo.classList.remove('is-submitted-locked');
       const gradingBanner = document.getElementById('station-grading-phase-banner');
       if (gradingBanner) {
         gradingBanner.style.display = 'none';
@@ -11746,7 +11836,13 @@
         if (patAccordion) patAccordion.style.display = 'none';
         if (patLockedCard) patLockedCard.style.display = 'none';
       } else if (!patGated || isExaminerRole || rev.patientInfo === true || anyPatItemOpen) {
-        if (patAccordion) patAccordion.style.display = 'block';
+        if (patAccordion) {
+          patAccordion.style.display = 'block';
+          if (!isExaminerRole && (rev.patientInfo === true || anyPatItemOpen)) {
+            _patientAccordionOpen = false;
+            togglePatientAccordion();
+          }
+        }
         if (patLockedCard) patLockedCard.style.display = 'none';
       } else {
         if (patAccordion) patAccordion.style.display = 'none';
@@ -11759,7 +11855,13 @@
         if (eqAccordion) eqAccordion.style.display = 'none';
         if (eqLockedCard) eqLockedCard.style.display = 'none';
       } else if (!eqGated || isExaminerRole || rev.equipment === true || anyEqItemOpen) {
-        if (eqAccordion) eqAccordion.style.display = 'block';
+        if (eqAccordion) {
+          eqAccordion.style.display = 'block';
+          if (!isExaminerRole && (rev.equipment === true || anyEqItemOpen)) {
+            _equipmentAccordionOpen = false;
+            toggleEquipmentAccordion();
+          }
+        }
         if (eqLockedCard) eqLockedCard.style.display = 'none';
       } else {
         if (eqAccordion) eqAccordion.style.display = 'none';
@@ -11784,14 +11886,15 @@
             itemEl.classList.remove('examinee-unlocked');
             if (headerEl) {
               headerEl.style.display = 'flex';
+              headerEl.style.whiteSpace = 'normal';
               headerEl.innerHTML = `
-                <div style="display:flex;align-items:center;gap:0.45rem;flex-wrap:wrap;">
-                  <span style="font-weight:700;font-size:0.86rem;color:var(--text-primary,#1e293b);">📌 ${escapeGatedHtml(itemLabel)}</span>
-                  <span class="badge" style="background:${isItemOpen ? 'rgba(34,197,94,0.14)' : 'rgba(100,116,139,0.14)'};color:${isItemOpen ? '#15803d' : '#475569'};font-weight:700;font-size:0.72rem;padding:2px 8px;border-radius:9999px;">
+                <div style="display:flex;align-items:center;gap:0.45rem;flex-wrap:wrap;flex:1;min-width:0;">
+                  <span style="font-weight:700;font-size:0.86rem;color:var(--text-primary,#1e293b);word-break:break-word;">📌 ${escapeGatedHtml(itemLabel)}</span>
+                  <span class="badge" style="background:${isItemOpen ? 'rgba(34,197,94,0.14)' : 'rgba(100,116,139,0.14)'};color:${isItemOpen ? '#15803d' : '#475569'};font-weight:700;font-size:0.72rem;padding:2px 8px;border-radius:9999px;white-space:nowrap;flex-shrink:0;">
                     ${isItemOpen ? '🟢 ส่งให้ผู้เข้าสอบแล้ว' : '🔒 ซ่อนอยู่ (ยังไม่ส่ง)'}
                   </span>
                 </div>
-                <button type="button" class="btn-inline-gated-item" data-gated-item-btn="${itemKey}" onclick="window.toggleStationGatedItem('${sectionKey}', '${itemKey}')" style="display:inline-flex;align-items:center;gap:0.3rem;padding:0.32rem 0.8rem;border-radius:9999px;border:1px solid ${isItemOpen ? 'rgba(239,68,68,0.35)' : '#16a34a'};background:${isItemOpen ? 'rgba(239,68,68,0.08)' : '#16a34a'};color:${isItemOpen ? '#dc2626' : '#ffffff'};font-weight:700;font-size:0.78rem;cursor:pointer;font-family:var(--font-body);">
+                <button type="button" class="btn-inline-gated-item" data-gated-item-btn="${itemKey}" onclick="window.toggleStationGatedItem('${sectionKey}', '${itemKey}')" style="display:inline-flex;align-items:center;gap:0.3rem;padding:0.28rem 0.75rem;border-radius:9999px;border:1px solid ${isItemOpen ? 'rgba(239,68,68,0.35)' : '#16a34a'};background:${isItemOpen ? 'rgba(239,68,68,0.08)' : '#16a34a'};color:${isItemOpen ? '#dc2626' : '#ffffff'};font-weight:700;font-size:0.76rem;cursor:pointer;white-space:nowrap;flex-shrink:0;font-family:var(--font-body);line-height:1.25;">
                   ${isItemOpen ? '🙈 ซ่อนข้อมูลนี้' : '👁️ ส่งข้อมูลนี้'}
                 </button>
               `;
@@ -11804,10 +11907,11 @@
             if (isItemOpen) {
               if (headerEl) {
                 headerEl.style.display = 'flex';
+                headerEl.style.whiteSpace = 'normal';
                 headerEl.innerHTML = `
                   <div style="display:flex;align-items:center;gap:0.45rem;flex-wrap:wrap;">
                     <span style="font-weight:700;font-size:0.86rem;color:#15803d;">📌 ${escapeGatedHtml(itemLabel)}</span>
-                    <span class="badge" style="background:rgba(34,197,94,0.14);color:#15803d;font-weight:700;font-size:0.72rem;padding:2px 8px;border-radius:9999px;">
+                    <span class="badge" style="background:rgba(34,197,94,0.14);color:#15803d;font-weight:700;font-size:0.72rem;padding:2px 8px;border-radius:9999px;white-space:nowrap;">
                       🟢 ข้อมูลจากผู้ประเมิน
                     </span>
                   </div>
@@ -11820,6 +11924,7 @@
               if (bodyEl) bodyEl.style.display = 'none';
               if (lockedCardEl) {
                 lockedCardEl.style.display = 'flex';
+                lockedCardEl.style.whiteSpace = 'normal';
                 lockedCardEl.innerHTML = `
                   <span>🔒</span>
                   <span>${escapeGatedHtml(itemLabel)} <span style="font-weight:500;color:#64748b;">(รอผู้ประเมินกดส่งข้อมูล)</span></span>
@@ -11849,12 +11954,12 @@
                 ${patItems.map(it => {
                   const itOpen = Boolean(rev.patientInfo || revItems[it.key]);
                   return `
-                    <div style="display:flex;align-items:center;justify-content:space-between;gap:0.5rem;padding:0.38rem 0.65rem;background:var(--surface,#fff);border:1px solid ${itOpen ? 'rgba(34,197,94,0.35)' : 'var(--border)'};border-radius:8px;">
-                      <div style="display:flex;align-items:center;gap:0.4rem;flex-wrap:wrap;">
-                        <span style="font-size:0.82rem;font-weight:700;color:var(--text-primary);">📌 ${escapeGatedHtml(it.label)}</span>
-                        <span style="font-size:0.72rem;font-weight:700;color:${itOpen ? '#15803d' : '#64748b'};">${itOpen ? '(ส่งแล้ว)' : '(ซ่อนอยู่)'}</span>
+                    <div style="display:flex;align-items:center;justify-content:space-between;gap:0.5rem;padding:0.35rem 0.6rem;background:var(--surface,#fff);border:1px solid ${itOpen ? 'rgba(34,197,94,0.35)' : 'var(--border)'};border-radius:8px;">
+                      <div style="display:flex;align-items:center;gap:0.35rem;flex-wrap:wrap;flex:1;min-width:0;">
+                        <span style="font-size:0.8rem;font-weight:700;color:var(--text-primary);word-break:break-word;">📌 ${escapeGatedHtml(it.label)}</span>
+                        <span style="font-size:0.7rem;font-weight:700;white-space:nowrap;color:${itOpen ? '#15803d' : '#64748b'};">${itOpen ? '(ส่งแล้ว)' : '(ซ่อนอยู่)'}</span>
                       </div>
-                      <button type="button" id="btn-toggle-gated-item-${it.key}" onclick="window.toggleStationGatedItem('patientInfo', '${it.key}')" style="display:inline-flex;align-items:center;gap:0.3rem;padding:0.3rem 0.78rem;border-radius:9999px;border:1px solid ${itOpen ? 'rgba(239,68,68,0.35)' : '#16a34a'};background:${itOpen ? 'rgba(239,68,68,0.08)' : '#16a34a'};color:${itOpen ? '#dc2626' : '#ffffff'};font-weight:700;font-size:0.76rem;cursor:pointer;font-family:var(--font-body);">
+                      <button type="button" id="btn-toggle-gated-item-${it.key}" onclick="window.toggleStationGatedItem('patientInfo', '${it.key}')" style="display:inline-flex;align-items:center;gap:0.25rem;padding:0.26rem 0.68rem;border-radius:9999px;border:1px solid ${itOpen ? 'rgba(239,68,68,0.35)' : '#16a34a'};background:${itOpen ? 'rgba(239,68,68,0.08)' : '#16a34a'};color:${itOpen ? '#dc2626' : '#ffffff'};font-weight:700;font-size:0.74rem;cursor:pointer;white-space:nowrap;flex-shrink:0;font-family:var(--font-body);line-height:1.2;">
                         ${itOpen ? '🙈 ซ่อนข้อมูลนี้' : '👁️ ส่งข้อมูลนี้'}
                       </button>
                     </div>
@@ -11890,12 +11995,12 @@
                 ${eqItems.map(it => {
                   const itOpen = Boolean(rev.equipment || revItems[it.key]);
                   return `
-                    <div style="display:flex;align-items:center;justify-content:space-between;gap:0.5rem;padding:0.38rem 0.65rem;background:var(--surface,#fff);border:1px solid ${itOpen ? 'rgba(34,197,94,0.35)' : 'var(--border)'};border-radius:8px;">
-                      <div style="display:flex;align-items:center;gap:0.4rem;flex-wrap:wrap;">
-                        <span style="font-size:0.82rem;font-weight:700;color:var(--text-primary);">📌 ${escapeGatedHtml(it.label)}</span>
-                        <span style="font-size:0.72rem;font-weight:700;color:${itOpen ? '#15803d' : '#64748b'};">${itOpen ? '(ส่งแล้ว)' : '(ซ่อนอยู่)'}</span>
+                    <div style="display:flex;align-items:center;justify-content:space-between;gap:0.5rem;padding:0.35rem 0.6rem;background:var(--surface,#fff);border:1px solid ${itOpen ? 'rgba(34,197,94,0.35)' : 'var(--border)'};border-radius:8px;">
+                      <div style="display:flex;align-items:center;gap:0.35rem;flex-wrap:wrap;flex:1;min-width:0;">
+                        <span style="font-size:0.8rem;font-weight:700;color:var(--text-primary);word-break:break-word;">📌 ${escapeGatedHtml(it.label)}</span>
+                        <span style="font-size:0.7rem;font-weight:700;white-space:nowrap;color:${itOpen ? '#15803d' : '#64748b'};">${itOpen ? '(ส่งแล้ว)' : '(ซ่อนอยู่)'}</span>
                       </div>
-                      <button type="button" id="btn-toggle-gated-item-${it.key}" onclick="window.toggleStationGatedItem('equipment', '${it.key}')" style="display:inline-flex;align-items:center;gap:0.3rem;padding:0.3rem 0.78rem;border-radius:9999px;border:1px solid ${itOpen ? 'rgba(239,68,68,0.35)' : '#7c3aed'};background:${itOpen ? 'rgba(239,68,68,0.08)' : '#7c3aed'};color:${itOpen ? '#dc2626' : '#ffffff'};font-weight:700;font-size:0.76rem;cursor:pointer;font-family:var(--font-body);">
+                      <button type="button" id="btn-toggle-gated-item-${it.key}" onclick="window.toggleStationGatedItem('equipment', '${it.key}')" style="display:inline-flex;align-items:center;gap:0.25rem;padding:0.26rem 0.68rem;border-radius:9999px;border:1px solid ${itOpen ? 'rgba(239,68,68,0.35)' : '#7c3aed'};background:${itOpen ? 'rgba(239,68,68,0.08)' : '#7c3aed'};color:${itOpen ? '#dc2626' : '#ffffff'};font-weight:700;font-size:0.74rem;cursor:pointer;white-space:nowrap;flex-shrink:0;font-family:var(--font-body);line-height:1.2;">
                         ${itOpen ? '🙈 ซ่อนข้อมูลนี้' : '👁️ ส่งข้อมูลนี้'}
                       </button>
                     </div>
@@ -17302,7 +17407,7 @@ ${caseContext || '(ยังไม่มีข้อมูลเคส)'}
       if (!content) return;
       _patientAccordionOpen = !_patientAccordionOpen;
       if (_patientAccordionOpen) {
-        content.style.maxHeight = '2000px';
+        content.style.maxHeight = 'none';
         content.style.padding = '1rem';
         if (chevron) chevron.style.transform = 'rotate(0deg)';
         if (btn) btn.style.background = 'var(--bg-secondary)';
@@ -17322,7 +17427,7 @@ ${caseContext || '(ยังไม่มีข้อมูลเคส)'}
       if (!content) return;
       _equipmentAccordionOpen = !_equipmentAccordionOpen;
       if (_equipmentAccordionOpen) {
-        content.style.maxHeight = '2000px';
+        content.style.maxHeight = 'none';
         content.style.padding = '1rem';
         if (chevron) chevron.style.transform = 'rotate(0deg)';
       } else {

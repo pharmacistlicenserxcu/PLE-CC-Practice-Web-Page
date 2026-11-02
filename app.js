@@ -1325,6 +1325,34 @@ function prepareGatedSectionDom(containerEl, sectionKey) {
       if (p.parentNode) p.parentNode.replaceChild(frag, p);
     });
 
+    const topLists = Array.from(containerEl.children).filter(el => /^(?:UL|OL)$/i.test(el.tagName || ''));
+    topLists.forEach((listEl) => {
+      const items = Array.from(listEl.children).filter(el => /^LI$/i.test(el.tagName || ''));
+      const hasMarkerLi = items.some(li => markerStartRe.test((li.textContent || '').trim()));
+      if (!hasMarkerLi) return;
+
+      const frag = document.createDocumentFragment();
+      let currentSubList = null;
+      items.forEach((li) => {
+        const liText = (li.textContent || '').trim();
+        if (markerStartRe.test(liText)) {
+          currentSubList = null;
+          const markerP = document.createElement('p');
+          markerP.innerHTML = li.innerHTML;
+          frag.appendChild(markerP);
+        } else {
+          if (!currentSubList) {
+            currentSubList = document.createElement(listEl.tagName);
+            currentSubList.className = listEl.className;
+            if (listEl.getAttribute('style')) currentSubList.setAttribute('style', listEl.getAttribute('style'));
+            frag.appendChild(currentSubList);
+          }
+          currentSubList.appendChild(li);
+        }
+      });
+      if (listEl.parentNode) listEl.parentNode.replaceChild(frag, listEl);
+    });
+
     const discoveredItems = [];
 
     const createSubItemWrapper = (label) => {

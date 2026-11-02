@@ -3482,7 +3482,7 @@ ol.ordered-list li,
   font-family: var(--font-title);
   line-height: 1;
   text-shadow: 0 0 40px rgba(99, 102, 241, 0.6);
-  animation: cdNumberPop 1s ease infinite;
+  animation: cdNumberPop 0.92s ease forwards;
 }
 
 @keyframes cdNumberPop {

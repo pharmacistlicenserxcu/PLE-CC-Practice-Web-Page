@@ -1,12 +1,12 @@
 /**
  * PLE-CC2 OSPE Practice System — Offline Case List Metadata (Auto-Generated)
- * Version: v_20261102_102704
- * Generated on 2026-11-02 10:27:04
+ * Version: v_20261102_103917
+ * Generated on 2026-11-02 10:39:17
  */
 
 const OFFLINE_DATA = {
-  "version": "v_20261102_102704",
-  "generatedAt": "2026-11-02 10:27:04",
+  "version": "v_20261102_103917",
+  "generatedAt": "2026-11-02 10:39:17",
   "totalCases": 433,
   "cases": [
     {
@@ -2765,24 +2765,7 @@ const OFFLINE_DATA = {
     },
     {
       "caseId": "OSPE-CL84DS03",
-      "title": "การประเมินและเลือกจ่ายยาในโรคเชื้อราในช่องคลอดและคำแนะนำเปรียบเทียบการแยกโรค",
-      "category": "Clinic",
-      "mainGroup": "การซักประวัติและจ่ายยา",
-      "subTopic": "",
-      "disease": "เชื้อราในช่องคลอด (Vulvovaginal Candidiasis)",
-      "difficulty": 2,
-      "docId": "1Bjdz8c6-Gr5GIHGllXIvt0FLPeWTAdZy586vtVDOr24",
-      "author": "คณะทำงานคลังข้อสอบร่วมสมรรถนะเภสัชกรรม (ระบบกลาง)",
-      "createdDate": "2/11/2569",
-      "source": "เคสซักประวัติจ่ายยาครั้งที่ 1",
-      "isActive": true,
-      "caseStatus": "Active",
-      "linkedNextCase": "",
-      "linkedFromCase": ""
-    },
-    {
-      "caseId": "OSPE-CL84DS04",
-      "title": "OSPE-CL84DS04",
+      "title": "OSPE-CL84DS03",
       "category": "Clinic",
       "mainGroup": "Mock Exam 2569",
       "subTopic": "🔒 ข้อสอบลับ (ต้องใช้รหัสผ่าน)",
@@ -2798,6 +2781,23 @@ const OFFLINE_DATA = {
       "linkedFromCase": "",
       "isProtected": true,
       "hasPassword": true
+    },
+    {
+      "caseId": "OSPE-CL84DS04",
+      "title": "การประเมินและเลือกจ่ายยาในโรคปวดศีรษะไมเกรนในผู้ป่วยที่ได้รับยาต้านไวรัส HIV และมีประวัติแพ้ยากลุ่มซัลฟา",
+      "category": "Clinic",
+      "mainGroup": "การซักประวัติและจ่ายยา",
+      "subTopic": "",
+      "disease": "ปวดศีรษะไมเกรน (Acute Migraine with HIV ARV DDI & Sulfa Allergy)",
+      "difficulty": 2,
+      "docId": "1Bjdz8c6-Gr5GIHGllXIvt0FLPeWTAdZy586vtVDOr24",
+      "author": "คณะทำงานคลังข้อสอบร่วมสมรรถนะเภสัชกรรม (ระบบกลาง)",
+      "createdDate": "2/11/2569",
+      "source": "เคสซักประวัติจ่ายยาครั้งที่ 1",
+      "isActive": true,
+      "caseStatus": "Active",
+      "linkedNextCase": "",
+      "linkedFromCase": ""
     },
     {
       "caseId": "OSPE-CL84DS05",

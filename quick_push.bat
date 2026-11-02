@@ -35,7 +35,7 @@ git add -A
 git commit -m "Quick website update [%DATE% %TIME%]"
 echo.
 echo [INFO] Syncing with GitHub (Pull and Rebase)...
-git pull --rebase origin main
+git pull --rebase -X theirs origin main
 echo.
 echo [INFO] Pushing to GitHub...
 git push origin main

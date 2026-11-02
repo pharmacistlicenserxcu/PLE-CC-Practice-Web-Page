@@ -1572,9 +1572,9 @@
   </div><!-- /.page-viewport -->
 </div><!-- /.app-shell -->
 
-  <script src="case-data-offline.js?v=v_20261026_155930"></script>
-  <script src="case-details-offline.js?v=v_20261026_155930"></script>
-  <script src="app.js?v=v_20261026_155930"></script>
+  <script src="case-data-offline.js?v=v_20261102_121648"></script>
+  <script src="case-details-offline.js?v=v_20261102_121648"></script>
+  <script src="app.js?v=v_20261102_121648"></script>
   <script src="scratchpad.js?v=20261004_234400"></script>
   <script src="station-chat.js?v=v_20261026_140000"></script>
 
@@ -2243,26 +2243,90 @@
         : rawScenario;
       document.getElementById('case-scenario-content').innerHTML = cleanScenario || '<p>ไม่มีข้อมูลสถานการณ์</p>';
 
+      function applyViewerSubItemsDom(containerEl, sectionType, caseIdStr, isSectionMasterUnlocked, isExamRole) {
+        if (!containerEl || typeof window.prepareGatedSectionDom !== 'function') return [];
+        const items = window.prepareGatedSectionDom(containerEl, sectionType === 'patient' ? 'patientInfo' : 'equipment');
+        const subEls = Array.from(containerEl.querySelectorAll('.gated-sub-item'));
+        subEls.forEach((itemEl, idx) => {
+          const itemKey = itemEl.getAttribute('data-gated-key') || (sectionType + '_item_' + idx);
+          const itemLabel = itemEl.getAttribute('data-gated-label') || ('ข้อมูลที่ ' + (idx + 1));
+          const isItemOpen = Boolean(isExamRole || isSectionMasterUnlocked || (window._viewerGatedUnlocked && window._viewerGatedUnlocked[caseIdStr + '_item_' + itemKey]));
+          const headerEl = itemEl.querySelector('.gated-sub-item-header');
+          const bodyEl = itemEl.querySelector('.gated-sub-item-body');
+          const lockedCardEl = itemEl.querySelector('.gated-sub-item-locked-card');
+
+          if (isExamRole) {
+            itemEl.classList.add('examiner-unlocked');
+            itemEl.classList.remove('examinee-unlocked');
+            if (headerEl) {
+              headerEl.style.display = 'flex';
+              headerEl.innerHTML = `
+                <div style="display:flex;align-items:center;gap:0.45rem;flex-wrap:wrap;">
+                  <span style="font-weight:700;font-size:0.86rem;color:var(--text-primary,#1e293b);">📌 ${escapeHtml(itemLabel)}</span>
+                  <span style="font-size:0.74rem;font-weight:700;padding:2px 8px;border-radius:999px;background:#fef3c7;color:#92400e;border:1px solid #fde68a;">🔒 ผู้เข้าสอบจะเห็นเมื่อผู้ประเมินกดส่ง</span>
+                </div>
+              `;
+            }
+            if (bodyEl) bodyEl.style.display = 'block';
+            if (lockedCardEl) lockedCardEl.style.display = 'none';
+          } else {
+            itemEl.classList.remove('examiner-unlocked');
+            itemEl.classList.toggle('examinee-unlocked', isItemOpen);
+            if (isItemOpen) {
+              if (headerEl) {
+                headerEl.style.display = 'flex';
+                headerEl.innerHTML = `
+                  <div style="display:flex;align-items:center;gap:0.45rem;flex-wrap:wrap;">
+                    <span style="font-weight:700;font-size:0.86rem;color:#15803d;">📌 ${escapeHtml(itemLabel)}</span>
+                    <span style="font-size:0.72rem;font-weight:700;padding:2px 8px;border-radius:999px;background:rgba(34,197,94,0.14);color:#15803d;">🟢 เปิดดูแล้ว</span>
+                  </div>
+                  <button type="button" onclick="window.toggleViewerGatedItem('${escapeHtml(caseIdStr)}', '${sectionType}', '${itemKey}')" style="padding:3px 10px;font-size:0.76rem;font-weight:700;border-radius:999px;border:1px solid rgba(239,68,68,0.35);background:rgba(239,68,68,0.08);color:#dc2626;cursor:pointer;font-family:var(--font-body);">🙈 ซ่อนข้อมูลนี้</button>
+                `;
+              }
+              if (bodyEl) bodyEl.style.display = 'block';
+              if (lockedCardEl) lockedCardEl.style.display = 'none';
+            } else {
+              if (headerEl) headerEl.style.display = 'none';
+              if (bodyEl) bodyEl.style.display = 'none';
+              if (lockedCardEl) {
+                lockedCardEl.style.display = 'flex';
+                lockedCardEl.style.justifyContent = 'space-between';
+                lockedCardEl.style.flexWrap = 'wrap';
+                lockedCardEl.innerHTML = `
+                  <div style="display:flex;align-items:center;gap:0.45rem;">
+                    <span>🔒</span>
+                    <span>${escapeHtml(itemLabel)} <span style="font-weight:500;color:#64748b;">(ส่งโดยผู้ประเมิน)</span></span>
+                  </div>
+                  <button type="button" onclick="window.toggleViewerGatedItem('${escapeHtml(caseIdStr)}', '${sectionType}', '${itemKey}')" style="padding:4px 12px;font-size:0.78rem;font-weight:700;border-radius:999px;border:none;background:#d97706;color:#ffffff;cursor:pointer;font-family:var(--font-body);">🔓 เปิดดูข้อมูลนี้</button>
+                `;
+              }
+            }
+          }
+        });
+        return items;
+      }
+
       const cleanPatient = stripSectionHeaders(c.patientInfoHtml);
       const patientTitleEl = document.getElementById('patient-section-title');
       const patientContentEl = document.getElementById('case-patient-content');
       const patGated = (typeof isPatientInfoGated === 'function') ? isPatientInfoGated(c) : Boolean(c.patientInfoGated || (c.patientInfoHtml && /ข้อมูลผู้ป่วย\s*\(\s*ส่งโดยผู้ประเมิน\s*\)/.test(c.patientInfoHtml)));
-      
+      const patHasSubItems = (typeof window.hasGatedSubItems === 'function') ? window.hasGatedSubItems(cleanPatient) : false;
+
       const hasPatientInfo = Boolean(
         cleanPatient && cleanPatient.trim() && (
           cleanPatient.replace(/<[^>]*>/g, '').trim().length > 0 ||
-          /<(?:img|svg|canvas|table|iframe|picture)\b/i.test(cleanPatient)
+          /<(?:img|svg|canvas|table|iframe|picture)/i.test(cleanPatient)
         )
       );
       if (hasPatientInfo) {
+        const isPatUnlocked = Boolean(window._viewerGatedUnlocked && window._viewerGatedUnlocked[caseId + '_patient']);
         if (patientTitleEl) {
           patientTitleEl.style.display = 'flex';
           patientTitleEl.style.alignItems = 'center';
           patientTitleEl.style.justifyContent = 'space-between';
           patientTitleEl.style.flexWrap = 'wrap';
           patientTitleEl.style.gap = '0.5rem';
-          if (patGated) {
-            const isPatUnlocked = Boolean(window._viewerGatedUnlocked && window._viewerGatedUnlocked[caseId + '_patient']);
+          if (patGated || patHasSubItems) {
             const toggleBtnHtml = (!isExaminer)
               ? `<button type="button" onclick="window.toggleViewerGatedSection('${escapeHtml(caseId)}', 'patient')" style="padding:3px 10px; font-size:0.78rem; font-weight:700; border-radius:999px; border:1px solid #d97706; background:${isPatUnlocked ? '#fef3c7' : '#d97706'}; color:${isPatUnlocked ? '#92400e' : '#ffffff'}; cursor:pointer; font-family:var(--font-body);">${isPatUnlocked ? '🙈 ซ่อนข้อมูล (จำลองผู้เข้าสอบ)' : '🔓 กดเพื่อเปิดดูข้อมูลผู้ป่วย'}</button>`
               : `<span style="font-size:0.75rem; font-weight:700; padding:2px 8px; border-radius:999px; background:#fef3c7; color:#92400e; border:1px solid #fde68a;">🔒 ผู้เข้าสอบจะเห็นเมื่อผู้ประเมินกดส่ง</span>`;
@@ -2272,8 +2336,7 @@
           }
         }
         if (patientContentEl) {
-          const isPatUnlocked = Boolean(window._viewerGatedUnlocked && window._viewerGatedUnlocked[caseId + '_patient']);
-          if (patGated && !isExaminer && !isPatUnlocked) {
+          if (patGated && !patHasSubItems && !isExaminer && !isPatUnlocked) {
             patientContentEl.style.display = 'block';
             patientContentEl.innerHTML = `<div style="padding:1rem; border:1.5px dashed #f59e0b; border-radius:10px; background:rgba(245, 158, 11, 0.08); text-align:center; color:var(--text-secondary); font-size:0.9rem;">
               <div style="font-weight:700; color:#d97706; margin-bottom:0.35rem;">🔒 ข้อมูลผู้ป่วย (ส่งโดยผู้ประเมิน)</div>
@@ -2283,6 +2346,7 @@
           } else {
             patientContentEl.style.display = 'block';
             patientContentEl.innerHTML = cleanPatient;
+            c._patGatedItems = applyViewerSubItemsDom(patientContentEl, 'patient', caseId, isPatUnlocked, isExaminer);
           }
         }
       } else {
@@ -2298,22 +2362,6 @@
       const eqContent = document.getElementById('case-equipment-content');
       const eqGated = (typeof isEquipmentGated === 'function') ? isEquipmentGated(c) : Boolean(c.equipmentGated || (c.equipmentHtml && /(?:สิ่งที่มีให้ในสถานี|สิ่งที่มีให้)\s*\(\s*ส่งโดยผู้ประเมิน\s*\)/.test(c.equipmentHtml)));
       if (c.equipmentHtml) {
-        if (eqTitleEl) {
-          eqTitleEl.style.display = 'flex';
-          eqTitleEl.style.alignItems = 'center';
-          eqTitleEl.style.justifyContent = 'space-between';
-          eqTitleEl.style.flexWrap = 'wrap';
-          eqTitleEl.style.gap = '0.5rem';
-          if (eqGated) {
-            const isEqUnlocked = Boolean(window._viewerGatedUnlocked && window._viewerGatedUnlocked[caseId + '_equipment']);
-            const toggleBtnHtml = (!isExaminer)
-              ? `<button type="button" onclick="window.toggleViewerGatedSection('${escapeHtml(caseId)}', 'equipment')" style="padding:3px 10px; font-size:0.78rem; font-weight:700; border-radius:999px; border:1px solid #7c3aed; background:${isEqUnlocked ? '#ede9fe' : '#7c3aed'}; color:${isEqUnlocked ? '#5b21b6' : '#ffffff'}; cursor:pointer; font-family:var(--font-body);">${isEqUnlocked ? '🙈 ซ่อนสิ่งที่มีให้ (จำลองผู้เข้าสอบ)' : '🔓 กดเพื่อเปิดดูสิ่งที่มีให้ในสถานี'}</button>`
-              : `<span style="font-size:0.75rem; font-weight:700; padding:2px 8px; border-radius:999px; background:#ede9fe; color:#5b21b6; border:1px solid #ddd6fe;">🔒 ผู้เข้าสอบจะเห็นเมื่อผู้ประเมินกดส่ง</span>`;
-            eqTitleEl.innerHTML = `<span>สิ่งที่มีให้ในสถานี (ส่งโดยผู้ประเมิน)</span>${toggleBtnHtml}`;
-          } else {
-            eqTitleEl.textContent = 'สิ่งที่มีให้ในสถานี';
-          }
-        }
         let rawEq = stripSectionHeaders(c.equipmentHtml).trim();
         let formattedEq = rawEq;
         if (rawEq.startsWith('<li')) {
@@ -2322,8 +2370,24 @@
           const listClass = isNumbered ? 'ordered-list' : 'bullet-list';
           formattedEq = `<${tag} class="${listClass}">${rawEq}</${tag}>`;
         }
+        const eqHasSubItems = (typeof window.hasGatedSubItems === 'function') ? window.hasGatedSubItems(formattedEq) : false;
         const isEqUnlocked = Boolean(window._viewerGatedUnlocked && window._viewerGatedUnlocked[caseId + '_equipment']);
-        if (eqGated && !isExaminer && !isEqUnlocked) {
+        if (eqTitleEl) {
+          eqTitleEl.style.display = 'flex';
+          eqTitleEl.style.alignItems = 'center';
+          eqTitleEl.style.justifyContent = 'space-between';
+          eqTitleEl.style.flexWrap = 'wrap';
+          eqTitleEl.style.gap = '0.5rem';
+          if (eqGated || eqHasSubItems) {
+            const toggleBtnHtml = (!isExaminer)
+              ? `<button type="button" onclick="window.toggleViewerGatedSection('${escapeHtml(caseId)}', 'equipment')" style="padding:3px 10px; font-size:0.78rem; font-weight:700; border-radius:999px; border:1px solid #7c3aed; background:${isEqUnlocked ? '#ede9fe' : '#7c3aed'}; color:${isEqUnlocked ? '#5b21b6' : '#ffffff'}; cursor:pointer; font-family:var(--font-body);">${isEqUnlocked ? '🙈 ซ่อนสิ่งที่มีให้ (จำลองผู้เข้าสอบ)' : '🔓 กดเพื่อเปิดดูสิ่งที่มีให้ในสถานี'}</button>`
+              : `<span style="font-size:0.75rem; font-weight:700; padding:2px 8px; border-radius:999px; background:#ede9fe; color:#5b21b6; border:1px solid #ddd6fe;">🔒 ผู้เข้าสอบจะเห็นเมื่อผู้ประเมินกดส่ง</span>`;
+            eqTitleEl.innerHTML = `<span>สิ่งที่มีให้ในสถานี (ส่งโดยผู้ประเมิน)</span>${toggleBtnHtml}`;
+          } else {
+            eqTitleEl.textContent = 'สิ่งที่มีให้ในสถานี';
+          }
+        }
+        if (eqGated && !eqHasSubItems && !isExaminer && !isEqUnlocked) {
           eqContent.style.display = 'block';
           eqContent.innerHTML = `<div style="padding:1rem; border:1.5px dashed #8b5cf6; border-radius:10px; background:rgba(139, 92, 246, 0.08); text-align:center; color:var(--text-secondary); font-size:0.9rem;">
             <div style="font-weight:700; color:#7c3aed; margin-bottom:0.35rem;">🔒 สิ่งที่มีให้ในสถานี (ส่งโดยผู้ประเมิน)</div>
@@ -2333,6 +2397,7 @@
         } else {
           eqContent.style.display = 'block';
           eqContent.innerHTML = formattedEq;
+          c._eqGatedItems = applyViewerSubItemsDom(eqContent, 'equipment', caseId, isEqUnlocked, isExaminer);
         }
       } else {
         if (eqTitleEl) eqTitleEl.style.display = 'none';
@@ -3241,7 +3306,31 @@
     window.toggleViewerGatedSection = function(caseId, sectionType) {
       if (!window._viewerGatedUnlocked) window._viewerGatedUnlocked = {};
       const key = caseId + '_' + sectionType;
-      window._viewerGatedUnlocked[key] = !window._viewerGatedUnlocked[key];
+      const nextVal = !Boolean(window._viewerGatedUnlocked[key]);
+      window._viewerGatedUnlocked[key] = nextVal;
+      if (AppState.currentCase) {
+        const items = sectionType === 'patient' ? (AppState.currentCase._patGatedItems || []) : (AppState.currentCase._eqGatedItems || []);
+        items.forEach(it => {
+          window._viewerGatedUnlocked[caseId + '_item_' + it.key] = nextVal;
+        });
+        renderCaseDetail(AppState.currentCase);
+      }
+    };
+
+    window.toggleViewerGatedItem = function(caseId, sectionType, itemKey) {
+      if (!window._viewerGatedUnlocked) window._viewerGatedUnlocked = {};
+      const secKey = caseId + '_' + sectionType;
+      const items = (AppState.currentCase && (sectionType === 'patient' ? AppState.currentCase._patGatedItems : AppState.currentCase._eqGatedItems)) || [];
+      if (window._viewerGatedUnlocked[secKey]) {
+        items.forEach(it => {
+          window._viewerGatedUnlocked[caseId + '_item_' + it.key] = true;
+        });
+      }
+      const fullItemKey = caseId + '_item_' + itemKey;
+      window._viewerGatedUnlocked[fullItemKey] = !Boolean(window._viewerGatedUnlocked[fullItemKey]);
+      if (items.length > 0) {
+        window._viewerGatedUnlocked[secKey] = items.every(it => Boolean(window._viewerGatedUnlocked[caseId + '_item_' + it.key]));
+      }
       if (AppState.currentCase) {
         renderCaseDetail(AppState.currentCase);
       }

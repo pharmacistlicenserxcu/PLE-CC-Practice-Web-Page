@@ -11,9 +11,9 @@
   <link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png">
   <link rel="shortcut icon" href="favicon.ico">
   <link rel="stylesheet" href="style.css?v=v_20261019_225500">
-  <script src="case-data-offline.js?v=v_20261026_155930"></script>
-  <script src="case-details-offline.js?v=v_20261026_155930"></script>
-  <script src="app.js?v=v_20261026_155930"></script>
+  <script src="case-data-offline.js?v=v_20261102_121648"></script>
+  <script src="case-details-offline.js?v=v_20261102_121648"></script>
+  <script src="app.js?v=v_20261102_121648"></script>
   <script src="scratchpad.js?v=20261004_201700"></script>
   <style>
     /* Simulation Source and Topic Selector */
@@ -6877,6 +6877,7 @@
                     } else {
                       initialTargetIdx = latestRoomOnCd.currentStationIdx !== undefined ? latestRoomOnCd.currentStationIdx : 0;
                     }
+                    SimState.hasRenderedFirstStation = true;
                     renderStation(initialTargetIdx);
                   }
                   
@@ -11508,7 +11509,16 @@
       } catch (e) {}
     }
 
-    function showExamineeGatedReleaseModal(sectionKey) {
+    function escapeGatedHtml(str) {
+      return String(str || '')
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#39;');
+    }
+
+    function showExamineeGatedReleaseModal(sectionKey, customItemLabel, targetItemKey) {
       const existing = document.getElementById('examinee-gated-release-modal');
       if (existing) {
         try { existing.remove(); } catch (e) {}
@@ -11516,8 +11526,11 @@
 
       const isPatient = sectionKey === 'patientInfo';
       const icon = isPatient ? '👤' : '📦';
-      const sectionTitle = isPatient ? 'ข้อมูลผู้ป่วย' : 'สิ่งที่มีให้ในสถานี';
-      const sectionBody = isPatient ? 'ประวัติผู้ป่วยและค่า Lab เปิดบนหน้าจอคุณแล้ว' : 'ใบสั่งยา อุปกรณ์ และสื่อ เปิดบนหน้าจอคุณแล้ว';
+      const baseSecTitle = isPatient ? 'ข้อมูลผู้ป่วย' : 'สิ่งที่มีให้ในสถานี';
+      const sectionTitle = customItemLabel ? `${baseSecTitle}: ${customItemLabel}` : baseSecTitle;
+      const sectionBody = customItemLabel
+        ? `ผู้ประเมินส่งข้อมูล "${customItemLabel}" ให้คุณบนหน้าจอแล้ว`
+        : (isPatient ? 'ประวัติผู้ป่วยและค่า Lab เปิดบนหน้าจอคุณแล้ว' : 'ใบสั่งยา อุปกรณ์ และสื่อ เปิดบนหน้าจอคุณแล้ว');
       const targetAccordionId = isPatient ? 'exam-patient-accordion' : 'exam-equipment-accordion';
 
       if (!document.getElementById('examinee-gated-modal-styles')) {
@@ -11575,13 +11588,13 @@
 
           <h3 style="
             font-family: var(--font-title, 'Bai Jamjuree', sans-serif);
-            font-size: 1.35rem;
+            font-size: 1.28rem;
             font-weight: 800;
             color: var(--text-primary, #1C2320);
             margin: 0 0 0.5rem 0;
             line-height: 1.35;
           ">
-            ${icon} ${sectionTitle}
+            ${icon} ${escapeGatedHtml(sectionTitle)}
           </h3>
 
           <div style="
@@ -11590,7 +11603,7 @@
             margin-bottom: 1.45rem;
             line-height: 1.55;
           ">
-            ${sectionBody}
+            ${escapeGatedHtml(sectionBody)}
           </div>
 
           <button type="button" id="btn-examinee-gated-ack" style="
@@ -11621,10 +11634,11 @@
         overlay.style.transition = 'opacity 0.15s ease-out';
         setTimeout(() => {
           try { overlay.remove(); } catch (e) {}
-          const acc = document.getElementById(targetAccordionId);
-          if (acc && typeof acc.scrollIntoView === 'function') {
+          const subItemEl = targetItemKey ? document.querySelector(`.gated-sub-item[data-gated-key="${targetItemKey}"]`) : null;
+          const scrollTarget = subItemEl || document.getElementById(targetAccordionId);
+          if (scrollTarget && typeof scrollTarget.scrollIntoView === 'function') {
             try {
-              acc.scrollIntoView({ behavior: 'smooth', block: 'center' });
+              scrollTarget.scrollIntoView({ behavior: 'smooth', block: 'center' });
             } catch (e) {}
           }
         }, 150);
@@ -11677,14 +11691,38 @@
       if (!c) return;
       if (!SimState.stationReveals) SimState.stationReveals = {};
       const stateKey = getStationRevealsLocalKey(stationNum);
-      const rev = SimState.stationReveals[stateKey] || { patientInfo: false, equipment: false };
+      const rev = SimState.stationReveals[stateKey] || { patientInfo: false, equipment: false, items: {} };
+      const revItems = (rev && rev.items && typeof rev.items === 'object') ? rev.items : {};
+
+      const patContentEl = document.getElementById('exam-patient-content');
+      const eqContentEl = document.getElementById('exam-equipment-content');
+
+      if (typeof window.prepareGatedSectionDom === 'function') {
+        c._patGatedItems = patContentEl ? window.prepareGatedSectionDom(patContentEl, 'patientInfo') : [];
+        c._eqGatedItems = eqContentEl ? window.prepareGatedSectionDom(eqContentEl, 'equipment') : [];
+      } else {
+        c._patGatedItems = c._patGatedItems || [];
+        c._eqGatedItems = c._eqGatedItems || [];
+      }
+
+      const patItems = Array.isArray(c._patGatedItems) ? c._patGatedItems : [];
+      const eqItems = Array.isArray(c._eqGatedItems) ? c._eqGatedItems : [];
+      const hasPatItems = patItems.length > 0;
+      const hasEqItems = eqItems.length > 0;
 
       const patGated = (typeof isPatientInfoGated === 'function') ? isPatientInfoGated(c) : Boolean(c.patientInfoGated || (c.patientInfoHtml && /ข้อมูลผู้ป่วย\s*\(\s*ส่งโดยผู้ประเมิน\s*\)/.test(c.patientInfoHtml)));
       const eqGated = (typeof isEquipmentGated === 'function') ? isEquipmentGated(c) : Boolean(c.equipmentGated || (c.equipmentHtml && /(?:สิ่งที่มีให้ในสถานี|สิ่งที่มีให้)\s*\(\s*ส่งโดยผู้ประเมิน\s*\)/.test(c.equipmentHtml)));
 
-      const patContentEl = document.getElementById('exam-patient-content');
+      const patientTitleEl = document.getElementById('exam-patient-title');
+      if (patientTitleEl) {
+        patientTitleEl.textContent = (patGated || hasPatItems) ? '📊 ข้อมูลผู้ป่วย (ส่งโดยผู้ประเมิน)' : '📊 ข้อมูลผู้ป่วย';
+      }
+      const equipTitleEl = document.getElementById('exam-equipment-title');
+      if (equipTitleEl) {
+        equipTitleEl.innerHTML = (eqGated || hasEqItems) ? '&#129514; สิ่งที่มีให้ในสถานี (ส่งโดยผู้ประเมิน)' : '&#129514; สิ่งที่มีให้ในสถานี';
+      }
+
       const hasPatientContent = Boolean(patContentEl && patContentEl.innerHTML.trim() !== '');
-      const eqContentEl = document.getElementById('exam-equipment-content');
       const hasEquipContent = Boolean(c.equipmentHtml && eqContentEl && eqContentEl.innerHTML.trim() !== '');
 
       const patAccordion = document.getElementById('exam-patient-accordion');
@@ -11698,11 +11736,16 @@
       const isExaminerRole = (SimState.role === 'examiner');
       const isSoloMode = (!SimState.isLobby || SimState.role === 'solo');
 
-      // 1. Patient Info Visibility
+      const anyPatItemOpen = hasPatItems && patItems.some(it => Boolean(revItems[it.key]));
+      const anyEqItemOpen = hasEqItems && eqItems.some(it => Boolean(revItems[it.key]));
+      const allPatItemsOpen = hasPatItems ? (Boolean(rev.patientInfo) || patItems.every(it => Boolean(revItems[it.key]))) : Boolean(rev.patientInfo);
+      const allEqItemsOpen = hasEqItems ? (Boolean(rev.equipment) || eqItems.every(it => Boolean(revItems[it.key]))) : Boolean(rev.equipment);
+
+      // 1. Patient Info Section Visibility
       if (!hasPatientContent) {
         if (patAccordion) patAccordion.style.display = 'none';
         if (patLockedCard) patLockedCard.style.display = 'none';
-      } else if (!patGated || isExaminerRole || rev.patientInfo === true) {
+      } else if (!patGated || isExaminerRole || rev.patientInfo === true || anyPatItemOpen) {
         if (patAccordion) patAccordion.style.display = 'block';
         if (patLockedCard) patLockedCard.style.display = 'none';
       } else {
@@ -11711,11 +11754,11 @@
         if (patSoloWrap) patSoloWrap.style.display = isSoloMode ? 'block' : 'none';
       }
 
-      // 2. Equipment Visibility
+      // 2. Equipment Section Visibility
       if (!hasEquipContent) {
         if (eqAccordion) eqAccordion.style.display = 'none';
         if (eqLockedCard) eqLockedCard.style.display = 'none';
-      } else if (!eqGated || isExaminerRole || rev.equipment === true) {
+      } else if (!eqGated || isExaminerRole || rev.equipment === true || anyEqItemOpen) {
         if (eqAccordion) eqAccordion.style.display = 'block';
         if (eqLockedCard) eqLockedCard.style.display = 'none';
       } else {
@@ -11724,50 +11767,160 @@
         if (eqSoloWrap) eqSoloWrap.style.display = isSoloMode ? 'block' : 'none';
       }
 
+      // 2.5 Sub-Item DOM Visibility inside Patient Info and Equipment
+      function updateSubItemsInContainer(containerEl, sectionKey, isMasterOpen) {
+        if (!containerEl) return;
+        const subItems = Array.from(containerEl.querySelectorAll('.gated-sub-item'));
+        subItems.forEach((itemEl, idx) => {
+          const itemKey = itemEl.getAttribute('data-gated-key') || (sectionKey + '_item_' + idx);
+          const itemLabel = itemEl.getAttribute('data-gated-label') || ('ข้อมูลที่ ' + (idx + 1));
+          const isItemOpen = Boolean(isMasterOpen || revItems[itemKey] === true);
+          const headerEl = itemEl.querySelector('.gated-sub-item-header');
+          const bodyEl = itemEl.querySelector('.gated-sub-item-body');
+          const lockedCardEl = itemEl.querySelector('.gated-sub-item-locked-card');
+
+          if (isExaminerRole || isSoloMode) {
+            itemEl.classList.toggle('examiner-unlocked', isItemOpen);
+            itemEl.classList.remove('examinee-unlocked');
+            if (headerEl) {
+              headerEl.style.display = 'flex';
+              headerEl.innerHTML = `
+                <div style="display:flex;align-items:center;gap:0.45rem;flex-wrap:wrap;">
+                  <span style="font-weight:700;font-size:0.86rem;color:var(--text-primary,#1e293b);">📌 ${escapeGatedHtml(itemLabel)}</span>
+                  <span class="badge" style="background:${isItemOpen ? 'rgba(34,197,94,0.14)' : 'rgba(100,116,139,0.14)'};color:${isItemOpen ? '#15803d' : '#475569'};font-weight:700;font-size:0.72rem;padding:2px 8px;border-radius:9999px;">
+                    ${isItemOpen ? '🟢 ส่งให้ผู้เข้าสอบแล้ว' : '🔒 ซ่อนอยู่ (ยังไม่ส่ง)'}
+                  </span>
+                </div>
+                <button type="button" class="btn-inline-gated-item" data-gated-item-btn="${itemKey}" onclick="window.toggleStationGatedItem('${sectionKey}', '${itemKey}')" style="display:inline-flex;align-items:center;gap:0.3rem;padding:0.32rem 0.8rem;border-radius:9999px;border:1px solid ${isItemOpen ? 'rgba(239,68,68,0.35)' : '#16a34a'};background:${isItemOpen ? 'rgba(239,68,68,0.08)' : '#16a34a'};color:${isItemOpen ? '#dc2626' : '#ffffff'};font-weight:700;font-size:0.78rem;cursor:pointer;font-family:var(--font-body);">
+                  ${isItemOpen ? '🙈 ซ่อนข้อมูลนี้' : '👁️ ส่งข้อมูลนี้'}
+                </button>
+              `;
+            }
+            if (bodyEl) bodyEl.style.display = 'block';
+            if (lockedCardEl) lockedCardEl.style.display = 'none';
+          } else {
+            itemEl.classList.remove('examiner-unlocked');
+            itemEl.classList.toggle('examinee-unlocked', isItemOpen);
+            if (isItemOpen) {
+              if (headerEl) {
+                headerEl.style.display = 'flex';
+                headerEl.innerHTML = `
+                  <div style="display:flex;align-items:center;gap:0.45rem;flex-wrap:wrap;">
+                    <span style="font-weight:700;font-size:0.86rem;color:#15803d;">📌 ${escapeGatedHtml(itemLabel)}</span>
+                    <span class="badge" style="background:rgba(34,197,94,0.14);color:#15803d;font-weight:700;font-size:0.72rem;padding:2px 8px;border-radius:9999px;">
+                      🟢 ข้อมูลจากผู้ประเมิน
+                    </span>
+                  </div>
+                `;
+              }
+              if (bodyEl) bodyEl.style.display = 'block';
+              if (lockedCardEl) lockedCardEl.style.display = 'none';
+            } else {
+              if (headerEl) headerEl.style.display = 'none';
+              if (bodyEl) bodyEl.style.display = 'none';
+              if (lockedCardEl) {
+                lockedCardEl.style.display = 'flex';
+                lockedCardEl.innerHTML = `
+                  <span>🔒</span>
+                  <span>${escapeGatedHtml(itemLabel)} <span style="font-weight:500;color:#64748b;">(รอผู้ประเมินกดส่งข้อมูล)</span></span>
+                `;
+              }
+            }
+          }
+        });
+      }
+
+      updateSubItemsInContainer(patContentEl, 'patientInfo', Boolean(rev.patientInfo));
+      updateSubItemsInContainer(eqContentEl, 'equipment', Boolean(rev.equipment));
+
       // 3. Examiner Controls Panel
       const exControlPanel = document.getElementById('examiner-gated-controls-panel');
       const exControlList = document.getElementById('examiner-gated-controls-list');
       if (exControlPanel && exControlList) {
-        const showPatControl = Boolean(patGated && hasPatientContent);
-        const showEqControl = Boolean(eqGated && hasEquipContent);
+        const showPatControl = Boolean((patGated || hasPatItems) && hasPatientContent);
+        const showEqControl = Boolean((eqGated || hasEqItems) && hasEquipContent);
         if ((isExaminerRole || isSoloMode) && (showPatControl || showEqControl)) {
           exControlPanel.style.display = 'block';
           let controlsHtml = '';
           if (showPatControl) {
-            const isOpen = Boolean(rev.patientInfo);
+            const isOpen = allPatItemsOpen;
+            const subItemsHtml = hasPatItems ? `
+              <div style="display:flex;flex-direction:column;gap:0.4rem;width:100%;margin-top:0.35rem;padding-top:0.5rem;border-top:1px dashed var(--border);">
+                ${patItems.map(it => {
+                  const itOpen = Boolean(rev.patientInfo || revItems[it.key]);
+                  return `
+                    <div style="display:flex;align-items:center;justify-content:space-between;gap:0.5rem;padding:0.38rem 0.65rem;background:var(--surface,#fff);border:1px solid ${itOpen ? 'rgba(34,197,94,0.35)' : 'var(--border)'};border-radius:8px;">
+                      <div style="display:flex;align-items:center;gap:0.4rem;flex-wrap:wrap;">
+                        <span style="font-size:0.82rem;font-weight:700;color:var(--text-primary);">📌 ${escapeGatedHtml(it.label)}</span>
+                        <span style="font-size:0.72rem;font-weight:700;color:${itOpen ? '#15803d' : '#64748b'};">${itOpen ? '(ส่งแล้ว)' : '(ซ่อนอยู่)'}</span>
+                      </div>
+                      <button type="button" id="btn-toggle-gated-item-${it.key}" onclick="window.toggleStationGatedItem('patientInfo', '${it.key}')" style="display:inline-flex;align-items:center;gap:0.3rem;padding:0.3rem 0.78rem;border-radius:9999px;border:1px solid ${itOpen ? 'rgba(239,68,68,0.35)' : '#16a34a'};background:${itOpen ? 'rgba(239,68,68,0.08)' : '#16a34a'};color:${itOpen ? '#dc2626' : '#ffffff'};font-weight:700;font-size:0.76rem;cursor:pointer;font-family:var(--font-body);">
+                        ${itOpen ? '🙈 ซ่อนข้อมูลนี้' : '👁️ ส่งข้อมูลนี้'}
+                      </button>
+                    </div>
+                  `;
+                }).join('')}
+              </div>
+            ` : '';
+
             controlsHtml += `
-              <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:0.75rem;padding:0.65rem 0.85rem;background:var(--bg);border:1px solid ${isOpen ? 'rgba(34,197,94,0.35)' : 'var(--border)'};border-radius:var(--radius-sm);transition:all 0.2s ease;">
-                <div style="display:flex;flex-direction:column;gap:0.2rem;">
-                  <div style="display:flex;align-items:center;gap:0.45rem;flex-wrap:wrap;">
-                    <strong style="font-size:0.88rem;color:var(--text-primary);">👤 ข้อมูลผู้ป่วย</strong>
-                    <span class="badge" style="background:${isOpen ? 'rgba(34,197,94,0.12)' : 'rgba(100,116,139,0.12)'};color:${isOpen ? '#15803d' : '#64748b'};font-weight:700;font-size:0.74rem;padding:2px 8px;border-radius:9999px;">
-                      ${isOpen ? '🟢 แสดงแล้ว (Visible)' : '🔒 ซ่อนอยู่ (Hidden)'}
-                    </span>
+              <div style="display:flex;flex-direction:column;gap:0.35rem;padding:0.65rem 0.85rem;background:var(--bg);border:1px solid ${isOpen ? 'rgba(34,197,94,0.35)' : 'var(--border)'};border-radius:var(--radius-sm);transition:all 0.2s ease;">
+                <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:0.75rem;width:100%;">
+                  <div style="display:flex;flex-direction:column;gap:0.2rem;">
+                    <div style="display:flex;align-items:center;gap:0.45rem;flex-wrap:wrap;">
+                      <strong style="font-size:0.88rem;color:var(--text-primary);">👤 ข้อมูลผู้ป่วย</strong>
+                      <span class="badge" style="background:${isOpen ? 'rgba(34,197,94,0.12)' : 'rgba(100,116,139,0.12)'};color:${isOpen ? '#15803d' : '#64748b'};font-weight:700;font-size:0.74rem;padding:2px 8px;border-radius:9999px;">
+                        ${isOpen ? '🟢 แสดงแล้ว (Visible)' : (anyPatItemOpen ? '🟡 แสดงบางรายการ (Partial)' : '🔒 ซ่อนอยู่ (Hidden)')}
+                      </span>
+                    </div>
+                    <span style="font-size:0.76rem;color:var(--text-secondary);">${hasPatItems ? `มีข้อมูลย่อย ${patItems.length} รายการ (ส่งทีละข้อหรือส่งทั้งหมวดได้)` : 'ประวัติผู้ป่วยและค่า Lab'}</span>
                   </div>
-                  <span style="font-size:0.76rem;color:var(--text-secondary);">ประวัติผู้ป่วยและค่า Lab</span>
+                  <button type="button" id="btn-toggle-gated-patientInfo" onclick="window.toggleStationGatedSection('patientInfo')" style="display:inline-flex;align-items:center;gap:0.35rem;padding:0.42rem 0.95rem;border-radius:9999px;border:1px solid ${isOpen ? 'rgba(239,68,68,0.35)' : '#16a34a'};background:${isOpen ? 'rgba(239,68,68,0.08)' : '#16a34a'};color:${isOpen ? '#dc2626' : '#ffffff'};font-weight:700;font-size:0.82rem;cursor:pointer;font-family:var(--font-body);transition:all 0.15s ease;${isOpen ? '' : 'box-shadow:0 1px 3px rgba(22,163,74,0.25);'}">
+                    ${isOpen ? (hasPatItems ? '🙈 Hide ทั้งหมวด' : '🙈 Hide') : (hasPatItems ? '👁️ Show ทั้งหมวด' : '👁️ Show')}
+                  </button>
                 </div>
-                <button type="button" id="btn-toggle-gated-patientInfo" onclick="window.toggleStationGatedSection('patientInfo')" style="display:inline-flex;align-items:center;gap:0.35rem;padding:0.42rem 0.95rem;border-radius:9999px;border:1px solid ${isOpen ? 'rgba(239,68,68,0.35)' : '#16a34a'};background:${isOpen ? 'rgba(239,68,68,0.08)' : '#16a34a'};color:${isOpen ? '#dc2626' : '#ffffff'};font-weight:700;font-size:0.82rem;cursor:pointer;font-family:var(--font-body);transition:all 0.15s ease;${isOpen ? '' : 'box-shadow:0 1px 3px rgba(22,163,74,0.25);'}">
-                  ${isOpen ? '🙈 Hide' : '👁️ Show'}
-                </button>
+                ${subItemsHtml}
               </div>
             `;
           }
           if (showEqControl) {
-            const isOpen = Boolean(rev.equipment);
+            const isOpen = allEqItemsOpen;
+            const subItemsHtml = hasEqItems ? `
+              <div style="display:flex;flex-direction:column;gap:0.4rem;width:100%;margin-top:0.35rem;padding-top:0.5rem;border-top:1px dashed var(--border);">
+                ${eqItems.map(it => {
+                  const itOpen = Boolean(rev.equipment || revItems[it.key]);
+                  return `
+                    <div style="display:flex;align-items:center;justify-content:space-between;gap:0.5rem;padding:0.38rem 0.65rem;background:var(--surface,#fff);border:1px solid ${itOpen ? 'rgba(34,197,94,0.35)' : 'var(--border)'};border-radius:8px;">
+                      <div style="display:flex;align-items:center;gap:0.4rem;flex-wrap:wrap;">
+                        <span style="font-size:0.82rem;font-weight:700;color:var(--text-primary);">📌 ${escapeGatedHtml(it.label)}</span>
+                        <span style="font-size:0.72rem;font-weight:700;color:${itOpen ? '#15803d' : '#64748b'};">${itOpen ? '(ส่งแล้ว)' : '(ซ่อนอยู่)'}</span>
+                      </div>
+                      <button type="button" id="btn-toggle-gated-item-${it.key}" onclick="window.toggleStationGatedItem('equipment', '${it.key}')" style="display:inline-flex;align-items:center;gap:0.3rem;padding:0.3rem 0.78rem;border-radius:9999px;border:1px solid ${itOpen ? 'rgba(239,68,68,0.35)' : '#7c3aed'};background:${itOpen ? 'rgba(239,68,68,0.08)' : '#7c3aed'};color:${itOpen ? '#dc2626' : '#ffffff'};font-weight:700;font-size:0.76rem;cursor:pointer;font-family:var(--font-body);">
+                        ${itOpen ? '🙈 ซ่อนข้อมูลนี้' : '👁️ ส่งข้อมูลนี้'}
+                      </button>
+                    </div>
+                  `;
+                }).join('')}
+              </div>
+            ` : '';
+
             controlsHtml += `
-              <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:0.75rem;padding:0.65rem 0.85rem;background:var(--bg);border:1px solid ${isOpen ? 'rgba(34,197,94,0.35)' : 'var(--border)'};border-radius:var(--radius-sm);transition:all 0.2s ease;">
-                <div style="display:flex;flex-direction:column;gap:0.2rem;">
-                  <div style="display:flex;align-items:center;gap:0.45rem;flex-wrap:wrap;">
-                    <strong style="font-size:0.88rem;color:var(--text-primary);">📦 สิ่งที่มีให้ในสถานี</strong>
-                    <span class="badge" style="background:${isOpen ? 'rgba(34,197,94,0.12)' : 'rgba(100,116,139,0.12)'};color:${isOpen ? '#15803d' : '#64748b'};font-weight:700;font-size:0.74rem;padding:2px 8px;border-radius:9999px;">
-                      ${isOpen ? '🟢 แสดงแล้ว (Visible)' : '🔒 ซ่อนอยู่ (Hidden)'}
-                    </span>
+              <div style="display:flex;flex-direction:column;gap:0.35rem;padding:0.65rem 0.85rem;background:var(--bg);border:1px solid ${isOpen ? 'rgba(34,197,94,0.35)' : 'var(--border)'};border-radius:var(--radius-sm);transition:all 0.2s ease;">
+                <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:0.75rem;width:100%;">
+                  <div style="display:flex;flex-direction:column;gap:0.2rem;">
+                    <div style="display:flex;align-items:center;gap:0.45rem;flex-wrap:wrap;">
+                      <strong style="font-size:0.88rem;color:var(--text-primary);">📦 สิ่งที่มีให้ในสถานี</strong>
+                      <span class="badge" style="background:${isOpen ? 'rgba(34,197,94,0.12)' : 'rgba(100,116,139,0.12)'};color:${isOpen ? '#15803d' : '#64748b'};font-weight:700;font-size:0.74rem;padding:2px 8px;border-radius:9999px;">
+                        ${isOpen ? '🟢 แสดงแล้ว (Visible)' : (anyEqItemOpen ? '🟡 แสดงบางรายการ (Partial)' : '🔒 ซ่อนอยู่ (Hidden)')}
+                      </span>
+                    </div>
+                    <span style="font-size:0.76rem;color:var(--text-secondary);">${hasEqItems ? `มีข้อมูลย่อย ${eqItems.length} รายการ (ส่งทีละข้อหรือส่งทั้งหมวดได้)` : 'ใบสั่งยา อุปกรณ์ และสื่อที่ผู้เข้าสอบจะได้รับ'}</span>
                   </div>
-                  <span style="font-size:0.76rem;color:var(--text-secondary);">ใบสั่งยา อุปกรณ์ และสื่อที่ผู้เข้าสอบจะได้รับ</span>
+                  <button type="button" id="btn-toggle-gated-equipment" onclick="window.toggleStationGatedSection('equipment')" style="display:inline-flex;align-items:center;gap:0.35rem;padding:0.42rem 0.95rem;border-radius:9999px;border:1px solid ${isOpen ? 'rgba(239,68,68,0.35)' : '#7c3aed'};background:${isOpen ? 'rgba(239,68,68,0.08)' : '#7c3aed'};color:${isOpen ? '#dc2626' : '#ffffff'};font-weight:700;font-size:0.82rem;cursor:pointer;font-family:var(--font-body);transition:all 0.15s ease;${isOpen ? '' : 'box-shadow:0 1px 3px rgba(124,58,237,0.25);'}">
+                    ${isOpen ? (hasEqItems ? '🙈 Hide ทั้งหมวด' : '🙈 Hide') : (hasEqItems ? '👁️ Show ทั้งหมวด' : '👁️ Show')}
+                  </button>
                 </div>
-                <button type="button" id="btn-toggle-gated-equipment" onclick="window.toggleStationGatedSection('equipment')" style="display:inline-flex;align-items:center;gap:0.35rem;padding:0.42rem 0.95rem;border-radius:9999px;border:1px solid ${isOpen ? 'rgba(239,68,68,0.35)' : '#7c3aed'};background:${isOpen ? 'rgba(239,68,68,0.08)' : '#7c3aed'};color:${isOpen ? '#dc2626' : '#ffffff'};font-weight:700;font-size:0.82rem;cursor:pointer;font-family:var(--font-body);transition:all 0.15s ease;${isOpen ? '' : 'box-shadow:0 1px 3px rgba(124,58,237,0.25);'}">
-                  ${isOpen ? '🙈 Hide' : '👁️ Show'}
-                </button>
+                ${subItemsHtml}
               </div>
             `;
           }
@@ -11789,8 +11942,13 @@
       const stationNum = st.stationNumber;
       const stateKey = getStationRevealsLocalKey(stationNum);
       if (!SimState.stationReveals) SimState.stationReveals = {};
-      if (!SimState.stationReveals[stateKey]) SimState.stationReveals[stateKey] = { patientInfo: false, equipment: false };
+      if (!SimState.stationReveals[stateKey]) SimState.stationReveals[stateKey] = { patientInfo: false, equipment: false, items: {} };
       SimState.stationReveals[stateKey][sectionKey] = true;
+      const secItems = sectionKey === 'patientInfo' ? (st.case._patGatedItems || []) : (st.case._eqGatedItems || []);
+      if (!SimState.stationReveals[stateKey].items) SimState.stationReveals[stateKey].items = {};
+      secItems.forEach(it => {
+        SimState.stationReveals[stateKey].items[it.key] = true;
+      });
       applyStationGatedVisibility(stationNum, st.case);
       const secLabel = sectionKey === 'patientInfo' ? 'ข้อมูลผู้ป่วย' : 'สิ่งที่มีให้ในสถานี';
       if (typeof showPleToast === 'function') {
@@ -11808,20 +11966,32 @@
       const stationNum = st.stationNumber;
       const stateKey = getStationRevealsLocalKey(stationNum);
       if (!SimState.stationReveals) SimState.stationReveals = {};
-      const currentObj = SimState.stationReveals[stateKey] || { patientInfo: false, equipment: false };
-      const nextVal = !Boolean(currentObj[sectionKey]);
+      const currentObj = SimState.stationReveals[stateKey] || { patientInfo: false, equipment: false, items: {} };
+      const currentItems = Object.assign({}, currentObj.items || {});
+      const secItems = sectionKey === 'patientInfo' ? (st.case._patGatedItems || []) : (st.case._eqGatedItems || []);
+      const currentlyAllOpen = secItems.length > 0
+        ? (Boolean(currentObj[sectionKey]) || secItems.every(it => Boolean(currentItems[it.key])))
+        : Boolean(currentObj[sectionKey]);
+      const nextVal = !currentlyAllOpen;
+      secItems.forEach(it => {
+        currentItems[it.key] = nextVal;
+      });
       const updatedObj = {
         patientInfo: sectionKey === 'patientInfo' ? nextVal : Boolean(currentObj.patientInfo),
         equipment: sectionKey === 'equipment' ? nextVal : Boolean(currentObj.equipment),
+        items: currentItems,
         updatedAt: Date.now(),
         updatedBy: SimState.lobbyPlayerName || 'Examiner',
         lastActionSection: sectionKey,
+        lastActionItemKey: '',
+        lastActionItemLabel: '',
         lastActionState: nextVal
       };
       SimState.stationReveals[stateKey] = updatedObj;
       _lastStationRevealsState[stateKey] = {
         patientInfo: updatedObj.patientInfo,
-        equipment: updatedObj.equipment
+        equipment: updatedObj.equipment,
+        items: Object.assign({}, currentItems)
       };
 
       applyStationGatedVisibility(stationNum, st.case);
@@ -11846,18 +12016,88 @@
     }
     window.toggleStationGatedSection = toggleStationGatedSection;
 
+    async function toggleStationGatedItem(sectionKey, itemKey) {
+      const idx = (SimState._isLocalReview && typeof SimState._localReviewStationIdx === 'number')
+        ? SimState._localReviewStationIdx
+        : SimState.currentIdx;
+      const st = SimState.stations && SimState.stations[idx];
+      if (!st || !st.case) return;
+      const stationNum = st.stationNumber;
+      const stateKey = getStationRevealsLocalKey(stationNum);
+      if (!SimState.stationReveals) SimState.stationReveals = {};
+      const currentObj = SimState.stationReveals[stateKey] || { patientInfo: false, equipment: false, items: {} };
+      const currentItems = Object.assign({}, currentObj.items || {});
+      const secItems = sectionKey === 'patientInfo' ? (st.case._patGatedItems || []) : (st.case._eqGatedItems || []);
+
+      if (Boolean(currentObj[sectionKey])) {
+        secItems.forEach(it => {
+          currentItems[it.key] = true;
+        });
+      }
+
+      const isCurrentlyOpen = Boolean(currentItems[itemKey]);
+      const nextVal = !isCurrentlyOpen;
+      currentItems[itemKey] = nextVal;
+
+      const foundItem = secItems.find(it => it.key === itemKey);
+      const domEl = document.querySelector(`.gated-sub-item[data-gated-key="${itemKey}"]`);
+      const itemLabel = (foundItem && foundItem.label) || (domEl && domEl.getAttribute('data-gated-label')) || itemKey;
+
+      const allSecItemsOpen = secItems.length > 0 && secItems.every(it => Boolean(currentItems[it.key]));
+
+      const updatedObj = {
+        patientInfo: sectionKey === 'patientInfo' ? allSecItemsOpen : Boolean(currentObj.patientInfo),
+        equipment: sectionKey === 'equipment' ? allSecItemsOpen : Boolean(currentObj.equipment),
+        items: currentItems,
+        updatedAt: Date.now(),
+        updatedBy: SimState.lobbyPlayerName || 'Examiner',
+        lastActionSection: sectionKey,
+        lastActionItemKey: itemKey,
+        lastActionItemLabel: itemLabel,
+        lastActionState: nextVal
+      };
+      SimState.stationReveals[stateKey] = updatedObj;
+      _lastStationRevealsState[stateKey] = {
+        patientInfo: updatedObj.patientInfo,
+        equipment: updatedObj.equipment,
+        items: Object.assign({}, currentItems)
+      };
+
+      applyStationGatedVisibility(stationNum, st.case);
+
+      if (typeof showPleToast === 'function') {
+        if (nextVal) {
+          showPleToast(`👁️ ส่ง "${itemLabel}" ให้ผู้เข้าสอบแล้ว`, 'success');
+        } else {
+          showPleToast(`🙈 ซ่อน "${itemLabel}" จากผู้เข้าสอบแล้ว`, 'info');
+        }
+      }
+
+      const fbPath = getStationRevealsFirebasePath(stationNum);
+      if (fbPath && typeof _fbDb !== 'undefined' && _fbDb) {
+        try {
+          await _fbDb.ref(fbPath).set(updatedObj);
+        } catch (err) {
+          console.warn('Failed to sync stationReveals item to Firebase:', err);
+        }
+      }
+    }
+    window.toggleStationGatedItem = toggleStationGatedItem;
+
     function setupStationRevealsSync(stationNum, c) {
       cleanupStationRevealsListener();
       if (!c) return;
       if (!SimState.stationReveals) SimState.stationReveals = {};
       const stateKey = getStationRevealsLocalKey(stationNum);
 
-      // Apply immediate local state
+      // Apply immediate local state (also populates c._patGatedItems and c._eqGatedItems)
       applyStationGatedVisibility(stationNum, c);
 
       const patGated = (typeof isPatientInfoGated === 'function') ? isPatientInfoGated(c) : Boolean(c.patientInfoGated || (c.patientInfoHtml && /ข้อมูลผู้ป่วย\s*\(\s*ส่งโดยผู้ประเมิน\s*\)/.test(c.patientInfoHtml)));
       const eqGated = (typeof isEquipmentGated === 'function') ? isEquipmentGated(c) : Boolean(c.equipmentGated || (c.equipmentHtml && /(?:สิ่งที่มีให้ในสถานี|สิ่งที่มีให้)\s*\(\s*ส่งโดยผู้ประเมิน\s*\)/.test(c.equipmentHtml)));
-      if (!patGated && !eqGated) return;
+      const hasPatItems = Array.isArray(c._patGatedItems) && c._patGatedItems.length > 0;
+      const hasEqItems = Array.isArray(c._eqGatedItems) && c._eqGatedItems.length > 0;
+      if (!patGated && !eqGated && !hasPatItems && !hasEqItems) return;
 
       const fbPath = getStationRevealsFirebasePath(stationNum);
       if (!fbPath || typeof _fbDb === 'undefined' || !_fbDb) return;
@@ -11865,57 +12105,93 @@
       let isInitialSnap = true;
       _activeStationRevealsRef = _fbDb.ref(fbPath);
       _activeStationRevealsRef.on('value', snap => {
-        const val = snap.val() || { patientInfo: false, equipment: false };
-        const prev = _lastStationRevealsState[stateKey] || { patientInfo: false, equipment: false };
+        const val = snap.val() || { patientInfo: false, equipment: false, items: {} };
+        const prev = _lastStationRevealsState[stateKey] || { patientInfo: false, equipment: false, items: {} };
+        const prevItems = (prev.items && typeof prev.items === 'object') ? prev.items : {};
         const newPat = Boolean(val.patientInfo);
         const newEq = Boolean(val.equipment);
+        const newItems = (val.items && typeof val.items === 'object') ? val.items : {};
 
         SimState.stationReveals[stateKey] = {
           patientInfo: newPat,
           equipment: newEq,
+          items: Object.assign({}, newItems),
           updatedAt: val.updatedAt || 0,
           updatedBy: val.updatedBy || ''
         };
-        _lastStationRevealsState[stateKey] = { patientInfo: newPat, equipment: newEq };
+        _lastStationRevealsState[stateKey] = {
+          patientInfo: newPat,
+          equipment: newEq,
+          items: Object.assign({}, newItems)
+        };
 
         applyStationGatedVisibility(stationNum, c);
 
-        // Notify Examinee when Examiner opens or closes a section in real time
+        // Notify Examinee when Examiner opens or closes a section or sub-item in real time
         const isCandidate = (SimState.role === 'examinee' || SimState.role === 'participant' || SimState.role === 'candidate');
         if (!isInitialSnap && isCandidate) {
-          if (patGated && newPat !== Boolean(prev.patientInfo)) {
-            playGatedReleaseNotificationChime(newPat);
-            if (newPat) {
-              if (typeof showExamineeGatedReleaseModal === 'function') {
-                showExamineeGatedReleaseModal('patientInfo');
-              } else if (typeof showPleToast === 'function') {
-                showPleToast('🔔 ผู้ประเมิน Show "ข้อมูลผู้ป่วย" ให้คุณแล้ว', 'success');
-              }
-            } else {
-              const existingModal = document.getElementById('examinee-gated-release-modal');
-              if (existingModal) {
-                try { existingModal.remove(); } catch (e) {}
-              }
-              if (typeof showPleToast === 'function') {
-                showPleToast('🔒 ผู้ประเมิน Hide "ข้อมูลผู้ป่วย" แล้ว', 'info');
+          const actItemKey = val.lastActionItemKey || '';
+          if (actItemKey) {
+            const actSection = val.lastActionSection || (actItemKey.startsWith('equipment') ? 'equipment' : 'patientInfo');
+            const wasMasterOpen = actSection === 'equipment' ? Boolean(prev.equipment) : Boolean(prev.patientInfo);
+            const prevItemOpen = Boolean(wasMasterOpen || prevItems[actItemKey]);
+            const nowItemOpen = Boolean((actSection === 'equipment' ? newEq : newPat) || newItems[actItemKey]);
+            if (nowItemOpen !== prevItemOpen) {
+              const allItems = (c._patGatedItems || []).concat(c._eqGatedItems || []);
+              const found = allItems.find(it => it.key === actItemKey);
+              const itemLabel = val.lastActionItemLabel || (found && found.label) || actItemKey;
+              playGatedReleaseNotificationChime(nowItemOpen);
+              if (nowItemOpen) {
+                if (typeof showExamineeGatedReleaseModal === 'function') {
+                  showExamineeGatedReleaseModal(actSection, itemLabel, actItemKey);
+                } else if (typeof showPleToast === 'function') {
+                  showPleToast(`🔔 ผู้ประเมินส่ง "${itemLabel}" ให้คุณแล้ว`, 'success');
+                }
+              } else {
+                const existingModal = document.getElementById('examinee-gated-release-modal');
+                if (existingModal) {
+                  try { existingModal.remove(); } catch (e) {}
+                }
+                if (typeof showPleToast === 'function') {
+                  showPleToast(`🔒 ผู้ประเมินซ่อน "${itemLabel}" แล้ว`, 'info');
+                }
               }
             }
-          }
-          if (eqGated && newEq !== Boolean(prev.equipment)) {
-            playGatedReleaseNotificationChime(newEq);
-            if (newEq) {
-              if (typeof showExamineeGatedReleaseModal === 'function') {
-                showExamineeGatedReleaseModal('equipment');
-              } else if (typeof showPleToast === 'function') {
-                showPleToast('🔔 ผู้ประเมิน Show "สิ่งที่มีให้ในสถานี" ให้คุณแล้ว', 'success');
+          } else {
+            if ((patGated || hasPatItems) && newPat !== Boolean(prev.patientInfo)) {
+              playGatedReleaseNotificationChime(newPat);
+              if (newPat) {
+                if (typeof showExamineeGatedReleaseModal === 'function') {
+                  showExamineeGatedReleaseModal('patientInfo');
+                } else if (typeof showPleToast === 'function') {
+                  showPleToast('🔔 ผู้ประเมิน Show "ข้อมูลผู้ป่วย" ให้คุณแล้ว', 'success');
+                }
+              } else {
+                const existingModal = document.getElementById('examinee-gated-release-modal');
+                if (existingModal) {
+                  try { existingModal.remove(); } catch (e) {}
+                }
+                if (typeof showPleToast === 'function') {
+                  showPleToast('🔒 ผู้ประเมิน Hide "ข้อมูลผู้ป่วย" แล้ว', 'info');
+                }
               }
-            } else {
-              const existingModal = document.getElementById('examinee-gated-release-modal');
-              if (existingModal) {
-                try { existingModal.remove(); } catch (e) {}
-              }
-              if (typeof showPleToast === 'function') {
-                showPleToast('🔒 ผู้ประเมิน Hide "สิ่งที่มีให้ในสถานี" แล้ว', 'info');
+            }
+            if ((eqGated || hasEqItems) && newEq !== Boolean(prev.equipment)) {
+              playGatedReleaseNotificationChime(newEq);
+              if (newEq) {
+                if (typeof showExamineeGatedReleaseModal === 'function') {
+                  showExamineeGatedReleaseModal('equipment');
+                } else if (typeof showPleToast === 'function') {
+                  showPleToast('🔔 ผู้ประเมิน Show "สิ่งที่มีให้ในสถานี" ให้คุณแล้ว', 'success');
+                }
+              } else {
+                const existingModal = document.getElementById('examinee-gated-release-modal');
+                if (existingModal) {
+                  try { existingModal.remove(); } catch (e) {}
+                }
+                if (typeof showPleToast === 'function') {
+                  showPleToast('🔒 ผู้ประเมิน Hide "สิ่งที่มีให้ในสถานี" แล้ว', 'info');
+                }
               }
             }
           }

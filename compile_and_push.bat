@@ -64,6 +64,16 @@ goto :RUN_COMPILE
 
 :RUN_COMPILE
 echo.
+echo [INFO] Pulling latest case database from GitHub before compiling...
+if exist "%~dp0Website\PLE CC Webpage" (
+    cd /d "%~dp0Website\PLE CC Webpage"
+) else (
+    cd /d "%~dp0"
+)
+git rebase --abort >nul 2>&1
+git pull --rebase --autostash -X theirs origin main
+cd /d "%~dp0"
+echo.
 echo [2/4] Compiling data (Mode: !MODE!, Query: '!QUERY!')...
 if "!QUERY!"=="" (
     python "scripts\compile_offline_db_python.py" --mode !MODE!
@@ -97,7 +107,7 @@ git add -A
 git commit -m "Auto sync offline DB cases [!MODE!: !QUERY!] [%DATE% %TIME%]"
 echo.
 echo [INFO] Syncing with GitHub (Pull and Rebase)...
-git pull --rebase origin main
+git pull --rebase -X theirs origin main
 echo.
 echo [INFO] Pushing to GitHub...
 git push origin main

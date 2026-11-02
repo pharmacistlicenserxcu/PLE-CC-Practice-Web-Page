@@ -1176,7 +1176,8 @@ function sanitizeAndSplitTrappedEquipment(c) {
     const match = c.patientInfoHtml.search(eqRegex);
     if (match !== -1) {
       const equipPart = c.patientInfoHtml.slice(match);
-      if (/(?:ส่งโดยผู้ประเมิน)/i.test(equipPart.slice(0, 300))) {
+      const headerMatch = equipPart.match(eqRegex);
+      if (headerMatch && /(?:ส่งโดยผู้ประเมิน)/i.test(headerMatch[0])) {
         c.equipmentGated = true;
       }
       c.equipmentHtml = equipPart;
@@ -1185,6 +1186,251 @@ function sanitizeAndSplitTrappedEquipment(c) {
   }
 }
 window.sanitizeAndSplitTrappedEquipment = sanitizeAndSplitTrappedEquipment;
+
+function hasGatedSubItems(htmlStr) {
+  if (!htmlStr || typeof htmlStr !== 'string') return false;
+  return /(?:\(\s{0,}ส่งโดยผู้ประเมิน\s{0,}(?:[:：\-–—]|\s+)\s{0,}[^)<]+\)|\[\s{0,}(?:ส่งโดยผู้ประเมิน|GATED)\s{0,}(?:[:：\-–—]|\s+)\s{0,}[^\]<]+\])/i.test(htmlStr);
+}
+window.hasGatedSubItems = hasGatedSubItems;
+
+function ensureGatedSubItemStyles() {
+  if (typeof document === 'undefined' || document.getElementById('ple-gated-sub-item-styles')) return;
+  const styleEl = document.createElement('style');
+  styleEl.id = 'ple-gated-sub-item-styles';
+  styleEl.textContent = `
+    .gated-sub-item {
+      margin: 0.65rem 0;
+      border-radius: 10px;
+      transition: all 0.2s ease;
+    }
+    .gated-sub-item.examiner-view {
+      border: 1.5px solid rgba(14, 116, 144, 0.28);
+      background: rgba(248, 250, 252, 0.65);
+      padding: 0.65rem 0.85rem;
+    }
+    .gated-sub-item.examiner-view.is-revealed {
+      border-color: rgba(22, 163, 74, 0.45);
+      background: rgba(240, 253, 244, 0.5);
+    }
+    .gated-sub-item.examinee-view.is-revealed {
+      border: 1px solid rgba(14, 116, 144, 0.22);
+      background: rgba(240, 249, 255, 0.4);
+      padding: 0.6rem 0.8rem;
+    }
+    .gated-sub-item-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+      margin-bottom: 0.45rem;
+      padding-bottom: 0.35rem;
+      border-bottom: 1px dashed rgba(148, 163, 184, 0.35);
+    }
+    @media print {
+      .gated-sub-item-header,
+      .gated-sub-item-locked-card {
+        display: none !important;
+      }
+      .gated-sub-item-body {
+        display: block !important;
+      }
+      .gated-sub-item {
+        border: none !important;
+        padding: 0 !important;
+        background: transparent !important;
+      }
+    }
+  `;
+  if (document.head) document.head.appendChild(styleEl);
+}
+
+function stripLeadingMarkerFromElement(el) {
+  if (!el) return;
+  const fullText = el.textContent || '';
+  const leadMatch = fullText.match(/^\s{0,}(?:\(\s{0,}ส่งโดยผู้ประเมิน\s{0,}(?:[:：\-–—]|\s+)\s{0,}[^)]+\)|\[\s{0,}(?:ส่งโดยผู้ประเมิน|GATED)\s{0,}(?:[:：\-–—]|\s+)\s{0,}[^\]]+\])\s{0,}/i);
+  if (!leadMatch) return;
+  let charsToRemove = leadMatch[0].length;
+  const walker = document.createTreeWalker(el, NodeFilter.SHOW_TEXT, null, false);
+  const textNodes = [];
+  let cur;
+  while ((cur = walker.nextNode())) {
+    textNodes.push(cur);
+  }
+  for (let i = 0; i < textNodes.length && charsToRemove > 0; i++) {
+    const tn = textNodes[i];
+    const val = tn.nodeValue || '';
+    if (val.length <= charsToRemove) {
+      charsToRemove -= val.length;
+      tn.nodeValue = '';
+    } else {
+      tn.nodeValue = val.slice(charsToRemove);
+      charsToRemove = 0;
+    }
+  }
+  while (el.firstChild) {
+    const fc = el.firstChild;
+    if (fc.nodeType === 3 && !(fc.nodeValue || '').trim()) {
+      el.removeChild(fc);
+    } else if (fc.nodeType === 1 && fc.tagName === 'BR') {
+      el.removeChild(fc);
+      break;
+    } else if (fc.nodeType === 1 && !(fc.textContent || '').trim() && !fc.querySelector('img, svg, canvas, iframe, picture')) {
+      el.removeChild(fc);
+    } else {
+      break;
+    }
+  }
+}
+
+function prepareGatedSectionDom(containerEl, sectionKey) {
+  if (!containerEl) return [];
+  try {
+    ensureGatedSubItemStyles();
+
+    const existing = Array.from(containerEl.querySelectorAll('.gated-sub-item'));
+    if (existing.length > 0) {
+      return existing.map((el, idx) => ({
+        key: el.getAttribute('data-gated-key') || (sectionKey + '_item_' + idx),
+        label: el.getAttribute('data-gated-label') || ('ข้อมูลที่ ' + (idx + 1)),
+        section: sectionKey,
+        index: idx
+      }));
+    }
+
+    const rawText = containerEl.textContent || '';
+    const quickGuardRe = /(?:\(\s{0,}ส่งโดยผู้ประเมิน\s{0,}(?:[:：\-–—]|\s+)\s{0,}[^)]+\)|\[\s{0,}(?:ส่งโดยผู้ประเมิน|GATED)\s{0,}(?:[:：\-–—]|\s+)\s{0,}[^\]]+\])/i;
+    if (!quickGuardRe.test(rawText)) {
+      return [];
+    }
+
+    const markerStartRe = /^\s{0,}(?:\(\s{0,}ส่งโดยผู้ประเมิน\s{0,}(?:[:：\-–—]|\s+)\s{0,}([^)]+)\)|\[\s{0,}(?:ส่งโดยผู้ประเมิน|GATED)\s{0,}(?:[:：\-–—]|\s+)\s{0,}([^\]]+)\])\s{0,}([\s\S]{0,})$/i;
+
+    const paragraphsWithBr = Array.from(containerEl.querySelectorAll('p'));
+    paragraphsWithBr.forEach((p) => {
+      if (!p.querySelector('br')) return;
+      if (!quickGuardRe.test(p.textContent || '')) return;
+      const parts = p.innerHTML.split(/<br\s{0,}\/?>/i);
+      if (parts.length <= 1) return;
+      const hasMarkerInParts = parts.some((part, idx) => idx > 0 && quickGuardRe.test(part.replace(/<[^>]+>/g, '')));
+      if (!hasMarkerInParts && !quickGuardRe.test(parts[0].replace(/<[^>]+>/g, ''))) return;
+
+      const frag = document.createDocumentFragment();
+      parts.forEach((partHtml) => {
+        if (!partHtml.trim()) return;
+        const newP = document.createElement('p');
+        newP.innerHTML = partHtml.trim();
+        frag.appendChild(newP);
+      });
+      if (p.parentNode) p.parentNode.replaceChild(frag, p);
+    });
+
+    const discoveredItems = [];
+
+    const createSubItemWrapper = (label) => {
+      const itemIdx = discoveredItems.length;
+      const itemKey = sectionKey + '_item_' + itemIdx;
+      const cleanLabel = (label || '').trim() || ('ข้อมูลที่ ' + (itemIdx + 1));
+
+      const wrapper = document.createElement('div');
+      wrapper.className = 'gated-sub-item';
+      wrapper.setAttribute('data-gated-key', itemKey);
+      wrapper.setAttribute('data-gated-label', cleanLabel);
+      wrapper.setAttribute('data-gated-section', sectionKey);
+
+      const headerBar = document.createElement('div');
+      headerBar.className = 'gated-sub-item-header';
+      wrapper.appendChild(headerBar);
+
+      const lockedCard = document.createElement('div');
+      lockedCard.className = 'gated-sub-item-locked-card';
+      lockedCard.style.display = 'none';
+      wrapper.appendChild(lockedCard);
+
+      const bodyEl = document.createElement('div');
+      bodyEl.className = 'gated-sub-item-body';
+      wrapper.appendChild(bodyEl);
+
+      discoveredItems.push({
+        key: itemKey,
+        label: cleanLabel,
+        section: sectionKey,
+        index: itemIdx
+      });
+
+      return { wrapper, bodyEl };
+    };
+
+    const children = Array.from(containerEl.childNodes);
+    let currentBodyEl = null;
+
+    children.forEach((node) => {
+      const nodeText = (node.textContent || '').trim();
+      const isTableOrList = node.nodeType === 1 && /^(?:TABLE|UL|OL)$/i.test(node.tagName || '');
+      const hasNestedTableOrList = node.nodeType === 1 && Boolean(node.querySelector && node.querySelector('table, ul, ol'));
+      const m = (node.nodeType === 1 && !isTableOrList && !hasNestedTableOrList) ? nodeText.match(markerStartRe) : null;
+
+      if (m) {
+        const label = (m[1] || m[2] || '').trim();
+        const remainderText = (m[3] || '').trim();
+        const hasRichMedia = Boolean(node.querySelector && node.querySelector('img, svg, canvas, iframe, picture'));
+
+        const { wrapper, bodyEl } = createSubItemWrapper(label);
+        currentBodyEl = bodyEl;
+        containerEl.insertBefore(wrapper, node);
+
+        if (remainderText.length > 0 || hasRichMedia) {
+          stripLeadingMarkerFromElement(node);
+          currentBodyEl.appendChild(node);
+        } else {
+          containerEl.removeChild(node);
+        }
+      } else if (currentBodyEl) {
+        currentBodyEl.appendChild(node);
+      }
+    });
+
+    if (discoveredItems.length === 0) {
+      const subContainers = Array.from(containerEl.querySelectorAll('td, li'));
+      subContainers.forEach((cell) => {
+        if (cell.querySelector('.gated-sub-item')) return;
+        const cellText = (cell.textContent || '').trim();
+        const m = cellText.match(markerStartRe);
+        if (m) {
+          const label = (m[1] || m[2] || '').trim();
+          const { wrapper, bodyEl } = createSubItemWrapper(label);
+          const cellChildren = Array.from(cell.childNodes);
+          cellChildren.forEach((ch) => {
+            if (ch.nodeType === 1) {
+              const chTxt = (ch.textContent || '').trim();
+              const chMatch = chTxt.match(markerStartRe);
+              if (chMatch) {
+                const rem = (chMatch[3] || '').trim();
+                const hasMedia = Boolean(ch.querySelector && ch.querySelector('img, svg, canvas, iframe, picture'));
+                if (rem.length > 0 || hasMedia) {
+                  stripLeadingMarkerFromElement(ch);
+                  bodyEl.appendChild(ch);
+                } else {
+                  cell.removeChild(ch);
+                }
+                return;
+              }
+            }
+            bodyEl.appendChild(ch);
+          });
+          stripLeadingMarkerFromElement(bodyEl);
+          cell.appendChild(wrapper);
+        }
+      });
+    }
+
+    return discoveredItems;
+  } catch (err) {
+    console.warn('prepareGatedSectionDom safe fallback:', err);
+    return [];
+  }
+}
+window.prepareGatedSectionDom = prepareGatedSectionDom;
 window.stripSectionHeaders = stripSectionHeaders;
 
 function isPatientInfoGated(c) {
@@ -2748,7 +2994,7 @@ if ('serviceWorker' in navigator && window.location.protocol !== 'file:') {
 const DB_NAME = 'RxCU_OSPE_DB';
 const DB_VERSION = 1;
 const STORE_NAME = 'case_details';
-const DB_VERSION_STR = 'v_20261026_155930'; // อัปเดตเวอร์ชันนี้เพื่อบังคับโหลดใหม่เมื่อมีเคสเพิ่มเติมในสคริปต์ออฟไลน์
+const DB_VERSION_STR = 'v_20261102_121648'; // อัปเดตเวอร์ชันนี้เพื่อบังคับโหลดใหม่เมื่อมีเคสเพิ่มเติมในสคริปต์ออฟไลน์
 
 function openIndexedDB() {
   return new Promise((resolve, reject) => {

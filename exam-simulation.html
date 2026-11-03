@@ -643,6 +643,36 @@
       background: #FEE2E2 !important;
     }
 
+    #exam-sticky-timer-bar #btn-finish-exam {
+      background: #dc2626;
+      border: 1.5px solid #dc2626;
+      color: #ffffff;
+      min-height: 44px;
+      padding: 0 18px;
+      border-radius: 9999px;
+      font-family: var(--font-body, 'Bai Jamjuree', sans-serif);
+      font-size: 0.88rem;
+      font-weight: 700;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      box-shadow: 0 4px 14px rgba(220, 38, 38, 0.28);
+      cursor: pointer;
+      transition: transform 0.15s ease, background-color 0.15s ease, box-shadow 0.15s ease;
+      white-space: nowrap;
+    }
+
+    #exam-sticky-timer-bar #btn-finish-exam:hover {
+      transform: scale(1.02);
+      filter: brightness(1.08);
+      box-shadow: 0 6px 18px rgba(220, 38, 38, 0.35);
+    }
+
+    #exam-sticky-timer-bar #btn-finish-exam:active {
+      transform: scale(0.98);
+    }
+
     @media (max-width: 960px) {
       .custom-picker-grid {
         grid-template-columns: 1fr !important;
@@ -2780,6 +2810,11 @@
                 <button type="button" class="menu-item dg" id="btn-sticky-abort-exam" onclick="abortExamSimulation(); closeTimerMoreMenu();">🏁 ยุติการสอบ</button>
               </div>
             </div>
+
+            <!-- 4. Finish Exam Button (Pinned on Sticky Bar) -->
+            <button type="button" class="btn btn-danger" id="btn-finish-exam" onclick="finishExamSimulation()" title="สิ้นสุดการสอบและสรุปผลคะแนน">
+              🏁 สิ้นสุดการสอบ
+            </button>
             
             <!-- Backward-compatible hidden placeholder -->
             <div id="exam-bar-fill" class="progress-bar-fill" style="display: none;"></div>
@@ -2831,7 +2866,6 @@
                       <span>แบบยาว</span>
                     </button>
                   </div>
-                  <button class="btn btn-danger" id="btn-finish-exam" onclick="finishExamSimulation()" style="padding: 5px 12px; font-size: 12.5px;">🏁 สิ้นสุดการสอบ</button>
                 </div>
               </div>
             </div>
@@ -10101,7 +10135,7 @@
           const examNav = document.querySelector('.exam-nav');
           if (examNav) examNav.style.display = (isStandardRoom || SimState.isHost) ? 'flex' : 'none';
           const finishBtn = document.getElementById('btn-finish-exam');
-          if (finishBtn) finishBtn.style.display = (isStandardRoom || SimState.isHost) ? 'block' : 'none';
+          if (finishBtn) finishBtn.style.display = (isStandardRoom || SimState.isHost) ? 'inline-flex' : 'none';
         }
 
         // In multiplayer room, control abort/leave button visibility
@@ -10209,15 +10243,15 @@
         const isStandardRoom = (SimState.examMode === 'standard' || !SimState.examMode);
         const canControlNav = Boolean(SimState.isHost || (isStandardRoom && SimState.role === 'examiner'));
         if (examNav) examNav.style.display = canControlNav ? 'flex' : 'none';
-        if (finishBtn) finishBtn.style.display = canControlNav ? 'block' : 'none';
+        if (finishBtn) finishBtn.style.display = canControlNav ? 'inline-flex' : 'none';
       } else {
         if (examNav) examNav.style.display = 'flex';
-        if (finishBtn) finishBtn.style.display = 'block';
+        if (finishBtn) finishBtn.style.display = 'inline-flex';
       }
 
       if (SimState._isSoloReview) {
         if (finishBtn) {
-          finishBtn.style.display = 'inline-block';
+          finishBtn.style.display = 'inline-flex';
           finishBtn.textContent = '🏁 สรุปผลคะแนน';
           finishBtn.style.background = '#10b981';
           finishBtn.style.borderColor = '#10b981';

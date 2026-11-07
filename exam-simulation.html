@@ -2426,7 +2426,7 @@
       <section class="exam-screen" id="exam-running-view" style="display: none;">
         
         <!-- Lobby Info Panel (Only shown in Lobby Mode) -->
-        <div id="exam-lobby-info-bar" class="exam-lobby-info-bar" style="display: none; background: var(--surface); color: var(--primary); padding: 0.55rem 1rem; border: 1.5px solid var(--border); border-radius: var(--radius-md); margin-bottom: 0.85rem; font-family: var(--font-title); font-size: 0.88rem; justify-content: space-between; align-items: center; box-shadow: var(--shadow-sm); flex-wrap: wrap; gap: 0.5rem;">
+        <div id="exam-lobby-info-bar" class="exam-lobby-info-bar" style="display: none; position: relative; z-index: 1050; background: var(--surface); color: var(--primary); padding: 0.55rem 1rem; border: 1.5px solid var(--border); border-radius: var(--radius-md); margin-bottom: 0.85rem; font-family: var(--font-title); font-size: 0.88rem; justify-content: space-between; align-items: center; box-shadow: var(--shadow-sm); flex-wrap: wrap; gap: 0.5rem;">
           <div style="display: flex; align-items: center; flex-wrap: wrap; gap: 0.85rem;">
             <span>🔑 รหัสห้อง: <strong id="lobby-room-id-display" style="font-size: 1.05rem; color: var(--primary); letter-spacing: 1px;">----</strong></span>
             
@@ -2437,7 +2437,7 @@
               </button>
               
               <!-- Collapsible Popover for Member Names -->
-              <div id="lobby-members-dropdown" style="display: none; position: absolute; top: calc(100% + 6px); left: 0; z-index: 1000; background: var(--surface); border: 1.5px solid var(--border); border-radius: var(--radius-md); box-shadow: var(--shadow-lg); padding: 0.75rem 1rem; min-width: 250px; max-width: 320px; max-height: 240px; overflow-y: auto; text-align: left;" onclick="event.stopPropagation()">
+              <div id="lobby-members-dropdown" style="display: none; position: absolute; top: calc(100% + 6px); left: 0; z-index: 2000; background: var(--surface); border: 1.5px solid var(--border); border-radius: var(--radius-md); box-shadow: 0 12px 32px rgba(0,0,0,0.18); padding: 0.75rem 1rem; min-width: 250px; max-width: 320px; max-height: 240px; overflow-y: auto; text-align: left;" onclick="event.stopPropagation()">
                 <div style="font-size: 0.78rem; font-weight: 700; color: var(--text-muted); margin-bottom: 0.4rem; border-bottom: 1px solid var(--border); padding-bottom: 0.25rem;">
                   รายชื่อผู้เข้าร่วม (<span id="lobby-dropdown-count">0</span> คน)
                 </div>
@@ -14563,8 +14563,12 @@ ${caseContext || '(ยังไม่มีข้อมูลเคส)'}
       toggleDrawer() {
         this.isOpen = !this.isOpen;
         const drawer = document.getElementById('station-chat-drawer');
+        const backdrop = document.getElementById('st-chat-backdrop');
         if (drawer) {
           drawer.style.display = this.isOpen ? 'flex' : 'none';
+          if (backdrop) {
+            backdrop.style.display = (this.isOpen && window.innerWidth <= 768) ? 'block' : 'none';
+          }
           if (this.isOpen) {
             initStationChatDragAndResize();
             applyStoredStationChatLayout();
@@ -14883,10 +14887,31 @@ ${caseContext || '(ยังไม่มีข้อมูลเคส)'}
 
     function openChatFromMenu() {
       closeUnifiedExamToolsMenu();
-      if (!StationChatController.isOpen) {
+      const drawer = document.getElementById('station-chat-drawer');
+      if (!StationChatController.isOpen || (drawer && drawer.style.display === 'none')) {
+        StationChatController.isOpen = false;
         StationChatController.toggleDrawer();
       }
     }
+
+    function closeStationChatDrawer() {
+      if (typeof StationChatController !== 'undefined') {
+        if (StationChatController.isOpen) {
+          StationChatController.toggleDrawer();
+        } else {
+          const drawer = document.getElementById('station-chat-drawer');
+          if (drawer) drawer.style.display = 'none';
+          const backdrop = document.getElementById('st-chat-backdrop');
+          if (backdrop) backdrop.style.display = 'none';
+        }
+      } else {
+        const drawer = document.getElementById('station-chat-drawer');
+        if (drawer) drawer.style.display = 'none';
+        const backdrop = document.getElementById('st-chat-backdrop');
+        if (backdrop) backdrop.style.display = 'none';
+      }
+    }
+    window.closeStationChatDrawer = closeStationChatDrawer;
 
     function openScratchpadFromMenu() {
       closeUnifiedExamToolsMenu();
@@ -20351,6 +20376,7 @@ ${caseContext || '(ยังไม่มีข้อมูลเคส)'}
       <div style="flex: 1;">
         <div style="font-weight: 700; font-size: 0.88rem; color: var(--text-primary);">กระดาษทด (Scratchpad)</div>
         <div style="font-size: 0.73rem; color: var(--text-secondary); margin-top: 1px;">วาดรูป เขียนสูตรคำนวณ จดบันทึก และฉลากยา</div>
+      </div>
     </div>
   </div>
 

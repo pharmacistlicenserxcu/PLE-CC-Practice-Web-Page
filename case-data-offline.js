@@ -1,12 +1,12 @@
 /**
  * PLE-CC2 OSPE Practice System — Offline Case List Metadata (Auto-Generated)
- * Version: v_20261109_151345
- * Generated on 2026-11-09 15:13:45
+ * Version: v_20261109_153041
+ * Generated on 2026-11-09 15:30:41
  */
 
 const OFFLINE_DATA = {
-  "version": "v_20261109_151345",
-  "generatedAt": "2026-11-09 15:13:45",
+  "version": "v_20261109_153041",
+  "generatedAt": "2026-11-09 15:30:41",
   "totalCases": 438,
   "cases": [
     {
@@ -2353,8 +2353,7 @@ const OFFLINE_DATA = {
       "isActive": true,
       "caseStatus": "Active",
       "linkedNextCase": "",
-      "linkedFromCase": "",
-      "durationMin": 4
+      "linkedFromCase": ""
     },
     {
       "caseId": "OSPE-CL83M109",
@@ -3558,31 +3557,28 @@ const OFFLINE_DATA = {
     },
     {
       "caseId": "OSPE-CLM101",
-      "title": "OSPE-CLM101",
+      "title": "Untitled Case",
       "category": "Clinic",
-      "mainGroup": "Mock Exam 2569",
-      "subTopic": "🔒 ข้อสอบลับ (ต้องใช้รหัสผ่าน)",
-      "disease": "🔒 ล็อกด้วยรหัสผ่าน (Secret Mock)",
+      "mainGroup": "",
+      "subTopic": "",
+      "disease": "ซักประวัติและจ่ายยา",
       "difficulty": 2,
       "docId": "1ZNKvEBVAUeVcJ2GSH4gGKujA8whv7zY0fH4pXVEJa4g",
       "author": "",
       "createdDate": "31 ตุลาคม 2569",
-      "source": "Mock Clinic RxCU84 Set A",
+      "source": "Mock Clinic RxCU84 Set B",
       "isActive": true,
       "caseStatus": "Active",
       "linkedNextCase": "",
-      "linkedFromCase": "",
-      "durationMin": 4,
-      "isProtected": true,
-      "hasPassword": true
+      "linkedFromCase": ""
     },
     {
       "caseId": "OSPE-CLM102",
-      "title": "OSPE-CLM102",
+      "title": "Untitled Case",
       "category": "Clinic",
-      "mainGroup": "Mock Exam 2569",
-      "subTopic": "🔒 ข้อสอบลับ (ต้องใช้รหัสผ่าน)",
-      "disease": "🔒 ล็อกด้วยรหัสผ่าน (Secret Mock)",
+      "mainGroup": "ตรวจสอบและแก้ไขใบสั่งยา",
+      "subTopic": "",
+      "disease": "",
       "difficulty": 2,
       "docId": "1ZNKvEBVAUeVcJ2GSH4gGKujA8whv7zY0fH4pXVEJa4g",
       "author": "",
@@ -3591,18 +3587,15 @@ const OFFLINE_DATA = {
       "isActive": true,
       "caseStatus": "Active",
       "linkedNextCase": "",
-      "linkedFromCase": "",
-      "durationMin": 4,
-      "isProtected": true,
-      "hasPassword": true
+      "linkedFromCase": ""
     },
     {
       "caseId": "OSPE-CLM103",
-      "title": "OSPE-CLM103",
+      "title": "Untitled Case",
       "category": "Clinic",
-      "mainGroup": "Mock Exam 2569",
-      "subTopic": "🔒 ข้อสอบลับ (ต้องใช้รหัสผ่าน)",
-      "disease": "🔒 ล็อกด้วยรหัสผ่าน (Secret Mock)",
+      "mainGroup": "",
+      "subTopic": "",
+      "disease": "ตอบคำถามและให้คำแนะนำด้านยา",
       "difficulty": 2,
       "docId": "1ZNKvEBVAUeVcJ2GSH4gGKujA8whv7zY0fH4pXVEJa4g",
       "author": "",
@@ -3611,18 +3604,15 @@ const OFFLINE_DATA = {
       "isActive": true,
       "caseStatus": "Active",
       "linkedNextCase": "",
-      "linkedFromCase": "",
-      "durationMin": 4,
-      "isProtected": true,
-      "hasPassword": true
+      "linkedFromCase": ""
     },
     {
       "caseId": "OSPE-CLM105",
-      "title": "OSPE-CLM105",
+      "title": "Untitled Case",
       "category": "Clinic",
-      "mainGroup": "Mock Exam 2569",
-      "subTopic": "🔒 ข้อสอบลับ (ต้องใช้รหัสผ่าน)",
-      "disease": "🔒 ล็อกด้วยรหัสผ่าน (Secret Mock)",
+      "mainGroup": "ประสานงาน ISBAR",
+      "subTopic": "",
+      "disease": "",
       "difficulty": 2,
       "docId": "1ZNKvEBVAUeVcJ2GSH4gGKujA8whv7zY0fH4pXVEJa4g",
       "author": "กิ๊ฟ เพ้นท์",
@@ -3631,10 +3621,7 @@ const OFFLINE_DATA = {
       "isActive": true,
       "caseStatus": "Active",
       "linkedNextCase": "",
-      "linkedFromCase": "",
-      "durationMin": 4,
-      "isProtected": true,
-      "hasPassword": true
+      "linkedFromCase": ""
     },
     {
       "caseId": "OSPE-CLSD01",
@@ -3906,8 +3893,7 @@ const OFFLINE_DATA = {
       "isActive": true,
       "caseStatus": "Active",
       "linkedNextCase": "",
-      "linkedFromCase": "",
-      "durationMin": 4
+      "linkedFromCase": ""
     },
     {
       "caseId": "OSPE-CLSD16B",
@@ -3924,8 +3910,7 @@ const OFFLINE_DATA = {
       "isActive": true,
       "caseStatus": "Active",
       "linkedNextCase": "",
-      "linkedFromCase": "",
-      "durationMin": 4
+      "linkedFromCase": ""
     },
     {
       "caseId": "OSPE-CLSD17",
@@ -4252,11 +4237,11 @@ const OFFLINE_DATA = {
     },
     {
       "caseId": "OSPE-CLW1M01",
-      "title": "OSPE-CLW1M01",
+      "title": "การตรวจสอบใบสั่งยา Mock RxCU84 Clinic Week 1",
       "category": "Clinic",
-      "mainGroup": "Mock Exam 2569",
-      "subTopic": "🔒 ข้อสอบลับ (ต้องใช้รหัสผ่าน)",
-      "disease": "🔒 ล็อกด้วยรหัสผ่าน (Secret Mock)",
+      "mainGroup": "การตรวจสอบใบสั่งยา",
+      "subTopic": "",
+      "disease": "NCD, Pain management",
       "difficulty": 2,
       "docId": "1ZNKvEBVAUeVcJ2GSH4gGKujA8whv7zY0fH4pXVEJa4g",
       "author": "",
@@ -4265,18 +4250,15 @@ const OFFLINE_DATA = {
       "isActive": true,
       "caseStatus": "Active",
       "linkedNextCase": "",
-      "linkedFromCase": "",
-      "durationMin": 4,
-      "isProtected": true,
-      "hasPassword": true
+      "linkedFromCase": ""
     },
     {
       "caseId": "OSPE-CLW1M02",
-      "title": "OSPE-CLW1M02",
+      "title": "การนับเม็ดยาและเขียนฉลากยา Mock RxCU84 Clinic Week 1",
       "category": "Clinic",
-      "mainGroup": "Mock Exam 2569",
-      "subTopic": "🔒 ข้อสอบลับ (ต้องใช้รหัสผ่าน)",
-      "disease": "🔒 ล็อกด้วยรหัสผ่าน (Secret Mock)",
+      "mainGroup": "การนับเม็ดยาและเขียนฉลากยา",
+      "subTopic": "",
+      "disease": "Cafegot",
       "difficulty": 2,
       "docId": "1ZNKvEBVAUeVcJ2GSH4gGKujA8whv7zY0fH4pXVEJa4g",
       "author": "",
@@ -4285,18 +4267,15 @@ const OFFLINE_DATA = {
       "isActive": true,
       "caseStatus": "Active",
       "linkedNextCase": "",
-      "linkedFromCase": "",
-      "durationMin": 4,
-      "isProtected": true,
-      "hasPassword": true
+      "linkedFromCase": ""
     },
     {
       "caseId": "OSPE-CLW1M03",
-      "title": "OSPE-CLW1M03",
+      "title": "เปิดหนังสือ Mock RxCU84 Clinic Week 1",
       "category": "Clinic",
-      "mainGroup": "Mock Exam 2569",
-      "subTopic": "🔒 ข้อสอบลับ (ต้องใช้รหัสผ่าน)",
-      "disease": "🔒 ล็อกด้วยรหัสผ่าน (Secret Mock)",
+      "mainGroup": "การค้นข้อมูลและประสานงาน",
+      "subTopic": "",
+      "disease": "เปิดหนังสือ",
       "difficulty": 2,
       "docId": "1ZNKvEBVAUeVcJ2GSH4gGKujA8whv7zY0fH4pXVEJa4g",
       "author": "",
@@ -4305,18 +4284,15 @@ const OFFLINE_DATA = {
       "isActive": true,
       "caseStatus": "Active",
       "linkedNextCase": "",
-      "linkedFromCase": "",
-      "durationMin": 4,
-      "isProtected": true,
-      "hasPassword": true
+      "linkedFromCase": ""
     },
     {
       "caseId": "OSPE-CLW1M04",
-      "title": "OSPE-CLW1M04",
+      "title": "Special precaution Mock RxCU84 Clinic Week 1",
       "category": "Clinic",
-      "mainGroup": "Mock Exam 2569",
-      "subTopic": "🔒 ข้อสอบลับ (ต้องใช้รหัสผ่าน)",
-      "disease": "🔒 ล็อกด้วยรหัสผ่าน (Secret Mock)",
+      "mainGroup": "Special precaution",
+      "subTopic": "",
+      "disease": "ยา Warfarin",
       "difficulty": 2,
       "docId": "1ZNKvEBVAUeVcJ2GSH4gGKujA8whv7zY0fH4pXVEJa4g",
       "author": "",
@@ -4325,18 +4301,15 @@ const OFFLINE_DATA = {
       "isActive": true,
       "caseStatus": "Active",
       "linkedNextCase": "",
-      "linkedFromCase": "",
-      "durationMin": 4,
-      "isProtected": true,
-      "hasPassword": true
+      "linkedFromCase": ""
     },
     {
       "caseId": "OSPE-CLW1M05",
-      "title": "OSPE-CLW1M05",
+      "title": "การระบุรูปแบบยาเตรียมและปัญหาความไม่คงตัวของตำรับยา (Dosage Forms & Drug Instabilities)",
       "category": "Product",
-      "mainGroup": "Mock Exam 2569",
-      "subTopic": "🔒 ข้อสอบลับ (ต้องใช้รหัสผ่าน)",
-      "disease": "🔒 ล็อกด้วยรหัสผ่าน (Secret Mock)",
+      "mainGroup": "Product",
+      "subTopic": "",
+      "disease": "Dosage Forms & Drug Instabilities",
       "difficulty": 2,
       "docId": "1ZNKvEBVAUeVcJ2GSH4gGKujA8whv7zY0fH4pXVEJa4g",
       "author": "Maxnum",
@@ -4345,18 +4318,15 @@ const OFFLINE_DATA = {
       "isActive": true,
       "caseStatus": "Active",
       "linkedNextCase": "",
-      "linkedFromCase": "",
-      "durationMin": 4,
-      "isProtected": true,
-      "hasPassword": true
+      "linkedFromCase": ""
     },
     {
       "caseId": "OSPE-CLW1M06",
-      "title": "OSPE-CLW1M06",
+      "title": "การจำแนกประเภทของยาตามกฎหมาย",
       "category": "SAP",
-      "mainGroup": "Mock Exam 2569",
-      "subTopic": "🔒 ข้อสอบลับ (ต้องใช้รหัสผ่าน)",
-      "disease": "🔒 ล็อกด้วยรหัสผ่าน (Secret Mock)",
+      "mainGroup": "กฎหมายทางยา",
+      "subTopic": "",
+      "disease": "พ.ร.บ. ยา พ.ศ. 2510 และฉบับแก้ไขเพิ่มเติม",
       "difficulty": 2,
       "docId": "1ZNKvEBVAUeVcJ2GSH4gGKujA8whv7zY0fH4pXVEJa4g",
       "author": "Maxnum",
@@ -4365,18 +4335,15 @@ const OFFLINE_DATA = {
       "isActive": true,
       "caseStatus": "Active",
       "linkedNextCase": "",
-      "linkedFromCase": "",
-      "durationMin": 4,
-      "isProtected": true,
-      "hasPassword": true
+      "linkedFromCase": ""
     },
     {
       "caseId": "OSPE-CLW2M01",
-      "title": "OSPE-CLW2M01",
+      "title": "การตรวจสอบใบสั่งยา Mock RxCU84 Clinic Week 2",
       "category": "Clinic",
-      "mainGroup": "Mock Exam 2569",
-      "subTopic": "🔒 ข้อสอบลับ (ต้องใช้รหัสผ่าน)",
-      "disease": "🔒 ล็อกด้วยรหัสผ่าน (Secret Mock)",
+      "mainGroup": "การเขียนฉลากช่วย และการเก็บรักษายา",
+      "subTopic": "",
+      "disease": "การใช้ยาเบาหวาน",
       "difficulty": 2,
       "docId": "1ZNKvEBVAUeVcJ2GSH4gGKujA8whv7zY0fH4pXVEJa4g",
       "author": "",
@@ -4385,18 +4352,15 @@ const OFFLINE_DATA = {
       "isActive": true,
       "caseStatus": "Active",
       "linkedNextCase": "",
-      "linkedFromCase": "",
-      "durationMin": 4,
-      "isProtected": true,
-      "hasPassword": true
+      "linkedFromCase": ""
     },
     {
       "caseId": "OSPE-CLW2M02",
-      "title": "OSPE-CLW2M02",
+      "title": "การนับเม็ดยาและเขียนฉลากยา Mock RxCU84 Clinic Week 2",
       "category": "Clinic",
-      "mainGroup": "Mock Exam 2569",
-      "subTopic": "🔒 ข้อสอบลับ (ต้องใช้รหัสผ่าน)",
-      "disease": "🔒 ล็อกด้วยรหัสผ่าน (Secret Mock)",
+      "mainGroup": "การนับเม็ดยาและเขียนฉลากยา",
+      "subTopic": "",
+      "disease": "โรคกระดูกพรุน (Osteoporosis)",
       "difficulty": 2,
       "docId": "1ZNKvEBVAUeVcJ2GSH4gGKujA8whv7zY0fH4pXVEJa4g",
       "author": "มิ้นท์, มดเขียว, ฟ้าใส",
@@ -4405,10 +4369,7 @@ const OFFLINE_DATA = {
       "isActive": true,
       "caseStatus": "Active",
       "linkedNextCase": "",
-      "linkedFromCase": "",
-      "durationMin": 4,
-      "isProtected": true,
-      "hasPassword": true
+      "linkedFromCase": ""
     },
     {
       "caseId": "OSPE-CLW2M03",
@@ -4429,11 +4390,11 @@ const OFFLINE_DATA = {
     },
     {
       "caseId": "OSPE-CLW2M04",
-      "title": "OSPE-CLW2M04",
+      "title": "เปิดหนังสือ Mock RxCU84 Clinic Week 2",
       "category": "Clinic",
-      "mainGroup": "Mock Exam 2569",
-      "subTopic": "🔒 ข้อสอบลับ (ต้องใช้รหัสผ่าน)",
-      "disease": "🔒 ล็อกด้วยรหัสผ่าน (Secret Mock)",
+      "mainGroup": "การค้นข้อมูลและประสานงาน",
+      "subTopic": "",
+      "disease": "Special precaution",
       "difficulty": 2,
       "docId": "1ZNKvEBVAUeVcJ2GSH4gGKujA8whv7zY0fH4pXVEJa4g",
       "author": "มิ้นท์, มดเขียว, ฟ้าใส",
@@ -4442,18 +4403,15 @@ const OFFLINE_DATA = {
       "isActive": true,
       "caseStatus": "Active",
       "linkedNextCase": "",
-      "linkedFromCase": "",
-      "durationMin": 4,
-      "isProtected": true,
-      "hasPassword": true
+      "linkedFromCase": ""
     },
     {
       "caseId": "OSPE-CLW2M05",
-      "title": "OSPE-CLW2M05",
+      "title": "ข้อสอบผลิตภัณฑ์ Mock RxCU84 Clinic Week 2",
       "category": "Product",
-      "mainGroup": "Mock Exam 2569",
-      "subTopic": "🔒 ข้อสอบลับ (ต้องใช้รหัสผ่าน)",
-      "disease": "🔒 ล็อกด้วยรหัสผ่าน (Secret Mock)",
+      "mainGroup": "",
+      "subTopic": "",
+      "disease": "Special precaution",
       "difficulty": 2,
       "docId": "1ZNKvEBVAUeVcJ2GSH4gGKujA8whv7zY0fH4pXVEJa4g",
       "author": "",
@@ -4462,18 +4420,15 @@ const OFFLINE_DATA = {
       "isActive": true,
       "caseStatus": "Active",
       "linkedNextCase": "",
-      "linkedFromCase": "",
-      "durationMin": 4,
-      "isProtected": true,
-      "hasPassword": true
+      "linkedFromCase": ""
     },
     {
       "caseId": "OSPE-CLW2M06",
-      "title": "OSPE-CLW2M06",
+      "title": "ข้อสอบกฎหมาย Mock RxCU84 Clinic Week 2",
       "category": "SAP",
-      "mainGroup": "Mock Exam 2569",
-      "subTopic": "🔒 ข้อสอบลับ (ต้องใช้รหัสผ่าน)",
-      "disease": "🔒 ล็อกด้วยรหัสผ่าน (Secret Mock)",
+      "mainGroup": "",
+      "subTopic": "",
+      "disease": "",
       "difficulty": 2,
       "docId": "1ZNKvEBVAUeVcJ2GSH4gGKujA8whv7zY0fH4pXVEJa4g",
       "author": "",
@@ -4482,18 +4437,15 @@ const OFFLINE_DATA = {
       "isActive": true,
       "caseStatus": "Active",
       "linkedNextCase": "",
-      "linkedFromCase": "",
-      "durationMin": 4,
-      "isProtected": true,
-      "hasPassword": true
+      "linkedFromCase": ""
     },
     {
       "caseId": "OSPE-CLW3M01",
-      "title": "OSPE-CLW3M01",
+      "title": "การตรวจสอบใบสั่งยา Mock RxCU84 Clinic Week 3",
       "category": "Clinic",
-      "mainGroup": "Mock Exam 2569",
-      "subTopic": "🔒 ข้อสอบลับ (ต้องใช้รหัสผ่าน)",
-      "disease": "🔒 ล็อกด้วยรหัสผ่าน (Secret Mock)",
+      "mainGroup": "การตรวจสอบใบสั่งยา",
+      "subTopic": "",
+      "disease": "",
       "difficulty": 2,
       "docId": "1ZNKvEBVAUeVcJ2GSH4gGKujA8whv7zY0fH4pXVEJa4g",
       "author": "",
@@ -4502,18 +4454,15 @@ const OFFLINE_DATA = {
       "isActive": true,
       "caseStatus": "Active",
       "linkedNextCase": "",
-      "linkedFromCase": "",
-      "durationMin": 4,
-      "isProtected": true,
-      "hasPassword": true
+      "linkedFromCase": ""
     },
     {
       "caseId": "OSPE-CLW3M02",
-      "title": "OSPE-CLW3M02",
+      "title": "การนับเม็ดยาและเขียนฉลากยา Mock RxCU84 Clinic Week 3",
       "category": "Clinic",
-      "mainGroup": "Mock Exam 2569",
-      "subTopic": "🔒 ข้อสอบลับ (ต้องใช้รหัสผ่าน)",
-      "disease": "🔒 ล็อกด้วยรหัสผ่าน (Secret Mock)",
+      "mainGroup": "การนับเม็ดยาและเขียนฉลากยา",
+      "subTopic": "",
+      "disease": "",
       "difficulty": 2,
       "docId": "1ZNKvEBVAUeVcJ2GSH4gGKujA8whv7zY0fH4pXVEJa4g",
       "author": "",
@@ -4522,10 +4471,7 @@ const OFFLINE_DATA = {
       "isActive": true,
       "caseStatus": "Active",
       "linkedNextCase": "",
-      "linkedFromCase": "",
-      "durationMin": 4,
-      "isProtected": true,
-      "hasPassword": true
+      "linkedFromCase": ""
     },
     {
       "caseId": "OSPE-CLW3M03",
@@ -4546,11 +4492,11 @@ const OFFLINE_DATA = {
     },
     {
       "caseId": "OSPE-CLW3M04",
-      "title": "OSPE-CLW3M04",
+      "title": "เปิดหนังสือ Mock RxCU84 Clinic Week 3",
       "category": "Clinic",
-      "mainGroup": "Mock Exam 2569",
-      "subTopic": "🔒 ข้อสอบลับ (ต้องใช้รหัสผ่าน)",
-      "disease": "🔒 ล็อกด้วยรหัสผ่าน (Secret Mock)",
+      "mainGroup": "การค้นข้อมูลและประสานงาน",
+      "subTopic": "",
+      "disease": "",
       "difficulty": 2,
       "docId": "1ZNKvEBVAUeVcJ2GSH4gGKujA8whv7zY0fH4pXVEJa4g",
       "author": "",
@@ -4559,18 +4505,15 @@ const OFFLINE_DATA = {
       "isActive": true,
       "caseStatus": "Active",
       "linkedNextCase": "",
-      "linkedFromCase": "",
-      "durationMin": 4,
-      "isProtected": true,
-      "hasPassword": true
+      "linkedFromCase": ""
     },
     {
       "caseId": "OSPE-CLW3M05",
-      "title": "OSPE-CLW3M05",
+      "title": "ข้อสอบผลิตภัณฑ์ Mock RxCU84 Clinic Week 3",
       "category": "Product",
-      "mainGroup": "Mock Exam 2569",
-      "subTopic": "🔒 ข้อสอบลับ (ต้องใช้รหัสผ่าน)",
-      "disease": "🔒 ล็อกด้วยรหัสผ่าน (Secret Mock)",
+      "mainGroup": "Special precaution",
+      "subTopic": "",
+      "disease": "",
       "difficulty": 2,
       "docId": "1ZNKvEBVAUeVcJ2GSH4gGKujA8whv7zY0fH4pXVEJa4g",
       "author": "",
@@ -4579,18 +4522,15 @@ const OFFLINE_DATA = {
       "isActive": true,
       "caseStatus": "Active",
       "linkedNextCase": "",
-      "linkedFromCase": "",
-      "durationMin": 4,
-      "isProtected": true,
-      "hasPassword": true
+      "linkedFromCase": ""
     },
     {
       "caseId": "OSPE-CLW3M06",
-      "title": "OSPE-CLW3M06",
+      "title": "ข้อสอบกฎหมาย Mock RxCU84 Clinic Week 3",
       "category": "SAP",
-      "mainGroup": "Mock Exam 2569",
-      "subTopic": "🔒 ข้อสอบลับ (ต้องใช้รหัสผ่าน)",
-      "disease": "🔒 ล็อกด้วยรหัสผ่าน (Secret Mock)",
+      "mainGroup": "",
+      "subTopic": "",
+      "disease": "",
       "difficulty": 2,
       "docId": "1ZNKvEBVAUeVcJ2GSH4gGKujA8whv7zY0fH4pXVEJa4g",
       "author": "",
@@ -4599,18 +4539,15 @@ const OFFLINE_DATA = {
       "isActive": true,
       "caseStatus": "Active",
       "linkedNextCase": "",
-      "linkedFromCase": "",
-      "durationMin": 4,
-      "isProtected": true,
-      "hasPassword": true
+      "linkedFromCase": ""
     },
     {
       "caseId": "OSPE-CLW4M01",
-      "title": "OSPE-CLW4M01",
+      "title": "การตรวจสอบใบสั่งยา Mock RxCU84 Clinic Week 4",
       "category": "Clinic",
-      "mainGroup": "Mock Exam 2569",
-      "subTopic": "🔒 ข้อสอบลับ (ต้องใช้รหัสผ่าน)",
-      "disease": "🔒 ล็อกด้วยรหัสผ่าน (Secret Mock)",
+      "mainGroup": "การตรวจสอบใบสั่งยา",
+      "subTopic": "",
+      "disease": "",
       "difficulty": 2,
       "docId": "1ZNKvEBVAUeVcJ2GSH4gGKujA8whv7zY0fH4pXVEJa4g",
       "author": "",
@@ -4619,18 +4556,15 @@ const OFFLINE_DATA = {
       "isActive": true,
       "caseStatus": "Active",
       "linkedNextCase": "",
-      "linkedFromCase": "",
-      "durationMin": 4,
-      "isProtected": true,
-      "hasPassword": true
+      "linkedFromCase": ""
     },
     {
       "caseId": "OSPE-CLW4M02",
-      "title": "OSPE-CLW4M02",
+      "title": "การนับเม็ดยาและเขียนฉลากยา Mock RxCU84 Clinic Week 4",
       "category": "Clinic",
-      "mainGroup": "Mock Exam 2569",
-      "subTopic": "🔒 ข้อสอบลับ (ต้องใช้รหัสผ่าน)",
-      "disease": "🔒 ล็อกด้วยรหัสผ่าน (Secret Mock)",
+      "mainGroup": "การนับเม็ดยาและเขียนฉลากยา",
+      "subTopic": "",
+      "disease": "",
       "difficulty": 2,
       "docId": "1ZNKvEBVAUeVcJ2GSH4gGKujA8whv7zY0fH4pXVEJa4g",
       "author": "",
@@ -4639,18 +4573,15 @@ const OFFLINE_DATA = {
       "isActive": true,
       "caseStatus": "Active",
       "linkedNextCase": "",
-      "linkedFromCase": "",
-      "durationMin": 4,
-      "isProtected": true,
-      "hasPassword": true
+      "linkedFromCase": ""
     },
     {
       "caseId": "OSPE-CLW4M03",
-      "title": "OSPE-CLW4M03",
+      "title": "เปิดหนังสือ Mock RxCU84 Clinic Week 4",
       "category": "Clinic",
-      "mainGroup": "Mock Exam 2569",
-      "subTopic": "🔒 ข้อสอบลับ (ต้องใช้รหัสผ่าน)",
-      "disease": "🔒 ล็อกด้วยรหัสผ่าน (Secret Mock)",
+      "mainGroup": "การค้นข้อมูลและประสานงาน",
+      "subTopic": "",
+      "disease": "",
       "difficulty": 2,
       "docId": "1ZNKvEBVAUeVcJ2GSH4gGKujA8whv7zY0fH4pXVEJa4g",
       "author": "",
@@ -4659,18 +4590,15 @@ const OFFLINE_DATA = {
       "isActive": true,
       "caseStatus": "Active",
       "linkedNextCase": "",
-      "linkedFromCase": "",
-      "durationMin": 4,
-      "isProtected": true,
-      "hasPassword": true
+      "linkedFromCase": ""
     },
     {
       "caseId": "OSPE-CLW4M04",
-      "title": "OSPE-CLW4M04",
+      "title": "ข้อสอบผลิตภัณฑ์ Mock RxCU84 Clinic Week 4",
       "category": "Product",
-      "mainGroup": "Mock Exam 2569",
-      "subTopic": "🔒 ข้อสอบลับ (ต้องใช้รหัสผ่าน)",
-      "disease": "🔒 ล็อกด้วยรหัสผ่าน (Secret Mock)",
+      "mainGroup": "Special precaution",
+      "subTopic": "",
+      "disease": "",
       "difficulty": 2,
       "docId": "1ZNKvEBVAUeVcJ2GSH4gGKujA8whv7zY0fH4pXVEJa4g",
       "author": "",
@@ -4679,18 +4607,15 @@ const OFFLINE_DATA = {
       "isActive": true,
       "caseStatus": "Active",
       "linkedNextCase": "",
-      "linkedFromCase": "",
-      "durationMin": 4,
-      "isProtected": true,
-      "hasPassword": true
+      "linkedFromCase": ""
     },
     {
       "caseId": "OSPE-CLW4M05",
-      "title": "OSPE-CLW4M05",
+      "title": "ข้อสอบกฎหมาย Mock RxCU84 Clinic Week 4",
       "category": "SAP",
-      "mainGroup": "Mock Exam 2569",
-      "subTopic": "🔒 ข้อสอบลับ (ต้องใช้รหัสผ่าน)",
-      "disease": "🔒 ล็อกด้วยรหัสผ่าน (Secret Mock)",
+      "mainGroup": "",
+      "subTopic": "",
+      "disease": "",
       "difficulty": 2,
       "docId": "1ZNKvEBVAUeVcJ2GSH4gGKujA8whv7zY0fH4pXVEJa4g",
       "author": "",
@@ -4699,10 +4624,7 @@ const OFFLINE_DATA = {
       "isActive": true,
       "caseStatus": "Active",
       "linkedNextCase": "",
-      "linkedFromCase": "",
-      "durationMin": 4,
-      "isProtected": true,
-      "hasPassword": true
+      "linkedFromCase": ""
     },
     {
       "caseId": "OSPE-PD83M01",
@@ -4719,8 +4641,7 @@ const OFFLINE_DATA = {
       "isActive": true,
       "caseStatus": "Active",
       "linkedNextCase": "",
-      "linkedFromCase": "",
-      "durationMin": 8
+      "linkedFromCase": ""
     },
     {
       "caseId": "OSPE-PD83M02",
@@ -5196,8 +5117,7 @@ const OFFLINE_DATA = {
       "isActive": true,
       "caseStatus": "Active",
       "linkedNextCase": "",
-      "linkedFromCase": "",
-      "durationMin": 4
+      "linkedFromCase": ""
     },
     {
       "caseId": "OSPE-PD84M1W101B",
@@ -5265,8 +5185,7 @@ const OFFLINE_DATA = {
       "isActive": true,
       "caseStatus": "Active",
       "linkedNextCase": "",
-      "linkedFromCase": "",
-      "durationMin": 8
+      "linkedFromCase": ""
     },
     {
       "caseId": "OSPE-PD84M1W103B",
@@ -5283,8 +5202,7 @@ const OFFLINE_DATA = {
       "isActive": true,
       "caseStatus": "Active",
       "linkedNextCase": "",
-      "linkedFromCase": "",
-      "durationMin": 8
+      "linkedFromCase": ""
     },
     {
       "caseId": "OSPE-PD84M1W201A",
@@ -5301,8 +5219,7 @@ const OFFLINE_DATA = {
       "isActive": true,
       "caseStatus": "Active",
       "linkedNextCase": "",
-      "linkedFromCase": "",
-      "durationMin": 4
+      "linkedFromCase": ""
     },
     {
       "caseId": "OSPE-PD84M1W201B",
@@ -5319,8 +5236,7 @@ const OFFLINE_DATA = {
       "isActive": true,
       "caseStatus": "Active",
       "linkedNextCase": "",
-      "linkedFromCase": "",
-      "durationMin": 4
+      "linkedFromCase": ""
     },
     {
       "caseId": "OSPE-PD84M1W202A",
@@ -5337,8 +5253,7 @@ const OFFLINE_DATA = {
       "isActive": true,
       "caseStatus": "Active",
       "linkedNextCase": "",
-      "linkedFromCase": "",
-      "durationMin": 4
+      "linkedFromCase": ""
     },
     {
       "caseId": "OSPE-PD84M1W202B",
@@ -5355,8 +5270,7 @@ const OFFLINE_DATA = {
       "isActive": true,
       "caseStatus": "Active",
       "linkedNextCase": "",
-      "linkedFromCase": "",
-      "durationMin": 4
+      "linkedFromCase": ""
     },
     {
       "caseId": "OSPE-PD84M1W203A",
@@ -5373,8 +5287,7 @@ const OFFLINE_DATA = {
       "isActive": true,
       "caseStatus": "Active",
       "linkedNextCase": "",
-      "linkedFromCase": "",
-      "durationMin": 8
+      "linkedFromCase": ""
     },
     {
       "caseId": "OSPE-PD84M1W203B",
@@ -5391,8 +5304,7 @@ const OFFLINE_DATA = {
       "isActive": true,
       "caseStatus": "Active",
       "linkedNextCase": "",
-      "linkedFromCase": "",
-      "durationMin": 8
+      "linkedFromCase": ""
     },
     {
       "caseId": "OSPE-PD84M1W204A",
@@ -5409,8 +5321,7 @@ const OFFLINE_DATA = {
       "isActive": true,
       "caseStatus": "Active",
       "linkedNextCase": "",
-      "linkedFromCase": "",
-      "durationMin": 4
+      "linkedFromCase": ""
     },
     {
       "caseId": "OSPE-PD84M1W204B",
@@ -5427,8 +5338,7 @@ const OFFLINE_DATA = {
       "isActive": true,
       "caseStatus": "Active",
       "linkedNextCase": "",
-      "linkedFromCase": "",
-      "durationMin": 4
+      "linkedFromCase": ""
     },
     {
       "caseId": "OSPE-PD84M1W205A",
@@ -5445,8 +5355,7 @@ const OFFLINE_DATA = {
       "isActive": true,
       "caseStatus": "Active",
       "linkedNextCase": "",
-      "linkedFromCase": "",
-      "durationMin": 4
+      "linkedFromCase": ""
     },
     {
       "caseId": "OSPE-PD84M1W205B",
@@ -5463,8 +5372,7 @@ const OFFLINE_DATA = {
       "isActive": true,
       "caseStatus": "Active",
       "linkedNextCase": "",
-      "linkedFromCase": "",
-      "durationMin": 4
+      "linkedFromCase": ""
     },
     {
       "caseId": "OSPE-PD84M1W301A",
@@ -5481,8 +5389,7 @@ const OFFLINE_DATA = {
       "isActive": true,
       "caseStatus": "Active",
       "linkedNextCase": "",
-      "linkedFromCase": "",
-      "durationMin": 4
+      "linkedFromCase": ""
     },
     {
       "caseId": "OSPE-PD84M1W301B",
@@ -5499,8 +5406,7 @@ const OFFLINE_DATA = {
       "isActive": true,
       "caseStatus": "Active",
       "linkedNextCase": "",
-      "linkedFromCase": "",
-      "durationMin": 4
+      "linkedFromCase": ""
     },
     {
       "caseId": "OSPE-PD84M1W302A",
@@ -5517,8 +5423,7 @@ const OFFLINE_DATA = {
       "isActive": true,
       "caseStatus": "Active",
       "linkedNextCase": "",
-      "linkedFromCase": "",
-      "durationMin": 8
+      "linkedFromCase": ""
     },
     {
       "caseId": "OSPE-PD84M1W302B",
@@ -5535,8 +5440,7 @@ const OFFLINE_DATA = {
       "isActive": true,
       "caseStatus": "Active",
       "linkedNextCase": "",
-      "linkedFromCase": "",
-      "durationMin": 8
+      "linkedFromCase": ""
     },
     {
       "caseId": "OSPE-PD84M1W303A",
@@ -5553,8 +5457,7 @@ const OFFLINE_DATA = {
       "isActive": true,
       "caseStatus": "Active",
       "linkedNextCase": "",
-      "linkedFromCase": "",
-      "durationMin": 4
+      "linkedFromCase": ""
     },
     {
       "caseId": "OSPE-PD84M1W303B",
@@ -5571,8 +5474,7 @@ const OFFLINE_DATA = {
       "isActive": true,
       "caseStatus": "Active",
       "linkedNextCase": "",
-      "linkedFromCase": "",
-      "durationMin": 4
+      "linkedFromCase": ""
     },
     {
       "caseId": "OSPE-PD84M1W401A",
@@ -5589,8 +5491,7 @@ const OFFLINE_DATA = {
       "isActive": true,
       "caseStatus": "Active",
       "linkedNextCase": "",
-      "linkedFromCase": "",
-      "durationMin": 8
+      "linkedFromCase": ""
     },
     {
       "caseId": "OSPE-PD84M1W401B",
@@ -5607,8 +5508,7 @@ const OFFLINE_DATA = {
       "isActive": true,
       "caseStatus": "Active",
       "linkedNextCase": "",
-      "linkedFromCase": "",
-      "durationMin": 8
+      "linkedFromCase": ""
     },
     {
       "caseId": "OSPE-PD84M1W402A",
@@ -5625,8 +5525,7 @@ const OFFLINE_DATA = {
       "isActive": true,
       "caseStatus": "Active",
       "linkedNextCase": "",
-      "linkedFromCase": "",
-      "durationMin": 4
+      "linkedFromCase": ""
     },
     {
       "caseId": "OSPE-PD84M1W402B",
@@ -5643,8 +5542,7 @@ const OFFLINE_DATA = {
       "isActive": true,
       "caseStatus": "Active",
       "linkedNextCase": "",
-      "linkedFromCase": "",
-      "durationMin": 4
+      "linkedFromCase": ""
     },
     {
       "caseId": "OSPE-PD84M1W403A",
@@ -5661,8 +5559,7 @@ const OFFLINE_DATA = {
       "isActive": true,
       "caseStatus": "Active",
       "linkedNextCase": "",
-      "linkedFromCase": "",
-      "durationMin": 6
+      "linkedFromCase": ""
     },
     {
       "caseId": "OSPE-PD84M1W403B",
@@ -5679,8 +5576,7 @@ const OFFLINE_DATA = {
       "isActive": true,
       "caseStatus": "Active",
       "linkedNextCase": "",
-      "linkedFromCase": "",
-      "durationMin": 6
+      "linkedFromCase": ""
     },
     {
       "caseId": "OSPE-PD84W101",

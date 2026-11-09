@@ -1162,7 +1162,7 @@ window.buildPrintChecklistTable = buildPrintChecklistTable;
 
 function stripSectionHeaders(str) {
   if (!str) return '';
-  const headerWords = '(?:สถานการณ์|โจทย์|ข้อมูลผู้ป่วย|สิ่งที่มีให้ในสถานี|สิ่งที่มีให้|Checklist|เกณฑ์ประเมิน|ข้อมูลผู้ตรวจ|เฉลย|หมายเหตุ|ข้อมูลเคส)';
+  const headerWords = '(?:สถานการณ์|ข้อมูลผู้ป่วย|สิ่งที่มีให้ในสถานี|Checklist|ข้อมูลผู้ตรวจ)';
   const reP = new RegExp('<p[^>]*>(?:\\s*<[^>]+>)*\\s*(?:#+\\s*)?(?:[📌📦👤🔑📝📋🔍🏷️\\s]*)?' + headerWords + '(?:\\s*\\([^)]*\\))?\\s*[:：\\-–—]?\\s*(?:<\\/[^>]+>)*\\s*<\\/p>', 'gi');
   const reH = new RegExp('<h[1-6][^>]*>(?:\\s*<[^>]+>)*\\s*(?:#+\\s*)?(?:[📌📦👤🔑📝📋🔍🏷️\\s]*)?' + headerWords + '(?:\\s*\\([^)]*\\))?\\s*[:：\\-–—]?\\s*(?:<\\/[^>]+>)*\\s*<\\/h[1-6]>', 'gi');
   const reMd = new RegExp('^(?:#+\\s*)?(?:[📌📦👤🔑📝📋🔍🏷️\\s]*)?' + headerWords + '(?:\\s*\\([^)]*\\))?\\s*[:：\\-–—]?\\s*$', 'gim');
@@ -1172,8 +1172,8 @@ window.stripSectionHeaders = stripSectionHeaders;
 
 function sanitizeAndSplitTrappedEquipment(c) {
   if (!c) return;
-  if (!c.equipmentHtml && c.patientInfoHtml && /(?:สิ่งที่มีให้ในสถานี|สิ่งที่มีให้)/i.test(c.patientInfoHtml)) {
-    const eqRegex = /<p[^>]*>(?:\s*<[^>]+>)*\s*(?:#+\s*)?(?:สิ่งที่มีให้ในสถานี|สิ่งที่มีให้)(?:\s*\(\s*ส่งโดยผู้ประเมิน\s*\))?[^<]*(?:<\/[^>]+>)*\s*<\/p>/i;
+  if (!c.equipmentHtml && c.patientInfoHtml && /สิ่งที่มีให้ในสถานี/i.test(c.patientInfoHtml)) {
+    const eqRegex = /<p[^>]*>(?:\s*<[^>]+>)*\s*(?:#+\s*)?สิ่งที่มีให้ในสถานี(?:\s*\(\s*ส่งโดยผู้ประเมิน\s*\))?[^<]*(?:<\/[^>]+>)*\s*<\/p>/i;
     const match = c.patientInfoHtml.search(eqRegex);
     if (match !== -1) {
       const equipPart = c.patientInfoHtml.slice(match);
@@ -1475,7 +1475,7 @@ function isEquipmentGated(c) {
   if (!c) return false;
   sanitizeAndSplitTrappedEquipment(c);
   if (c.equipmentGated === true) return true;
-  if (c.equipmentHtml && /(?:สิ่งที่มีให้ในสถานี|สิ่งที่มีให้)\s*\(\s*ส่งโดยผู้ประเมิน\s*\)/.test(c.equipmentHtml)) return true;
+  if (c.equipmentHtml && /สิ่งที่มีให้ในสถานี\s*\(\s*ส่งโดยผู้ประเมิน\s*\)/.test(c.equipmentHtml)) return true;
   return false;
 }
 window.isEquipmentGated = isEquipmentGated;

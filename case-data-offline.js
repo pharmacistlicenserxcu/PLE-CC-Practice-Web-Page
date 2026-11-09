@@ -1,12 +1,12 @@
 /**
  * PLE-CC2 OSPE Practice System — Offline Case List Metadata (Auto-Generated)
- * Version: v_20261109_093555
- * Generated on 2026-11-09 09:35:55
+ * Version: v_20261109_094127
+ * Generated on 2026-11-09 09:41:27
  */
 
 const OFFLINE_DATA = {
-  "version": "v_20261109_093555",
-  "generatedAt": "2026-11-09 09:35:55",
+  "version": "v_20261109_094127",
+  "generatedAt": "2026-11-09 09:41:27",
   "totalCases": 438,
   "cases": [
     {
@@ -3462,11 +3462,11 @@ const OFFLINE_DATA = {
     },
     {
       "caseId": "OSPE-CLALLERGY01",
-      "title": "OSPE-CLALLERGY01",
+      "title": "การประเมินและส่งมอบบัตรแพ้ยา Amoxicillin (ผื่นลมพิษและ Angioedema)",
       "category": "Clinic",
-      "mainGroup": "Mock Exam 2569",
-      "subTopic": "🔒 ข้อสอบลับ (ต้องใช้รหัสผ่าน)",
-      "disease": "🔒 ล็อกด้วยรหัสผ่าน (Secret Mock)",
+      "mainGroup": "การประเมินการแพ้ยา",
+      "subTopic": "",
+      "disease": "Type I Immediate Hypersensitivity, Drug Allergy Card Delivery, Complete Naranjo Algorithm",
       "difficulty": 2,
       "docId": "1Bjdz8c6-Gr5GIHGllXIvt0FLPeWTAdZy586vtVDOr24",
       "author": "คณะทำงานคลังข้อสอบร่วมสมรรถนะเภสัชกรรม (ระบบกลาง)",
@@ -3475,9 +3475,7 @@ const OFFLINE_DATA = {
       "isActive": true,
       "caseStatus": "Active",
       "linkedNextCase": "",
-      "linkedFromCase": "",
-      "isProtected": true,
-      "hasPassword": true
+      "linkedFromCase": ""
     },
     {
       "caseId": "OSPE-CLCOUNSEL01",
@@ -3498,11 +3496,11 @@ const OFFLINE_DATA = {
     },
     {
       "caseId": "OSPE-CLCOUNSEL02",
-      "title": "การให้คำปรึกษาและจัดการผลข้างเคียงในผู้ป่วยเริ่มยารักษาวัณโรคปอดสูตรมาตรฐาน (2HRZE Counseling)",
+      "title": "OSPE-CLCOUNSEL02",
       "category": "Clinic",
-      "mainGroup": "การให้คำแนะนำด้านยา",
-      "subTopic": "",
-      "disease": "Pulmonary Tuberculosis, 2HRZE Regimen, ADR Management & Adherence",
+      "mainGroup": "Mock Exam 2569",
+      "subTopic": "🔒 ข้อสอบลับ (ต้องใช้รหัสผ่าน)",
+      "disease": "🔒 ล็อกด้วยรหัสผ่าน (Secret Mock)",
       "difficulty": 2,
       "docId": "1Bjdz8c6-Gr5GIHGllXIvt0FLPeWTAdZy586vtVDOr24",
       "author": "คณะทำงานคลังข้อสอบร่วมสมรรถนะเภสัชกรรม (ระบบกลาง)",
@@ -3511,7 +3509,9 @@ const OFFLINE_DATA = {
       "isActive": true,
       "caseStatus": "Active",
       "linkedNextCase": "",
-      "linkedFromCase": ""
+      "linkedFromCase": "",
+      "isProtected": true,
+      "hasPassword": true
     },
     {
       "caseId": "OSPE-CLISBAR01",

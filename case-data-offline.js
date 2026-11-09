@@ -1,12 +1,12 @@
 /**
  * PLE-CC2 OSPE Practice System — Offline Case List Metadata (Auto-Generated)
- * Version: v_20261109_092148
- * Generated on 2026-11-09 09:21:48
+ * Version: v_20261109_092321
+ * Generated on 2026-11-09 09:23:21
  */
 
 const OFFLINE_DATA = {
-  "version": "v_20261109_092148",
-  "generatedAt": "2026-11-09 09:21:48",
+  "version": "v_20261109_092321",
+  "generatedAt": "2026-11-09 09:23:21",
   "totalCases": 438,
   "cases": [
     {
@@ -3462,11 +3462,11 @@ const OFFLINE_DATA = {
     },
     {
       "caseId": "OSPE-CLALLERGY01",
-      "title": "OSPE-CLALLERGY01",
+      "title": "การประเมินและส่งมอบบัตรแพ้ยา Amoxicillin (ผื่นลมพิษและ Angioedema)",
       "category": "Clinic",
-      "mainGroup": "Mock Exam 2569",
-      "subTopic": "🔒 ข้อสอบลับ (ต้องใช้รหัสผ่าน)",
-      "disease": "🔒 ล็อกด้วยรหัสผ่าน (Secret Mock)",
+      "mainGroup": "การประเมินการแพ้ยา",
+      "subTopic": "",
+      "disease": "Type I Immediate Hypersensitivity, Drug Allergy Card Delivery, Complete Naranjo Algorithm",
       "difficulty": 2,
       "docId": "1Bjdz8c6-Gr5GIHGllXIvt0FLPeWTAdZy586vtVDOr24",
       "author": "คณะทำงานคลังข้อสอบร่วมสมรรถนะเภสัชกรรม (ระบบกลาง)",
@@ -3475,17 +3475,15 @@ const OFFLINE_DATA = {
       "isActive": true,
       "caseStatus": "Active",
       "linkedNextCase": "",
-      "linkedFromCase": "",
-      "isProtected": true,
-      "hasPassword": true
+      "linkedFromCase": ""
     },
     {
       "caseId": "OSPE-CLCOUNSEL01",
-      "title": "OSPE-CLCOUNSEL01",
+      "title": "การแยกแยะอาการไม่พึงประสงค์ Hypoglycemia vs Drug Allergy ในผู้ป่วยเบาหวาน",
       "category": "Clinic",
-      "mainGroup": "Mock Exam 2569",
-      "subTopic": "🔒 ข้อสอบลับ (ต้องใช้รหัสผ่าน)",
-      "disease": "🔒 ล็อกด้วยรหัสผ่าน (Secret Mock)",
+      "mainGroup": "การให้คำแนะนำด้านยา",
+      "subTopic": "",
+      "disease": "Type 2 Diabetes, Glipizide-induced Hypoglycemia, Rule of 15",
       "difficulty": 2,
       "docId": "1Bjdz8c6-Gr5GIHGllXIvt0FLPeWTAdZy586vtVDOr24",
       "author": "คณะทำงานคลังข้อสอบร่วมสมรรถนะเภสัชกรรม (ระบบกลาง)",
@@ -3494,17 +3492,15 @@ const OFFLINE_DATA = {
       "isActive": true,
       "caseStatus": "Active",
       "linkedNextCase": "",
-      "linkedFromCase": "",
-      "isProtected": true,
-      "hasPassword": true
+      "linkedFromCase": ""
     },
     {
       "caseId": "OSPE-CLCOUNSEL02",
-      "title": "OSPE-CLCOUNSEL02",
+      "title": "การให้คำปรึกษาและจัดการผลข้างเคียงในผู้ป่วยเริ่มยารักษาวัณโรคปอดสูตรมาตรฐาน (2HRZE Counseling)",
       "category": "Clinic",
-      "mainGroup": "Mock Exam 2569",
-      "subTopic": "🔒 ข้อสอบลับ (ต้องใช้รหัสผ่าน)",
-      "disease": "🔒 ล็อกด้วยรหัสผ่าน (Secret Mock)",
+      "mainGroup": "การให้คำแนะนำด้านยา",
+      "subTopic": "",
+      "disease": "Pulmonary Tuberculosis, 2HRZE Regimen, ADR Management & Adherence",
       "difficulty": 2,
       "docId": "1Bjdz8c6-Gr5GIHGllXIvt0FLPeWTAdZy586vtVDOr24",
       "author": "คณะทำงานคลังข้อสอบร่วมสมรรถนะเภสัชกรรม (ระบบกลาง)",
@@ -3513,9 +3509,7 @@ const OFFLINE_DATA = {
       "isActive": true,
       "caseStatus": "Active",
       "linkedNextCase": "",
-      "linkedFromCase": "",
-      "isProtected": true,
-      "hasPassword": true
+      "linkedFromCase": ""
     },
     {
       "caseId": "OSPE-CLISBAR01",
@@ -3538,11 +3532,11 @@ const OFFLINE_DATA = {
     },
     {
       "caseId": "OSPE-CLISBAR03",
-      "title": "OSPE-CLISBAR03",
+      "title": "การโทรประสานงานแพทย์กรณี Colchicine Overdose ในผู้ป่วย Acute Kidney Injury (AKI)",
       "category": "Clinic",
-      "mainGroup": "Mock Exam 2569",
-      "subTopic": "🔒 ข้อสอบลับ (ต้องใช้รหัสผ่าน)",
-      "disease": "🔒 ล็อกด้วยรหัสผ่าน (Secret Mock)",
+      "mainGroup": "การค้นข้อมูลและประสานงาน",
+      "subTopic": "",
+      "disease": "Gout with Acute Kidney Injury, Colchicine Toxicity Risk, Lexicomp Renal Dosing",
       "difficulty": 2,
       "docId": "1Bjdz8c6-Gr5GIHGllXIvt0FLPeWTAdZy586vtVDOr24",
       "author": "คณะทำงานคลังข้อสอบร่วมสมรรถนะเภสัชกรรม (ระบบกลาง)",
@@ -3551,9 +3545,7 @@ const OFFLINE_DATA = {
       "isActive": true,
       "caseStatus": "Active",
       "linkedNextCase": "",
-      "linkedFromCase": "",
-      "isProtected": true,
-      "hasPassword": true
+      "linkedFromCase": ""
     },
     {
       "caseId": "OSPE-CLM101",

@@ -2006,6 +2006,10 @@ function resetAllFilters() {
   try {
     sessionStorage.removeItem('ple_case_library_filters');
     sessionStorage.removeItem('ple_case_library_scroll');
+    if (Array.isArray(AppState.cases)) {
+      const allNavList = AppState.cases.map(c => c && c.caseId).filter(Boolean);
+      sessionStorage.setItem('ple_case_nav_list', JSON.stringify(allNavList));
+    }
   } catch (e) {}
 
   const searchInput = document.getElementById('search-case');
@@ -2182,6 +2186,10 @@ function applyFilters() {
   
   AppState.filteredCases = list;
   updateActiveFilterCountBadge();
+  try {
+    const navList = list.map(c => c && c.caseId).filter(Boolean);
+    sessionStorage.setItem('ple_case_nav_list', JSON.stringify(navList));
+  } catch (e) {}
 }
 
 function renderFilterSelectOptions() {
@@ -2321,6 +2329,10 @@ function renderCaseList() {
     const openCase = () => {
       try {
         sessionStorage.setItem('ple_case_library_scroll', window.scrollY.toString());
+        if (Array.isArray(AppState.filteredCases) && AppState.filteredCases.length > 0) {
+          const navList = AppState.filteredCases.map(item => item && item.caseId).filter(Boolean);
+          sessionStorage.setItem('ple_case_nav_list', JSON.stringify(navList));
+        }
       } catch (e) {}
       window.location.href = `case-viewer.html?id=${encodeURIComponent(c.caseId)}`;
     };

@@ -1273,6 +1273,175 @@
     }
     /* Hide floating scratchpad FAB — tools are accessible via unified dock */
     #scratchpad-fab-btn { display: none !important; }
+
+    /* ──────────────────────────────────────────────────────────────
+       Case Sequence Navigation (By Active Filter & Search)
+       ────────────────────────────────────────────────────────────── */
+    .case-viewer-top-bar {
+      margin-bottom: 1.25rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 0.75rem;
+    }
+    .case-back-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      font-family: var(--font-title);
+      font-weight: 600;
+      color: var(--primary);
+      font-size: 0.95rem;
+      text-decoration: none;
+    }
+    .case-back-link:hover {
+      text-decoration: underline;
+    }
+    .case-tools-group {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      flex-wrap: wrap;
+    }
+
+    /* Top Navigation Pill */
+    .case-nav-widget {
+      display: inline-flex;
+      align-items: center;
+      background: var(--surface, #FFFFFF);
+      border: 1px solid var(--border, #E2E8F0);
+      border-radius: 9999px;
+      padding: 3px 6px;
+      box-shadow: 0 1px 4px rgba(0,0,0,0.04);
+      gap: 4px;
+    }
+    .btn-case-nav {
+      border: none;
+      background: transparent;
+      border-radius: 9999px;
+      padding: 5px 12px;
+      font-family: var(--font-title);
+      font-size: 0.82rem;
+      font-weight: 600;
+      color: var(--text-primary);
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      transition: all 0.15s ease;
+      user-select: none;
+    }
+    .btn-case-nav:hover:not(:disabled) {
+      background: rgba(14, 116, 144, 0.08);
+      color: var(--primary);
+    }
+    .btn-case-nav:disabled,
+    .btn-case-nav.disabled {
+      opacity: 0.35;
+      cursor: not-allowed;
+      pointer-events: none;
+    }
+    .case-nav-counter-box {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 0 8px;
+      min-width: 70px;
+      line-height: 1.15;
+      user-select: none;
+    }
+    .case-nav-counter {
+      font-family: var(--font-mono, 'IBM Plex Mono', monospace);
+      font-size: 0.86rem;
+      font-weight: 700;
+      color: var(--primary, #0E7490);
+    }
+    .case-nav-filter-label {
+      font-size: 0.68rem;
+      color: var(--text-muted, #64748b);
+      max-width: 140px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    /* Sticky Timer Bar Quick Navigation */
+    .sticky-case-nav {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      background: rgba(0, 0, 0, 0.04);
+      padding: 2px 6px;
+      border-radius: 9999px;
+      margin-left: 4px;
+    }
+    .btn-sticky-nav {
+      width: 26px;
+      height: 26px;
+      border-radius: 50%;
+      border: 1px solid var(--border, #E2E8F0);
+      background: var(--surface, #FFFFFF);
+      color: var(--text-primary);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      padding: 0;
+      transition: all 0.15s ease;
+    }
+    .btn-sticky-nav:hover:not(:disabled) {
+      background: rgba(14, 116, 144, 0.1);
+      color: var(--primary);
+    }
+    .btn-sticky-nav:disabled,
+    .btn-sticky-nav.disabled {
+      opacity: 0.35;
+      cursor: not-allowed;
+      pointer-events: none;
+    }
+    .sticky-nav-counter {
+      font-family: var(--font-mono, monospace);
+      font-size: 0.78rem;
+      font-weight: 700;
+      color: var(--primary, #0E7490);
+      padding: 0 4px;
+      min-width: 48px;
+      text-align: center;
+      user-select: none;
+    }
+
+    /* Bottom Action Navigation Box */
+    .viewer-bottom-nav-box {
+      background: var(--surface, #FFFFFF);
+      border: 1px solid var(--border, #E2E8F0);
+      border-radius: 12px;
+      padding: 0.75rem;
+      box-shadow: 0 1px 4px rgba(0,0,0,0.03);
+    }
+
+    @media (max-width: 768px) {
+      .case-viewer-top-bar {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 0.65rem;
+      }
+      .case-nav-widget {
+        justify-content: space-between;
+        width: 100%;
+      }
+      .case-tools-group {
+        justify-content: flex-end;
+      }
+      .case-nav-filter-label {
+        max-width: 110px;
+      }
+      .sticky-case-nav {
+        display: none;
+      }
+    }
+
   </style>
 </head>
 <body>
@@ -1320,13 +1489,30 @@
   <main class="main-section" id="case-viewer-app">
     <div class="container">
       
-      <!-- Back navigation & Report -->
-      <div style="margin-bottom: 1.25rem; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.75rem;" class="no-print">
-        <a href="case-library.html" style="display: inline-flex; align-items: center; gap: 0.4rem; font-family: var(--font-title); font-weight: 600; color: var(--primary); font-size: 0.95rem;">
+      <!-- Back navigation, Case Sequence Navigation & Tools -->
+      <div class="case-viewer-top-bar no-print">
+        <a href="case-library.html" class="case-back-link">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M19 12H5"/><polyline points="12 19 5 12 12 5"/></svg>
           ย้อนกลับไปคลังเคสสอบ
         </a>
-        <div style="display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap;">
+
+        <!-- Case sequence navigation according to current active filters/search -->
+        <div class="case-nav-widget" id="case-nav-top-widget">
+          <button type="button" class="btn-case-nav" id="btn-top-prev-case" onclick="navigateAdjacentCase(-1)" title="เคสก่อนหน้า (กดปุ่ม ← หรือ Alt+←)">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="15 18 9 12 15 6"/></svg>
+            <span>ก่อนหน้า</span>
+          </button>
+          <div class="case-nav-counter-box" id="top-case-counter-box" title="ลำดับเคสตามตัวกรองที่เลือกไว้">
+            <span class="case-nav-counter" id="top-case-nav-counter">-- / --</span>
+            <span class="case-nav-filter-label" id="top-case-nav-filter-label">ตามตัวกรอง</span>
+          </div>
+          <button type="button" class="btn-case-nav" id="btn-top-next-case" onclick="navigateAdjacentCase(1)" title="เคสถัดไป (กดปุ่ม → หรือ Alt+→)">
+            <span>ถัดไป</span>
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"/></svg>
+          </button>
+        </div>
+
+        <div class="case-tools-group">
           <button class="btn btn-secondary" onclick="updateCurrentCaseFromDoc()" id="btn-update-doc" style="font-size: 0.82rem; padding: 0.35rem 0.75rem;">
             🔄 อัปเดตข้อมูลจาก Google เอกสาร
           </button>
@@ -1350,6 +1536,17 @@
           <span id="sticky-case-id-badge" class="badge" style="background: rgba(14, 116, 144, 0.12); color: #0E7490; font-weight: 700; font-size: 0.84rem; padding: 4px 10px; border-radius: 9999px;">OSPE</span>
           <span id="sticky-role-badge" class="badge" style="background: var(--bg-secondary, #ECEAE4); color: var(--text-secondary, #555C54); font-weight: 600; font-size: 0.8rem; padding: 4px 10px; border-radius: 9999px;">👤 ฝึกคนเดียว</span>
           <span id="sticky-timer-status" class="status-badge" style="font-size: 0.76rem; padding: 2px 8px; border-radius: 9999px; background: rgba(14, 165, 233, 0.12); color: #0284c7; font-weight: 700;">พร้อมเริ่ม</span>
+
+          <!-- Quick Sticky Case Sequence Flipper -->
+          <div class="sticky-case-nav" id="sticky-case-nav">
+            <button type="button" class="btn-sticky-nav" id="btn-sticky-prev-case" onclick="navigateAdjacentCase(-1)" title="เคสก่อนหน้า (←)">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="15 18 9 12 15 6"/></svg>
+            </button>
+            <span class="sticky-nav-counter" id="sticky-case-nav-counter">-- / --</span>
+            <button type="button" class="btn-sticky-nav" id="btn-sticky-next-case" onclick="navigateAdjacentCase(1)" title="เคสถัดไป (→)">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"/></svg>
+            </button>
+          </div>
         </div>
         <div style="display: flex; align-items: center; gap: 14px;">
           <div id="viewer-sticky-timer" style="font-family: var(--font-mono, 'IBM Plex Mono', monospace); font-size: 1.85rem; font-weight: 700; color: #0E7490; letter-spacing: -0.02em; line-height: 1;">04:00</div>
@@ -1543,6 +1740,21 @@
 
           <!-- Action buttons (no-print) -->
           <div id="viewer-action-buttons" class="no-print" style="margin-top: 1.25rem;">
+            <!-- Sequence Navigation at Bottom of Case -->
+            <div id="viewer-bottom-nav-box" class="viewer-bottom-nav-box" style="margin-bottom: 0.75rem;">
+              <div style="display: flex; gap: 0.5rem; align-items: stretch;">
+                <button type="button" class="btn btn-secondary" id="btn-bottom-prev-case" onclick="navigateAdjacentCase(-1)" style="flex: 1; justify-content: center; font-size: 0.88rem; padding: 0.65rem 0.5rem;">
+                  ◀ เคสก่อนหน้า
+                </button>
+                <button type="button" class="btn btn-primary" id="btn-bottom-next-case" onclick="navigateAdjacentCase(1)" style="flex: 1.4; justify-content: center; font-size: 0.92rem; padding: 0.65rem 0.5rem; background: var(--primary); border-color: var(--primary);">
+                  เคสถัดไป ▶
+                </button>
+              </div>
+              <div id="bottom-case-nav-desc" style="text-align: center; font-size: 0.78rem; color: var(--text-muted); margin-top: 0.4rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+                เคสที่ -- จาก -- ตามตัวกรองปัจจุบัน
+              </div>
+            </div>
+
             <button id="btn-next-linked-station" class="btn btn-primary" style="display: none; width: 100%; font-size: 0.95rem; padding: 0.65rem; margin-bottom: 0.5rem; justify-content: center; background: linear-gradient(135deg, var(--primary), var(--secondary));">
               ⏩ ไปยังสถานีต่อเนื่อง (ถัดไป)
             </button>
@@ -1638,6 +1850,223 @@
     let viewerTimerInterval = null;
     let viewerTimerRunning = false;
 
+
+    // ──────────────────────────────────────────────────────────────
+    // Case Sequence Navigation by Active Filter & Search
+    // ──────────────────────────────────────────────────────────────
+    let activeCaseNavList = [];
+    let activeCaseNavIndex = -1;
+    let activeCaseFilterDesc = '';
+
+    function getActiveCaseNavList() {
+      // 1. Try reading pre-filtered case list from sessionStorage
+      try {
+        const raw = sessionStorage.getItem('ple_case_nav_list');
+        if (raw) {
+          const list = JSON.parse(raw);
+          if (Array.isArray(list) && list.length > 0) {
+            return list;
+          }
+        }
+      } catch (e) {}
+
+      // 2. Fallback: Compute from ple_case_library_filters
+      try {
+        const savedFilters = sessionStorage.getItem('ple_case_library_filters');
+        const allCases = (typeof OFFLINE_DATA !== 'undefined' && Array.isArray(OFFLINE_DATA.cases)) 
+          ? OFFLINE_DATA.cases 
+          : (typeof AppState !== 'undefined' && Array.isArray(AppState.cases) ? AppState.cases : []);
+
+        if (savedFilters && allCases.length > 0) {
+          const filters = JSON.parse(savedFilters);
+          let list = [...allCases];
+          if (filters.category && filters.category !== 'All') {
+            list = list.filter(c => c && c.category === filters.category);
+          }
+          if (filters.mainGroup && filters.mainGroup !== 'All') {
+            list = list.filter(c => c && c.mainGroup === filters.mainGroup);
+          }
+          if (filters.disease && filters.disease !== 'All') {
+            const getTags = (typeof window.parseDiseaseTags === 'function') 
+              ? window.parseDiseaseTags 
+              : (s => s ? s.split(',').map(x => x.trim()).filter(Boolean) : []);
+            list = list.filter(c => {
+              if (!c) return false;
+              const tags = getTags(c.disease || c.subTopic);
+              return tags.length > 0 ? tags.includes(filters.disease) : (c.disease === filters.disease || c.subTopic === filters.disease);
+            });
+          }
+          if (filters.source && filters.source !== 'All') {
+            const normSource = filters.source.replace(/^ข้อสอบจริง\s*ปี\s*/, 'ข้อสอบจริง ปี ').replace(/^ข้อสอบจริงปี\s*/, 'ข้อสอบจริง ปี ');
+            list = list.filter(c => {
+              if (!c || !c.source) return false;
+              const cNorm = c.source.replace(/^ข้อสอบจริง\s*ปี\s*/, 'ข้อสอบจริง ปี ').replace(/^ข้อสอบจริงปี\s*/, 'ข้อสอบจริง ปี ');
+              return cNorm === normSource;
+            });
+          }
+          if (filters.search) {
+            const q = filters.search.toLowerCase();
+            list = list.filter(c => c && (
+              (c.title && c.title.toLowerCase().includes(q)) ||
+              (c.caseId && c.caseId.toLowerCase().includes(q)) ||
+              (c.disease && c.disease.toLowerCase().includes(q)) ||
+              (c.subTopic && c.subTopic.toLowerCase().includes(q)) ||
+              (c.mainGroup && c.mainGroup.toLowerCase().includes(q))
+            ));
+          }
+          if (list.length > 0) {
+            return list.map(c => c.caseId).filter(Boolean);
+          }
+        }
+      } catch (e) {}
+
+      // 3. Fallback: All cases in OFFLINE_DATA
+      const allCases = (typeof OFFLINE_DATA !== 'undefined' && Array.isArray(OFFLINE_DATA.cases)) 
+        ? OFFLINE_DATA.cases 
+        : (typeof AppState !== 'undefined' && Array.isArray(AppState.cases) ? AppState.cases : []);
+      return allCases.map(c => c.caseId).filter(Boolean);
+    }
+
+    function computeActiveFilterDesc() {
+      try {
+        const savedFilters = sessionStorage.getItem('ple_case_library_filters');
+        if (savedFilters) {
+          const f = JSON.parse(savedFilters);
+          const parts = [];
+          if (f.search) parts.push(`ค้นหา: "${f.search}"`);
+          if (f.category && f.category !== 'All') parts.push(f.category);
+          if (f.mainGroup && f.mainGroup !== 'All') parts.push(f.mainGroup);
+          if (f.disease && f.disease !== 'All') parts.push(f.disease);
+          if (f.source && f.source !== 'All') parts.push(f.source);
+          if (parts.length > 0) return parts.join(' · ');
+        }
+      } catch (e) {}
+      return 'เคสทั้งหมด';
+    }
+
+    function initCaseNavigation() {
+      activeCaseNavList = getActiveCaseNavList();
+      activeCaseFilterDesc = computeActiveFilterDesc();
+
+      const normActive = (activeCaseId || '').trim().toUpperCase();
+      activeCaseNavIndex = activeCaseNavList.findIndex(id => {
+        const norm = (id || '').trim().toUpperCase();
+        return norm === normActive || norm.replace(/^OSPE-/i, '') === normActive.replace(/^OSPE-/i, '');
+      });
+
+      updateCaseNavigationUI();
+      setupKeyboardNavigation();
+    }
+
+    function updateCaseNavigationUI() {
+      const total = activeCaseNavList.length;
+      const idx = activeCaseNavIndex;
+      const hasPrev = idx > 0;
+      const hasNext = idx !== -1 && idx < total - 1;
+
+      const counterText = idx >= 0 ? `${idx + 1} / ${total}` : `-- / ${total}`;
+      const descText = idx >= 0 ? `เคสที่ ${idx + 1} จาก ${total} (${activeCaseFilterDesc})` : `นอกตัวกรอง (${activeCaseFilterDesc})`;
+
+      // Top widget
+      const topCounter = document.getElementById('top-case-nav-counter');
+      const topLabel = document.getElementById('top-case-nav-filter-label');
+      const btnTopPrev = document.getElementById('btn-top-prev-case');
+      const btnTopNext = document.getElementById('btn-top-next-case');
+
+      if (topCounter) topCounter.textContent = counterText;
+      if (topLabel) {
+        topLabel.textContent = activeCaseFilterDesc;
+        topLabel.title = activeCaseFilterDesc;
+      }
+      if (btnTopPrev) {
+        btnTopPrev.disabled = !hasPrev;
+        btnTopPrev.classList.toggle('disabled', !hasPrev);
+      }
+      if (btnTopNext) {
+        btnTopNext.disabled = !hasNext;
+        btnTopNext.classList.toggle('disabled', !hasNext);
+      }
+
+      // Sticky widget
+      const stickyCounter = document.getElementById('sticky-case-nav-counter');
+      const btnStickyPrev = document.getElementById('btn-sticky-prev-case');
+      const btnStickyNext = document.getElementById('btn-sticky-next-case');
+
+      if (stickyCounter) stickyCounter.textContent = counterText;
+      if (btnStickyPrev) {
+        btnStickyPrev.disabled = !hasPrev;
+        btnStickyPrev.classList.toggle('disabled', !hasPrev);
+      }
+      if (btnStickyNext) {
+        btnStickyNext.disabled = !hasNext;
+        btnStickyNext.classList.toggle('disabled', !hasNext);
+      }
+
+      // Bottom widget
+      const bottomDesc = document.getElementById('bottom-case-nav-desc');
+      const btnBottomPrev = document.getElementById('btn-bottom-prev-case');
+      const btnBottomNext = document.getElementById('btn-bottom-next-case');
+
+      if (bottomDesc) bottomDesc.textContent = descText;
+      if (btnBottomPrev) {
+        btnBottomPrev.disabled = !hasPrev;
+        btnBottomPrev.classList.toggle('disabled', !hasPrev);
+      }
+      if (btnBottomNext) {
+        btnBottomNext.disabled = !hasNext;
+        btnBottomNext.classList.toggle('disabled', !hasNext);
+      }
+    }
+
+    function navigateAdjacentCase(direction) {
+      if (!Array.isArray(activeCaseNavList) || activeCaseNavList.length === 0) return;
+      const targetIndex = activeCaseNavIndex + direction;
+      if (targetIndex < 0 || targetIndex >= activeCaseNavList.length) return;
+      
+      const targetId = activeCaseNavList[targetIndex];
+      if (!targetId) return;
+
+      // Preserve role/mode parameter if present
+      const urlParams = new URLSearchParams(window.location.search);
+      const mode = urlParams.get('mode') || urlParams.get('role');
+      let nextUrl = `case-viewer.html?id=${encodeURIComponent(targetId)}`;
+      if (mode && ['solo', 'examinee', 'examiner'].includes(mode)) {
+        nextUrl += `&mode=${encodeURIComponent(mode)}`;
+      }
+      window.location.href = nextUrl;
+    }
+
+    let _keyboardNavBound = false;
+    function setupKeyboardNavigation() {
+      if (_keyboardNavBound) return;
+      _keyboardNavBound = true;
+
+      window.addEventListener('keydown', (e) => {
+        // Do not trigger keyboard navigation if user is typing in an input, textarea, scratchpad or chat
+        const target = e.target;
+        if (target) {
+          const tag = (target.tagName || '').toLowerCase();
+          if (tag === 'input' || tag === 'textarea' || tag === 'select' || target.isContentEditable) return;
+          if (target.closest && (target.closest('#station-chat-drawer') || target.closest('#scratchpad-dock') || target.closest('.scratchpad-container'))) return;
+        }
+
+        // Left Arrow or Alt + Left Arrow -> Prev Case
+        if (e.key === 'ArrowLeft' && (e.altKey || (!e.ctrlKey && !e.metaKey && !e.shiftKey))) {
+          if (activeCaseNavIndex > 0) {
+            e.preventDefault();
+            navigateAdjacentCase(-1);
+          }
+        }
+        // Right Arrow or Alt + Right Arrow -> Next Case
+        if (e.key === 'ArrowRight' && (e.altKey || (!e.ctrlKey && !e.metaKey && !e.shiftKey))) {
+          if (activeCaseNavIndex !== -1 && activeCaseNavIndex < activeCaseNavList.length - 1) {
+            e.preventDefault();
+            navigateAdjacentCase(1);
+          }
+        }
+      });
+    }
+
     function goToReportCase(event) {
       if (event) event.preventDefault();
       window.location.href = `case-library.html?report=${encodeURIComponent(activeCaseId)}`;
@@ -1646,6 +2075,7 @@
     document.addEventListener('DOMContentLoaded', () => {
       applyViewerLayoutMode();
       initStickyTimerBarObserver();
+      initCaseNavigation();
       if (activeCaseId) {
         // ดึงบทบาทจาก URL ถ้ามี (mode หรือ role)
         const modeParam = getUrlParam('mode') || getUrlParam('role');

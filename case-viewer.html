@@ -1275,7 +1275,7 @@
     #scratchpad-fab-btn { display: none !important; }
 
     /* ──────────────────────────────────────────────────────────────
-       Case Sequence Navigation (By Active Filter & Search)
+       Neomorphic Frosted Pill Case Navigation (Exact Mockup Match)
        ────────────────────────────────────────────────────────────── */
     .case-viewer-top-bar {
       margin-bottom: 1.25rem;
@@ -1289,14 +1289,16 @@
       display: inline-flex;
       align-items: center;
       gap: 0.4rem;
-      font-family: var(--font-title);
+      font-family: var(--font-title, 'Bai Jamjuree', sans-serif);
       font-weight: 600;
-      color: var(--primary);
+      color: var(--primary, #0E7490);
       font-size: 0.95rem;
       text-decoration: none;
+      transition: color 0.15s ease;
     }
     .case-back-link:hover {
       text-decoration: underline;
+      color: #0284c7;
     }
     .case-tools-group {
       display: flex;
@@ -1305,66 +1307,180 @@
       flex-wrap: wrap;
     }
 
-    /* Top Navigation Pill */
-    .case-nav-widget {
+    /* Floating Frosted Pill Container */
+    .neo-case-nav-pill {
       display: inline-flex;
       align-items: center;
-      background: var(--surface, #FFFFFF);
-      border: 1px solid var(--border, #E2E8F0);
+      justify-content: center;
+      background: rgba(255, 255, 255, 0.78);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border: 1.5px solid rgba(255, 255, 255, 0.9);
       border-radius: 9999px;
-      padding: 3px 6px;
-      box-shadow: 0 1px 4px rgba(0,0,0,0.04);
-      gap: 4px;
-    }
-    .btn-case-nav {
-      border: none;
-      background: transparent;
-      border-radius: 9999px;
-      padding: 5px 12px;
-      font-family: var(--font-title);
-      font-size: 0.82rem;
-      font-weight: 600;
-      color: var(--text-primary);
-      cursor: pointer;
-      display: inline-flex;
-      align-items: center;
-      gap: 4px;
-      transition: all 0.15s ease;
+      padding: 8px 16px;
+      gap: 14px;
+      box-shadow: 0 14px 34px -6px rgba(37, 99, 235, 0.12), 0 4px 14px rgba(0, 0, 0, 0.04), inset 0 1px 0 rgba(255, 255, 255, 1);
       user-select: none;
+      transition: box-shadow 0.2s ease, transform 0.2s ease;
     }
-    .btn-case-nav:hover:not(:disabled) {
-      background: rgba(14, 116, 144, 0.08);
-      color: var(--primary);
+    .neo-case-nav-pill:hover {
+      box-shadow: 0 16px 40px -4px rgba(37, 99, 235, 0.16), 0 6px 18px rgba(0, 0, 0, 0.05), inset 0 1px 0 rgba(255, 255, 255, 1);
     }
-    .btn-case-nav:disabled,
-    .btn-case-nav.disabled {
+
+    /* Side Action Button (Previous / Next) */
+    .neo-nav-side-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      background: transparent;
+      border: none;
+      padding: 0;
+      cursor: pointer;
+      text-decoration: none;
+      transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    .neo-nav-side-btn:disabled,
+    .neo-nav-side-btn.disabled {
       opacity: 0.35;
       cursor: not-allowed;
       pointer-events: none;
+      filter: grayscale(0.5);
     }
-    .case-nav-counter-box {
+
+    /* Arrow Tile (Neomorphic Soft Box) */
+    .neo-arrow-box {
+      width: 44px;
+      height: 44px;
+      border-radius: 14px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+      flex-shrink: 0;
+    }
+    .neo-prev-arrow {
+      background: linear-gradient(145deg, #ffffff, #f1f5f9);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06), inset 0 1px 1px #ffffff;
+      border: 1px solid rgba(226, 232, 240, 0.9);
+      color: #334155;
+    }
+    .neo-prev-btn:hover:not(:disabled) .neo-prev-arrow {
+      transform: scale(1.06);
+      box-shadow: 0 6px 16px rgba(0, 0, 0, 0.09);
+      color: #0284c7;
+    }
+    .neo-prev-btn:active:not(:disabled) .neo-prev-arrow {
+      transform: scale(0.96);
+    }
+
+    .neo-next-arrow {
+      background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+      box-shadow: 0 6px 18px rgba(37, 99, 235, 0.36), inset 0 1px 1px rgba(255, 255, 255, 0.35);
+      border: 1px solid rgba(59, 130, 246, 0.6);
+      color: #ffffff;
+    }
+    .neo-next-btn:hover:not(:disabled) .neo-next-arrow {
+      transform: scale(1.06);
+      box-shadow: 0 8px 24px rgba(37, 99, 235, 0.48);
+      filter: brightness(1.06);
+    }
+    .neo-next-btn:active:not(:disabled) .neo-next-arrow {
+      transform: scale(0.96);
+    }
+
+    /* Divider */
+    .neo-divider {
+      width: 1.5px;
+      height: 24px;
+      background: rgba(148, 163, 184, 0.35);
+      display: inline-block;
+      flex-shrink: 0;
+    }
+
+    /* Button Text */
+    .neo-btn-text {
+      font-family: var(--font-title, 'Bai Jamjuree', sans-serif);
+      font-size: 0.96rem;
+      font-weight: 600;
+      color: #1e293b;
+      letter-spacing: -0.01em;
+      white-space: nowrap;
+    }
+    .neo-next-btn .neo-btn-text {
+      color: #1d4ed8;
+    }
+
+    /* Center Elevated Capsule (Numbers + Filter Label + Progress) */
+    .neo-counter-capsule {
+      background: #ffffff;
+      border-radius: 20px;
+      padding: 6px 22px 8px 22px;
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.06), 0 1px 2px rgba(0, 0, 0, 0.03);
       display: flex;
       flex-direction: column;
       align-items: center;
       justify-content: center;
-      padding: 0 8px;
-      min-width: 70px;
-      line-height: 1.15;
-      user-select: none;
+      min-width: 140px;
+      border: 1px solid rgba(241, 245, 249, 0.8);
     }
-    .case-nav-counter {
+    .neo-counter-row {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+    }
+    .neo-current-badge {
+      background: linear-gradient(135deg, #2563eb, #1d4ed8);
+      color: #ffffff;
       font-family: var(--font-mono, 'IBM Plex Mono', monospace);
-      font-size: 0.86rem;
+      font-size: 1.05rem;
       font-weight: 700;
-      color: var(--primary, #0E7490);
+      padding: 3px 12px;
+      border-radius: 8px;
+      box-shadow: 0 3px 8px rgba(37, 99, 235, 0.28);
+      letter-spacing: 0.02em;
+      line-height: 1.2;
     }
-    .case-nav-filter-label {
-      font-size: 0.68rem;
-      color: var(--text-muted, #64748b);
-      max-width: 140px;
+    .neo-counter-slash {
+      font-size: 1.15rem;
+      font-weight: 600;
+      color: #94a3b8;
+      margin: 0 1px;
+    }
+    .neo-total-num {
+      font-family: var(--font-mono, 'IBM Plex Mono', monospace);
+      font-size: 1.15rem;
+      font-weight: 800;
+      color: #0f172a;
+      letter-spacing: 0.02em;
+      line-height: 1.2;
+    }
+    .neo-counter-label {
+      font-size: 0.72rem;
+      color: #64748b;
+      font-weight: 500;
+      margin-top: 3px;
+      text-align: center;
+      max-width: 160px;
       white-space: nowrap;
       overflow: hidden;
       text-overflow: ellipsis;
+    }
+
+    /* Progress Bar Underneath */
+    .neo-progress-track {
+      width: 82px;
+      height: 4px;
+      background: #e2e8f0;
+      border-radius: 9999px;
+      overflow: hidden;
+      margin-top: 5px;
+    }
+    .neo-progress-fill {
+      height: 100%;
+      background: linear-gradient(90deg, #3b82f6, #1d4ed8);
+      border-radius: 9999px;
+      transition: width 0.3s cubic-bezier(0.16, 1, 0.3, 1);
     }
 
     /* Sticky Timer Bar Quick Navigation */
@@ -1414,28 +1530,46 @@
 
     /* Bottom Action Navigation Box */
     .viewer-bottom-nav-box {
-      background: var(--surface, #FFFFFF);
+      background: rgba(255, 255, 255, 0.85);
       border: 1px solid var(--border, #E2E8F0);
-      border-radius: 12px;
-      padding: 0.75rem;
-      box-shadow: 0 1px 4px rgba(0,0,0,0.03);
+      border-radius: 16px;
+      padding: 1rem;
+      box-shadow: 0 4px 16px rgba(0,0,0,0.04);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
     }
 
     @media (max-width: 768px) {
       .case-viewer-top-bar {
         flex-direction: column;
         align-items: stretch;
-        gap: 0.65rem;
+        gap: 0.85rem;
       }
-      .case-nav-widget {
-        justify-content: space-between;
+      .neo-case-nav-pill {
         width: 100%;
+        justify-content: space-between;
+        padding: 6px 10px;
+        gap: 8px;
+      }
+      .neo-counter-capsule {
+        padding: 5px 12px 6px 12px;
+        min-width: 105px;
+      }
+      .neo-counter-label {
+        max-width: 105px;
+      }
+      .neo-arrow-box {
+        width: 38px;
+        height: 38px;
+        border-radius: 12px;
+      }
+      .neo-btn-text {
+        font-size: 0.86rem;
       }
       .case-tools-group {
         justify-content: flex-end;
-      }
-      .case-nav-filter-label {
-        max-width: 110px;
       }
       .sticky-case-nav {
         display: none;
@@ -1496,19 +1630,41 @@
           ย้อนกลับไปคลังเคสสอบ
         </a>
 
-        <!-- Case sequence navigation according to current active filters/search -->
-        <div class="case-nav-widget" id="case-nav-top-widget">
-          <button type="button" class="btn-case-nav" id="btn-top-prev-case" onclick="navigateAdjacentCase(-1)" title="เคสก่อนหน้า (กดปุ่ม ← หรือ Alt+←)">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="15 18 9 12 15 6"/></svg>
-            <span>ก่อนหน้า</span>
+        <!-- Case sequence navigation (Neomorphic Frosted Pill Mockup Match) -->
+        <div class="neo-case-nav-pill no-print" id="case-nav-top-widget">
+          <!-- Left: Previous -->
+          <button type="button" class="neo-nav-side-btn neo-prev-btn" id="btn-top-prev-case" onclick="navigateAdjacentCase(-1)" title="เคสก่อนหน้า (กดปุ่ม ← หรือ Alt+←)">
+            <div class="neo-arrow-box neo-prev-arrow">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round">
+                <polyline points="15 18 9 12 15 6"></polyline>
+              </svg>
+            </div>
+            <span class="neo-divider"></span>
+            <span class="neo-btn-text">ก่อนหน้า</span>
           </button>
-          <div class="case-nav-counter-box" id="top-case-counter-box" title="ลำดับเคสตามตัวกรองที่เลือกไว้">
-            <span class="case-nav-counter" id="top-case-nav-counter">-- / --</span>
-            <span class="case-nav-filter-label" id="top-case-nav-filter-label">ตามตัวกรอง</span>
+
+          <!-- Center: Numbers, Filter Subtitle & Progress Bar -->
+          <div class="neo-counter-capsule" id="top-case-counter-box" title="ลำดับเคสตามตัวกรองที่เลือกไว้">
+            <div class="neo-counter-row">
+              <span class="neo-current-badge" id="top-case-current-num">--</span>
+              <span class="neo-counter-slash">/</span>
+              <span class="neo-total-num" id="top-case-total-num">--</span>
+            </div>
+            <div class="neo-counter-label" id="top-case-nav-filter-label">หน้าปัจจุบัน</div>
+            <div class="neo-progress-track">
+              <div class="neo-progress-fill" id="top-case-progress-bar" style="width: 0%;"></div>
+            </div>
           </div>
-          <button type="button" class="btn-case-nav" id="btn-top-next-case" onclick="navigateAdjacentCase(1)" title="เคสถัดไป (กดปุ่ม → หรือ Alt+→)">
-            <span>ถัดไป</span>
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"/></svg>
+
+          <!-- Right: Next -->
+          <button type="button" class="neo-nav-side-btn neo-next-btn" id="btn-top-next-case" onclick="navigateAdjacentCase(1)" title="เคสถัดไป (กดปุ่ม → หรือ Alt+→)">
+            <span class="neo-btn-text">ถัดไป</span>
+            <span class="neo-divider"></span>
+            <div class="neo-arrow-box neo-next-arrow">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round">
+                <polyline points="9 18 15 12 9 6"></polyline>
+              </svg>
+            </div>
           </button>
         </div>
 
@@ -1740,18 +1896,40 @@
 
           <!-- Action buttons (no-print) -->
           <div id="viewer-action-buttons" class="no-print" style="margin-top: 1.25rem;">
-            <!-- Sequence Navigation at Bottom of Case -->
+            <!-- Sequence Navigation at Bottom of Case (Matching Pill) -->
             <div id="viewer-bottom-nav-box" class="viewer-bottom-nav-box" style="margin-bottom: 0.75rem;">
-              <div style="display: flex; gap: 0.5rem; align-items: stretch;">
-                <button type="button" class="btn btn-secondary" id="btn-bottom-prev-case" onclick="navigateAdjacentCase(-1)" style="flex: 1; justify-content: center; font-size: 0.88rem; padding: 0.65rem 0.5rem;">
-                  ◀ เคสก่อนหน้า
+              <div class="neo-case-nav-pill" style="box-shadow: none; border-color: rgba(226, 232, 240, 0.8);">
+                <button type="button" class="neo-nav-side-btn neo-prev-btn" id="btn-bottom-prev-case" onclick="navigateAdjacentCase(-1)" title="เคสก่อนหน้า">
+                  <div class="neo-arrow-box neo-prev-arrow">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round">
+                      <polyline points="15 18 9 12 15 6"></polyline>
+                    </svg>
+                  </div>
+                  <span class="neo-divider"></span>
+                  <span class="neo-btn-text">ก่อนหน้า</span>
                 </button>
-                <button type="button" class="btn btn-primary" id="btn-bottom-next-case" onclick="navigateAdjacentCase(1)" style="flex: 1.4; justify-content: center; font-size: 0.92rem; padding: 0.65rem 0.5rem; background: var(--primary); border-color: var(--primary);">
-                  เคสถัดไป ▶
+
+                <div class="neo-counter-capsule">
+                  <div class="neo-counter-row">
+                    <span class="neo-current-badge" id="bottom-case-current-num">--</span>
+                    <span class="neo-counter-slash">/</span>
+                    <span class="neo-total-num" id="bottom-case-total-num">--</span>
+                  </div>
+                  <div class="neo-counter-label" id="bottom-case-nav-desc">หน้าปัจจุบัน</div>
+                  <div class="neo-progress-track">
+                    <div class="neo-progress-fill" id="bottom-case-progress-bar" style="width: 0%;"></div>
+                  </div>
+                </div>
+
+                <button type="button" class="neo-nav-side-btn neo-next-btn" id="btn-bottom-next-case" onclick="navigateAdjacentCase(1)" title="เคสถัดไป">
+                  <span class="neo-btn-text">ถัดไป</span>
+                  <span class="neo-divider"></span>
+                  <div class="neo-arrow-box neo-next-arrow">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round">
+                      <polyline points="9 18 15 12 9 6"></polyline>
+                    </svg>
+                  </div>
                 </button>
-              </div>
-              <div id="bottom-case-nav-desc" style="text-align: center; font-size: 0.78rem; color: var(--text-muted); margin-top: 0.4rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
-                เคสที่ -- จาก -- ตามตัวกรองปัจจุบัน
               </div>
             </div>
 
@@ -1964,19 +2142,28 @@
       const hasPrev = idx > 0;
       const hasNext = idx !== -1 && idx < total - 1;
 
-      const counterText = idx >= 0 ? `${idx + 1} / ${total}` : `-- / ${total}`;
-      const descText = idx >= 0 ? `เคสที่ ${idx + 1} จาก ${total} (${activeCaseFilterDesc})` : `นอกตัวกรอง (${activeCaseFilterDesc})`;
+      const currentNum = idx >= 0 ? String(idx + 1) : '--';
+      const totalNum = total > 0 ? String(total) : '--';
+      const counterText = `${currentNum} / ${totalNum}`;
+      const progressPercent = (total > 0 && idx >= 0) ? Math.min(100, Math.max(2, Math.round(((idx + 1) / total) * 100))) : 0;
+      const descText = idx >= 0 ? (activeCaseFilterDesc || 'หน้าปัจจุบัน') : `นอกตัวกรอง (${activeCaseFilterDesc || ''})`;
 
-      // Top widget
-      const topCounter = document.getElementById('top-case-nav-counter');
+      // Top Widget Elements
+      const topCurrent = document.getElementById('top-case-current-num');
+      const topTotal = document.getElementById('top-case-total-num');
       const topLabel = document.getElementById('top-case-nav-filter-label');
+      const topProgress = document.getElementById('top-case-progress-bar');
       const btnTopPrev = document.getElementById('btn-top-prev-case');
       const btnTopNext = document.getElementById('btn-top-next-case');
 
-      if (topCounter) topCounter.textContent = counterText;
+      if (topCurrent) topCurrent.textContent = currentNum;
+      if (topTotal) topTotal.textContent = totalNum;
       if (topLabel) {
-        topLabel.textContent = activeCaseFilterDesc;
-        topLabel.title = activeCaseFilterDesc;
+        topLabel.textContent = descText;
+        topLabel.title = descText;
+      }
+      if (topProgress) {
+        topProgress.style.width = progressPercent + '%';
       }
       if (btnTopPrev) {
         btnTopPrev.disabled = !hasPrev;
@@ -1987,7 +2174,7 @@
         btnTopNext.classList.toggle('disabled', !hasNext);
       }
 
-      // Sticky widget
+      // Sticky Widget Elements
       const stickyCounter = document.getElementById('sticky-case-nav-counter');
       const btnStickyPrev = document.getElementById('btn-sticky-prev-case');
       const btnStickyNext = document.getElementById('btn-sticky-next-case');
@@ -2002,12 +2189,23 @@
         btnStickyNext.classList.toggle('disabled', !hasNext);
       }
 
-      // Bottom widget
+      // Bottom Widget Elements
+      const bottomCurrent = document.getElementById('bottom-case-current-num');
+      const bottomTotal = document.getElementById('bottom-case-total-num');
       const bottomDesc = document.getElementById('bottom-case-nav-desc');
+      const bottomProgress = document.getElementById('bottom-case-progress-bar');
       const btnBottomPrev = document.getElementById('btn-bottom-prev-case');
       const btnBottomNext = document.getElementById('btn-bottom-next-case');
 
-      if (bottomDesc) bottomDesc.textContent = descText;
+      if (bottomCurrent) bottomCurrent.textContent = currentNum;
+      if (bottomTotal) bottomTotal.textContent = totalNum;
+      if (bottomDesc) {
+        bottomDesc.textContent = descText;
+        bottomDesc.title = descText;
+      }
+      if (bottomProgress) {
+        bottomProgress.style.width = progressPercent + '%';
+      }
       if (btnBottomPrev) {
         btnBottomPrev.disabled = !hasPrev;
         btnBottomPrev.classList.toggle('disabled', !hasPrev);

@@ -1,12 +1,12 @@
 /**
  * PLE-CC2 OSPE Practice System — Offline Case List Metadata (Auto-Generated)
- * Version: v_20261111_085331
- * Generated on 2026-11-11 08:53:31
+ * Version: v_20261113_100529
+ * Generated on 2026-11-13 10:05:29
  */
 
 const OFFLINE_DATA = {
-  "version": "v_20261111_085331",
-  "generatedAt": "2026-11-11 08:53:31",
+  "version": "v_20261113_100529",
+  "generatedAt": "2026-11-13 10:05:29",
   "totalCases": 438,
   "cases": [
     {
@@ -3530,11 +3530,11 @@ const OFFLINE_DATA = {
     },
     {
       "caseId": "OSPE-CLISBAR03",
-      "title": "OSPE-CLISBAR03",
+      "title": "การโทรประสานงานแพทย์กรณี Colchicine Overdose ในผู้ป่วย Acute Kidney Injury (AKI)",
       "category": "Clinic",
-      "mainGroup": "Mock Exam 2569",
-      "subTopic": "🔒 ข้อสอบลับ (ต้องใช้รหัสผ่าน)",
-      "disease": "🔒 ล็อกด้วยรหัสผ่าน (Secret Mock)",
+      "mainGroup": "การค้นข้อมูลและประสานงาน",
+      "subTopic": "",
+      "disease": "Gout with Acute Kidney Injury, Colchicine Toxicity Risk, Lexicomp Renal Dosing",
       "difficulty": 2,
       "docId": "1Bjdz8c6-Gr5GIHGllXIvt0FLPeWTAdZy586vtVDOr24",
       "author": "คณะทำงานคลังข้อสอบร่วมสมรรถนะเภสัชกรรม (ระบบกลาง)",
@@ -3543,9 +3543,7 @@ const OFFLINE_DATA = {
       "isActive": true,
       "caseStatus": "Active",
       "linkedNextCase": "",
-      "linkedFromCase": "",
-      "isProtected": true,
-      "hasPassword": true
+      "linkedFromCase": ""
     },
     {
       "caseId": "OSPE-CLM101",
@@ -5568,7 +5566,8 @@ const OFFLINE_DATA = {
       "isActive": true,
       "caseStatus": "Active",
       "linkedNextCase": "",
-      "linkedFromCase": ""
+      "linkedFromCase": "",
+      "durationMin": 6
     },
     {
       "caseId": "OSPE-PD84W101",

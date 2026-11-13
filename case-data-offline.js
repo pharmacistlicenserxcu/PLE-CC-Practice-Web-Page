@@ -1,12 +1,12 @@
 /**
  * PLE-CC2 OSPE Practice System — Offline Case List Metadata (Auto-Generated)
- * Version: v_20261113_100529
- * Generated on 2026-11-13 10:05:29
+ * Version: v_20261113_100604
+ * Generated on 2026-11-13 10:06:04
  */
 
 const OFFLINE_DATA = {
-  "version": "v_20261113_100529",
-  "generatedAt": "2026-11-13 10:05:29",
+  "version": "v_20261113_100604",
+  "generatedAt": "2026-11-13 10:06:04",
   "totalCases": 438,
   "cases": [
     {
@@ -5549,7 +5549,8 @@ const OFFLINE_DATA = {
       "isActive": true,
       "caseStatus": "Active",
       "linkedNextCase": "",
-      "linkedFromCase": ""
+      "linkedFromCase": "",
+      "durationMin": 6
     },
     {
       "caseId": "OSPE-PD84M1W403B",
@@ -5566,8 +5567,7 @@ const OFFLINE_DATA = {
       "isActive": true,
       "caseStatus": "Active",
       "linkedNextCase": "",
-      "linkedFromCase": "",
-      "durationMin": 6
+      "linkedFromCase": ""
     },
     {
       "caseId": "OSPE-PD84W101",

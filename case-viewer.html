@@ -3209,6 +3209,15 @@
           console.warn('StationChatController init in viewer error:', err);
         }
       }
+
+      // Load station attachments into StationDocViewer (Google Drive PDF / Docs / Images)
+      if (typeof window.StationDocViewer !== 'undefined' && typeof window.StationDocViewer.loadCase === 'function') {
+        try {
+          window.StationDocViewer.loadCase(c);
+        } catch (docErr) {
+          console.warn('StationDocViewer loadCase error in viewer:', docErr);
+        }
+      }
     }
 
     function getViewerLayoutPreference() {

@@ -10069,6 +10069,15 @@
         setupStationRevealsSync(st.stationNumber, c);
       }
 
+      // Load station attachments into StationDocViewer (Google Drive PDF / Docs / Images)
+      if (typeof window.StationDocViewer !== 'undefined' && typeof window.StationDocViewer.loadCase === 'function') {
+        try {
+          window.StationDocViewer.loadCase(c);
+        } catch (docErr) {
+          console.warn('StationDocViewer loadCase error in exam simulation:', docErr);
+        }
+      }
+
       
       const badge = document.getElementById('exam-station-badge');
       badge.className = 'station-badge ' + (c.category || 'rest').toLowerCase();
@@ -11538,6 +11547,15 @@
 
       if (typeof setupStationRevealsSync === 'function') {
         setupStationRevealsSync(st.stationNumber, c);
+      }
+
+      // Load reviewed station attachments into StationDocViewer
+      if (typeof window.StationDocViewer !== 'undefined' && typeof window.StationDocViewer.loadCase === 'function') {
+        try {
+          window.StationDocViewer.loadCase(c);
+        } catch (docErr) {
+          console.warn('StationDocViewer loadCase error in exam review:', docErr);
+        }
       }
 
       // Update Examiner Notes for reviewed station

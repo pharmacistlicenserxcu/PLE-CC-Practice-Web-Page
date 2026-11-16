@@ -1502,6 +1502,9 @@ function getFormattedCaseScenarioHtml(c, options = {}) {
       caseId: c.caseId || ''
     });
   }
+  if (typeof StationDocViewer !== 'undefined' && typeof StationDocViewer.formatContentHtml === 'function') {
+    raw = StationDocViewer.formatContentHtml(raw, c.caseId, 'scenario');
+  }
   return raw;
 }
 window.getFormattedCaseScenarioHtml = getFormattedCaseScenarioHtml;
@@ -1515,6 +1518,9 @@ function getFormattedCasePatientHtml(c) {
   }
   if (!raw) return '';
   raw = stripSectionHeaders(raw);
+  if (typeof StationDocViewer !== 'undefined' && typeof StationDocViewer.formatContentHtml === 'function') {
+    raw = StationDocViewer.formatContentHtml(raw, c.caseId, 'patient');
+  }
   const hasContent = Boolean(
     raw.trim() && (
       raw.replace(/<[^>]*>/g, '').trim().length > 0 ||
@@ -1534,6 +1540,9 @@ function getFormattedCaseEquipmentHtml(c) {
   }
   if (!raw) return '';
   raw = stripSectionHeaders(raw).trim();
+  if (typeof StationDocViewer !== 'undefined' && typeof StationDocViewer.formatContentHtml === 'function') {
+    raw = StationDocViewer.formatContentHtml(raw, c.caseId, 'equipment');
+  }
   if (raw.startsWith('<li')) {
     const isNumbered = /^\s*<li[^>]*>\s*(\d+[\.\)]|\(\d+\))/i.test(raw);
     const tag = isNumbered ? 'ol' : 'ul';
@@ -2949,9 +2958,14 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // Attach delegated click listener for content images
   document.body.addEventListener('click', function(e) {
-    if (e.target.tagName === 'IMG' && !e.target.closest('#image-lightbox')) {
+    if (e.target.tagName === 'IMG' && !e.target.closest('#image-lightbox') && !e.target.closest('#station-doc-viewer-drawer')) {
       const contentArea = e.target.closest('#case-scenario-content, #case-patient-content, #case-equipment-content, #exam-scenario-content, #exam-patient-content, #exam-equipment-content, .case-content-area');
       if (contentArea) {
+        if (window.StationDocViewer && typeof window.StationDocViewer.openByImageSrc === 'function') {
+          if (window.StationDocViewer.openByImageSrc(e.target.src)) {
+            return;
+          }
+        }
         openLightbox(e.target.src);
       }
     }
@@ -4795,3 +4809,794 @@ function closeMobileNav() {
 window.initMobileNavigation = initMobileNavigation;
 window.openMobileNav = openMobileNav;
 window.closeMobileNav = closeMobileNav;
+
+
+/**
+ * ──────────────────────────────────────────────────────────────
+ * Station Document Viewer & Google Drive PDF Reader Module
+ * File component of: app.js
+ * ──────────────────────────────────────────────────────────────
+ * Provides smooth, non-intrusive attachment viewing for OSPE stations:
+ * - Google Drive PDF / Docs / Sheets / Slides preview in clean embed
+ * - Direct PDF link preview
+ * - Image zoom / pan / flip viewer
+ * - Multi-attachment stepper (< 1 / N >) and tab bar
+ * - Dockable Side Drawer (split-screen) — keeps 4-min station timer & scenario 100% visible
+ * - Floating action pill for quick re-open / minimize
+ * - Fully deterministic attachment numbering (explicit [เอกสารแนบ N: ...] priority, then top-to-bottom sequence)
+ * - Safe fallback and print layout
+ */
+
+const StationDocViewer = (function() {
+  'use strict';
+
+  // Internal state
+  let _activeCase = null;
+  let _attachments = [];
+  let _currentIndex = 0;
+  let _isOpen = false;
+  let _isExpanded = false;
+  let _isFullscreen = false;
+
+  // Image pan & zoom state
+  let _imgScale = 1;
+  let _imgTranslateX = 0;
+  let _imgTranslateY = 0;
+  let _isImgDragging = false;
+  let _dragStartX = 0;
+  let _dragStartY = 0;
+
+  // DOM References (cached on init)
+  let _pillEl = null;
+  let _drawerEl = null;
+  let _tabsContainer = null;
+  let _activeTitleEl = null;
+  let _stepperTextEl = null;
+  let _extLinkEl = null;
+  let _loadingOverlay = null;
+  let _iframeWrapper = null;
+  let _iframeEl = null;
+  let _imageWrapper = null;
+  let _imgEl = null;
+  let _imageViewport = null;
+  let _fallbackWrapper = null;
+  let _fallbackTextEl = null;
+  let _fallbackBtnEl = null;
+
+  function extractDriveId(url) {
+    if (!url || typeof url !== 'string') return null;
+    const m = url.match(/(?:drive|docs)\.google\.com\/(?:file\/d\/|open\?id=|uc\?id=|(?:document|spreadsheets|presentation)\/d\/)([a-zA-Z0-9_-]+)/i);
+    return m ? m[1] : null;
+  }
+
+  function extractGoogleDrivePreviewUrl(url) {
+    if (!url) return '';
+    const fileId = extractDriveId(url);
+    if (!fileId) return url;
+    if (url.includes('/document/d/')) {
+      return `https://docs.google.com/document/d/${fileId}/preview`;
+    }
+    if (url.includes('/spreadsheets/d/')) {
+      return `https://docs.google.com/spreadsheets/d/${fileId}/preview`;
+    }
+    if (url.includes('/presentation/d/')) {
+      return `https://docs.google.com/presentation/d/${fileId}/preview`;
+    }
+    return `https://drive.google.com/file/d/${fileId}/preview`;
+  }
+
+  function extractCleanDriveViewUrl(url) {
+    const fileId = extractDriveId(url);
+    if (!fileId) return url;
+    return `https://drive.google.com/file/d/${fileId}/view`;
+  }
+
+  /**
+   * Parse station attachments from a case object or HTML strings.
+   * Priority ordering:
+   * 1. Explicit numbering in [เอกสารแนบ N: ...] or 1. เอกสารแนบ: ...
+   * 2. Top-to-bottom document order
+   */
+  function extractAttachmentsFromCase(caseObj) {
+    if (!caseObj) return [];
+    const attachments = [];
+    const seenUrls = new Set();
+
+    const sections = [
+      { key: 'equipment', html: caseObj.equipmentHtml || '', gated: Boolean(caseObj.equipmentGated) },
+      { key: 'patient', html: caseObj.patientInfoHtml || '', gated: Boolean(caseObj.patientInfoGated) },
+      { key: 'scenario', html: caseObj.contentHtml || (caseObj.scenario ? `<p>${caseObj.scenario}</p>` : ''), gated: false }
+    ];
+
+    sections.forEach(sec => {
+      if (!sec.html || typeof sec.html !== 'string') return;
+      const tempDiv = (typeof document !== 'undefined') ? document.createElement('div') : null;
+      if (!tempDiv) return;
+      tempDiv.innerHTML = sec.html;
+
+      // 1. Scan anchor tags with Drive or PDF links
+      const anchors = Array.from(tempDiv.querySelectorAll('a'));
+      anchors.forEach(a => {
+        const href = (a.getAttribute('href') || '').trim();
+        const driveId = extractDriveId(href);
+        const isPdf = /\.pdf(?:\?|$)/i.test(href);
+        if (!driveId && !isPdf) return;
+
+        if (seenUrls.has(href)) return;
+        seenUrls.add(href);
+
+        let parentEl = a.closest('p, li, div') || a;
+        let pText = (parentEl.textContent || '').trim();
+
+        let num = null;
+        let title = '';
+
+        const tagMatch = pText.match(/\[\s*เอกสารแนบ\s*(\d+)?\s*(?:[:：\-–—]\s*)?([^\]]+)?\]/i);
+        const listMatch = pText.match(/(?:^|\n)\s*(\d+)[\.\)]\s*(?:เอกสารแนบ|เอกสารประกอบ|ภาพประกอบ|Attachment)\s*(?:[:：\-–—]\s*)?([^<\n\r]+)/i);
+
+        if (tagMatch) {
+          if (tagMatch[1]) num = parseInt(tagMatch[1], 10);
+          title = (tagMatch[2] || '').trim();
+        } else if (listMatch) {
+          num = parseInt(listMatch[1], 10);
+          title = (listMatch[2] || '').trim();
+        }
+
+        if (!title) {
+          const aTxt = (a.textContent || '').trim();
+          if (aTxt && !aTxt.startsWith('http') && !aTxt.startsWith('www.') && !aTxt.includes('drive.google.com')) {
+            title = aTxt;
+          }
+        }
+
+        const gatedParent = a.closest('.gated-sub-item');
+        const isGated = Boolean(sec.gated || gatedParent);
+        const gatedKey = gatedParent ? gatedParent.getAttribute('data-gated-key') : null;
+
+        const previewUrl = driveId ? extractGoogleDrivePreviewUrl(href) : href;
+        const cleanUrl = driveId ? extractCleanDriveViewUrl(href) : href;
+
+        attachments.push({
+          id: 'att_' + attachments.length,
+          num: num,
+          title: title,
+          type: driveId ? 'drive-pdf' : 'direct-pdf',
+          url: cleanUrl,
+          previewUrl: previewUrl,
+          section: sec.key,
+          isGated: isGated,
+          isUnlocked: !isGated,
+          gatedKey: gatedKey
+        });
+      });
+
+      // 2. Scan raw text Drive links not wrapped in <a>
+      const rawText = tempDiv.textContent || '';
+      const rawMatches = rawText.matchAll(/https?:\/\/(?:drive|docs)\.google\.com\/(?:file\/d\/|open\?id=|uc\?id=|(?:document|spreadsheets|presentation)\/d\/)[a-zA-Z0-9_-]+[^\s"'>]*/gi);
+      for (const rm of rawMatches) {
+        const rawUrl = rm[0].trim();
+        if (seenUrls.has(rawUrl)) continue;
+        seenUrls.add(rawUrl);
+
+        const driveId = extractDriveId(rawUrl);
+        const idx = rawText.indexOf(rawUrl);
+        const beforeContext = rawText.substring(Math.max(0, idx - 140), idx);
+        const tagMatch = beforeContext.match(/\[\s*เอกสารแนบ\s*(\d+)?\s*(?:[:：\-–—]\s*)?([^\]]+)?\]/i);
+        let num = null;
+        let title = '';
+        if (tagMatch) {
+          if (tagMatch[1]) num = parseInt(tagMatch[1], 10);
+          title = (tagMatch[2] || '').trim();
+        }
+
+        attachments.push({
+          id: 'att_' + attachments.length,
+          num: num,
+          title: title,
+          type: 'drive-pdf',
+          url: extractCleanDriveViewUrl(rawUrl),
+          previewUrl: extractGoogleDrivePreviewUrl(rawUrl),
+          section: sec.key,
+          isGated: sec.gated,
+          isUnlocked: !sec.gated,
+          gatedKey: null
+        });
+      }
+
+      // 3. Scan images
+      const imgs = Array.from(tempDiv.querySelectorAll('img'));
+      imgs.forEach((img, i) => {
+        const src = (img.getAttribute('src') || '').trim();
+        if (!src || src.startsWith('about:') || seenUrls.has(src)) return;
+        seenUrls.add(src);
+
+        let title = (img.getAttribute('title') || img.getAttribute('alt') || '').trim();
+        if (!title || title === 'รูปภาพประกอบเคส') {
+          const parentEl = img.closest('p, div, li');
+          const pText = parentEl ? (parentEl.textContent || '').trim() : '';
+          const tagMatch = pText.match(/\[\s*เอกสารแนบ\s*(\d+)?\s*(?:[:：\-–—]\s*)?([^\]]+)?\]/i);
+          if (tagMatch && tagMatch[2]) {
+            title = tagMatch[2].trim();
+          } else {
+            title = `ภาพประกอบที่ ${i + 1}`;
+          }
+        }
+
+        const gatedParent = img.closest('.gated-sub-item');
+        const isGated = Boolean(sec.gated || gatedParent);
+        const gatedKey = gatedParent ? gatedParent.getAttribute('data-gated-key') : null;
+
+        attachments.push({
+          id: 'att_' + attachments.length,
+          num: null,
+          title: title,
+          type: 'image',
+          url: src,
+          previewUrl: src,
+          section: sec.key,
+          isGated: isGated,
+          isUnlocked: !isGated,
+          gatedKey: gatedKey
+        });
+      });
+    });
+
+    // Deterministic numbering resolution
+    let nextSeq = 1;
+    const usedNums = new Set(attachments.map(a => a.num).filter(n => n !== null));
+    attachments.forEach(att => {
+      if (att.num === null) {
+        while (usedNums.has(nextSeq)) nextSeq++;
+        att.num = nextSeq;
+        usedNums.add(nextSeq);
+      }
+      if (!att.title) {
+        att.title = (att.type === 'image') ? `ภาพประกอบที่ ${att.num}` : `เอกสารแนบ ${att.num}`;
+      }
+    });
+
+    // Sort by final assigned num
+    attachments.sort((a, b) => a.num - b.num);
+    return attachments;
+  }
+
+  /**
+   * Format content HTML: replaces Drive links and [เอกสารแนบ N: ...] tags
+   * with clickable, sleek `.station-doc-card` widgets + `.station-doc-print-card`.
+   */
+  function formatContentHtml(rawHtml, caseId = '', sectionKey = 'equipment') {
+    if (!rawHtml || typeof rawHtml !== 'string') return '';
+
+    // Pattern 1: [เอกสารแนบ N: Title] followed by <a ...> or URL
+    const docTagPattern = /(?:<p[^>]*>)?\s*\[\s*เอกสารแนบ\s*(\d+)?\s*(?:[:：\-–—]\s*)?([^\]]+)?\]\s*(?:<br\s*\/?>)?\s*(?:<a[^>]*href=["']([^"']+)["'][^>]*>.*?<\/a>|(https?:\/\/[^\s<"'>]+))(?:\s*<\/p>)?/gi;
+
+    let processed = rawHtml.replace(docTagPattern, (match, pNum, pTitle, url1, url2) => {
+      const url = (url1 || url2 || '').trim();
+      const driveId = extractDriveId(url);
+      const isPdf = /\.pdf(?:\?|$)/i.test(url);
+      if (!driveId && !isPdf) return match;
+
+      const num = pNum ? parseInt(pNum, 10) : 1;
+      const title = (pTitle || '').trim() || `เอกสารแนบ ${num}`;
+      const cleanUrl = driveId ? extractCleanDriveViewUrl(url) : url;
+      const typeLabel = driveId ? 'Google Drive PDF' : 'PDF Document';
+
+      return `
+        <div class="station-doc-card no-print" onclick="window.StationDocViewer && window.StationDocViewer.openByUrl('${cleanUrl}')" title="คลิกเพื่อเปิดอ่านแบบแบ่งจอ">
+          <div class="station-doc-card-main">
+            <span class="station-doc-card-badge">เอกสารแนบ ${num}</span>
+            <div class="station-doc-card-title">${title}</div>
+            <div class="station-doc-card-meta">
+              <span>📄 ${typeLabel}</span>
+              <span>•</span>
+              <span>คลิกเพื่อเปิดอ่านแบบแบ่งจอ</span>
+            </div>
+          </div>
+          <button type="button" class="station-doc-card-btn">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>
+            <span>เปิดอ่าน</span>
+          </button>
+        </div>
+        <div class="station-doc-print-card print-only" style="display:none;">
+          <div>📄 <strong>เอกสารแนบ ${num}: ${title}</strong></div>
+          <div style="font-size:0.75rem; color:#475569; word-break:break-all;">ลิงก์: ${cleanUrl}</div>
+        </div>
+      `;
+    });
+
+    return processed;
+  }
+
+  /**
+   * Build drawer and floating pill UI elements if not already present in DOM.
+   */
+  function ensureDomElements() {
+    if (typeof document === 'undefined') return;
+    if (document.getElementById('station-doc-viewer-drawer')) {
+      _cacheDomRefs();
+      return;
+    }
+
+    // 1. Floating Action Pill
+    const pill = document.createElement('div');
+    pill.id = 'station-doc-floating-pill';
+    pill.className = 'station-doc-pill no-print';
+    pill.style.display = 'none';
+    pill.setAttribute('title', 'เปิดดูเอกสารแนบประจำสถานี');
+    pill.innerHTML = `
+      <div class="doc-pill-icon-wrap">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+          <polyline points="14 2 14 8 20 8"></polyline>
+          <line x1="16" y1="13" x2="8" y2="13"></line>
+          <line x1="16" y1="17" x2="8" y2="17"></line>
+        </svg>
+      </div>
+      <div class="doc-pill-text-wrap">
+        <span class="doc-pill-label">เอกสารแนบ</span>
+        <span class="doc-pill-badge" id="doc-pill-badge-count">0</span>
+      </div>
+    `;
+    pill.onclick = () => toggle();
+    document.body.appendChild(pill);
+
+    // 2. Dockable Side Drawer
+    const drawer = document.createElement('aside');
+    drawer.id = 'station-doc-viewer-drawer';
+    drawer.className = 'station-doc-drawer no-print';
+    drawer.setAttribute('role', 'dialog');
+    drawer.setAttribute('aria-label', 'ตัวอ่านเอกสารประจำสถานี');
+    drawer.innerHTML = `
+      <div class="doc-drawer-header">
+        <div class="doc-drawer-header-top">
+          <div class="doc-drawer-title-group">
+            <span style="font-size:1.1rem;">📄</span>
+            <span class="doc-drawer-title" id="doc-drawer-active-title">เอกสารแนบ</span>
+            <span class="doc-drawer-stepper-badge" id="doc-drawer-stepper-text">1 / 1</span>
+          </div>
+          <div class="doc-drawer-actions">
+            <button type="button" class="doc-drawer-btn" id="doc-drawer-prev-btn" title="เอกสารก่อนหน้า (◀)">◀</button>
+            <button type="button" class="doc-drawer-btn" id="doc-drawer-next-btn" title="เอกสารถัดไป (▶)">▶</button>
+            <a id="doc-drawer-ext-link" href="#" target="_blank" rel="noopener noreferrer" class="doc-drawer-btn" title="เปิดดูในแท็บใหม่ ↗">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+              <span style="margin-left:3px;">แท็บใหม่ ↗</span>
+            </a>
+            <button type="button" class="doc-drawer-btn" id="doc-drawer-expand-btn" title="ขยายความกว้าง">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><polyline points="15 3 21 3 21 9"/><polyline points="9 21 3 21 3 15"/><line x1="21" y1="3" x2="14" y2="10"/><line x1="3" y1="21" x2="10" y2="14"/></svg>
+            </button>
+            <button type="button" class="doc-drawer-btn" id="doc-drawer-minimize-btn" title="ย่อเป็นปุ่มลอย (พับเก็บ)">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><line x1="5" y1="12" x2="19" y2="12"/></svg>
+            </button>
+            <button type="button" class="doc-drawer-btn doc-drawer-close-btn" id="doc-drawer-close-btn" title="ปิด (✕)">✕</button>
+          </div>
+        </div>
+        <div class="doc-drawer-tabs-wrapper" id="doc-drawer-tabs-container"></div>
+      </div>
+      <div class="doc-drawer-body" id="doc-drawer-body">
+        <div id="doc-drawer-loading" class="doc-drawer-loading" style="display:none;">
+          <div class="doc-drawer-spinner"></div>
+          <span>กำลังโหลดเอกสาร...</span>
+        </div>
+        <div id="doc-iframe-wrapper" class="doc-iframe-wrapper" style="display:none;">
+          <iframe id="doc-drawer-iframe" src="about:blank" title="Station Document Preview" allow="autoplay; fullscreen" loading="lazy"></iframe>
+        </div>
+        <div id="doc-image-wrapper" class="doc-image-wrapper" style="display:none;">
+          <div class="doc-image-toolbar">
+            <button type="button" class="doc-img-tb-btn" id="doc-zoom-in-btn" title="ขยายภาพ (Zoom In)">🔍+</button>
+            <button type="button" class="doc-img-tb-btn" id="doc-zoom-out-btn" title="ย่อภาพ (Zoom Out)">🔍-</button>
+            <button type="button" class="doc-img-tb-btn" id="doc-zoom-reset-btn" title="ขนาดปกติ">↺ ขนาดปกติ</button>
+            <span class="doc-img-hint">💡 หมุนลูกกลิ้งเมาส์เพื่อย่อ-ขยาย หรือลากเพื่อเลื่อนดูภาพ</span>
+          </div>
+          <div class="doc-image-viewport" id="doc-image-viewport">
+            <img id="doc-drawer-img" src="" alt="Station Document Attachment" draggable="false">
+          </div>
+        </div>
+        <div id="doc-fallback-wrapper" class="doc-fallback-wrapper" style="display:none;">
+          <div class="doc-fallback-icon">📄</div>
+          <div class="doc-fallback-text" id="doc-fallback-text">ไม่พบเอกสารแนบในสถานีนี้</div>
+          <a id="doc-fallback-btn" href="#" target="_blank" rel="noopener noreferrer" class="doc-fallback-link-btn" style="display:none;">เปิดดูผ่านลิงก์ภายนอก ↗</a>
+        </div>
+      </div>
+      <div class="doc-drawer-footer">
+        <span>💡 ใช้ปุ่มลูกศร ◀ ▶ เพื่อสลับเอกสาร | กด [Esc] หรือปุ่มย่อเพื่อพับเก็บ</span>
+      </div>
+    `;
+    document.body.appendChild(drawer);
+
+    _cacheDomRefs();
+    _bindEvents();
+  }
+
+  function _cacheDomRefs() {
+    _pillEl = document.getElementById('station-doc-floating-pill');
+    _drawerEl = document.getElementById('station-doc-viewer-drawer');
+    _tabsContainer = document.getElementById('doc-drawer-tabs-container');
+    _activeTitleEl = document.getElementById('doc-drawer-active-title');
+    _stepperTextEl = document.getElementById('doc-drawer-stepper-text');
+    _extLinkEl = document.getElementById('doc-drawer-ext-link');
+    _loadingOverlay = document.getElementById('doc-drawer-loading');
+    _iframeWrapper = document.getElementById('doc-iframe-wrapper');
+    _iframeEl = document.getElementById('doc-drawer-iframe');
+    _imageWrapper = document.getElementById('doc-image-wrapper');
+    _imgEl = document.getElementById('doc-drawer-img');
+    _imageViewport = document.getElementById('doc-image-viewport');
+    _fallbackWrapper = document.getElementById('doc-fallback-wrapper');
+    _fallbackTextEl = document.getElementById('doc-fallback-text');
+    _fallbackBtnEl = document.getElementById('doc-fallback-btn');
+  }
+
+  function _bindEvents() {
+    const prevBtn = document.getElementById('doc-drawer-prev-btn');
+    const nextBtn = document.getElementById('doc-drawer-next-btn');
+    const expandBtn = document.getElementById('doc-drawer-expand-btn');
+    const minimizeBtn = document.getElementById('doc-drawer-minimize-btn');
+    const closeBtn = document.getElementById('doc-drawer-close-btn');
+
+    if (prevBtn) prevBtn.onclick = () => prev();
+    if (nextBtn) nextBtn.onclick = () => next();
+    if (expandBtn) expandBtn.onclick = () => toggleExpand();
+    if (minimizeBtn) minimizeBtn.onclick = () => minimize();
+    if (closeBtn) closeBtn.onclick = () => close();
+
+    const zoomInBtn = document.getElementById('doc-zoom-in-btn');
+    const zoomOutBtn = document.getElementById('doc-zoom-out-btn');
+    const zoomResetBtn = document.getElementById('doc-zoom-reset-btn');
+    if (zoomInBtn) zoomInBtn.onclick = () => zoomImage(0.25);
+    if (zoomOutBtn) zoomOutBtn.onclick = () => zoomImage(-0.25);
+    if (zoomResetBtn) zoomResetBtn.onclick = () => resetImageTransform();
+
+    // Escape key closes drawer
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' && _isOpen) {
+        close();
+      }
+    });
+
+    // Image viewport mousewheel zoom & drag pan
+    if (_imageViewport) {
+      _imageViewport.addEventListener('wheel', (e) => {
+        if (_imageWrapper && _imageWrapper.style.display !== 'none') {
+          e.preventDefault();
+          const delta = e.deltaY < 0 ? 0.2 : -0.2;
+          zoomImage(delta);
+        }
+      }, { passive: false });
+
+      _imageViewport.addEventListener('mousedown', (e) => {
+        if (e.target !== _imgEl) return;
+        e.preventDefault();
+        _isImgDragging = true;
+        _dragStartX = e.clientX - _imgTranslateX;
+        _dragStartY = e.clientY - _imgTranslateY;
+        _imageViewport.style.cursor = 'grabbing';
+      });
+
+      window.addEventListener('mousemove', (e) => {
+        if (!_isImgDragging) return;
+        _imgTranslateX = e.clientX - _dragStartX;
+        _imgTranslateY = e.clientY - _dragStartY;
+        _updateImgTransform();
+      });
+
+      window.addEventListener('mouseup', () => {
+        _isImgDragging = false;
+        if (_imageViewport) _imageViewport.style.cursor = 'grab';
+      });
+
+      // Touch drag
+      _imageViewport.addEventListener('touchstart', (e) => {
+        if (e.touches.length === 1) {
+          _isImgDragging = true;
+          _dragStartX = e.touches[0].clientX - _imgTranslateX;
+          _dragStartY = e.touches[0].clientY - _imgTranslateY;
+        }
+      }, { passive: true });
+
+      _imageViewport.addEventListener('touchmove', (e) => {
+        if (!_isImgDragging || e.touches.length !== 1) return;
+        _imgTranslateX = e.touches[0].clientX - _dragStartX;
+        _imgTranslateY = e.touches[0].clientY - _dragStartY;
+        _updateImgTransform();
+      }, { passive: true });
+
+      _imageViewport.addEventListener('touchend', () => {
+        _isImgDragging = false;
+      });
+    }
+
+    // Hide iframe loading overlay once iframe finishes loading
+    if (_iframeEl) {
+      _iframeEl.onload = () => {
+        if (_loadingOverlay) _loadingOverlay.style.display = 'none';
+      };
+    }
+  }
+
+  function _updateImgTransform() {
+    if (_imgEl) {
+      _imgEl.style.transform = `translate(${_imgTranslateX}px, ${_imgTranslateY}px) scale(${_imgScale})`;
+    }
+  }
+
+  function zoomImage(delta) {
+    _imgScale = Math.min(Math.max(0.4, _imgScale + delta), 4.5);
+    _updateImgTransform();
+  }
+
+  function resetImageTransform() {
+    _imgScale = 1;
+    _imgTranslateX = 0;
+    _imgTranslateY = 0;
+    _updateImgTransform();
+  }
+
+  function toggleExpand() {
+    ensureDomElements();
+    if (!_drawerEl) return;
+    _isExpanded = !_isExpanded;
+    _drawerEl.classList.toggle('expanded', _isExpanded);
+  }
+
+  /**
+   * Load a case into StationDocViewer.
+   * Parses attachments, updates floating pill and tab list.
+   */
+  function loadCase(caseObj, options = {}) {
+    ensureDomElements();
+    _activeCase = caseObj;
+    _attachments = extractAttachmentsFromCase(caseObj);
+    _currentIndex = 0;
+
+    // Update Floating Pill
+    const count = _attachments.length;
+    const badgeEl = document.getElementById('doc-pill-badge-count');
+    if (badgeEl) badgeEl.textContent = String(count);
+
+    if (_pillEl) {
+      if (count > 0 && !_isOpen) {
+        _pillEl.style.display = 'inline-flex';
+      } else {
+        _pillEl.style.display = 'none';
+      }
+    }
+
+    // Render tab buttons
+    _renderTabs();
+
+    // If drawer is already open, show the active station's attachments
+    if (_isOpen) {
+      if (count > 0) {
+        _renderCurrentAttachment();
+      } else {
+        close();
+      }
+    }
+
+    return _attachments;
+  }
+
+  function _renderTabs() {
+    if (!_tabsContainer) return;
+    _tabsContainer.innerHTML = '';
+    if (_attachments.length <= 1) {
+      _tabsContainer.style.display = 'none';
+      return;
+    }
+    _tabsContainer.style.display = 'flex';
+
+    _attachments.forEach((att, idx) => {
+      const tab = document.createElement('button');
+      tab.type = 'button';
+      tab.className = 'doc-drawer-tab' + (idx === _currentIndex ? ' active' : '');
+      const icon = att.type === 'image' ? '🖼️' : '📄';
+      tab.innerHTML = `<span>${icon}</span> <span>${att.num}. ${escapeHtml(att.title || 'เอกสาร')}</span>`;
+      tab.onclick = () => {
+        _currentIndex = idx;
+        _renderTabs();
+        _renderCurrentAttachment();
+      };
+      _tabsContainer.appendChild(tab);
+    });
+  }
+
+  function _renderCurrentAttachment() {
+    if (!_attachments || _attachments.length === 0) {
+      _showFallback('ไม่พบเอกสารแนบในสถานีนี้');
+      return;
+    }
+
+    const att = _attachments[_currentIndex] || _attachments[0];
+
+    // Update Header
+    if (_activeTitleEl) {
+      _activeTitleEl.textContent = `${att.num}. ${att.title || 'เอกสารแนบ'}`;
+      _activeTitleEl.title = att.title || '';
+    }
+    if (_stepperTextEl) {
+      _stepperTextEl.textContent = `${_currentIndex + 1} / ${_attachments.length}`;
+    }
+    if (_extLinkEl) {
+      _extLinkEl.href = att.url || att.previewUrl || '#';
+    }
+
+    // Update Tab highlights
+    if (_tabsContainer) {
+      const tabs = Array.from(_tabsContainer.querySelectorAll('.doc-drawer-tab'));
+      tabs.forEach((t, i) => t.classList.toggle('active', i === _currentIndex));
+    }
+
+    // Render Body according to type
+    if (att.type === 'image') {
+      if (_iframeWrapper) _iframeWrapper.style.display = 'none';
+      if (_fallbackWrapper) _fallbackWrapper.style.display = 'none';
+      if (_loadingOverlay) _loadingOverlay.style.display = 'none';
+      if (_imageWrapper) {
+        _imageWrapper.style.display = 'flex';
+        if (_imgEl) _imgEl.src = att.url;
+        resetImageTransform();
+      }
+    } else {
+      // PDF or Google Drive embed
+      if (_imageWrapper) _imageWrapper.style.display = 'none';
+      if (_fallbackWrapper) _fallbackWrapper.style.display = 'none';
+      if (_iframeWrapper) {
+        _iframeWrapper.style.display = 'flex';
+        if (_loadingOverlay) _loadingOverlay.style.display = 'flex';
+        if (_iframeEl) {
+          if (_iframeEl.src !== att.previewUrl) {
+            _iframeEl.src = att.previewUrl;
+          } else {
+            if (_loadingOverlay) _loadingOverlay.style.display = 'none';
+          }
+        }
+      }
+    }
+  }
+
+  function _showFallback(msg, extUrl = null) {
+    if (_iframeWrapper) _iframeWrapper.style.display = 'none';
+    if (_imageWrapper) _imageWrapper.style.display = 'none';
+    if (_loadingOverlay) _loadingOverlay.style.display = 'none';
+    if (_fallbackWrapper) {
+      _fallbackWrapper.style.display = 'flex';
+      if (_fallbackTextEl) _fallbackTextEl.textContent = msg;
+      if (_fallbackBtnEl) {
+        if (extUrl) {
+          _fallbackBtnEl.href = extUrl;
+          _fallbackBtnEl.style.display = 'inline-flex';
+        } else {
+          _fallbackBtnEl.style.display = 'none';
+        }
+      }
+    }
+  }
+
+  function open(index = 0) {
+    ensureDomElements();
+    if (_attachments.length === 0) return;
+    _currentIndex = Math.max(0, Math.min(index, _attachments.length - 1));
+    _isOpen = true;
+
+    if (_drawerEl) _drawerEl.classList.add('active');
+    if (_pillEl) _pillEl.style.display = 'none';
+
+    _renderTabs();
+    _renderCurrentAttachment();
+  }
+
+  function close() {
+    ensureDomElements();
+    _isOpen = false;
+    if (_drawerEl) _drawerEl.classList.remove('active');
+    if (_pillEl && _attachments.length > 0) {
+      _pillEl.style.display = 'inline-flex';
+    }
+  }
+
+  function minimize() {
+    close();
+  }
+
+  function toggle() {
+    if (_isOpen) {
+      minimize();
+    } else {
+      open(_currentIndex);
+    }
+  }
+
+  function next() {
+    if (_attachments.length <= 1) return;
+    _currentIndex = (_currentIndex + 1) % _attachments.length;
+    _renderTabs();
+    _renderCurrentAttachment();
+  }
+
+  function prev() {
+    if (_attachments.length <= 1) return;
+    _currentIndex = (_currentIndex - 1 + _attachments.length) % _attachments.length;
+    _renderTabs();
+    _renderCurrentAttachment();
+  }
+
+  function openByUrl(url) {
+    if (!url) return;
+    const clean = url.trim();
+    const idx = _attachments.findIndex(a => a.url === clean || a.previewUrl === clean || (extractDriveId(a.url) && extractDriveId(a.url) === extractDriveId(clean)));
+    if (idx !== -1) {
+      open(idx);
+    } else {
+      // Dynamic single attachment open
+      const driveId = extractDriveId(clean);
+      const isPdf = /\.pdf(?:\?|$)/i.test(clean);
+      const newAtt = {
+        id: 'att_dyn',
+        num: _attachments.length + 1,
+        title: 'เอกสารแนบ',
+        type: driveId ? 'drive-pdf' : (isPdf ? 'direct-pdf' : 'image'),
+        url: driveId ? extractCleanDriveViewUrl(clean) : clean,
+        previewUrl: driveId ? extractGoogleDrivePreviewUrl(clean) : clean
+      };
+      _attachments.push(newAtt);
+      _currentIndex = _attachments.length - 1;
+      open(_currentIndex);
+    }
+  }
+
+  function openByImageSrc(src) {
+    if (!src) return false;
+    const idx = _attachments.findIndex(a => a.type === 'image' && a.url === src);
+    if (idx !== -1) {
+      open(idx);
+      return true;
+    }
+    return false;
+  }
+
+  function escapeHtml(str) {
+    if (!str) return '';
+    return String(str)
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;');
+  }
+
+  // Auto initialize on DOM ready
+  if (typeof document !== 'undefined') {
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', () => ensureDomElements());
+    } else {
+      ensureDomElements();
+    }
+  }
+
+  return {
+    init: ensureDomElements,
+    loadCase: loadCase,
+    extractAttachments: extractAttachmentsFromCase,
+    formatContentHtml: formatContentHtml,
+    open: open,
+    close: close,
+    minimize: minimize,
+    toggle: toggle,
+    next: next,
+    prev: prev,
+    openByUrl: openByUrl,
+    openByImageSrc: openByImageSrc,
+    toggleExpand: toggleExpand,
+    zoomImage: zoomImage,
+    resetImageTransform: resetImageTransform,
+    getAttachments: () => _attachments,
+    getActiveIndex: () => _currentIndex,
+    isOpen: () => _isOpen
+  };
+})();
+
+// Export globally
+if (typeof window !== 'undefined') {
+  window.StationDocViewer = StationDocViewer;
+}
+if (typeof module !== 'undefined' && module.exports) {
+  module.exports = StationDocViewer;
+}

@@ -10005,7 +10005,11 @@
       const cleanScenario = (typeof renderInteractiveBlanks === 'function')
         ? renderInteractiveBlanks(rawScenario, { isExaminer, stationNum: st.stationNumber, caseId: c.caseId })
         : rawScenario;
-      document.getElementById('exam-scenario-content').innerHTML = cleanScenario;
+      let finalScenario = cleanScenario;
+      if (window.StationDocViewer && typeof window.StationDocViewer.formatContentHtml === 'function') {
+        finalScenario = window.StationDocViewer.formatContentHtml(finalScenario, c.caseId, 'scenario');
+      }
+      document.getElementById('exam-scenario-content').innerHTML = finalScenario;
 
       // Render patientInfoHtml — convert inner ##Header markers to styled headings while stripping section tag
       const rawPatient = stripSectionHeaders(c.patientInfoHtml || '');
@@ -10024,10 +10028,13 @@
 
       if (hasPatientInfo) {
         if (patientAccordion) patientAccordion.style.display = 'block';
-        const processedPatient = rawPatient.replace(
+        let processedPatient = rawPatient.replace(
           /<p[^>]*>##([^<]+)<\/p>/gi,
           (match, heading) => `<p style="font-family:var(--font-title);font-weight:700;color:var(--text-primary);margin:1rem 0 0.35rem 0;font-size:0.92rem;border-left:3px solid var(--primary);padding-left:0.6rem;">&#128204; ${heading.trim()}</p>`
         );
+        if (window.StationDocViewer && typeof window.StationDocViewer.formatContentHtml === 'function') {
+          processedPatient = window.StationDocViewer.formatContentHtml(processedPatient, c.caseId, 'patient');
+        }
         document.getElementById('exam-patient-content').innerHTML = processedPatient;
         _patientAccordionOpen = false;
         togglePatientAccordion();
@@ -10047,6 +10054,9 @@
         if (equipAccordion) equipAccordion.style.display = 'block';
         const eqContent = document.getElementById('exam-equipment-content');
         let rawEq = stripSectionHeaders(c.equipmentHtml || '').trim();
+        if (window.StationDocViewer && typeof window.StationDocViewer.formatContentHtml === 'function') {
+          rawEq = window.StationDocViewer.formatContentHtml(rawEq, c.caseId, 'equipment');
+        }
         if (rawEq.startsWith('<li')) {
           const isNumbered = /^\s*<li[^>]*>\s*(\d+[\.\)]|\(\d+\))/i.test(rawEq);
           const tag = isNumbered ? 'ol' : 'ul';
@@ -11490,9 +11500,13 @@
       const cleanScenario = (typeof renderInteractiveBlanks === 'function')
         ? renderInteractiveBlanks(rawScenario, { isExaminer, stationNum: st.stationNumber, caseId: c.caseId })
         : rawScenario;
+      let finalScenario = cleanScenario;
+      if (window.StationDocViewer && typeof window.StationDocViewer.formatContentHtml === 'function') {
+        finalScenario = window.StationDocViewer.formatContentHtml(finalScenario, c.caseId, 'scenario');
+      }
       const contentEl = document.getElementById('exam-scenario-content');
       if (contentEl) {
-        contentEl.innerHTML = cleanScenario || '<p style="color:var(--text-muted);">ไม่มีข้อมูลสถานการณ์</p>';
+        contentEl.innerHTML = finalScenario || '<p style="color:var(--text-muted);">ไม่มีข้อมูลสถานการณ์</p>';
       }
 
       // Update Patient Info Accordion for reviewed station
@@ -11512,10 +11526,14 @@
       );
       if (hasPatientInfo && patientContentEl) {
         if (patientAccordion) patientAccordion.style.display = 'block';
-        patientContentEl.innerHTML = rawPatient.replace(
+        let processedPatient = rawPatient.replace(
           /<p[^>]*>##([^<]+)<\/p>/gi,
           (match, heading) => `<p style="font-family:var(--font-title);font-weight:700;color:var(--text-primary);margin:1rem 0 0.35rem 0;font-size:0.92rem;border-left:3px solid var(--primary);padding-left:0.6rem;">&#128204; ${heading.trim()}</p>`
         );
+        if (window.StationDocViewer && typeof window.StationDocViewer.formatContentHtml === 'function') {
+          processedPatient = window.StationDocViewer.formatContentHtml(processedPatient, c.caseId, 'patient');
+        }
+        patientContentEl.innerHTML = processedPatient;
       } else {
         if (patientAccordion) patientAccordion.style.display = 'none';
         if (patientContentEl) patientContentEl.innerHTML = '';
@@ -11531,7 +11549,10 @@
       }
       if (c.equipmentHtml && eqContent) {
         if (equipAccordion) equipAccordion.style.display = 'block';
-        const rawEq = stripSectionHeadersLocal(c.equipmentHtml || '').trim();
+        let rawEq = stripSectionHeadersLocal(c.equipmentHtml || '').trim();
+        if (window.StationDocViewer && typeof window.StationDocViewer.formatContentHtml === 'function') {
+          rawEq = window.StationDocViewer.formatContentHtml(rawEq, c.caseId, 'equipment');
+        }
         if (rawEq.startsWith('<li')) {
           const isNumbered = /^\s*<li[^>]*>\s*(\d+[\.\)]|\(\d+\))/i.test(rawEq);
           const tag = isNumbered ? 'ol' : 'ul';

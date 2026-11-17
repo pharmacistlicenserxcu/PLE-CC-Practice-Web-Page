@@ -885,53 +885,156 @@ const tools = {};
   contents.visible = false;
   const pestle = mk(new THREE.CapsuleGeometry(.09, .72, 6, 10), M(0xe2e8f0), 0, .68, 0, g);
   pestle.rotation.z = -0.35;
-  tools.mortar = { g, bowl, bowlMat, contents, pestle, type: 'porcelain', grindPct: 0, pounded: false, drops: 0, poundAnim: 0 };
+  // 3D Dropper above Mortar for Levigation / Intervention
+  const dropper = new THREE.Group(); dropper.position.set(0.35, 1.35, 0); dropper.visible = false; g.add(dropper);
+  mk(new THREE.CylinderGeometry(.035, .015, .42, 12), glassM(0xe0f2fe, 0.7), 0, 0, 0, dropper);
+  mk(new THREE.SphereGeometry(.065, 12, 10), M(0xdc2626), 0, .24, 0, dropper).scale.set(1, 1.4, 1);
+  tools.mortar = { g, bowl, bowlMat, contents, pestle, dropper, type: 'porcelain', grindPct: 0, pounded: false, drops: 0, poundAnim: 0, pestleSpinAnim: 0, dropAnim: 0, scrapeAnim: 0 };
 }
 
-// 6. OINTMENT SLAB
+// 6. OINTMENT SLAB + 3D FIGURE-8 SPATULA
 {
   const g = new THREE.Group(); g.position.set(-0.8, BENCH_Y + 0.02, 0.35); productGroup.add(g);
   mk(new THREE.BoxGeometry(2.2, .06, 1.5), glassM(0xdbeafe, 0.55), 0, .03, 0, g);
-  const blobDrug = mk(new THREE.SphereGeometry(.16, 10, 8), M(0xfef08a), -0.35, .1, 0, g); blobDrug.scale.set(1.4, .4, 1.2);
-  const blobBase = mk(new THREE.SphereGeometry(.26, 12, 8), M(0xffffff), 0.35, .12, 0, g); blobBase.scale.set(1.5, .45, 1.3);
+  const blobDrug = mk(new THREE.SphereGeometry(.16, 14, 10), M(0xfef08a), -0.35, .1, 0, g); blobDrug.scale.set(1.4, .4, 1.2);
+  const blobBase = mk(new THREE.SphereGeometry(.26, 16, 12), M(0xffffff), 0.35, .12, 0, g); blobBase.scale.set(1.5, .45, 1.3);
+  const slabSpatula = new THREE.Group(); slabSpatula.position.set(0, .18, .25); g.add(slabSpatula);
+  mk(new THREE.BoxGeometry(.14, .018, .65), M(0xcbd5e1, { metalness: 0.85, roughness: 0.2 }), 0, 0, 0, slabSpatula);
+  mk(new THREE.CylinderGeometry(.045, .045, .38, 12), M(0x78350f), 0, .02, .48, slabSpatula).rotation.x = Math.PI/2;
   g.visible = false;
-  tools.slab = { g, blobDrug, blobBase, blendPct: 0, stageIdx: 0 };
+  tools.slab = { g, blobDrug, blobBase, slabSpatula, blendPct: 0, stageIdx: 0, spatulaAnim: 0 };
 }
 
-// 7. BEAKER 50 mL
-{
-  const g = new THREE.Group(); g.position.set(0.35, BENCH_Y, 0.4); productGroup.add(g);
-  mk(new THREE.CylinderGeometry(.55, .49, 1.05, 20, 1, true), glassM(0x93c5fd, .34), 0, .53, 0, g);
-  mk(new THREE.TorusGeometry(.55, .025, 8, 24), glassM(0x60a5fa, .65), 0, 1.05, 0, g).rotation.x = Math.PI/2;
-  mk(new THREE.CylinderGeometry(.49, .49, .04, 20), glassM(0x93c5fd, .55), 0, .02, 0, g);
-  const liqGeo = new THREE.CylinderGeometry(.47, .47, .88, 20); liqGeo.translate(0, .44, 0);
+/* ── 7-8. GLASSWARE RACK: BEAKERS 25/50/100/250 mL + GRADUATED CYLINDERS 10/25/50/100 mL ──
+   Every vessel starts on the front rack. Clicking one brings it to the working spot
+   (it lifts, travels and lands); clicking it again returns it. tools.beaker / tools.cylinder
+   always point at the vessel currently chosen, so every existing step keeps working. */
+const BEAKER_HOME = new THREE.Vector3(0.35, BENCH_Y, 0.4);
+const CYL_HOME = new THREE.Vector3(1.55, BENCH_Y, 0.35);
+const vesselRack = [];
+const vessels = { beaker: [], cylinder: [] };
+mk(new THREE.BoxGeometry(4.3, .05, .75), M(0xe2e8f0, { roughness: .8 }), -3.15, BENCH_Y + .025, 1.3, productGroup);
+mk(new THREE.BoxGeometry(3.0, .05, .75), M(0xe2e8f0, { roughness: .8 }), 3.1, BENCH_Y + .025, 1.3, productGroup);
+function makeVesselLabel(txt, y) {
+  const c = document.createElement('canvas'); c.width = 256; c.height = 80;
+  const g2 = c.getContext('2d');
+  g2.fillStyle = 'rgba(255,255,255,.94)'; g2.fillRect(0, 0, 256, 80);
+  g2.strokeStyle = '#0891b2'; g2.lineWidth = 5; g2.strokeRect(2, 2, 252, 76);
+  g2.fillStyle = '#0f172a'; g2.font = '700 33px sans-serif'; g2.textAlign = 'center'; g2.fillText(txt, 128, 52);
+  const t = new THREE.CanvasTexture(c); t.colorSpace = THREE.SRGBColorSpace;
+  const s = new THREE.Sprite(new THREE.SpriteMaterial({ map: t, depthTest: false, transparent: true }));
+  s.scale.set(1.0, .31, 1); s.position.y = y; s.renderOrder = 5; return s;
+}
+function registerVessel(v, kind, shelfX, shelfZ) {
+  v.kind = kind; v.onBench = false;
+  v.home = (kind === 'beaker' ? BEAKER_HOME : CYL_HOME).clone();
+  v.shelf = new THREE.Vector3(shelfX, BENCH_Y, shelfZ);
+  v.target = v.shelf.clone(); v.g.position.copy(v.shelf);
+  v.g.userData.vessel = v;
+  vessels[kind].push(v); vesselRack.push(v);
+}
+function makeBeaker(cap, r, h, shelfX) {
+  const g = new THREE.Group(); productGroup.add(g);
+  mk(new THREE.CylinderGeometry(r, r * .89, h, 22, 1, true), glassM(0x93c5fd, .34), 0, h / 2, 0, g);
+  mk(new THREE.TorusGeometry(r, .025, 8, 26), glassM(0x60a5fa, .65), 0, h, 0, g).rotation.x = Math.PI / 2;
+  mk(new THREE.CylinderGeometry(r * .89, r * .89, .04, 22), glassM(0x93c5fd, .55), 0, .02, 0, g);
+  const liqH = h * .84;
+  const liqGeo = new THREE.CylinderGeometry(r * .855, r * .855, liqH, 22); liqGeo.translate(0, liqH / 2, 0);
   const liqMat = new THREE.MeshStandardMaterial({ color: 0x38bdf8, transparent: true, opacity: .78, roughness: .15 });
   const liq = mk(liqGeo, liqMat, 0, .04, 0, g); liq.castShadow = false; liq.scale.y = 0.001;
-  const ring = mk(new THREE.TorusGeometry(.56, .035, 8, 24), M(0x16a34a, { emissive: 0x15803d }), 0, 1.07, 0, g);
+  const ring = mk(new THREE.TorusGeometry(r + .01, .035, 8, 26), M(0x16a34a, { emissive: 0x15803d }), 0, h + .02, 0, g);
   ring.rotation.x = Math.PI / 2; ring.castShadow = false; ring.visible = false;
-  [.25, .5, .75].forEach(y => mk(new THREE.BoxGeometry(.15, .025, .02), M(0x334155), .5, y, 0, g).castShadow = false);
-  const rod = mk(new THREE.CylinderGeometry(.025, .025, 1.4, 8), glassM(0x60a5fa, 0.75), 0, .78, 0, g);
+  [.25, .5, .75].forEach(f => mk(new THREE.BoxGeometry(.15, .025, .02), M(0x334155), r * .9, h * f, 0, g).castShadow = false);
+  const rod = mk(new THREE.CylinderGeometry(.025, .025, h * 1.33, 8), glassM(0x60a5fa, 0.75), 0, h * .74, 0, g);
   rod.rotation.z = 0.2; rod.visible = false;
-  tools.beaker = { g, liq, liqMat, ring, rod, volume: 0, waterVol: 0, glyVol: 0, stirPct: 0, foam: 0, lumps: 0, radius: 0.55, mouthY: BENCH_Y + 1.06 };
+  const label = makeVesselLabel('Beaker ' + cap + ' mL', h + .42); g.add(label);
+  const v = { g, liq, liqMat, ring, rod, label, cap, volume: 0, waterVol: 0, glyVol: 0, stirPct: 0, foam: 0, lumps: 0, film: 0, radius: r, mouthY: BENCH_Y + h + .01, fullVol: cap * 0.6 };
+  registerVessel(v, 'beaker', shelfX, 1.3);
+  return v;
 }
-
-// 8. GRADUATED CYLINDER 50 mL
-{
-  const g = new THREE.Group(); g.position.set(1.55, BENCH_Y, 0.35); productGroup.add(g);
-  mk(new THREE.CylinderGeometry(.32, .38, .1, 6), M(0xcbd5e1), 0, .05, 0, g);
-  mk(new THREE.CylinderGeometry(.2, .2, 1.75, 20, 1, true), glassM(0x93c5fd, .36), 0, .97, 0, g);
-  mk(new THREE.TorusGeometry(.2, .02, 8, 20), glassM(0x60a5fa, .65), 0, 1.85, 0, g).rotation.x = Math.PI/2;
-  for (let mL = 10; mL <= 50; mL += 5) {
-    const y = 0.1 + (mL / 50) * 1.56;
-    const isTarget = mL === 30 || mL === 20;
-    mk(new THREE.BoxGeometry(isTarget ? .16 : .1, .016, .015), M(isTarget ? 0xdc2626 : 0x334155), .21, y, 0, g).castShadow = false;
+function makeCylinder(cap, r, liqH, shelfX) {
+  const g = new THREE.Group(); productGroup.add(g);
+  mk(new THREE.CylinderGeometry(r * 1.6, r * 1.9, .1, 6), M(0xcbd5e1), 0, .05, 0, g);
+  const tubeH = liqH + .19;
+  mk(new THREE.CylinderGeometry(r, r, tubeH, 22, 1, true), glassM(0x93c5fd, .36), 0, .095 + tubeH / 2, 0, g);
+  mk(new THREE.TorusGeometry(r, .02, 8, 22), glassM(0x60a5fa, .65), 0, .095 + tubeH, 0, g).rotation.x = Math.PI / 2;
+  for (let i = 1; i <= 20; i++) {
+    const major = i % 4 === 0;
+    const y = 0.1 + (i / 20) * liqH;
+    mk(new THREE.BoxGeometry(major ? r * .8 : r * .45, .016, .015), M(0x334155), r + .01, y, 0, g).castShadow = false;
   }
-  const liqGeo = new THREE.CylinderGeometry(.175, .175, 1.56, 18); liqGeo.translate(0, .78, 0);
+  const liqGeo = new THREE.CylinderGeometry(r * .88, r * .88, liqH, 20); liqGeo.translate(0, liqH / 2, 0);
   const liq = mk(liqGeo, new THREE.MeshStandardMaterial({ color: 0x38bdf8, transparent: true, opacity: .8, roughness: .1 }), 0, .1, 0, g);
   liq.castShadow = false; liq.scale.y = 0.001;
-  const meniscusRing = mk(new THREE.TorusGeometry(.16, .022, 8, 18), M(0x0284c7), 0, .1, 0, g);
+  const meniscusRing = mk(new THREE.TorusGeometry(r * .8, .022, 8, 18), M(0x0284c7), 0, .1, 0, g);
   meniscusRing.rotation.x = Math.PI / 2; meniscusRing.visible = false;
-  tools.cylinder = { g, liq, meniscusRing, vol: 0, maxVol: 50 };
+  const label = makeVesselLabel('Cylinder ' + cap + ' mL', tubeH + .5); g.add(label);
+  const v = { g, liq, meniscusRing, label, vol: 0, maxVol: cap, cap, liqH, radius: r };
+  registerVessel(v, 'cylinder', shelfX, 1.3);
+  return v;
+}
+makeBeaker(25, .40, .85, -4.55);
+makeBeaker(50, .55, 1.05, -3.75);
+makeBeaker(100, .65, 1.25, -2.8);
+makeBeaker(250, .78, 1.5, -1.7);
+makeCylinder(10, .11, 1.1, 2.2);
+makeCylinder(25, .16, 1.35, 2.85);
+makeCylinder(50, .20, 1.56, 3.5);
+makeCylinder(100, .26, 1.7, 4.1);
+tools.beaker = vessels.beaker[1];
+tools.cylinder = vessels.cylinder[2];
+
+function setVesselTarget(v, onBench) {
+  v.onBench = onBench;
+  v.target.copy(onBench ? v.home : v.shelf);
+  v.label.visible = !onBench;
+}
+function vesselHasLiquid(v) { return v.kind === 'beaker' ? v.volume > 0.05 : v.vol > 0.05; }
+window.pickVessel = (v) => {
+  sfx.init();
+  if (isClinicOrSap()) return;
+  const name = v.kind === 'beaker' ? 'บีกเกอร์' : 'กระบอกตวง';
+  if (v.onBench) {
+    if (vesselHasLiquid(v)) { showToast(`⚠️ ${name}มีของเหลวอยู่ ย้ายคืนชั้นไม่ได้`, true); return; }
+    setVesselTarget(v, false); sfx.sfxClink(); showToast(`↩️ คืน${name} ${v.cap} mL กลับชั้น`); updateUI(); return;
+  }
+  const cur = tools[v.kind];
+  if (cur && cur.onBench) {
+    if (vesselHasLiquid(cur)) { showToast(`⚠️ ${name} ${cur.cap} mL บนโต๊ะมีของเหลวอยู่ เปลี่ยนไม่ได้`, true); return; }
+    setVesselTarget(cur, false);
+  }
+  tools[v.kind] = v; setVesselTarget(v, true);
+  sfx.sfxClink(); showToast(`🧪 เลือก${name} ${v.cap} mL วางบนโต๊ะแล้ว`); updateUI();
+};
+function resetVessels() {
+  vesselRack.forEach(v => {
+    if (v.kind === 'beaker') { v.volume = 0; v.waterVol = 0; v.glyVol = 0; v.stirPct = 0; v.lumps = 0; v.film = 0; v.rod.visible = false; v.liq.scale.y = 0.001; }
+    else { v.vol = 0; }
+    setVesselTarget(v, false); v.g.position.copy(v.shelf);
+  });
+  tools.beaker = vessels.beaker[1]; tools.cylinder = vessels.cylinder[2];
+  updateCylinderVisual();
+}
+function updateBeakerVisual(b) { b.liq.scale.y = Math.max(0.001, Math.min(1, b.volume / b.fullVol)); }
+/* Which vessel is correct for this station, and is the student's pick acceptable? */
+function vesselCheck(cur, rec) {
+  const needBeaker = ['pour_beaker', 'sprinkle_stir', 'drop_neutralize', 'rinse_transfer'].includes(cur.type);
+  const needCyl = ['rinse_transfer', 'eye_meniscus'].includes(cur.type);
+  if (needBeaker && !tools.beaker.onBench) return { block: 'ยังไม่ได้เลือกบีกเกอร์จากชั้นอุปกรณ์ (คลิกบีกเกอร์ที่เหมาะสม)' };
+  if (needCyl && !tools.cylinder.onBench) return { block: 'ยังไม่ได้เลือกกระบอกตวงจากชั้นอุปกรณ์' };
+  const tv = Number(cur.targetVol || rec.targetVol || 30);
+  let penalty = null;
+  if (needBeaker) {
+    const best = [25, 50, 100, 250].find(c => c >= tv * 1.3) || 250;
+    if (tools.beaker.cap < tv * 1.1) return { block: `บีกเกอร์ ${tools.beaker.cap} mL เล็กเกินไปสำหรับปริมาตรสุดท้าย ${tv} mL` };
+    if (tools.beaker.cap > best) penalty = `บีกเกอร์ ${tools.beaker.cap} mL ใหญ่เกินจำเป็น (เหมาะสม ${best} mL)`;
+  }
+  if (needCyl) {
+    const bestC = [10, 25, 50, 100].find(c => c >= tv) || 100;
+    if (tools.cylinder.cap < tv) return { block: `กระบอกตวง ${tools.cylinder.cap} mL เล็กกว่าปริมาตร ${tv} mL` };
+    if (tools.cylinder.cap > bestC) penalty = (penalty ? penalty + ' / ' : '') + `กระบอกตวง ${tools.cylinder.cap} mL ความละเอียดต่ำ (เหมาะสม ${bestC} mL)`;
+  }
+  return { penalty };
 }
 
 // 9. PURIFIED WATER BOTTLE
@@ -981,35 +1084,37 @@ const tools = {};
 // 12. PRODUCT SPECIAL PROPS (Chartulae, Filter Funnel, Suppository Mold, IV Admixture Set)
 {
   const chartG = new THREE.Group(); chartG.position.set(1.1, BENCH_Y + 0.02, 1.0); chartG.visible = false; productGroup.add(chartG);
+  const chartPapers = [];
   for (let i = 0; i < 4; i++) {
-    mk(new THREE.BoxGeometry(.38, .02, .22), M(0xf8fafc), (i - 1.5) * 0.25, .02 + i * 0.005, 0, chartG);
+    const p = mk(new THREE.BoxGeometry(.38, .02, .22), M(0xf8fafc), (i - 1.5) * 0.42, .02 + i * 0.005, 0, chartG);
+    chartPapers.push(p);
   }
-  tools.chartulae = { g: chartG };
+  tools.chartulae = { g: chartG, chartPapers, animT: 0 };
 
   const filtG = new THREE.Group(); filtG.position.set(1.55, BENCH_Y + 1.18, 0.35); filtG.visible = false; productGroup.add(filtG);
   const fCone = mk(new THREE.ConeGeometry(.32, .45, 24, 1, true), glassM(0xe0f2fe, 0.55), 0, 0, 0, filtG);
   fCone.rotation.x = Math.PI;
   const fPaper = mk(new THREE.ConeGeometry(.29, .38, 16, 1, true), M(0xffffff, { side: THREE.DoubleSide }), 0, .05, 0, filtG);
   fPaper.rotation.x = Math.PI;
-  tools.filterSet = { g: filtG };
+  tools.filterSet = { g: filtG, fPaper, animT: 0 };
 
   const moldG = new THREE.Group(); moldG.position.set(-0.9, BENCH_Y + 0.12, 1.0); moldG.visible = false; productGroup.add(moldG);
   mk(new THREE.BoxGeometry(.95, .24, .32), M(0x94a3b8, { metalness: 0.75, roughness: 0.25 }), 0, .12, 0, moldG);
   const suppCones = [];
   for (let i = 0; i < 4; i++) {
-    const sc = mk(new THREE.ConeGeometry(.06, .18, 14), M(0xfef9c3), -0.3 + i * 0.2, .28, 0, moldG);
+    const sc = mk(new THREE.ConeGeometry(.06, .18, 14), M(0xfef9c3), -0.3 + i * 0.2, .12, 0, moldG);
     sc.rotation.x = Math.PI; sc.visible = false;
     suppCones.push(sc);
   }
-  tools.suppMold = { g: moldG, suppCones };
+  tools.suppMold = { g: moldG, suppCones, animT: 0 };
 
   const ivG = new THREE.Group(); ivG.position.set(0.1, BENCH_Y + 0.15, 0.85); ivG.visible = false; productGroup.add(ivG);
   mk(new THREE.BoxGeometry(.75, .08, 1.1), glassM(0xe0f2fe, 0.55), 0, .06, 0, ivG); // 500mL IV Bag
   mk(new THREE.CylinderGeometry(.06, .06, .16, 14), M(0x0284c7), 0, .06, .62, ivG).rotation.x = Math.PI/2; // Port
   const ivSyr = new THREE.Group(); ivSyr.position.set(.75, .14, .2); ivSyr.rotation.z = Math.PI/2; ivG.add(ivSyr);
   mk(new THREE.CylinderGeometry(.07, .07, .65, 16), glassM(0xf8fafc, 0.65), 0, 0, 0, ivSyr);
-  mk(new THREE.CylinderGeometry(.04, .04, .55, 12), M(0x38bdf8), 0, -.22, 0, ivSyr);
-  tools.ivSet = { g: ivG, ivSyr };
+  const ivPlunger = mk(new THREE.CylinderGeometry(.04, .04, .55, 12), M(0x38bdf8), 0, -.22, 0, ivSyr);
+  tools.ivSet = { g: ivG, ivSyr, ivPlunger, animT: 0 };
 }
 
 /* ═══════════════════════════════════════════════════════════════
@@ -1597,8 +1702,8 @@ function updateTelemetryUI() {
     $('tel-body').innerHTML = `
       <div class="tel-row"><span>หน้าปัดตาชั่ง:</span><span class="tel-val">${scaleReading.toFixed(3)} g</span></div>
       <div class="tel-row"><span>ผงบนกระทง:</span><span class="tel-val">${paper.powderMass.toFixed(3)} g</span></div>
-      <div class="tel-row"><span>บีกเกอร์:</span><span class="tel-val">${tools.beaker.volume.toFixed(1)} mL</span></div>
-      <div class="tel-row"><span>กระบอกตวง:</span><span class="tel-val">${tools.cylinder.vol.toFixed(1)} mL</span></div>
+      <div class="tel-row"><span>บีกเกอร์ ${tools.beaker.cap} mL${tools.beaker.onBench ? '' : ' (ยังไม่เลือก)'}:</span><span class="tel-val">${tools.beaker.volume.toFixed(1)} mL</span></div>
+      <div class="tel-row"><span>กระบอกตวง ${tools.cylinder.cap} mL${tools.cylinder.onBench ? '' : ' (ยังไม่เลือก)'}:</span><span class="tel-val">${tools.cylinder.vol.toFixed(1)} mL</span></div>
       <div class="tel-row"><span>สารหกบนโต๊ะ:</span><span class="tel-val ${state.spillVol > 0.5 ? 'warn' : ''}">${state.spillVol.toFixed(1)} mL</span></div>`;
   } else {
     $('tel-title').textContent = '📊 สถานะอุปกรณ์ & ทักษะ';
@@ -1941,6 +2046,7 @@ function renderControls(cur) {
       const tid = cur.liquidId || 'water';
       const lbl = tid === 'water' ? '💧 Purified Water' : '🫙 Glycerin';
       box.innerHTML = `
+        ${!tools.beaker.onBench ? '<span class="pill static" style="font-size:11px;color:var(--bad)">👆 คลิกเลือกบีกเกอร์ที่เหมาะสมจากชั้นหน้าโต๊ะก่อน</span>' : ''}
         <button class="btn sky" onclick="snapToolOverBeaker('${tid}')">🎯 จัด${lbl}เหนือบีกเกอร์</button>
         <div class="slider-wrap"><label>เอียงเท:</label>
           <input type="range" id="tilt-slider" min="0" max="100" value="${state.tiltValue}" oninput="setTilt(this.value)">
@@ -2027,12 +2133,14 @@ function renderControls(cur) {
     }
     case 'rinse_transfer': {
       box.innerHTML = `
+        ${(!tools.beaker.onBench || !tools.cylinder.onBench) ? '<span class="pill static" style="font-size:11px;color:var(--bad)">👆 เลือกบีกเกอร์และกระบอกตวงจากชั้นหน้าโต๊ะก่อน</span>' : ''}
         <button class="btn sky" onclick="actionRinse()">💦 ฉีดน้ำกลั่น Rinse (${state.rinseCount}/${cur.minRinses})</button>
         <button class="btn ok" onclick="actionTransferCylinder()">📏 เทรวมลงกระบอกตวง</button>`;
       break;
     }
     case 'eye_meniscus': {
       box.innerHTML = `
+        ${!tools.cylinder.onBench ? '<span class="pill static" style="font-size:11px;color:var(--bad)">👆 เลือกกระบอกตวงจากชั้นหน้าโต๊ะก่อน</span>' : ''}
         <button class="btn sky" onclick="actionDropperCylinder(1.0)">💧 หยดเติม +1.0 mL</button>
         <button class="btn ok" onclick="actionDropperCylinder(0.2)">✨ หยดละเอียด +0.2 mL</button>
         <span class="pill static" style="font-size:11.5px;color:var(--ok)">ปริมาตร: ${tools.cylinder.vol.toFixed(1)} / ${cur.targetVol.toFixed(1)} mL</span>`;
@@ -2538,7 +2646,9 @@ window.actionTapPowder = (amt) => {
   updateUI();
 };
 window.snapToolOverBeaker = (id) => {
-  sfx.init(); state.activeTool = id; const b = tools.beaker.g.position;
+  sfx.init();
+  if (!tools.beaker.onBench) { showToast('⚠️ เลือกบีกเกอร์จากชั้นอุปกรณ์ก่อน (คลิกที่บีกเกอร์ที่ต้องการ)', true); return; }
+  state.activeTool = id; const b = tools.beaker.g.position;
   tools[id].g.position.set(b.x + 1.15, BENCH_Y + 1.55, b.z);
   sfx.sfxClink(); updateUI();
 };
@@ -2588,12 +2698,37 @@ window.actionSelectMortar = (type) => {
   else { tools.mortar.bowlMat.color.setHex(0xf8fafc); tools.mortar.bowlMat.transparent = false; sfx.sfxBad(); }
   updateUI();
 };
-window.actionRinse = () => { sfx.init(); state.rinseCount++; sfx.sfxDrop(); tools.beaker.volume += 3.0; tools.beaker.liq.scale.y = Math.min(1, tools.beaker.volume/30); updateUI(); };
-window.actionTransferCylinder = () => { sfx.init(); tools.cylinder.vol = Math.min(25, Math.max(15, tools.beaker.volume)); tools.beaker.volume = 0; tools.beaker.liq.scale.y = 0.001; sfx.sfxClink(); updateCylinderVisual(); updateUI(); };
-window.actionDropperCylinder = (ml) => { sfx.init(); tools.cylinder.vol = Math.min(50, tools.cylinder.vol + ml); sfx.sfxDrop(); updateCylinderVisual(); updateUI(); };
+window.actionRinse = () => {
+  sfx.init();
+  const b = tools.beaker;
+  if (!b.onBench) { showToast('⚠️ เลือกบีกเกอร์จากชั้นอุปกรณ์ก่อน', true); return; }
+  if (tools.water.vol < 3) { showToast('⚠️ น้ำกลั่นในขวดไม่พอสำหรับ Rinse', true); return; }
+  if (b.volume + 3 > b.cap * 0.9) { showToast('⚠️ บีกเกอร์ใกล้เต็ม เทรวมลงกระบอกตวงก่อนแล้วจึง Rinse ต่อ', true); return; }
+  tools.water.vol -= 3; state.rinseCount++; b.volume += 3; b.waterVol += 3;
+  sfx.sfxDrop(); updateBeakerVisual(b); showToast(`💦 Rinse ครั้งที่ ${state.rinseCount} (+3 mL น้ำกลั่น ล้างตัวยาที่ติดผนังบีกเกอร์)`); updateUI();
+};
+window.actionTransferCylinder = () => {
+  sfx.init();
+  const b = tools.beaker, c = tools.cylinder;
+  if (!b.onBench || !c.onBench) { showToast('⚠️ ต้องเลือกทั้งบีกเกอร์และกระบอกตวงจากชั้นอุปกรณ์ก่อน', true); return; }
+  if (b.volume <= 0.05) { showToast('⚠️ บีกเกอร์ไม่มีของเหลวให้เท', true); return; }
+  // Liquid clinging to the glass stays behind: 1.2 mL the first time, then 35% of it after each rinse
+  const film = Math.min(b.volume, b.film === 0 ? 1.2 : b.film * 0.35);
+  const wanted = b.volume - film;
+  const room = c.maxVol - c.vol;
+  const actual = Math.max(0, Math.min(wanted, room));
+  const before = b.volume;
+  c.vol += actual; b.volume -= actual;
+  const k = before > 0 ? b.volume / before : 0; b.waterVol *= k; b.glyVol *= k; b.film = b.volume;
+  sfx.sfxClink(); updateCylinderVisual(); updateBeakerVisual(b);
+  if (actual < wanted - 0.01) showToast(`⚠️ กระบอกตวง ${c.cap} mL เต็ม — เทได้เพียง ${actual.toFixed(1)} mL`, true);
+  else showToast(`📏 เทลงกระบอกตวง +${actual.toFixed(1)} mL (เหลือติดบีกเกอร์ ${b.volume.toFixed(1)} mL)`);
+  updateUI();
+};
+window.actionDropperCylinder = (ml) => { sfx.init(); tools.cylinder.vol = Math.min(tools.cylinder.maxVol, tools.cylinder.vol + ml); sfx.sfxDrop(); updateCylinderVisual(); updateUI(); };
 function updateCylinderVisual() {
-  const c = tools.cylinder; const f = Math.max(0.001, c.vol / c.maxVol);
-  c.liq.scale.y = f; c.meniscusRing.visible = c.vol > 0; c.meniscusRing.position.y = 0.1 + f * 1.56;
+  const c = tools.cylinder; const f = Math.min(1, Math.max(0.001, c.vol / c.maxVol));
+  c.liq.scale.y = f; c.meniscusRing.visible = c.vol > 0; c.meniscusRing.position.y = 0.1 + f * c.liqH;
 }
 window.actionPourAmber = () => { sfx.init(); tools.amber.funnel.visible = true; sfx.sfxGood(); setTimeout(() => { tools.amber.funnel.visible = false; showToast('🍵 บรรจุลงภาชนะเรียบร้อย'); }, 650); };
 
@@ -2611,6 +2746,11 @@ canvas.addEventListener('pointerdown', (e) => {
   if (raycaster.intersectObject(tools.scale.tareBtn, false).length > 0) return actionTare();
   if (raycaster.intersectObject(tools.nahco3.g, true).length > 0 && getRecipe().steps[state.step]?.type === 'label_uncap') return actionReadLabel();
   const hits = raycaster.intersectObjects(draggables, true);
+  const vHits = raycaster.intersectObjects(vesselRack.map(v => v.g), true);
+  if (vHits.length > 0 && (hits.length === 0 || vHits[0].distance < hits[0].distance)) {
+    let vr = vHits[0].object; while (vr.parent && !vr.userData.vessel) vr = vr.parent;
+    if (vr.userData.vessel) return pickVessel(vr.userData.vessel);
+  }
   if (hits.length > 0) {
     let root = hits[0].object; while (root.parent && !root.userData.draggable) root = root.parent;
     if (root.userData.draggable) {
@@ -2743,9 +2883,16 @@ window.verifyCurrentStep = () => {
     case 'drop_neutralize': pass=Math.abs(state.dropsAdded-cur.targetDrops)<=cur.tolDrops&&tools.beaker.stirPct>=75; pts=pass?cur.pts:0; note=`${state.dropsAdded} หยด`; break;
     case 'slab_spatulate': pass=tools.slab.blendPct>=100; pts=pass?cur.pts:0; note=`${tools.slab.blendPct}%`; break;
     case 'select_mortar': pass=tools.mortar.type===cur.correctMortar; pts=pass?cur.pts:0; note=tools.mortar.type; break;
-    case 'rinse_transfer': pass=state.rinseCount>=cur.minRinses&&tools.cylinder.vol>0; pts=pass?cur.pts:0; note=`Rinse ${state.rinseCount} รอบ`; break;
+    case 'rinse_transfer': pass=state.rinseCount>=cur.minRinses&&tools.cylinder.vol>0&&tools.beaker.volume<=1.6; pts=pass?cur.pts:0; note=`Rinse ${state.rinseCount} รอบ${tools.beaker.volume>1.6?' (ยังเทรวมลงกระบอกตวงไม่หมดหลัง Rinse ครั้งสุดท้าย)':''}`; break;
     case 'eye_meniscus': pass=Math.abs(tools.cylinder.vol-cur.targetVol)<=cur.tol; pts=pass?cur.pts:0; note=`${tools.cylinder.vol.toFixed(1)} mL`; break;
     case 'package_label': pass=state.selectedBud===cur.correctBud&&state.selectedAux===cur.reqAux; pts=pass?cur.pts:0; note='บรรจุ & ฉลาก'; break;
+  }
+
+  // Glassware choice: block when nothing/too-small was chosen, halve the points when the size is wasteful
+  if (!isClinicOrSap()) {
+    const vc = vesselCheck(cur, rec);
+    if (vc.block) { pass = false; pts = 0; note = vc.block; }
+    else if (vc.penalty && pass) { pts = pts * 0.5; note += ' | ' + vc.penalty; showToast('⚠️ ' + vc.penalty + ' (หัก 50% ของคะแนนข้อนี้)', true); }
   }
 
   if (state.mode === 'practice' && !pass) {
@@ -3005,6 +3152,8 @@ window.resetStation = () => {
   tools.beaker.volume = 0; tools.beaker.waterVol = 0; tools.beaker.glyVol = 0; tools.beaker.stirPct = 0;
   tools.beaker.lumps = 0; tools.beaker.rod.visible = false; tools.beaker.liq.scale.y = 0.001;
   tools.cylinder.vol = 0; updateCylinderVisual();
+  resetVessels();
+  vessels.cylinder.forEach(v => { v.liq.scale.y = 0.001; v.meniscusRing.visible = false; });
   tools.water.vol = 60; tools.water.g.position.copy(tools.water.g.userData.home); tools.water.bodyG.rotation.z = 0;
   tools.glycerin.vol = 20; tools.glycerin.g.position.copy(tools.glycerin.g.userData.home); tools.glycerin.bodyG.rotation.z = 0;
   tools.amber.funnel.visible = false;
@@ -3180,6 +3329,13 @@ function animate() {
   }
 
   const bPos = tools.beaker.g.position;
+  // Glassware travels from the rack to the working spot with a small lift (and back again)
+  vesselRack.forEach(v => {
+    const dx = v.target.x - v.g.position.x, dz = v.target.z - v.g.position.z;
+    const d = Math.hypot(dx, dz), k = Math.min(1, dt * 7);
+    v.g.position.x += dx * k; v.g.position.z += dz * k;
+    v.g.position.y = BENCH_Y + Math.min(.9, d * .5);
+  });
   for (let i = particles.length - 1; i >= 0; i--) {
     const p = particles[i], u = p.userData; u.life -= dt;
     if (!u.meta.isMist) u.vel.y -= 9.8 * dt;
@@ -3188,7 +3344,7 @@ function animate() {
       if (Math.hypot(p.position.x - bPos.x, p.position.z - bPos.z) <= tools.beaker.radius) {
         if (u.meta.id === 'water') tools.beaker.waterVol += u.meta.ml; else tools.beaker.glyVol += u.meta.ml;
         tools.beaker.volume = tools.beaker.waterVol + tools.beaker.glyVol;
-        tools.beaker.liq.scale.y = Math.min(1, tools.beaker.volume / 30);
+        updateBeakerVisual(tools.beaker);
         scene.remove(p); particles.splice(i, 1); continue;
       }
     }
@@ -3337,7 +3493,7 @@ if (urlCaseId && typeof OFFLINE_DATA !== 'undefined' && OFFLINE_DATA.cases && OF
   openLobby();
 }
 animate();
-window.__lab3d = { state, tools, clinicDevices, setCamera, adjustZoom, enterLabWithArchetype, enterLabWithStation, openLobby, switchRubricTab };
+window.__lab3d = { vessels, vesselRack, state, tools, clinicDevices, setCamera, adjustZoom, enterLabWithArchetype, enterLabWithStation, openLobby, switchRubricTab };
 </script>
 </body>
 </html>

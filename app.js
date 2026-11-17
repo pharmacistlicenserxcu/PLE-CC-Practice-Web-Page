@@ -2972,6 +2972,35 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   });
 
+  // Attach delegated click listener for station document & Google Drive PDF links
+  document.body.addEventListener('click', function(e) {
+    const anchor = e.target.closest('a');
+    if (!anchor) return;
+
+    // If explicitly marked as external link or open in new tab button, allow default browser navigation
+    if (anchor.classList.contains('doc-ext-link') || anchor.classList.contains('station-doc-card-btn-secondary') || anchor.closest('.doc-drawer-ext-btn')) {
+      return;
+    }
+
+    const contentArea = anchor.closest('#case-scenario-content, #case-patient-content, #case-equipment-content, #exam-scenario-content, #exam-patient-content, #exam-equipment-content, .case-content-area');
+    if (!contentArea) return;
+
+    const href = (anchor.getAttribute('href') || '').trim();
+    if (!href) return;
+
+    const driveId = (typeof extractGoogleDriveFileId === 'function') ? extractGoogleDriveFileId(href) : null;
+    const isDriveLink = /(?:drive|docs)\.google\.com\/(?:file\/d\/|open\?id=|uc\?id=|(?:document|spreadsheets|presentation)\/d\/)/i.test(href);
+    const isPdf = /\.pdf(?:\?|$)/i.test(href);
+
+    if (driveId || isDriveLink || isPdf) {
+      e.preventDefault();
+      e.stopPropagation();
+      if (window.StationDocViewer && typeof window.StationDocViewer.openByUrl === 'function') {
+        window.StationDocViewer.openByUrl(href);
+      }
+    }
+  });
+
   // Report System Event Listeners: Close dropdown or modal when clicking outside
   document.addEventListener('click', function(e) {
     const dropdown = document.getElementById('report-case-dropdown');
@@ -4932,12 +4961,13 @@ const StationDocViewer = (function() {
         let num = null;
         let title = '';
 
-        const tagMatch = pText.match(/\[\s*เอกสารแนบ\s*(\d+)?\s*(?:[:：\-–—]\s*)?([^\]]+)?\]/i);
+        const tagMatch = pText.match(/(?:\[\s*เอกสารแนบ\s*(\d+)?\s*(?:[:：\-–—]\s*)?([^\]]+)\]|\(\s*เอกสารแนบ\s*(\d+)?\s*(?:[:：\-–—]\s*)?((?:[^()]|\([^()]*\))+)\))/i);
         const listMatch = pText.match(/(?:^|\n)\s*(\d+)[\.\)]\s*(?:เอกสารแนบ|เอกสารประกอบ|ภาพประกอบ|Attachment)\s*(?:[:：\-–—]\s*)?([^<\n\r]+)/i);
 
         if (tagMatch) {
-          if (tagMatch[1]) num = parseInt(tagMatch[1], 10);
-          title = (tagMatch[2] || '').trim();
+          const rawNum = tagMatch[1] || tagMatch[3];
+          if (rawNum) num = parseInt(rawNum, 10);
+          title = (tagMatch[2] || tagMatch[4] || '').trim();
         } else if (listMatch) {
           num = parseInt(listMatch[1], 10);
           title = (listMatch[2] || '').trim();
@@ -5063,44 +5093,86 @@ const StationDocViewer = (function() {
 
   /**
    * Format content HTML: replaces Drive links and [เอกสารแนบ N: ...] tags
-   * with clickable, sleek `.station-doc-card` widgets + `.station-doc-print-card`.
+   * with clickable, sleek `.station-doc-card` widgets (with dual choices) + `.station-doc-print-card` with QR.
    */
   function formatContentHtml(rawHtml, caseId = '', sectionKey = 'equipment') {
     if (!rawHtml || typeof rawHtml !== 'string') return '';
 
-    // Pattern 1: [เอกสารแนบ N: Title] followed by <a ...> or URL
-    const docTagPattern = /(?:<p[^>]*>)?\s*\[\s*เอกสารแนบ\s*(\d+)?\s*(?:[:：\-–—]\s*)?([^\]]+)?\]\s*(?:<br\s*\/?>)?\s*(?:<a[^>]*href=["']([^"']+)["'][^>]*>.*?<\/a>|(https?:\/\/[^\s<"'>]+))(?:\s*<\/p>)?/gi;
+    // 1. Clean out [ไม่สามารถแสดงรูปภาพได้: ...] error spans and empty anchors
+    let cleaned = rawHtml.replace(/<span class="image-error"[^>]*>\[.*?\]<\/span>/gi, '');
 
-    let processed = rawHtml.replace(docTagPattern, (match, pNum, pTitle, url1, url2) => {
-      const url = (url1 || url2 || '').trim();
-      const driveId = extractDriveId(url);
-      const isPdf = /\.pdf(?:\?|$)/i.test(url);
-      if (!driveId && !isPdf) return match;
+    // 2. Pattern to match paragraph or line with attachment tag and drive/pdf link
+    const pPattern = /<p[^>]*>([\s\S]*?)<\/p>/gi;
+    const tagRe = /(?:\[\s*เอกสารแนบ\s*(\d+)?\s*(?:[:：\-–—]\s*)?([^\]]+)\]|\(\s*เอกสารแนบ\s*(\d+)?\s*(?:[:：\-–—]\s*)?((?:[^()]|\([^()]*\))+)\))/i;
+    const linkRe = /<a[^>]*href=["']([^"']*(?:drive\.google\.com|docs\.google\.com|\.pdf)[^"']*)["'][^>]*>(?:<[^>]+>)*([\s\S]*?)(?:<\/[^>]+>)*<\/a>/gi;
 
-      const num = pNum ? parseInt(pNum, 10) : 1;
-      const title = (pTitle || '').trim() || `เอกสารแนบ ${num}`;
-      const cleanUrl = driveId ? extractCleanDriveViewUrl(url) : url;
+    let processed = cleaned.replace(pPattern, (pMatch, pContent) => {
+      const tagMatch = pContent.match(tagRe);
+      if (!tagMatch) return pMatch;
+
+      const num = tagMatch[1] || tagMatch[3] || '1';
+      const tagTitle = (tagMatch[2] || tagMatch[4] || '').trim();
+
+      // Find links in paragraph
+      const links = [];
+      let lm;
+      const lRe = new RegExp(linkRe.source, 'gi');
+      while ((lm = lRe.exec(pContent)) !== null) {
+        links.push({
+          url: lm[1].trim(),
+          text: lm[2].replace(/<[^>]+>/g, '').trim()
+        });
+      }
+
+      if (links.length === 0) return pMatch;
+
+      // Pick best link (one that has text or the last one)
+      let chosen = links[links.length - 1];
+      for (const l of links) {
+        if (l.text && !l.text.startsWith('http') && !l.text.startsWith('www.')) {
+          chosen = l;
+          break;
+        }
+      }
+
+      const driveId = extractDriveId(chosen.url);
+      const cleanUrl = driveId ? extractCleanDriveViewUrl(chosen.url) : chosen.url;
+      const title = tagTitle || chosen.text || `เอกสารแนบ ${num}`;
       const typeLabel = driveId ? 'Google Drive PDF' : 'PDF Document';
+      const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=110x110&margin=2&data=${encodeURIComponent(cleanUrl)}`;
 
       return `
-        <div class="station-doc-card no-print" onclick="window.StationDocViewer && window.StationDocViewer.openByUrl('${cleanUrl}')" title="คลิกเพื่อเปิดอ่านแบบแบ่งจอ">
+        <div class="station-doc-card no-print" onclick="window.StationDocViewer && window.StationDocViewer.openByUrl('${cleanUrl}')" title="คลิกเพื่อเปิดอ่านแบบแบ่งจอในหน้านี้">
+          <div class="station-doc-card-icon-wrap">
+            <span style="font-size:1.35rem;">📄</span>
+          </div>
           <div class="station-doc-card-main">
             <span class="station-doc-card-badge">เอกสารแนบ ${num}</span>
             <div class="station-doc-card-title">${title}</div>
             <div class="station-doc-card-meta">
               <span>📄 ${typeLabel}</span>
               <span>•</span>
-              <span>คลิกเพื่อเปิดอ่านแบบแบ่งจอ</span>
+              <span>คลิกเปิดอ่านแบ่งจอ หรือเลือกเปิดแท็บใหม่</span>
             </div>
           </div>
-          <button type="button" class="station-doc-card-btn">
-            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>
-            <span>เปิดอ่าน</span>
-          </button>
+          <div class="station-doc-card-actions">
+            <button type="button" class="station-doc-card-btn station-doc-card-btn-primary" onclick="event.stopPropagation(); window.StationDocViewer && window.StationDocViewer.openByUrl('${cleanUrl}')" title="เปิดอ่านแบบแบ่งจอ (ไม่บังตัวจับเวลา 4 นาที)">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>
+              <span>เปิดอ่าน</span>
+            </button>
+            <a href="${cleanUrl}" target="_blank" rel="noopener noreferrer" class="station-doc-card-btn station-doc-card-btn-secondary doc-ext-link" onclick="event.stopPropagation();" title="เปิดดูใน Google Drive แท็บใหม่ ↗">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+              <span>แท็บใหม่ ↗</span>
+            </a>
+          </div>
         </div>
         <div class="station-doc-print-card print-only" style="display:none;">
-          <div>📄 <strong>เอกสารแนบ ${num}: ${title}</strong></div>
-          <div style="font-size:0.75rem; color:#475569; word-break:break-all;">ลิงก์: ${cleanUrl}</div>
+          <div class="station-doc-print-main">
+            <div class="station-doc-print-badge">เอกสารแนบ ${num}</div>
+            <div class="station-doc-print-title">${title}</div>
+            <div class="station-doc-print-url">ลิงก์เอกสารฉบับเต็ม: ${cleanUrl}</div>
+          </div>
+          <img src="${qrUrl}" class="station-doc-print-qr" alt="QR Code">
         </div>
       `;
     });
@@ -5576,6 +5648,7 @@ const StationDocViewer = (function() {
     init: ensureDomElements,
     loadCase: loadCase,
     extractAttachments: extractAttachmentsFromCase,
+    extractAttachmentsFromCase: extractAttachmentsFromCase,
     formatContentHtml: formatContentHtml,
     open: open,
     close: close,

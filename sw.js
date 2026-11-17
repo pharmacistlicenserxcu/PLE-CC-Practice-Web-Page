@@ -4,10 +4,10 @@
  * ====================================================
  * จัดการ Caching ทรัพยากรระบบเพื่อเพิ่มความเร็วในการโหลด (Preloading) 
  * และสนับสนุนการเข้าใช้งานแบบออฟไลน์ (Offline Mode)
- * Version: ple-cc2-ospe-v1.6.8 (Smart Station Document Viewer & Google Drive PDF Support)
+ * Version: ple-cc2-ospe-v1.6.9 (Pop Up PDF Reader on Attachment Click, Dual Action Buttons, Modern Doc Cards & Print Layout)
  */
 
-const CACHE_NAME = 'ple-cc2-ospe-v1.6.8';
+const CACHE_NAME = 'ple-cc2-ospe-v1.6.9';
 const ASSETS = [
   './',
   './index.html',

@@ -2858,7 +2858,11 @@
       const cleanScenario = (typeof renderInteractiveBlanks === 'function') 
         ? renderInteractiveBlanks(rawScenario, { isExaminer, caseId }) 
         : rawScenario;
-      document.getElementById('case-scenario-content').innerHTML = cleanScenario || '<p>ไม่มีข้อมูลสถานการณ์</p>';
+      let finalScenario = cleanScenario;
+      if (window.StationDocViewer && typeof window.StationDocViewer.formatContentHtml === 'function') {
+        finalScenario = window.StationDocViewer.formatContentHtml(finalScenario, caseId, 'scenario');
+      }
+      document.getElementById('case-scenario-content').innerHTML = finalScenario || '<p>ไม่มีข้อมูลสถานการณ์</p>';
 
       function applyViewerSubItemsDom(containerEl, sectionType, caseIdStr, isSectionMasterUnlocked, isExamRole) {
         if (!containerEl || typeof window.prepareGatedSectionDom !== 'function') return [];
@@ -2924,7 +2928,10 @@
         return items;
       }
 
-      const cleanPatient = stripSectionHeaders(c.patientInfoHtml);
+      let cleanPatient = stripSectionHeaders(c.patientInfoHtml);
+      if (window.StationDocViewer && typeof window.StationDocViewer.formatContentHtml === 'function') {
+        cleanPatient = window.StationDocViewer.formatContentHtml(cleanPatient, caseId, 'patient');
+      }
       const patientTitleEl = document.getElementById('patient-section-title');
       const patientContentEl = document.getElementById('case-patient-content');
       const patGated = (typeof isPatientInfoGated === 'function') ? isPatientInfoGated(c) : Boolean(c.patientInfoGated || (c.patientInfoHtml && /ข้อมูลผู้ป่วย\s*\(\s*ส่งโดยผู้ประเมิน\s*\)/.test(c.patientInfoHtml)));
@@ -2981,6 +2988,9 @@
       const eqGated = (typeof isEquipmentGated === 'function') ? isEquipmentGated(c) : Boolean(c.equipmentGated || (c.equipmentHtml && /(?:สิ่งที่มีให้ในสถานี|สิ่งที่มีให้)\s*\(\s*ส่งโดยผู้ประเมิน\s*\)/.test(c.equipmentHtml)));
       if (c.equipmentHtml) {
         let rawEq = stripSectionHeaders(c.equipmentHtml).trim();
+        if (window.StationDocViewer && typeof window.StationDocViewer.formatContentHtml === 'function') {
+          rawEq = window.StationDocViewer.formatContentHtml(rawEq, caseId, 'equipment');
+        }
         let formattedEq = rawEq;
         if (rawEq.startsWith('<li')) {
           const isNumbered = /^\s*<li[^>]*>\s*(\d+[\.\)]|\(\d+\))/i.test(rawEq);

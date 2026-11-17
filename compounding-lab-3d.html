@@ -2536,26 +2536,26 @@ window.actionEyeOcclude = () => {
 };
 window.actionFoldChartulae = () => {
   sfx.init(); state.chartulaeFolded = true; sfx.sfxFold();
-  tools.chartulae.g.visible = true;
+  tools.chartulae.g.visible = true; tools.chartulae.animT = 1.6;
   setMood('happy', 1.0); showToast('📄 แบ่งผงยาเท่าๆ กัน & พับห่อกระดาษ Chartulae เรียบร้อย!'); updateUI();
 };
 window.actionFilterPour = () => {
   sfx.init(); state.filteredDone = true; sfx.sfxDrop();
-  tools.filterSet.g.visible = true;
+  tools.filterSet.g.visible = true; tools.filterSet.animT = 2.2;
+  if (!tools.cylinder.onBench) pickVessel(vessels.cylinder[2]);
   tools.cylinder.vol = 28.0; updateCylinderVisual();
   for (let i=0;i<14;i++) spawnParticle(new THREE.Vector3(1.55, BENCH_Y + 1.0, 0.35), new THREE.Vector3(0, -1.4, 0), 0xbae6fd, false);
   setMood('happy', 1.0); showToast('🧪 กรองผ่านกระดาษกรองจีบจนได้ Filtrate ใสเรียบร้อย!'); updateUI();
 };
 window.actionMoldPour = () => {
   sfx.init(); state.moldPoured = true; sfx.sfxGood();
-  tools.suppMold.g.visible = true;
-  tools.suppMold.suppCones.forEach(c => c.visible = true);
+  tools.suppMold.g.visible = true; tools.suppMold.animT = 1.8;
+  tools.suppMold.suppCones.forEach(c => { c.visible = true; c.position.y = 0.12; });
   setMood('happy', 1.0); showToast('🧊 เทเบสยาเหน็บล้นพิมพ์ & ปาดแต่งหลังเย็นตัวเรียบร้อย!'); updateUI();
 };
 window.actionIvInject = () => {
   sfx.init(); state.ivInjected = true; sfx.sfxGood();
-  tools.ivSet.g.visible = true;
-  tools.ivSet.ivSyr.position.set(0.35, 0.14, 0.62);
+  tools.ivSet.g.visible = true; tools.ivSet.animT = 2.0;
   setMood('happy', 1.0); showToast('💉 ดูดยาปลอดเชื้อ ไล่ฟอง & ฉีดเข้าถุงน้ำเกลือเรียบร้อย!'); updateUI();
 };
 window.actionInsulinRoll = () => {
@@ -2656,13 +2656,23 @@ window.setTilt = (v) => { sfx.init(); state.tiltValue = Number(v); const d=$('ti
 let holdPourTarget = null;
 window.startHoldPour = (id) => { sfx.init(); state.activeTool = id; holdPourTarget = id; state.isPouringBtn = true; };
 window.stopHoldPour = () => { state.isPouringBtn = false; state.tiltValue = 0; const s=$('tilt-slider'); if(s)s.value=0; const d=$('tilt-deg'); if(d)d.textContent='0°'; };
-window.actionStirBeaker = () => { sfx.init(); tools.beaker.rod.visible = true; tools.beaker.stirPct = Math.min(100, tools.beaker.stirPct + 34); sfx.sfxClink(); updateUI(); };
-window.actionSprinkleSlow = () => { sfx.init(); state.sprinklePct = Math.min(100, state.sprinklePct + 25); sfx.sfxTap(); updateUI(); };
+window.actionStirBeaker = () => { sfx.init(); tools.beaker.rod.visible = true; tools.beaker.stirAnim = 1.2; tools.beaker.stirPct = Math.min(100, tools.beaker.stirPct + 34); sfx.sfxClink(); updateUI(); };
+window.actionSprinkleSlow = () => {
+  sfx.init(); state.sprinklePct = Math.min(100, state.sprinklePct + 25); sfx.sfxTap();
+  const b = tools.beaker.g.position;
+  for (let i=0;i<10;i++) spawnParticle(new THREE.Vector3(b.x + (Math.random()-.5)*0.3, BENCH_Y + 1.45, b.z + (Math.random()-.5)*0.3), new THREE.Vector3(0, -1.2, 0), 0xffffff, true);
+  updateUI();
+};
 window.actionSprinkleFast = () => { sfx.init(); tools.beaker.lumps++; sfx.sfxBad(); setMood('panic', 1.4); showToast('❌ โปรยเร็วเกินไป! ผงเกาะเป็นก้อน', true); updateUI(); };
-window.actionStirGentle = () => { sfx.init(); tools.beaker.rod.visible = true; tools.beaker.stirPct = Math.min(100, tools.beaker.stirPct + 25); sfx.sfxClink(); updateUI(); };
+window.actionStirGentle = () => { sfx.init(); tools.beaker.rod.visible = true; tools.beaker.stirAnim = 1.2; tools.beaker.stirPct = Math.min(100, tools.beaker.stirPct + 25); sfx.sfxClink(); updateUI(); };
 window.actionPoundMortar = () => { sfx.init(); const m = tools.mortar; m.pounded = true; m.poundAnim = 1.0; m.contents.visible = true; sfx.sfxPound(); updateUI(); };
-window.actionGrindMortar = () => { sfx.init(); const m = tools.mortar; m.contents.visible = true; m.grindPct = Math.min(100, m.grindPct + 20); m.pestle.rotation.y += 1.2; sfx.sfxGrind(); updateUI(); };
-window.actionScrapeMortar = () => { sfx.init(); sfx.sfxTap(); showToast('🥄 ปาดผงที่ติดข้างโกร่งลงตรงกลางแล้ว'); };
+window.actionGrindMortar = () => {
+  sfx.init(); const m = tools.mortar; m.contents.visible = true;
+  m.grindPct = Math.min(100, m.grindPct + 20);
+  m.pestleSpinAnim = 1.1;
+  sfx.sfxGrind(); updateUI();
+};
+window.actionScrapeMortar = () => { sfx.init(); tools.mortar.scrapeAnim = 1.0; sfx.sfxTap(); showToast('🥄 ปาดผงที่ติดข้างโกร่งลงตรงกลางแล้ว'); };
 window.actionEmulsionAddWater = () => {
   sfx.init(); state.emulsionWaterAdded = true;
   const m = tools.mortar; m.contents.visible = true;
@@ -2689,9 +2699,28 @@ window.actionEmulsionTriturate = () => {
   }
   updateUI();
 };
-window.actionDropAgent = () => { sfx.init(); state.dropsAdded++; sfx.sfxDrop(); tools.mortar.contents.visible = true; updateUI(); };
-window.actionDropTEA = () => { sfx.init(); state.dropsAdded++; sfx.sfxDrop(); if (state.dropsAdded >= 7) { tools.beaker.liqMat.opacity = 0.45; } updateUI(); };
-window.actionSlabMix = () => { sfx.init(); const sl = tools.slab; sl.blendPct = Math.min(100, sl.blendPct + 25); const f = sl.blendPct/100; sl.blobDrug.position.x = THREE.MathUtils.lerp(-0.35, 0, f); sl.blobBase.position.x = THREE.MathUtils.lerp(0.35, 0, f); sfx.sfxFold(); updateUI(); };
+window.actionDropAgent = () => {
+  sfx.init(); state.dropsAdded++; sfx.sfxDrop();
+  const m = tools.mortar; m.contents.visible = true; m.dropAnim = 0.9;
+  spawnParticle(new THREE.Vector3(m.g.position.x, BENCH_Y + 1.15, m.g.position.z), new THREE.Vector3(0, -1.8, 0), 0xfde047, false);
+  updateUI();
+};
+window.actionDropTEA = () => {
+  sfx.init(); state.dropsAdded++; sfx.sfxDrop();
+  const b = tools.beaker.g.position;
+  spawnParticle(new THREE.Vector3(b.x, BENCH_Y + 1.4, b.z), new THREE.Vector3(0, -1.8, 0), 0xbae6fd, false);
+  if (state.dropsAdded >= 7) { tools.beaker.liqMat.opacity = 0.45; }
+  updateUI();
+};
+window.actionSlabMix = () => {
+  sfx.init(); const sl = tools.slab;
+  sl.blendPct = Math.min(100, sl.blendPct + 25);
+  sl.spatulaAnim = 1.3;
+  const f = sl.blendPct/100;
+  sl.blobDrug.position.x = THREE.MathUtils.lerp(-0.35, 0, f);
+  sl.blobBase.position.x = THREE.MathUtils.lerp(0.35, 0, f);
+  sfx.sfxFold(); updateUI();
+};
 window.actionSelectMortar = (type) => {
   sfx.init(); tools.mortar.type = type;
   if (type === 'glass') { tools.mortar.bowlMat.color.setHex(0xdbeafe); tools.mortar.bowlMat.transparent = true; tools.mortar.bowlMat.opacity = 0.55; sfx.sfxGood(); }
@@ -3022,17 +3051,19 @@ function renderLobby() {
   const cases = (typeof OFFLINE_DATA !== 'undefined' && OFFLINE_DATA.cases) ? OFFLINE_DATA.cases : [];
   $('lobby-total-cnt').textContent = cases.length;
 
-  // Featured Week 1-4 Clinic, SAP & Core Product Archetypes
-  const feat = [
-    ...Object.values(window.CLINIC_SAP_ARCHETYPES),
-    ...Object.values(window.LAB_ARCHETYPES).slice(0, 3)
-  ];
-  $('lobby-featured-grid').innerHTML = feat.map(a => {
-    const cls = a.track === 'SAP' ? 'sap' : (a.track === 'Clinic' ? '' : 'product');
-    return `<div class="case-card ${cls} ${state.recipeKey===a.id && !state.customStation ? 'active' : ''}" onclick="enterLabWithArchetype('${a.id}')">
-      <div class="cid"><span>${a.code}</span><span>${a.week || a.category}</span></div>
-      <div class="ctitle">${a.name}</div>
-      <div class="csub">${a.category} · ${a.steps.length} ขั้นตอน 3D</div>
+  // Featured Core Stations: 36 CLSD/CLSP + 28 Product Weekly Mock
+  const clsdClsp = cases.filter(c => /CLSD|CLDS|CLSP/i.test(c.caseId || ''));
+  const pdWeekly = cases.filter(c => String(c.category).toLowerCase() === 'product' && (/PD83W|PD84W/i.test(c.caseId || '')));
+  const featCases = [...clsdClsp, ...pdWeekly];
+  $('lobby-featured-grid').innerHTML = featCases.map(c => {
+    const catL = String(c.category || '').toLowerCase();
+    const cls = catL === 'sap' ? 'sap' : (catL === 'product' ? 'product' : '');
+    const isAct = state.customStation?.caseId === c.caseId;
+    const grp = c.mainGroup || c.category || 'OSPE';
+    return `<div class="case-card ${cls} ${isAct ? 'active' : ''}" onclick="enterLabWithStation('${c.caseId}')">
+      <div class="cid"><span>${c.caseId}</span><span>${grp}</span></div>
+      <div class="ctitle">${c.title}</div>
+      <div class="csub">${c.disease || grp} · คลิกเพื่อฝึก 3D OSPE</div>
     </div>`;
   }).join('');
 
@@ -3318,6 +3349,48 @@ function animate() {
 
   if (tools.spatula.tapAnim > 0) { tools.spatula.tapAnim = Math.max(0, tools.spatula.tapAnim - dt*6); tools.spatula.g.rotation.z = -Math.sin(tools.spatula.tapAnim*Math.PI)*0.35; }
   if (tools.mortar.poundAnim > 0) { tools.mortar.poundAnim = Math.max(0, tools.mortar.poundAnim - dt*5); tools.mortar.pestle.position.y = 0.68 + Math.sin(tools.mortar.poundAnim*Math.PI)*0.45; }
+  if (tools.mortar.dropAnim > 0) {
+    tools.mortar.dropAnim = Math.max(0, tools.mortar.dropAnim - dt * 2.2);
+    tools.mortar.dropper.visible = tools.mortar.dropAnim > 0.05;
+    tools.mortar.dropper.position.set(0, 1.15 + Math.sin(tools.mortar.dropAnim * Math.PI) * 0.15, 0);
+  }
+  if ((tools.beaker.stirAnim || 0) > 0) {
+    tools.beaker.stirAnim = Math.max(0, tools.beaker.stirAnim - dt * 2.0);
+    const r = tools.beaker.radius * 0.42;
+    tools.beaker.rod.position.x = Math.cos(t * 14) * r;
+    tools.beaker.rod.position.z = Math.sin(t * 14) * r;
+  }
+  if ((tools.slab.spatulaAnim || 0) > 0) {
+    tools.slab.spatulaAnim = Math.max(0, tools.slab.spatulaAnim - dt * 1.8);
+    tools.slab.slabSpatula.position.x = Math.sin(t * 10) * 0.48;
+    tools.slab.slabSpatula.position.z = 0.15 + Math.sin(t * 20) * 0.22;
+    tools.slab.slabSpatula.rotation.y = Math.cos(t * 10) * 0.45;
+  }
+  if (tools.chartulae.animT > 0) {
+    tools.chartulae.animT = Math.max(0, tools.chartulae.animT - dt * 1.8);
+    const p = 1 - tools.chartulae.animT / 1.6;
+    tools.chartulae.chartPapers.forEach((cp, idx) => {
+      cp.position.x = (idx - 1.5) * THREE.MathUtils.lerp(0.42, 0.22, p);
+      cp.scale.z = THREE.MathUtils.lerp(1.0, 0.65, p);
+    });
+  }
+  if (tools.filterSet.animT > 0) {
+    tools.filterSet.animT = Math.max(0, tools.filterSet.animT - dt * 1.5);
+    tools.filterSet.fPaper.rotation.y += dt * 2.5;
+    if (Math.random() < 0.35) spawnParticle(new THREE.Vector3(1.55, BENCH_Y + 0.98, 0.35), new THREE.Vector3(0, -1.5, 0), 0xbae6fd, false);
+  }
+  if (tools.suppMold.animT > 0) {
+    tools.suppMold.animT = Math.max(0, tools.suppMold.animT - dt * 1.6);
+    const p = 1 - tools.suppMold.animT / 1.8;
+    tools.suppMold.suppCones.forEach(c => { c.position.y = THREE.MathUtils.lerp(0.12, 0.28, p); });
+  }
+  if (tools.ivSet.animT > 0) {
+    tools.ivSet.animT = Math.max(0, tools.ivSet.animT - dt * 1.6);
+    const p = 1 - tools.ivSet.animT / 2.0;
+    tools.ivSet.ivSyr.position.set(THREE.MathUtils.lerp(0.75, 0.35, p), 0.14, THREE.MathUtils.lerp(0.2, 0.62, p));
+    tools.ivSet.ivPlunger.position.y = THREE.MathUtils.lerp(-0.22, -0.05, p);
+    tools.ivSet.g.rotation.z = Math.sin(p * Math.PI * 4) * 0.08;
+  }
   if (tools.mortar.pestleSpinAnim > 0) {
     tools.mortar.pestleSpinAnim = Math.max(0, tools.mortar.pestleSpinAnim - dt * 2.2);
     const a = t * 14;

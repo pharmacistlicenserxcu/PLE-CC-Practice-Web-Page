@@ -4,10 +4,10 @@
  * ====================================================
  * จัดการ Caching ทรัพยากรระบบเพื่อเพิ่มความเร็วในการโหลด (Preloading) 
  * และสนับสนุนการเข้าใช้งานแบบออฟไลน์ (Offline Mode)
- * Version: ple-cc2-ospe-v1.6.9 (Pop Up PDF Reader on Attachment Click, Dual Action Buttons, Modern Doc Cards & Print Layout)
+ * Version: ple-cc2-ospe-v1.7.0 (Compact Snug Doc Cards & Split Multi-Attachments Parser)
  */
 
-const CACHE_NAME = 'ple-cc2-ospe-v1.6.9';
+const CACHE_NAME = 'ple-cc2-ospe-v1.7.0';
 const ASSETS = [
   './',
   './index.html',

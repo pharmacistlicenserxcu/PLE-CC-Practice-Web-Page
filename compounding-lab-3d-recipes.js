@@ -358,7 +358,8 @@ window.LAB_ARCHETYPES = {
  */
 window.mapStationToArchetype = function(station) {
   const cid = String(station.caseId || '').toUpperCase();
-  const txt = `${cid} ${station.title || ''} ${station.mainGroup || ''} ${station.disease || ''}`.toLowerCase();
+  const titleTxt = `${station.title || ''}`.toLowerCase();
+  const txt = `${cid} ${titleTxt} ${station.mainGroup || ''} ${station.disease || ''}`.toLowerCase();
   if (txt.includes('ความไม่คงตัว') || txt.includes('incompat') || txt.includes('การระบุรูปแบบยา') || cid.startsWith('OSPE-CL')) {
     return 'PRODUCT_STABILITY_AUDIT';
   }
@@ -377,20 +378,20 @@ window.mapStationToArchetype = function(station) {
   if (txt.includes('camphor') || txt.includes('intervention') || txt.includes('เมนทอล') || txt.includes('พิมเสน')) {
     return 'CAMPHOR_INTERVENTION';
   }
-  if (txt.includes('solid dosage') || txt.includes('trituration') || txt.includes('geometric') || txt.includes('powder') || txt.includes('capsule') || txt.includes('ยาผง') || txt.includes('แคปซูล')) {
-    return 'SOLID_POWDER_CHARTULAE';
-  }
-  if (txt.includes('carbopol') || txt.includes('hydrogel') || txt.includes('เจล') || txt.includes('gel ')) {
+  if (txt.includes('carbopol') || txt.includes('hydrogel') || txt.includes('เจล') || /\bgel\b/.test(txt)) {
     return 'GEL_CARBOPOL';
+  }
+  if (txt.includes('suspension') || txt.includes('แขวนตะกอน') || txt.includes('เม็ดยา') || txt.includes('enalapril') || txt.includes('extemporaneous') || titleTxt.includes('calamine lotion')) {
+    return 'SUSPENSION_TABLET';
   }
   if (txt.includes('mucilage') || txt.includes('scmc') || txt.includes('cmc')) {
     return 'MUCILAGE_SCMC';
   }
-  if (txt.includes('suspension') || txt.includes('แขวนตะกอน') || txt.includes('เม็ดยา') || txt.includes('enalapril') || txt.includes('extemporaneous')) {
-    return 'SUSPENSION_TABLET';
-  }
-  if (txt.includes('semisolid') || txt.includes('slab') || txt.includes('ointment') || txt.includes('cream') || txt.includes('paste') || txt.includes('ขี้ผึ้ง') || txt.includes('ครีม') || txt.includes('weighing')) {
+  if (txt.includes('ointment') || txt.includes('cream') || txt.includes('paste') || txt.includes('slab') || txt.includes('ขี้ผึ้ง') || txt.includes('ครีม') || txt.includes('semisolid')) {
     return 'SEMISOLID_SLAB';
+  }
+  if (/\bsolid dosage\b/.test(txt) || txt.includes('trituration') || txt.includes('geometric') || txt.includes('powder') || txt.includes('capsule') || txt.includes('ยาผง') || txt.includes('แคปซูล')) {
+    return 'SOLID_POWDER_CHARTULAE';
   }
   return 'SOLUTION_NAHCO3';
 };

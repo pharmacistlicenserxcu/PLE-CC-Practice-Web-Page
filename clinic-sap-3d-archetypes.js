@@ -1023,32 +1023,55 @@ window.mapClinicSapToArchetype = function(station) {
   if (cat === 'sap' || cid.startsWith('OSPE-SP') || txt.includes('กฎหมาย') || txt.includes('จรรยาบรรณ') || txt.includes('วัตถุออกฤทธิ์')) {
     return 'SAP_LAW_DISPENSING';
   }
-  // Exact CLSD Inhaler mappings (Phase 2)
-  if (cid.includes('CLSD02') || txt.includes('spacer') || txt.includes('aerochamber')) return 'CLINIC_MDI_SPACER';
-  if (cid.includes('CLSD03') || txt.includes('turbuhaler') || txt.includes('budesonide/formoterol')) return 'CLINIC_TURBUHALER';
-  if (cid.includes('CLSD04') || txt.includes('accuhaler') || txt.includes('diskus')) return 'CLINIC_ACCUHALER';
-  if (cid.includes('CLSD05') || txt.includes('handihaler') || txt.includes('spiriva')) return 'CLINIC_HANDIHALER';
-  if (cid.includes('CLSD06') || txt.includes('easyhaler')) return 'CLINIC_EASYHALER';
-  if (cid.includes('CLSD07') || txt.includes('swinghaler')) return 'CLINIC_SWINGHALER';
-  if (cid.includes('CLSDEX01') || txt.includes('ellipta') || txt.includes('relvar')) return 'CLINIC_ELLIPTA';
-  if (cid.includes('CLSDEX02') || txt.includes('respimat')) return 'CLINIC_RESPIMAT';
-  if (cid.includes('CLSD01') || txt.includes('mdi') || txt.includes('salbutamol') || txt.includes('evohaler')) return 'CLINIC_MDI';
+  // 1. Exact CLSD Case ID priority (prevents keyword cross-matches like 'spacer', 'spiriva', 'syringe')
+  if (cid.includes('CLSD01')) return 'CLINIC_MDI';
+  if (cid.includes('CLSD02')) return 'CLINIC_MDI_SPACER';
+  if (cid.includes('CLSD03')) return 'CLINIC_TURBUHALER';
+  if (cid.includes('CLSD04')) return 'CLINIC_ACCUHALER';
+  if (cid.includes('CLSD05')) return 'CLINIC_HANDIHALER';
+  if (cid.includes('CLSD06')) return 'CLINIC_EASYHALER';
+  if (cid.includes('CLSD07')) return 'CLINIC_SWINGHALER';
+  if (cid.includes('CLSDEX01')) return 'CLINIC_ELLIPTA';
+  if (cid.includes('CLSDEX02')) return 'CLINIC_RESPIMAT';
+  if (cid.includes('CLSD08') || cid.includes('CLSD09')) return 'CLINIC_NASAL_SPRAY';
+  if (cid.includes('CLSD10')) return 'CLINIC_NASAL_DROPS';
+  if (cid.includes('CLSD11')) return 'CLINIC_NASAL_IRRIGATION';
+  if (cid.includes('CLSD12')) return 'CLINIC_EAR_DROPS';
+  if (cid.includes('CLSD13')) return 'CLINIC_EYE_DROPS';
+  if (cid.includes('CLSD14')) return 'CLINIC_EYE_OINTMENT';
+  if (cid.includes('CLSD15')) return 'CLINIC_SUBLINGUAL';
+  if (cid.includes('CLSD16')) return 'CLINIC_RECTAL_SUPP';
+  if (cid.includes('CLSD17')) return 'CLINIC_VAGINAL_SUPP';
+  if (cid.includes('CLSD18')) return 'CLINIC_INSULIN_PEN';
+  if (cid.includes('CLSD19')) return 'CLINIC_INSULIN_MIX';
+  if (cid.includes('CLSD20')) return 'CLINIC_NICOTINE';
+  if (cid.includes('CLSD21')) return 'CLINIC_DRY_SYRUP';
+  if (cid.includes('CLSD22') || cid.includes('CLSD23')) return 'CLINIC_OC_PILLS';
 
-  // Exact CLSD ENT, Eye, Suppositories, Injectables & Special Oral mappings (Phase 3)
-  if (cid.includes('CLSD10') || txt.includes('nasal drop') || txt.includes('หยอดจมูก')) return 'CLINIC_NASAL_DROPS';
-  if (cid.includes('CLSD11') || txt.includes('irrigation') || txt.includes('ล้างจมูก') || txt.includes('0.9% nss')) return 'CLINIC_NASAL_IRRIGATION';
-  if (cid.includes('CLSD08') || cid.includes('CLSD09') || txt.includes('nasal') || txt.includes('พ่นจมูก')) return 'CLINIC_NASAL_SPRAY';
-  if (cid.includes('CLSD12') || txt.includes('ear drop') || txt.includes('หยอดหู') || txt.includes('otic')) return 'CLINIC_EAR_DROPS';
-  if (cid.includes('CLSD14') || txt.includes('ointment') || txt.includes('ป้ายตา')) return 'CLINIC_EYE_OINTMENT';
-  if (cid.includes('CLSD13') || txt.includes('eye') || txt.includes('หยอดตา') || txt.includes('conjunctivitis')) return 'CLINIC_EYE_DROPS';
-  if (cid.includes('CLSD15') || txt.includes('sublingual') || txt.includes('อมใต้ลิ้น') || txt.includes('nitrate') || txt.includes('isosorbide')) return 'CLINIC_SUBLINGUAL';
-  if (cid.includes('CLSD16') || txt.includes('rectal') || txt.includes('ทวาร') || txt.includes('enema')) return 'CLINIC_RECTAL_SUPP';
-  if (cid.includes('CLSD17') || txt.includes('vaginal') || txt.includes('ช่องคลอด') || txt.includes('clotrimazole')) return 'CLINIC_VAGINAL_SUPP';
-  if (cid.includes('CLSD19') || txt.includes('clear before cloudy') || txt.includes('syringe') && txt.includes('insulin') || txt.includes('ผสมอินซูลิน')) return 'CLINIC_INSULIN_MIX';
-  if (cid.includes('CLSD18') || txt.includes('insulin') || txt.includes('อินซูลิน')) return 'CLINIC_INSULIN_PEN';
-  if (cid.includes('CLSD20') || txt.includes('nicotine') || txt.includes('เลิกบุหรี่') || txt.includes('หมากฝรั่ง')) return 'CLINIC_NICOTINE';
-  if (cid.includes('CLSD21') || txt.includes('dry syrup') || txt.includes('ยาผงแห้ง') || txt.includes('oral syringe')) return 'CLINIC_DRY_SYRUP';
-  if (cid.includes('CLSD22') || cid.includes('CLSD23') || txt.includes('contraceptive') || txt.includes('ยาคุม') || txt.includes('coc') || txt.includes('pop')) return 'CLINIC_OC_PILLS';
+  // 2. Keyword fallback for general Clinic stations
+  if (txt.includes('spacer') || txt.includes('aerochamber')) return 'CLINIC_MDI_SPACER';
+  if (txt.includes('turbuhaler') || txt.includes('budesonide/formoterol')) return 'CLINIC_TURBUHALER';
+  if (txt.includes('accuhaler') || txt.includes('diskus')) return 'CLINIC_ACCUHALER';
+  if (txt.includes('respimat')) return 'CLINIC_RESPIMAT';
+  if (txt.includes('handihaler') || txt.includes('spiriva')) return 'CLINIC_HANDIHALER';
+  if (txt.includes('easyhaler')) return 'CLINIC_EASYHALER';
+  if (txt.includes('swinghaler')) return 'CLINIC_SWINGHALER';
+  if (txt.includes('ellipta') || txt.includes('relvar')) return 'CLINIC_ELLIPTA';
+  if (txt.includes('mdi') || txt.includes('salbutamol') || txt.includes('evohaler')) return 'CLINIC_MDI';
+  if (txt.includes('nasal drop') || txt.includes('หยอดจมูก')) return 'CLINIC_NASAL_DROPS';
+  if (txt.includes('irrigation') || txt.includes('ล้างจมูก') || txt.includes('0.9% nss')) return 'CLINIC_NASAL_IRRIGATION';
+  if (txt.includes('nasal') || txt.includes('พ่นจมูก')) return 'CLINIC_NASAL_SPRAY';
+  if (txt.includes('ear drop') || txt.includes('หยอดหู') || txt.includes('otic')) return 'CLINIC_EAR_DROPS';
+  if (txt.includes('ointment') || txt.includes('ป้ายตา')) return 'CLINIC_EYE_OINTMENT';
+  if (txt.includes('eye') || txt.includes('หยอดตา') || txt.includes('conjunctivitis')) return 'CLINIC_EYE_DROPS';
+  if (txt.includes('sublingual') || txt.includes('อมใต้ลิ้น') || txt.includes('nitrate') || txt.includes('isosorbide')) return 'CLINIC_SUBLINGUAL';
+  if (txt.includes('rectal') || txt.includes('ทวาร') || txt.includes('enema')) return 'CLINIC_RECTAL_SUPP';
+  if (txt.includes('vaginal') || txt.includes('ช่องคลอด') || txt.includes('clotrimazole')) return 'CLINIC_VAGINAL_SUPP';
+  if (txt.includes('clear before cloudy') || txt.includes('ผสมอินซูลิน')) return 'CLINIC_INSULIN_MIX';
+  if (txt.includes('insulin') || txt.includes('อินซูลิน')) return 'CLINIC_INSULIN_PEN';
+  if (txt.includes('nicotine') || txt.includes('เลิกบุหรี่') || txt.includes('หมากฝรั่ง')) return 'CLINIC_NICOTINE';
+  if (txt.includes('dry syrup') || txt.includes('ยาผงแห้ง') || txt.includes('oral syringe')) return 'CLINIC_DRY_SYRUP';
+  if (txt.includes('contraceptive') || txt.includes('ยาคุม') || txt.includes('coc') || txt.includes('pop')) return 'CLINIC_OC_PILLS';
 
   // Tablet counting & Prescription audit
   if (txt.includes('นับเม็ดยา') || txt.includes('tablet counting') || txt.includes('เขียนฉลาก')) return 'CLINIC_TABLET_COUNTING';

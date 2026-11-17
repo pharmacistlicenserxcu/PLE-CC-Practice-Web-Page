@@ -1,0 +1,1746 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>🎮 Compounding Lab — 8-bit Demo | PLE-CC2 Product</title>
+<link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Bai+Jamjuree:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+/* ═══════════════════════════════════════════
+   DESIGN TOKENS — Game Boy Color palette
+═══════════════════════════════════════════ */
+:root {
+  --bg:         #0f1a0f;
+  --bench:      #1a2e1a;
+  --bench-top:  #2d4a2d;
+  --bench-edge: #1a3320;
+  --pixel-green:#00cc44;
+  --pixel-lime: #88ff44;
+  --pixel-amber:#f0a000;
+  --pixel-red:  #cc2200;
+  --pixel-blue: #0088cc;
+  --pixel-cyan: #00cccc;
+  --pixel-white:#e8f0e0;
+  --pixel-gray: #8899aa;
+  --pixel-dark: #223322;
+  --ui-bg:      rgba(10,25,10,0.95);
+  --border-px:  2px solid var(--pixel-green);
+  --font-pixel: 'Press Start 2P', monospace;
+  --font-th:    'Bai Jamjuree', sans-serif;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  background: var(--bg);
+  color: var(--pixel-white);
+  font-family: var(--font-pixel);
+  min-height: 100vh;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  image-rendering: pixelated;
+}
+
+/* ════════════════ SCANLINE OVERLAY ════════════════ */
+body::after {
+  content: '';
+  position: fixed; inset: 0;
+  background: repeating-linear-gradient(
+    0deg, transparent, transparent 2px,
+    rgba(0,0,0,0.08) 2px, rgba(0,0,0,0.08) 4px
+  );
+  pointer-events: none; z-index: 9999;
+}
+
+/* ════════════════ HUD TOP BAR ════════════════ */
+.hud {
+  background: #000;
+  border-bottom: 3px solid var(--pixel-green);
+  padding: 8px 16px;
+  display: flex; align-items: center; gap: 16px;
+  flex-wrap: wrap;
+  position: relative; z-index: 100;
+}
+
+.hud-title {
+  font-size: 8px;
+  color: var(--pixel-lime);
+  letter-spacing: 1px;
+}
+
+.hud-sep { color: var(--pixel-green); font-size: 10px; }
+
+.lives { display: flex; gap: 4px; align-items: center; }
+.heart {
+  display: inline-block; width: 12px; height: 12px;
+  background: var(--pixel-red);
+  clip-path: polygon(25% 0%,75% 0%,100% 25%,100% 50%,50% 100%,0% 50%,0% 25%);
+  transition: transform 0.1s;
+}
+.heart.lost {
+  background: #333;
+  clip-path: polygon(25% 0%,75% 0%,100% 25%,100% 50%,50% 100%,0% 50%,0% 25%);
+}
+
+.timer-box {
+  font-size: 12px; color: var(--pixel-cyan);
+  border: 2px solid var(--pixel-cyan);
+  padding: 2px 10px;
+}
+.timer-box.urgent { color: var(--pixel-red); border-color: var(--pixel-red); animation: blink 0.5s infinite; }
+
+.score-box {
+  font-size: 9px; color: var(--pixel-amber);
+  margin-left: auto;
+}
+
+@keyframes blink { 50% { opacity: 0.3; } }
+
+/* ════════════════ MAIN GAME AREA ════════════════ */
+.game-area {
+  display: flex; flex: 1; overflow: hidden;
+}
+
+/* ════════════════ LEFT PANEL — CASE INFO ════════════════ */
+.case-panel {
+  width: 240px; min-width: 240px;
+  background: #000;
+  border-right: 3px solid var(--pixel-green);
+  display: flex; flex-direction: column;
+  overflow: hidden;
+}
+
+.panel-header {
+  background: var(--pixel-dark);
+  border-bottom: 2px solid var(--pixel-green);
+  padding: 8px;
+  font-size: 7px; color: var(--pixel-lime);
+  text-align: center;
+  letter-spacing: 1px;
+}
+
+.case-info {
+  padding: 10px;
+  flex: 1; overflow-y: auto;
+  scrollbar-width: thin;
+  scrollbar-color: var(--pixel-green) #000;
+}
+
+.case-title {
+  font-size: 7px;
+  color: var(--pixel-amber);
+  line-height: 1.6;
+  margin-bottom: 10px;
+  font-family: var(--font-th);
+  font-weight: 700;
+}
+
+.case-step {
+  font-size: 6px;
+  color: var(--pixel-gray);
+  line-height: 1.8;
+  font-family: var(--font-th);
+  margin-bottom: 6px;
+  padding: 4px 6px;
+  border-left: 3px solid var(--pixel-dark);
+  transition: all 0.2s;
+}
+.case-step.active {
+  color: var(--pixel-white);
+  border-left-color: var(--pixel-cyan);
+  background: rgba(0,204,204,0.08);
+}
+.case-step.done { border-left-color: var(--pixel-green); color: var(--pixel-green); }
+.case-step.wrong { border-left-color: var(--pixel-red); color: var(--pixel-red); }
+
+/* ════════════════ CENTER — LAB BENCH ════════════════ */
+.bench-area {
+  flex: 1; display: flex; flex-direction: column;
+  position: relative; overflow: hidden;
+}
+
+/* Pixel backdrop — lab wall */
+.lab-wall {
+  flex: 1;
+  background:
+    repeating-linear-gradient(90deg, rgba(0,100,0,0.04) 0px, transparent 1px, transparent 32px),
+    repeating-linear-gradient(0deg, rgba(0,100,0,0.04) 0px, transparent 1px, transparent 32px),
+    linear-gradient(180deg, #0a1a0a 0%, #0d1f0d 100%);
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: flex-end;
+  position: relative;
+  padding-bottom: 0;
+}
+
+/* Cabinet above bench */
+.lab-cabinet {
+  position: absolute; top: 10px; left: 50%; transform: translateX(-50%);
+  width: 70%; height: 60px;
+  background: #1a2e1a;
+  border: 3px solid var(--pixel-green);
+  display: flex; align-items: center; justify-content: space-around;
+  padding: 0 10px;
+}
+.lab-cabinet::after {
+  content: '';
+  position: absolute; bottom: -3px; left: 0; right: 0;
+  height: 3px; background: var(--pixel-dark);
+}
+.cabinet-label {
+  font-size: 5px; color: var(--pixel-green);
+  position: absolute; top: -12px; left: 50%; transform: translateX(-50%);
+  white-space: nowrap;
+}
+
+/* ════════ CSS PIXEL EQUIPMENT SPRITES ════════ */
+/* Mortar & Pestle */
+.sprite-mortar {
+  width: 48px; height: 36px;
+  position: relative;
+}
+.sprite-mortar .bowl {
+  position: absolute; bottom: 0; left: 4px;
+  width: 40px; height: 28px;
+  background: #aabbcc;
+  border-radius: 0 0 50% 50%;
+  border: 3px solid #778899;
+  overflow: hidden;
+}
+.sprite-mortar .bowl::after {
+  content: '';
+  position: absolute; top: 6px; left: 50%; transform: translateX(-50%);
+  width: 24px; height: 14px;
+  background: rgba(255,255,255,0.1);
+  border-radius: 50%;
+}
+.sprite-mortar .pestle {
+  position: absolute; top: 0; left: 50%; transform: translateX(-50%);
+  width: 8px; height: 32px;
+  background: #aabbcc;
+  border: 2px solid #778899;
+  border-radius: 2px 2px 4px 4px;
+}
+.sprite-mortar .pestle::after {
+  content: '';
+  position: absolute; bottom: -4px; left: -4px;
+  width: 16px; height: 10px;
+  background: #aabbcc;
+  border: 2px solid #778899;
+  border-radius: 50%;
+}
+
+/* Balance/Scale */
+.sprite-scale {
+  width: 56px; height: 50px;
+  position: relative;
+}
+.sprite-scale .display {
+  position: absolute; top: 0; left: 4px;
+  width: 48px; height: 20px;
+  background: #001100;
+  border: 3px solid #445544;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 7px; color: #00ff44;
+  font-family: var(--font-pixel);
+}
+.sprite-scale .pan {
+  position: absolute; bottom: 10px; left: 50%; transform: translateX(-50%);
+  width: 36px; height: 6px;
+  background: #778899;
+  border: 2px solid #556677;
+  border-radius: 2px;
+}
+.sprite-scale .stem {
+  position: absolute; bottom: 0; left: 50%; transform: translateX(-50%);
+  width: 4px; height: 14px;
+  background: #556677;
+}
+.sprite-scale .base {
+  position: absolute; bottom: 0; left: 50%; transform: translateX(-50%);
+  width: 40px; height: 6px;
+  background: #445566;
+  border-radius: 2px;
+}
+
+/* Beaker */
+.sprite-beaker {
+  width: 32px; height: 44px;
+  position: relative;
+}
+.sprite-beaker .body {
+  position: absolute; bottom: 0; left: 2px;
+  width: 28px; height: 36px;
+  background: rgba(100,200,255,0.15);
+  border: 3px solid rgba(100,200,255,0.6);
+  border-top: none;
+  clip-path: polygon(0 10%,100% 0%,100% 100%,0 100%);
+}
+.sprite-beaker .spout {
+  position: absolute; top: 0; left: 2px;
+  width: 28px; height: 10px;
+  background: rgba(100,200,255,0.1);
+  border: 3px solid rgba(100,200,255,0.6);
+  border-radius: 2px 6px 0 0;
+}
+.sprite-beaker .liquid {
+  position: absolute; bottom: 3px; left: 5px;
+  width: 20px; height: 14px;
+  background: rgba(100,200,255,0.3);
+  border-radius: 0 0 2px 2px;
+  transition: height 0.5s;
+}
+
+/* Graduated Cylinder */
+.sprite-cylinder {
+  width: 20px; height: 56px;
+  position: relative;
+}
+.sprite-cylinder .body {
+  position: absolute; top: 8px; left: 2px;
+  width: 16px; height: 44px;
+  background: rgba(150,220,255,0.1);
+  border: 3px solid rgba(150,220,255,0.5);
+}
+.sprite-cylinder .top {
+  position: absolute; top: 0; left: 0;
+  width: 20px; height: 10px;
+  background: rgba(150,220,255,0.1);
+  border: 3px solid rgba(150,220,255,0.5);
+  border-radius: 2px;
+}
+.sprite-cylinder .base {
+  position: absolute; bottom: 0; left: -2px;
+  width: 24px; height: 6px;
+  background: rgba(150,220,255,0.3);
+  border: 2px solid rgba(150,220,255,0.5);
+  border-radius: 2px;
+}
+.sprite-cylinder .liquid {
+  position: absolute; bottom: 6px; left: 5px;
+  width: 10px; height: 20px;
+  background: rgba(150,220,255,0.35);
+  transition: height 0.5s;
+}
+.sprite-cylinder .meniscus {
+  position: absolute; left: 2px;
+  width: 16px; height: 4px;
+  background: rgba(150,220,255,0.6);
+  border-radius: 0 0 50% 50%;
+  transition: bottom 0.5s;
+}
+
+/* Spatula */
+.sprite-spatula {
+  width: 10px; height: 50px;
+  position: relative;
+  transform: rotate(-15deg);
+}
+.sprite-spatula .handle {
+  position: absolute; top: 0;
+  width: 6px; height: 32px;
+  background: #bc8c5c;
+  border: 2px solid #8c6c3c;
+  border-radius: 2px;
+  left: 2px;
+}
+.sprite-spatula .blade {
+  position: absolute; bottom: 0; left: 0;
+  width: 10px; height: 20px;
+  background: #aabbcc;
+  border: 2px solid #778899;
+  border-radius: 0 0 1px 1px;
+  clip-path: polygon(20% 0%,80% 0%,100% 100%,0% 100%);
+}
+
+/* Bottle */
+.sprite-bottle {
+  width: 28px; height: 52px;
+  position: relative;
+}
+.sprite-bottle .body {
+  position: absolute; bottom: 0; left: 2px;
+  width: 24px; height: 38px;
+  background: rgba(100,160,80,0.25);
+  border: 3px solid rgba(100,160,80,0.6);
+  border-radius: 0 0 4px 4px;
+}
+.sprite-bottle .neck {
+  position: absolute; bottom: 36px; left: 8px;
+  width: 12px; height: 12px;
+  background: rgba(100,160,80,0.2);
+  border: 3px solid rgba(100,160,80,0.6);
+}
+.sprite-bottle .cap {
+  position: absolute; top: 0; left: 6px;
+  width: 16px; height: 8px;
+  background: #cc6600;
+  border: 2px solid #884400;
+  border-radius: 2px 2px 0 0;
+}
+.sprite-bottle .label {
+  position: absolute; bottom: 10px; left: 5px;
+  width: 18px; height: 18px;
+  background: white;
+  border: 2px solid #aaa;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 4px; color: #333;
+  font-family: var(--font-pixel);
+  text-align: center;
+  line-height: 1.2;
+}
+
+/* Wash bottle */
+.sprite-washbottle {
+  width: 24px; height: 48px;
+  position: relative;
+}
+.sprite-washbottle .body {
+  position: absolute; bottom: 0; left: 2px;
+  width: 20px; height: 36px;
+  background: rgba(80,160,220,0.15);
+  border: 3px solid rgba(80,160,220,0.5);
+  border-radius: 2px;
+}
+.sprite-washbottle .nozzle {
+  position: absolute; top: 0; right: 0;
+  width: 6px; height: 20px;
+  background: rgba(80,160,220,0.3);
+  border: 2px solid rgba(80,160,220,0.6);
+  border-radius: 2px;
+  transform: rotate(-20deg);
+  transform-origin: bottom right;
+}
+
+/* ════════════════ BENCH SURFACE ════════════════ */
+.bench-surface {
+  width: 100%; height: 160px;
+  background: linear-gradient(180deg, #2d4a2d 0px, #1a3320 4px, #1a3320 100%);
+  border-top: 4px solid #3d6a3d;
+  position: relative;
+  display: flex; align-items: flex-start;
+  padding: 12px 16px 0;
+  gap: 10px;
+  overflow: hidden;
+}
+
+.bench-surface::before {
+  content: '';
+  position: absolute; top: 0; left: 0; right: 0;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, #88cc88 20%, #88cc88 80%, transparent);
+  opacity: 0.4;
+}
+
+/* Wood grain lines */
+.bench-surface::after {
+  content: '';
+  position: absolute; inset: 0;
+  background: repeating-linear-gradient(
+    90deg, transparent, transparent 60px,
+    rgba(0,0,0,0.05) 60px, rgba(0,0,0,0.05) 61px
+  );
+  pointer-events: none;
+}
+
+/* Equipment slot on bench */
+.equip-slot {
+  position: relative;
+  display: flex; flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  padding: 6px;
+  cursor: pointer;
+  border: 2px solid transparent;
+  border-radius: 2px;
+  transition: all 0.1s;
+  image-rendering: pixelated;
+  user-select: none;
+}
+.equip-slot:hover { border-color: var(--pixel-cyan); background: rgba(0,204,204,0.08); }
+.equip-slot.selected { border-color: var(--pixel-amber); background: rgba(240,160,0,0.1); }
+.equip-slot.correct-flash { animation: flash-green 0.4s; }
+.equip-slot.wrong-flash { animation: flash-red 0.3s; }
+
+.equip-label {
+  font-size: 5px; color: var(--pixel-gray);
+  text-align: center; white-space: nowrap;
+  font-family: var(--font-pixel);
+  margin-top: 2px;
+}
+
+@keyframes flash-green {
+  0% { background: rgba(0,204,68,0.4); border-color: var(--pixel-green); }
+  100% { background: transparent; }
+}
+@keyframes flash-red {
+  0%,50% { background: rgba(204,34,0,0.4); border-color: var(--pixel-red); }
+  100% { background: transparent; }
+}
+
+/* ════════════════ MINIGAME STAGE ════════════════ */
+.minigame-stage {
+  flex: 1;
+  display: flex; align-items: center; justify-content: center;
+  flex-direction: column; gap: 12px;
+  padding: 12px;
+  position: relative;
+}
+
+/* ORDER MIXER cards */
+.order-mixer {
+  display: flex; flex-direction: column; gap: 6px;
+  width: 100%;
+}
+.order-mixer-title {
+  font-size: 7px; color: var(--pixel-cyan);
+  text-align: center; margin-bottom: 8px;
+}
+.mix-card {
+  display: flex; align-items: center; gap: 8px;
+  padding: 8px 10px;
+  background: var(--bench);
+  border: 2px solid var(--pixel-dark);
+  cursor: pointer;
+  transition: all 0.1s;
+  position: relative;
+}
+.mix-card:hover { border-color: var(--pixel-amber); background: rgba(240,160,0,0.08); }
+.mix-card.selected { border-color: var(--pixel-amber); background: rgba(240,160,0,0.15); }
+.mix-card.placed-correct { border-color: var(--pixel-green); background: rgba(0,204,68,0.1); pointer-events: none; }
+.mix-card.placed-wrong { animation: shake 0.3s; border-color: var(--pixel-red); }
+.mix-card-num {
+  width: 20px; height: 20px;
+  background: var(--pixel-dark);
+  border: 2px solid var(--pixel-gray);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 8px; color: var(--pixel-gray);
+  flex-shrink: 0;
+}
+.mix-card.placed-correct .mix-card-num { background: var(--pixel-green); border-color: var(--pixel-lime); color: #000; }
+.mix-card-text {
+  font-size: 7px; font-family: var(--font-th);
+  color: var(--pixel-white); line-height: 1.4;
+}
+.mix-card-icon { font-size: 16px; }
+
+@keyframes shake {
+  0%,100% { transform: translateX(0); }
+  25% { transform: translateX(-6px); }
+  75% { transform: translateX(6px); }
+}
+
+/* WEIGHT INPUT */
+.weight-game {
+  display: flex; flex-direction: column; align-items: center; gap: 10px;
+  width: 100%;
+}
+.scale-display-big {
+  width: 180px; height: 48px;
+  background: #001100;
+  border: 4px solid #223322;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 20px;
+  font-family: var(--font-pixel);
+  color: #00ff44;
+  letter-spacing: 4px;
+  position: relative;
+}
+.scale-display-big::before {
+  content: 'g';
+  position: absolute; right: 8px; bottom: 6px;
+  font-size: 8px; color: #00aa22;
+}
+.scale-buttons {
+  display: flex; gap: 6px;
+}
+.px-btn {
+  font-family: var(--font-pixel);
+  font-size: 7px;
+  padding: 6px 10px;
+  background: var(--pixel-dark);
+  border: 2px solid var(--pixel-green);
+  color: var(--pixel-green);
+  cursor: pointer;
+  transition: all 0.1s;
+  image-rendering: pixelated;
+}
+.px-btn:hover { background: var(--pixel-green); color: #000; }
+.px-btn:active { transform: translate(1px,1px); }
+.px-btn.red { border-color: var(--pixel-red); color: var(--pixel-red); }
+.px-btn.red:hover { background: var(--pixel-red); color: #fff; }
+.px-btn.amber { border-color: var(--pixel-amber); color: var(--pixel-amber); }
+.px-btn.amber:hover { background: var(--pixel-amber); color: #000; }
+.px-btn.big { font-size: 9px; padding: 10px 18px; }
+
+.target-hint {
+  font-size: 6px; color: var(--pixel-gray);
+  font-family: var(--font-th); text-align: center;
+  line-height: 1.6;
+}
+
+/* ════════════════ RIGHT PANEL — CHECKLIST ════════════════ */
+.rubric-panel {
+  width: 220px; min-width: 220px;
+  background: #000;
+  border-left: 3px solid var(--pixel-green);
+  display: flex; flex-direction: column;
+  overflow: hidden;
+}
+
+.chk-list { flex: 1; overflow-y: auto; padding: 8px; display: flex; flex-direction: column; gap: 6px; }
+
+.chk-item {
+  display: flex; align-items: flex-start; gap: 6px;
+  padding: 6px;
+  background: var(--pixel-dark);
+  border: 2px solid #223322;
+  transition: all 0.2s;
+}
+.chk-item.pass { border-color: var(--pixel-green); background: rgba(0,204,68,0.1); }
+.chk-item.fail { border-color: var(--pixel-red); background: rgba(204,34,0,0.1); }
+.chk-item.active { border-color: var(--pixel-cyan); background: rgba(0,204,204,0.08); }
+
+.chk-icon { font-size: 12px; flex-shrink: 0; margin-top: 2px; }
+.chk-text { font-size: 6px; font-family: var(--font-th); color: var(--pixel-gray); line-height: 1.6; }
+.chk-item.pass .chk-text { color: var(--pixel-green); }
+.chk-item.fail .chk-text { color: var(--pixel-red); }
+.chk-item.active .chk-text { color: var(--pixel-white); }
+.chk-pts { font-size: 7px; color: var(--pixel-amber); font-family: var(--font-pixel); margin-left: auto; white-space: nowrap; }
+
+.score-meter {
+  padding: 10px;
+  border-top: 2px solid var(--pixel-green);
+  background: #000;
+}
+.score-label { font-size: 6px; color: var(--pixel-gray); margin-bottom: 4px; }
+.score-bar-bg {
+  width: 100%; height: 10px;
+  background: #111; border: 2px solid #333;
+  position: relative; overflow: hidden;
+}
+.score-bar-fill {
+  height: 100%; background: var(--pixel-green);
+  transition: width 0.4s steps(10);
+  position: relative;
+}
+.score-val { font-size: 10px; color: var(--pixel-lime); text-align: center; margin-top: 4px; }
+
+/* ════════════════ FEEDBACK POPUP ════════════════ */
+.feedback-popup {
+  position: fixed;
+  top: 50%; left: 50%; transform: translate(-50%, -50%) scale(0);
+  background: #000;
+  border: 4px solid var(--pixel-green);
+  padding: 20px 24px;
+  z-index: 500;
+  min-width: 320px; max-width: 480px;
+  transition: transform 0.15s steps(3);
+  image-rendering: pixelated;
+}
+.feedback-popup.show { transform: translate(-50%, -50%) scale(1); }
+.feedback-popup.correct-popup { border-color: var(--pixel-green); }
+.feedback-popup.wrong-popup { border-color: var(--pixel-red); }
+
+.feedback-title {
+  font-size: 11px; margin-bottom: 12px; text-align: center;
+  letter-spacing: 1px;
+}
+.feedback-popup.correct-popup .feedback-title { color: var(--pixel-green); }
+.feedback-popup.wrong-popup .feedback-title { color: var(--pixel-red); }
+
+.feedback-body { font-size: 8px; font-family: var(--font-th); color: var(--pixel-white); line-height: 1.8; }
+.feedback-rationale { margin-top: 10px; padding-top: 10px; border-top: 2px solid #333; }
+.rationale-row { margin-bottom: 6px; font-size: 7px; font-family: var(--font-th); color: var(--pixel-gray); }
+.rationale-row strong { color: var(--pixel-cyan); }
+.rationale-wrong { color: var(--pixel-red); }
+.rationale-wrong-row { font-size: 6px; font-family: var(--font-th); color: #cc8888; line-height: 1.6; margin-left: 8px; }
+
+.feedback-actions { display: flex; gap: 8px; justify-content: center; margin-top: 14px; }
+
+/* ════════════════ SCORE FLOAT ════════════════ */
+.score-float {
+  position: fixed;
+  font-size: 12px; font-family: var(--font-pixel);
+  pointer-events: none;
+  animation: floatUp 0.8s forwards;
+  z-index: 600;
+}
+@keyframes floatUp {
+  0%   { opacity: 1; transform: translateY(0); }
+  100% { opacity: 0; transform: translateY(-48px); }
+}
+
+/* ════════════════ STAGE TRANSITION OVERLAY ════════════════ */
+.stage-overlay {
+  position: fixed; inset: 0;
+  background: #000;
+  z-index: 800;
+  display: flex; align-items: center; justify-content: center;
+  flex-direction: column; gap: 16px;
+  opacity: 0; pointer-events: none;
+  transition: opacity 0.2s;
+}
+.stage-overlay.show { opacity: 1; pointer-events: all; }
+
+/* ════════════════ RESULT SCREEN ════════════════ */
+.result-screen {
+  position: fixed; inset: 0;
+  background: #000;
+  z-index: 900;
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  gap: 16px; padding: 20px;
+  transform: translateY(100%);
+  transition: transform 0.3s steps(6);
+}
+.result-screen.show { transform: translateY(0); }
+.result-title { font-size: 14px; color: var(--pixel-lime); text-align: center; }
+.result-score { font-size: 28px; color: var(--pixel-amber); }
+.result-pass { font-size: 10px; color: var(--pixel-green); }
+.result-fail { font-size: 10px; color: var(--pixel-red); }
+.result-breakdown {
+  display: flex; flex-direction: column; gap: 4px; width: 100%; max-width: 400px;
+  font-size: 7px; font-family: var(--font-th);
+}
+.breakdown-row {
+  display: flex; justify-content: space-between; align-items: center;
+  padding: 4px 8px; border-left: 3px solid var(--pixel-green);
+  color: var(--pixel-white);
+}
+.breakdown-row.miss { border-left-color: var(--pixel-red); color: var(--pixel-gray); }
+
+/* ════════════════ PIXEL DECORATIONS ════════════════ */
+.pixel-star {
+  position: fixed; pointer-events: none;
+  font-size: 12px;
+  animation: starBurst 0.6s forwards;
+  z-index: 700;
+}
+@keyframes starBurst {
+  0%   { opacity: 1; transform: scale(0.5) rotate(0deg); }
+  50%  { opacity: 1; transform: scale(1.5) rotate(180deg); }
+  100% { opacity: 0; transform: scale(0.5) rotate(360deg) translateY(-30px); }
+}
+
+/* ════════════════ STEP INDICATOR ════════════════ */
+.step-indicator {
+  display: flex; gap: 4px; padding: 6px; justify-content: center;
+}
+.step-dot {
+  width: 8px; height: 8px;
+  background: #333;
+  border: 2px solid #444;
+}
+.step-dot.done { background: var(--pixel-green); border-color: var(--pixel-lime); }
+.step-dot.active { background: var(--pixel-amber); border-color: var(--pixel-lime); animation: blink 0.8s infinite; }
+.step-dot.fail { background: var(--pixel-red); border-color: #ff4444; }
+
+/* ════════════════ INSTRUCTION BAR ════════════════ */
+.instruction-bar {
+  background: #000;
+  border-top: 2px solid #223322;
+  padding: 6px 12px;
+  font-size: 7px; color: var(--pixel-cyan);
+  font-family: var(--font-th);
+  display: flex; align-items: center; gap: 6px;
+}
+.inst-arrow { color: var(--pixel-amber); animation: blink 1s infinite; }
+</style>
+</head>
+<body>
+
+<!-- ════════ HUD ════════ -->
+<div class="hud">
+  <span class="hud-title">⚗️ COMPOUNDING LAB</span>
+  <span class="hud-sep">|</span>
+  <div class="lives" id="lives-display">
+    <span style="font-size:7px;color:#888;margin-right:4px;">LIVES</span>
+    <span class="heart" id="h1"></span>
+    <span class="heart" id="h2"></span>
+    <span class="heart" id="h3"></span>
+  </div>
+  <span class="hud-sep">|</span>
+  <div class="timer-box" id="timer-box">04:00</div>
+  <span class="hud-sep">|</span>
+  <span style="font-size:6px;color:var(--pixel-gray);" id="station-label">OSPE-PD83M01 • สถานีที่ 1-2</span>
+  <div class="score-box" id="hud-score">★ 0 PTS</div>
+</div>
+
+<!-- ════════ MAIN GAME AREA ════════ -->
+<div class="game-area">
+
+  <!-- LEFT: CASE INFO -->
+  <div class="case-panel">
+    <div class="panel-header">📋 CASE INFO</div>
+    <div class="case-info">
+      <div class="case-title" id="case-title">Oral Solution Preparation<br>Sodium Bicarbonate Mixture</div>
+      <div style="font-size:6px;color:var(--pixel-gray);font-family:var(--font-th);margin-bottom:8px;">
+        ใบสั่งเตรียม: NaHCO₃ 1.5g + Glycerin 4.5mL + Purified Water → 30mL
+      </div>
+      <div style="font-size:6px;color:#666;font-family:var(--font-pixel);margin-bottom:6px;">STEPS:</div>
+      <div class="case-step active" id="step-info-0">1. ตรวจฉลาก 3 ครั้ง + ชั่ง NaHCO₃</div>
+      <div class="case-step" id="step-info-1">2. เรียงลำดับ Order of Mixing</div>
+      <div class="case-step" id="step-info-2">3. ป้อนน้ำหนัก (ชั่งสาร)</div>
+      <div class="case-step" id="step-info-3">4. Rinse บีกเกอร์ 2 รอบ</div>
+      <div class="case-step" id="step-info-4">5. ปรับ Meniscus + บรรจุ</div>
+    </div>
+    <div class="step-indicator" id="step-dots">
+      <div class="step-dot active" id="dot-0"></div>
+      <div class="step-dot" id="dot-1"></div>
+      <div class="step-dot" id="dot-2"></div>
+      <div class="step-dot" id="dot-3"></div>
+      <div class="step-dot" id="dot-4"></div>
+    </div>
+  </div>
+
+  <!-- CENTER: BENCH -->
+  <div class="bench-area">
+    <div class="lab-wall">
+      <div class="lab-cabinet">
+        <span class="cabinet-label">🗄️ PHARMACY CABINET</span>
+        <!-- Cabinet items -->
+        <div style="text-align:center;font-size:5px;color:var(--pixel-green)">
+          <div style="width:20px;height:28px;background:rgba(100,160,80,0.2);border:2px solid rgba(100,160,80,0.5);margin:0 auto;display:flex;align-items:center;justify-content:center;font-size:8px;">🧴</div>
+          <div style="margin-top:2px;">NaHCO₃</div>
+        </div>
+        <div style="text-align:center;font-size:5px;color:var(--pixel-green)">
+          <div style="width:20px;height:28px;background:rgba(100,160,80,0.2);border:2px solid rgba(100,160,80,0.5);margin:0 auto;display:flex;align-items:center;justify-content:center;font-size:8px;">🫙</div>
+          <div style="margin-top:2px;">Glycerin</div>
+        </div>
+        <div style="text-align:center;font-size:5px;color:var(--pixel-green)">
+          <div style="width:20px;height:28px;background:rgba(80,120,220,0.2);border:2px solid rgba(80,120,220,0.5);margin:0 auto;display:flex;align-items:center;justify-content:center;font-size:8px;">💧</div>
+          <div style="margin-top:2px;">Purified Water</div>
+        </div>
+      </div>
+
+      <!-- MINIGAME STAGE (central area above bench) -->
+      <div class="minigame-stage" id="minigame-stage">
+        <!-- content injected by JS -->
+      </div>
+    </div>
+
+    <!-- LAB BENCH SURFACE -->
+    <div class="bench-surface" id="bench-surface">
+      <div class="equip-slot" id="eq-scale" onclick="clickEquip('scale')">
+        <div class="sprite-scale">
+          <div class="display" id="scale-read">0.000</div>
+          <div class="pan"></div>
+          <div class="stem"></div>
+          <div class="base"></div>
+        </div>
+        <div class="equip-label">⚖️ Balance</div>
+      </div>
+
+      <div class="equip-slot" id="eq-mortar" onclick="clickEquip('mortar')">
+        <div class="sprite-mortar">
+          <div class="pestle"></div>
+          <div class="bowl"></div>
+        </div>
+        <div class="equip-label">⚗️ Mortar</div>
+      </div>
+
+      <div class="equip-slot" id="eq-beaker" onclick="clickEquip('beaker')">
+        <div class="sprite-beaker">
+          <div class="spout"></div>
+          <div class="body">
+            <div class="liquid" id="beaker-liq" style="height:0px;"></div>
+          </div>
+        </div>
+        <div class="equip-label">🧫 Beaker</div>
+      </div>
+
+      <div class="equip-slot" id="eq-cylinder" onclick="clickEquip('cylinder')">
+        <div class="sprite-cylinder">
+          <div class="top"></div>
+          <div class="body">
+            <div class="liquid" id="cyl-liq" style="height:0px;"></div>
+            <div class="meniscus" id="cyl-men" style="bottom:0px;display:none;"></div>
+          </div>
+          <div class="base"></div>
+        </div>
+        <div class="equip-label">📏 Cylinder</div>
+      </div>
+
+      <div class="equip-slot" id="eq-spatula" onclick="clickEquip('spatula')">
+        <div class="sprite-spatula">
+          <div class="handle"></div>
+          <div class="blade"></div>
+        </div>
+        <div class="equip-label">🔧 Spatula</div>
+      </div>
+
+      <div class="equip-slot" id="eq-washbottle" onclick="clickEquip('washbottle')">
+        <div class="sprite-washbottle">
+          <div class="body" style="background:rgba(80,160,220,0.2);"></div>
+          <div class="nozzle"></div>
+        </div>
+        <div class="equip-label">💧 Wash Bottle</div>
+      </div>
+
+      <div class="equip-slot" id="eq-bottle" onclick="clickEquip('bottle')">
+        <div class="sprite-bottle">
+          <div class="body">
+            <div class="label">ชา<br>30mL</div>
+          </div>
+          <div class="neck"></div>
+          <div class="cap"></div>
+        </div>
+        <div class="equip-label">🍵 Amber Bottle</div>
+      </div>
+    </div>
+
+    <!-- INSTRUCTION BAR -->
+    <div class="instruction-bar">
+      <span class="inst-arrow">▶</span>
+      <span id="instruction-text">ตรวจสอบฉลากขวดสาร NaHCO₃ แล้วกดชั่งสาร</span>
+    </div>
+  </div>
+
+  <!-- RIGHT: CHECKLIST -->
+  <div class="rubric-panel">
+    <div class="panel-header">✅ OSPE CHECKLIST</div>
+    <div class="chk-list" id="chk-list">
+      <div class="chk-item active" id="chk-0">
+        <span class="chk-icon" id="chk-icon-0">⏳</span>
+        <div class="chk-text">1. การอ่านฉลาก 3 ครั้ง</div>
+        <span class="chk-pts">+1.0</span>
+      </div>
+      <div class="chk-item" id="chk-1">
+        <span class="chk-icon" id="chk-icon-1">⬜</span>
+        <div class="chk-text">2. Order of Mixing ถูกต้อง</div>
+        <span class="chk-pts">+2.0</span>
+      </div>
+      <div class="chk-item" id="chk-2">
+        <span class="chk-icon" id="chk-icon-2">⬜</span>
+        <div class="chk-text">3. ชั่งน้ำหนักแม่นยำ (±5%)</div>
+        <span class="chk-pts">+2.0</span>
+      </div>
+      <div class="chk-item" id="chk-3">
+        <span class="chk-icon" id="chk-icon-3">⬜</span>
+        <div class="chk-text">4. Rinse บีกเกอร์ ≥2 รอบ</div>
+        <span class="chk-pts">+2.0</span>
+      </div>
+      <div class="chk-item" id="chk-4">
+        <span class="chk-icon" id="chk-icon-4">⬜</span>
+        <div class="chk-text">5. ดู Meniscus ระดับสายตา</div>
+        <span class="chk-pts">+2.0</span>
+      </div>
+      <div class="chk-item" id="chk-5">
+        <span class="chk-icon" id="chk-icon-5">⬜</span>
+        <div class="chk-text">6. BUD ถูกต้อง (14 วัน)</div>
+        <span class="chk-pts">+1.0</span>
+      </div>
+    </div>
+    <div class="score-meter">
+      <div class="score-label">SCORE</div>
+      <div class="score-bar-bg">
+        <div class="score-bar-fill" id="score-bar" style="width:0%"></div>
+      </div>
+      <div class="score-val" id="score-val">0.0 / 10.0</div>
+      <div style="font-size:5px;color:#555;text-align:center;margin-top:4px;">Pass ≥ 80% (8.0 pts)</div>
+    </div>
+  </div>
+</div>
+
+<!-- ════════ FEEDBACK POPUP ════════ -->
+<div class="feedback-popup" id="feedback-popup">
+  <div class="feedback-title" id="fb-title">✅ ถูกต้อง!</div>
+  <div class="feedback-body" id="fb-body">ดีมาก! อ่านฉลากครบ 3 ครั้งตามมาตรฐาน</div>
+  <div class="feedback-rationale" id="fb-rationale" style="display:none">
+    <div class="rationale-row" id="fb-correct-why"></div>
+    <div class="rationale-row rationale-wrong" id="fb-wrong-why" style="display:none"></div>
+    <div class="rationale-wrong-row" id="fb-wrong-detail"></div>
+  </div>
+  <div class="feedback-actions">
+    <button class="px-btn" onclick="closeFeedback()">ตกลง [ENTER]</button>
+    <button class="px-btn amber" onclick="showVideo()" id="video-btn" style="display:none">📹 ดูวิดีโอ</button>
+  </div>
+</div>
+
+<!-- ════════ RESULT SCREEN ════════ -->
+<div class="result-screen" id="result-screen">
+  <div class="result-title">🏆 STATION COMPLETE!</div>
+  <div style="font-size:7px;color:var(--pixel-gray);">NaHCO₃ Oral Solution • OSPE-PD83M01</div>
+  <div class="result-score" id="result-score-val">9.0 / 10.0</div>
+  <div class="result-pass" id="result-pass-fail">✅ PASS — ผ่านเกณฑ์สภาเภสัชกรรม (≥80%)</div>
+  <div class="result-breakdown" id="result-breakdown"></div>
+  <div style="display:flex;gap:10px;margin-top:10px;">
+    <button class="px-btn big" onclick="restartGame()">🔄 ทำใหม่</button>
+    <button class="px-btn big amber" onclick="nextStation()">ถัดไป →</button>
+  </div>
+</div>
+
+<script>
+// ════════════════════════════════════════════════════════
+//  GAME STATE
+// ════════════════════════════════════════════════════════
+const G = {
+  lives: 3,
+  score: 0,
+  maxScore: 10,
+  step: 0,       // 0=label,1=order,2=weight,3=rinse,4=meniscus
+  timeLeft: 240,
+  timerRunning: false,
+  checkResults: {},
+  wrongStreak: 0,
+};
+
+// ════ STEP DEFINITIONS ════
+const STEPS = [
+  { id: 'label',   title: 'ตรวจฉลาก 3 ครั้ง',         points: 1.0, chkIdx: 0 },
+  { id: 'order',   title: 'Order of Mixing',           points: 2.0, chkIdx: 1 },
+  { id: 'weight',  title: 'ชั่งสาร NaHCO₃',           points: 2.0, chkIdx: 2 },
+  { id: 'rinse',   title: 'Rinse บีกเกอร์',            points: 2.0, chkIdx: 3 },
+  { id: 'meniscus','title': 'ดู Meniscus + บรรจุ',     points: 2.0, chkIdx: 4 },
+  { id: 'bud',     title: 'BUD Picker',                points: 1.0, chkIdx: 5 },
+];
+
+// ════ ORDER OF MIXING DATA ════
+const ORDER_CARDS = [
+  { id:'dissolve', text:'ละลาย NaHCO₃ ใน Purified Water 10–15 mL', icon:'🧪', correctPos:1 },
+  { id:'glycerin', text:'ตวง Glycerin 4.5 mL + รอ Draining Time 30 วิ', icon:'🫙', correctPos:2 },
+  { id:'rinse2',   text:'Rinse บีกเกอร์ด้วยน้ำกลั่น × 2 รอบ', icon:'💧', correctPos:3 },
+  { id:'adjust',   text:'ปรับปริมาตรจนท้องน้ำแตะขีด 30 mL', icon:'📏', correctPos:4 },
+  { id:'fill',     text:'บรรจุขวดชา + ติดฉลาก BUD 14 วัน', icon:'🍵', correctPos:5 },
+];
+
+// ════ WEIGHT GAME ════
+const WEIGHT_TARGET = 1.500;
+const WEIGHT_TOLERANCE = 0.075; // ±5%
+let currentWeight = 0.000;
+
+// ════ RINSE GAME ════
+let rinseCount = 0;
+let meniscusOk = false;
+
+// ════════════════════════════════════════════════════════
+//  TIMER
+// ════════════════════════════════════════════════════════
+let timerInterval = null;
+
+function startTimer() {
+  G.timerRunning = true;
+  timerInterval = setInterval(() => {
+    G.timeLeft--;
+    updateTimerDisplay();
+    if (G.timeLeft <= 0) {
+      clearInterval(timerInterval);
+      timeUp();
+    }
+  }, 1000);
+}
+
+function updateTimerDisplay() {
+  const m = Math.floor(G.timeLeft / 60).toString().padStart(2,'0');
+  const s = (G.timeLeft % 60).toString().padStart(2,'0');
+  const el = document.getElementById('timer-box');
+  el.textContent = `${m}:${s}`;
+  el.className = G.timeLeft <= 30 ? 'timer-box urgent' : 'timer-box';
+}
+
+function timeUp() {
+  showFeedback('wrong', '⏰ หมดเวลา!', 'สถานี OSPE มีเวลา 4 นาที ต้องบริหารเวลาให้ดีขึ้น', null, true);
+}
+
+// ════════════════════════════════════════════════════════
+//  RENDER STEP
+// ════════════════════════════════════════════════════════
+function renderStep(stepIdx) {
+  G.step = stepIdx;
+  updateStepUI();
+
+  const stage = document.getElementById('minigame-stage');
+  const step = STEPS[stepIdx];
+
+  if (!G.timerRunning) startTimer();
+
+  switch(step.id) {
+    case 'label':   renderLabelGame(stage); break;
+    case 'order':   renderOrderGame(stage); break;
+    case 'weight':  renderWeightGame(stage); break;
+    case 'rinse':   renderRinseGame(stage); break;
+    case 'meniscus':renderMeniscusGame(stage); break;
+    case 'bud':     renderBUDGame(stage); break;
+  }
+}
+
+// ════════════════════════════════════════════════════════
+//  STEP 1: LABEL CHECK GAME
+// ════════════════════════════════════════════════════════
+let labelClicks = 0;
+function renderLabelGame(stage) {
+  labelClicks = 0;
+  document.getElementById('instruction-text').textContent =
+    'กดปุ่ม "อ่านฉลาก" 3 ครั้ง ตามลำดับที่ถูกต้อง';
+
+  stage.innerHTML = `
+    <div style="text-align:center;">
+      <div style="font-size:8px;color:var(--pixel-cyan);margin-bottom:12px;">📋 การตรวจสอบฉลาก (Label Check)</div>
+      <div style="font-size:7px;color:var(--pixel-gray);font-family:var(--font-th);margin-bottom:16px;line-height:1.6;">
+        ต้องอ่านฉลากขวด NaHCO₃ <span style="color:var(--pixel-amber)">ครบ 3 ครั้ง</span> ตามลำดับ:
+      </div>
+      <div style="display:flex;flex-direction:column;gap:8px;max-width:300px;margin:0 auto;">
+        <button class="px-btn" id="lbl-btn-0" onclick="labelClick(0)" style="font-family:var(--font-th);font-size:9px;padding:10px;">
+          🔍 ครั้งที่ 1: อ่านก่อนหยิบ
+        </button>
+        <button class="px-btn" id="lbl-btn-1" onclick="labelClick(1)" disabled style="opacity:0.4;font-family:var(--font-th);font-size:9px;padding:10px;">
+          🔍 ครั้งที่ 2: อ่านก่อนชั่ง
+        </button>
+        <button class="px-btn" id="lbl-btn-2" onclick="labelClick(2)" disabled style="opacity:0.4;font-family:var(--font-th);font-size:9px;padding:10px;">
+          🔍 ครั้งที่ 3: อ่านหลังชั่ง
+        </button>
+      </div>
+      <div style="margin-top:12px;font-size:9px;" id="label-counter">🏷️ อ่านแล้ว: 0/3</div>
+    </div>
+  `;
+}
+
+function labelClick(idx) {
+  if (idx !== labelClicks) {
+    // Wrong order!
+    loseLife();
+    shakeElement('lbl-btn-'+idx);
+    showFeedback('wrong',
+      '❌ ผิดลำดับ!',
+      `ต้องกดตามลำดับ: ก่อนหยิบ → ก่อนชั่ง → หลังชั่ง`,
+      { correct: 'อ่านฉลากตามลำดับ 3 ครั้งเป็นมาตรฐาน GMP ป้องกันหยิบสารผิด' }
+    );
+    return;
+  }
+  labelClicks++;
+  sfxClick();
+  document.getElementById('label-counter').textContent = `🏷️ อ่านแล้ว: ${labelClicks}/3`;
+  spawnStar(...evPos(), '✓', 'var(--pixel-green)');
+
+  // Enable next button
+  if (labelClicks < 3) {
+    const nextBtn = document.getElementById('lbl-btn-'+labelClicks);
+    nextBtn.disabled = false;
+    nextBtn.style.opacity = '1';
+    document.getElementById('lbl-btn-'+(labelClicks-1)).style.borderColor = 'var(--pixel-green)';
+    document.getElementById('lbl-btn-'+(labelClicks-1)).style.color = 'var(--pixel-green)';
+  }
+
+  if (labelClicks === 3) {
+    setTimeout(() => {
+      passStep(0, 1.0, 'อ่านฉลากครบ 3 ครั้งตามมาตรฐาน GMP ✅');
+    }, 400);
+  }
+}
+
+// ════════════════════════════════════════════════════════
+//  STEP 2: ORDER OF MIXING
+// ════════════════════════════════════════════════════════
+let orderShuffled = [];
+let orderSelected = [];
+let orderNextPos = 1;
+
+function renderOrderGame(stage) {
+  // Shuffle cards
+  orderShuffled = [...ORDER_CARDS].sort(() => Math.random() - 0.5);
+  orderSelected = [];
+  orderNextPos = 1;
+
+  document.getElementById('instruction-text').textContent =
+    'คลิกขั้นตอนตามลำดับที่ถูกต้อง (1→2→3→4→5)';
+
+  stage.innerHTML = `
+    <div class="order-mixer" style="max-width:400px;width:100%;">
+      <div class="order-mixer-title">🔀 เรียงลำดับ Order of Mixing</div>
+      <div style="font-size:6px;color:var(--pixel-gray);text-align:center;margin-bottom:8px;font-family:var(--font-th);">
+        คลิกเลือกขั้นตอนตามลำดับที่ถูกต้อง
+      </div>
+      ${orderShuffled.map((c,i) => `
+        <div class="mix-card" id="mix-${c.id}" onclick="orderClick('${c.id}',${c.correctPos})">
+          <div class="mix-card-num" id="mix-num-${c.id}">?</div>
+          <span class="mix-card-icon">${c.icon}</span>
+          <div class="mix-card-text">${c.text}</div>
+        </div>
+      `).join('')}
+    </div>
+  `;
+}
+
+function orderClick(cardId, correctPos) {
+  const card = document.getElementById('mix-'+cardId);
+  if (card.classList.contains('placed-correct')) return;
+
+  if (correctPos === orderNextPos) {
+    // Correct!
+    sfxCoin();
+    spawnStar(...evPos(), `${orderNextPos}`, 'var(--pixel-green)');
+    card.classList.add('placed-correct');
+    document.getElementById('mix-num-'+cardId).textContent = orderNextPos;
+    orderNextPos++;
+    orderSelected.push(cardId);
+
+    if (orderNextPos > ORDER_CARDS.length) {
+      setTimeout(() => passStep(1, 2.0, 'เรียงลำดับ Order of Mixing ถูกต้องทุกขั้นตอน ✅'), 500);
+    }
+  } else {
+    // Wrong!
+    loseLife();
+    card.classList.add('placed-wrong');
+    sfxWrong();
+    setTimeout(() => card.classList.remove('placed-wrong'), 400);
+
+    const correctCard = ORDER_CARDS.find(c => c.correctPos === orderNextPos);
+    showFeedback('wrong',
+      `❌ ลำดับที่ ${orderNextPos} ไม่ใช่ข้อนี้!`,
+      `ขั้นตอนที่ ${orderNextPos} ที่ถูกต้องคือ: "${correctCard.text}"`,
+      {
+        correct: `Order of Mixing: NaHCO₃ ต้องละลายในน้ำก่อน แล้วค่อยเติม Glycerin (viscous agent ใส่ทีหลังเสมอ)`,
+        wrongDetails: [`ถ้าเติม Glycerin ก่อน NaHCO₃ จะละลายยาก เกิด undissolved particles`]
+      }
+    );
+  }
+}
+
+// ════════════════════════════════════════════════════════
+//  STEP 3: WEIGHT INPUT
+// ════════════════════════════════════════════════════════
+function renderWeightGame(stage) {
+  currentWeight = 0.000;
+  document.getElementById('instruction-text').textContent =
+    'ชั่ง NaHCO₃ ให้ได้ 1.500 g (±5% = 1.425–1.575 g)';
+
+  stage.innerHTML = `
+    <div class="weight-game">
+      <div style="font-size:8px;color:var(--pixel-cyan);margin-bottom:4px;">⚖️ การชั่งสารเคมี</div>
+      <div class="target-hint">เป้าหมาย: NaHCO₃ = <span style="color:var(--pixel-amber)">1.500 g</span><br>ยอมรับ: 1.425 – 1.575 g</div>
+      <div class="scale-display-big" id="weight-display">0.000</div>
+      <div class="scale-buttons">
+        <button class="px-btn red" onclick="adjustWeight(-0.100)">−0.100</button>
+        <button class="px-btn red" onclick="adjustWeight(-0.010)">−0.010</button>
+        <button class="px-btn red" onclick="adjustWeight(-0.001)">−0.001</button>
+        <button class="px-btn" onclick="adjustWeight(+0.001)">+0.001</button>
+        <button class="px-btn" onclick="adjustWeight(+0.010)">+0.010</button>
+        <button class="px-btn" onclick="adjustWeight(+0.100)">+0.100</button>
+      </div>
+      <div style="display:flex;gap:8px;margin-top:4px;">
+        <button class="px-btn amber" onclick="confirmWeight()">✅ ยืนยันน้ำหนัก</button>
+        <button class="px-btn red" onclick="resetWeight()">🔄 TARE</button>
+      </div>
+      <div style="font-size:6px;color:#555;font-family:var(--font-th);text-align:center;margin-top:6px;">
+        กด TARE เพื่อรีเซ็ต | วางกระทงก่อนกด TARE เสมอ
+      </div>
+    </div>
+  `;
+}
+
+function adjustWeight(delta) {
+  currentWeight = Math.max(0, Math.min(5, currentWeight + delta));
+  currentWeight = Math.round(currentWeight * 1000) / 1000;
+  document.getElementById('weight-display').textContent = currentWeight.toFixed(3);
+  document.getElementById('scale-read').textContent = currentWeight.toFixed(3);
+  sfxClick();
+}
+
+function resetWeight() {
+  currentWeight = 0.000;
+  document.getElementById('weight-display').textContent = '0.000';
+  document.getElementById('scale-read').textContent = '0.000';
+  sfxClick();
+}
+
+function confirmWeight() {
+  const min = WEIGHT_TARGET - WEIGHT_TOLERANCE;
+  const max = WEIGHT_TARGET + WEIGHT_TOLERANCE;
+  if (currentWeight >= min && currentWeight <= max) {
+    sfxCoin();
+    // Animate beaker filling
+    document.getElementById('beaker-liq').style.height = '20px';
+    passStep(2, 2.0, `ชั่งได้ ${currentWeight.toFixed(3)} g — อยู่ในเกณฑ์ ✅`);
+  } else {
+    loseLife();
+    sfxWrong();
+    const dir = currentWeight > WEIGHT_TARGET ? 'มากเกินไป' : 'น้อยเกินไป';
+    showFeedback('wrong',
+      `❌ น้ำหนัก${dir}!`,
+      `ชั่งได้ ${currentWeight.toFixed(3)} g แต่ต้องอยู่ใน 1.425–1.575 g`,
+      {
+        correct: `Acceptable error ±5% = ±0.075 g จาก 1.500 g`,
+        wrongDetails: [`MWQ = Sensitivity Requisite / Acceptable Error% × 100`, `ค่าที่ชั่งได้: ${currentWeight.toFixed(3)} g ไม่ผ่านเกณฑ์`]
+      }
+    );
+  }
+}
+
+// ════════════════════════════════════════════════════════
+//  STEP 4: RINSE GAME
+// ════════════════════════════════════════════════════════
+function renderRinseGame(stage) {
+  rinseCount = 0;
+  document.getElementById('instruction-text').textContent =
+    'กด Rinse บีกเกอร์ด้วยน้ำกลั่น ≥ 2 รอบ แล้วเทรวมลงกระบอกตวง';
+
+  stage.innerHTML = `
+    <div style="text-align:center;">
+      <div style="font-size:8px;color:var(--pixel-cyan);margin-bottom:12px;">💧 Rinsing Technique</div>
+      <div style="font-size:7px;color:var(--pixel-gray);font-family:var(--font-th);margin-bottom:14px;line-height:1.6;">
+        ล้างบีกเกอร์เพื่อกู้สารตกค้างลงกระบอกตวง<br>
+        ต้อง Rinse <span style="color:var(--pixel-amber)">อย่างน้อย 2 รอบ</span>
+      </div>
+      <div style="font-size:28px;margin-bottom:10px;" id="rinse-counter-display">🫧</div>
+      <div style="font-size:10px;color:var(--pixel-lime);margin-bottom:12px;" id="rinse-count-text">รอบที่: 0 / 2</div>
+      <div style="display:flex;gap:8px;justify-content:center;">
+        <button class="px-btn big" onclick="doRinse()">💧 Rinse รอบที่ <span id="next-rinse-num">1</span></button>
+      </div>
+      <div style="margin-top:10px;">
+        <button class="px-btn amber" onclick="confirmRinse()" id="confirm-rinse-btn" style="display:none">✅ เทลงกระบอกตวง (เสร็จ)</button>
+        <button class="px-btn red" onclick="confirmRinseTooEarly()" id="stop-rinse-btn">⬛ หยุด Rinse แค่นี้</button>
+      </div>
+    </div>
+  `;
+}
+
+function doRinse() {
+  rinseCount++;
+  sfxCoin();
+  spawnStar(...evPos(), `R${rinseCount}`, 'var(--pixel-cyan)');
+  document.getElementById('rinse-count-text').textContent = `รอบที่: ${rinseCount} / 2`;
+  document.getElementById('next-rinse-num').textContent = rinseCount + 1;
+  // Animate cylinder fill
+  const liq = document.getElementById('cyl-liq');
+  liq.style.height = Math.min(36, rinseCount * 12) + 'px';
+
+  if (rinseCount >= 2) {
+    document.getElementById('confirm-rinse-btn').style.display = 'inline-block';
+    document.getElementById('stop-rinse-btn').style.display = 'none';
+  }
+  if (rinseCount >= 2) {
+    document.getElementById('rinse-counter-display').textContent = '✅✅';
+  }
+}
+
+function confirmRinse() {
+  if (rinseCount >= 2) {
+    passStep(3, 2.0, `Rinse ${rinseCount} รอบ — ผ่านเกณฑ์ ✅`);
+  }
+}
+
+function confirmRinseTooEarly() {
+  if (rinseCount < 2) {
+    loseLife(); sfxWrong();
+    showFeedback('wrong',
+      `❌ Rinse ไม่ครบ!`,
+      `Rinse แค่ ${rinseCount} รอบ ต้องอย่างน้อย 2 รอบ`,
+      { correct: 'Rinsing ≥2 รอบ ช่วยกู้สารตกค้างในบีกเกอร์ไม่ให้สูญหาย ส่งผลต่อ concentration สุดท้าย' }
+    );
+  } else {
+    confirmRinse();
+  }
+}
+
+// ════════════════════════════════════════════════════════
+//  STEP 5: MENISCUS + FILL
+// ════════════════════════════════════════════════════════
+function renderMeniscusGame(stage) {
+  document.getElementById('instruction-text').textContent =
+    'ปรับปริมาตรจนท้องน้ำแตะขีด 30 mL (ระดับสายตา)';
+
+  const positions = [
+    {id:'too-low',  label:'วางสายตาสูงเกิน (มองลงมา)', value:28, icon:'👀⬇️'},
+    {id:'correct',  label:'ระดับสายตาพอดี (ถูกต้อง)',   value:30, icon:'👁️'},
+    {id:'too-high', label:'วางสายตาต่ำเกิน (มองขึ้น)',   value:32, icon:'👀⬆️'},
+  ].sort(() => Math.random() - 0.5);
+
+  stage.innerHTML = `
+    <div style="text-align:center;">
+      <div style="font-size:8px;color:var(--pixel-cyan);margin-bottom:10px;">📏 Meniscus Reading</div>
+      <div style="font-size:7px;color:var(--pixel-gray);font-family:var(--font-th);margin-bottom:14px;line-height:1.6;">
+        เลือกตำแหน่งสายตาที่ถูกต้องในการอ่านปริมาตร
+      </div>
+      <div style="display:flex;flex-direction:column;gap:8px;max-width:320px;margin:0 auto;">
+        ${positions.map(p => `
+          <button class="px-btn" onclick="checkMeniscus('${p.id}',event)"
+            style="font-family:var(--font-th);font-size:8px;padding:10px;text-align:left;display:flex;align-items:center;gap:10px;">
+            <span style="font-size:18px;">${p.icon}</span>
+            <div>
+              <div>${p.label}</div>
+              <div style="font-size:6px;color:var(--pixel-gray);">อ่านได้: ${p.value} mL</div>
+            </div>
+          </button>
+        `).join('')}
+      </div>
+    </div>
+  `;
+}
+
+function checkMeniscus(id, evt) {
+  if (id === 'correct') {
+    sfxCoin();
+    spawnStar(...evPos(evt), '✓', 'var(--pixel-green)');
+    // Fill cylinder to top
+    document.getElementById('cyl-liq').style.height = '36px';
+    document.getElementById('cyl-men').style.display = 'block';
+    document.getElementById('cyl-men').style.bottom = '36px';
+    // Fill amber bottle
+    setTimeout(() => passStep(4, 2.0, 'ดู Meniscus ระดับสายตาถูกต้อง → ปริมาตร 30 mL แม่นยำ ✅'), 400);
+  } else {
+    loseLife(); sfxWrong();
+    const reason = id === 'too-low'
+      ? 'มองลงมา (parallax error) ทำให้ท้องน้ำอยู่เหนือขีด 30 mL → ปริมาตรน้อยกว่าความจริง'
+      : 'มองขึ้นมา (parallax error) ทำให้ท้องน้ำอยู่ต่ำกว่าขีด 30 mL → ปริมาตรมากกว่าความจริง';
+    showFeedback('wrong',
+      '❌ ผิด! Parallax Error',
+      reason,
+      { correct: 'ต้องอ่าน Meniscus ที่ระดับสายตาพอดี — ท้องน้ำ (bottom of meniscus) แตะขีด 30 mL' }
+    );
+  }
+}
+
+// ════════════════════════════════════════════════════════
+//  STEP 6: BUD PICKER
+// ════════════════════════════════════════════════════════
+function renderBUDGame(stage) {
+  document.getElementById('instruction-text').textContent =
+    'เลือก Beyond-Use Date (BUD) ที่ถูกต้องสำหรับ NaHCO₃ Oral Solution';
+
+  const opts = [
+    {id:'7d',  label:'7 วัน (ตู้เย็น)',           correct:false},
+    {id:'14d', label:'14 วัน (ตู้เย็น)',           correct:true},
+    {id:'30d', label:'30 วัน (อุณหภูมิห้อง)',       correct:false},
+    {id:'6mo', label:'6 เดือน (อุณหภูมิห้อง)',      correct:false},
+  ].sort(() => Math.random() - 0.5);
+
+  stage.innerHTML = `
+    <div style="text-align:center;">
+      <div style="font-size:8px;color:var(--pixel-cyan);margin-bottom:10px;">📅 Beyond-Use Date (BUD)</div>
+      <div style="font-size:7px;color:var(--pixel-gray);font-family:var(--font-th);margin-bottom:6px;">อ้างอิง: USP &lt;795&gt; Table 3</div>
+      <div style="font-size:7px;color:var(--pixel-gray);font-family:var(--font-th);margin-bottom:14px;">
+        ยาน้ำ NaHCO₃ Oral Solution (Water-containing oral)
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;max-width:320px;margin:0 auto;">
+        ${opts.map(o => `
+          <button class="px-btn" onclick="checkBUD(${o.correct},event)"
+            style="font-family:var(--font-th);font-size:9px;padding:12px;">
+            ${o.label}
+          </button>
+        `).join('')}
+      </div>
+    </div>
+  `;
+}
+
+function checkBUD(isCorrect, evt) {
+  if (isCorrect) {
+    sfxCoin();
+    spawnStar(...evPos(evt), '★', 'var(--pixel-amber)');
+    passStep(5, 1.0, 'BUD = 14 วัน (ตู้เย็น) ถูกต้องตาม USP <795> ✅');
+  } else {
+    loseLife(); sfxWrong();
+    showFeedback('wrong',
+      '❌ BUD ไม่ถูกต้อง!',
+      'ยาน้ำ Water-containing oral preparation → BUD = 14 วัน เก็บในตู้เย็น',
+      {
+        correct: 'USP <795> Table 3: Water-containing oral = ≤14 days (refrigerator)',
+        wrongDetails: [
+          'Water-containing topical = ≤30 days',
+          'Nonaqueous (เช่น ointment ไม่มีน้ำ) = ≤6 months',
+        ]
+      }
+    );
+  }
+}
+
+// ════════════════════════════════════════════════════════
+//  STEP PASS / FAIL
+// ════════════════════════════════════════════════════════
+function passStep(stepIdx, pts, msg) {
+  G.score += pts;
+  G.checkResults[STEPS[stepIdx].id] = { pass: true, pts };
+  G.wrongStreak = 0;
+  updateChecklistItem(STEPS[stepIdx].chkIdx, 'pass', pts);
+  updateScore();
+
+  if (stepIdx < STEPS.length - 1) {
+    showFeedback('correct', '✅ ถูกต้อง!', msg, null, false, () => {
+      advanceStep();
+    });
+  } else {
+    // Final step
+    showFeedback('correct', '🎉 เสร็จสิ้น!', msg, null, false, () => {
+      clearInterval(timerInterval);
+      showResult();
+    });
+  }
+  spawnScoreFloat(pts);
+}
+
+function advanceStep() {
+  const next = G.step + 1;
+  if (next < STEPS.length) {
+    // Update step info panel
+    document.getElementById('step-info-'+G.step).className = 'case-step done';
+    renderStep(next);
+  }
+}
+
+// ════════════════════════════════════════════════════════
+//  LIVES / WRONG
+// ════════════════════════════════════════════════════════
+function loseLife() {
+  G.lives--;
+  G.wrongStreak++;
+  updateLivesDisplay();
+  if (G.lives <= 0) {
+    setTimeout(() => {
+      clearInterval(timerInterval);
+      showFeedback('wrong', '💀 GAME OVER', 'ชีวิตหมด! ต้องฝึกซ้อมเพิ่มเติม', null, true);
+    }, 100);
+  }
+}
+
+function updateLivesDisplay() {
+  for (let i = 1; i <= 3; i++) {
+    const h = document.getElementById('h'+i);
+    if (i <= G.lives) {
+      h.className = 'heart';
+    } else {
+      h.className = 'heart lost';
+      h.style.transform = 'scale(0.7)';
+    }
+  }
+}
+
+// ════════════════════════════════════════════════════════
+//  SCORE / CHECKLIST UI
+// ════════════════════════════════════════════════════════
+function updateChecklistItem(idx, state, pts) {
+  const item = document.getElementById('chk-'+idx);
+  const icon = document.getElementById('chk-icon-'+idx);
+  if (state === 'pass') {
+    item.className = 'chk-item pass';
+    icon.textContent = '✅';
+  } else {
+    item.className = 'chk-item fail';
+    icon.textContent = '❌';
+  }
+  // Activate next
+  if (idx + 1 < 6) {
+    document.getElementById('chk-'+(idx+1)).className = 'chk-item active';
+    document.getElementById('chk-icon-'+(idx+1)).textContent = '⏳';
+  }
+}
+
+function updateScore() {
+  const pct = (G.score / G.maxScore) * 100;
+  document.getElementById('score-bar').style.width = pct + '%';
+  document.getElementById('score-bar').style.background = pct >= 80 ? 'var(--pixel-green)' : pct >= 60 ? 'var(--pixel-amber)' : 'var(--pixel-red)';
+  document.getElementById('score-val').textContent = `${G.score.toFixed(1)} / ${G.maxScore.toFixed(1)}`;
+  document.getElementById('hud-score').textContent = `★ ${Math.round(G.score * 100)} PTS`;
+}
+
+function updateStepUI() {
+  STEPS.forEach((s, i) => {
+    const dot = document.getElementById('dot-'+i);
+    if (!dot) return;
+    if (i < G.step) dot.className = 'step-dot done';
+    else if (i === G.step) dot.className = 'step-dot active';
+    else dot.className = 'step-dot';
+
+    const si = document.getElementById('step-info-'+i);
+    if (si) {
+      if (i < G.step) si.className = 'case-step done';
+      else if (i === G.step) si.className = 'case-step active';
+      else si.className = 'case-step';
+    }
+  });
+}
+
+// ════════════════════════════════════════════════════════
+//  FEEDBACK POPUP
+// ════════════════════════════════════════════════════════
+let feedbackCallback = null;
+
+function showFeedback(type, title, body, rationale, isGameOver=false, cb=null) {
+  feedbackCallback = cb;
+  const popup = document.getElementById('feedback-popup');
+  document.getElementById('fb-title').textContent = title;
+  document.getElementById('fb-body').textContent = body;
+
+  const ratEl = document.getElementById('fb-rationale');
+  if (rationale) {
+    ratEl.style.display = 'block';
+    if (rationale.correct) {
+      document.getElementById('fb-correct-why').innerHTML =
+        `<strong>🎯 ทำไมถึงถูก/ผิด:</strong> ${rationale.correct}`;
+    }
+    if (rationale.wrongDetails && rationale.wrongDetails.length) {
+      document.getElementById('fb-wrong-why').style.display = 'block';
+      document.getElementById('fb-wrong-why').textContent = '🔍 รายละเอียดเพิ่มเติม:';
+      document.getElementById('fb-wrong-detail').innerHTML =
+        rationale.wrongDetails.map(d => `• ${d}`).join('<br>');
+    }
+  } else { ratEl.style.display = 'none'; }
+
+  popup.className = `feedback-popup ${type === 'correct' ? 'correct-popup' : 'wrong-popup'} show`;
+
+  const vBtn = document.getElementById('video-btn');
+  vBtn.style.display = type === 'wrong' ? 'inline-block' : 'none';
+
+  if (isGameOver) {
+    document.querySelector('.feedback-actions').innerHTML = `
+      <button class="px-btn red" onclick="restartGame()">🔄 เริ่มใหม่</button>
+    `;
+  }
+}
+
+function closeFeedback() {
+  document.getElementById('feedback-popup').classList.remove('show');
+  document.getElementById('fb-wrong-why').style.display = 'none';
+  document.getElementById('fb-wrong-detail').textContent = '';
+  if (feedbackCallback) {
+    const cb = feedbackCallback;
+    feedbackCallback = null;
+    setTimeout(cb, 50);
+  }
+}
+
+// Close on ENTER/SPACE
+document.addEventListener('keydown', (e) => {
+  if ((e.key === 'Enter' || e.key === ' ') && document.getElementById('feedback-popup').classList.contains('show')) {
+    closeFeedback();
+  }
+});
+
+// ════════════════════════════════════════════════════════
+//  EQUIPMENT CLICK (bench items)
+// ════════════════════════════════════════════════════════
+function clickEquip(type) {
+  sfxClick();
+  // Visual feedback
+  const el = document.getElementById('eq-'+type);
+  el.classList.add('selected');
+  setTimeout(() => el.classList.remove('selected'), 300);
+}
+
+// ════════════════════════════════════════════════════════
+//  RESULT SCREEN
+// ════════════════════════════════════════════════════════
+function showResult() {
+  const pct = (G.score / G.maxScore) * 100;
+  const passed = pct >= 80;
+  document.getElementById('result-score-val').textContent = `${G.score.toFixed(1)} / ${G.maxScore.toFixed(1)} (${pct.toFixed(1)}%)`;
+  document.getElementById('result-pass-fail').className = passed ? 'result-pass' : 'result-fail';
+  document.getElementById('result-pass-fail').textContent = passed
+    ? '✅ PASS — ผ่านเกณฑ์สภาเภสัชกรรม (≥80%)'
+    : '❌ FAIL — ไม่ผ่านเกณฑ์ (ต้อง ≥80%)';
+
+  const bd = document.getElementById('result-breakdown');
+  bd.innerHTML = STEPS.map(s => {
+    const r = G.checkResults[s.id];
+    const pass = r && r.pass;
+    return `<div class="breakdown-row ${pass ? '' : 'miss'}">
+      <span>${pass ? '✅' : '❌'} ${s.title}</span>
+      <span style="color:${pass?'var(--pixel-green)':'var(--pixel-red)'}">${pass ? '+'+r.pts.toFixed(1) : '0.0'}</span>
+    </div>`;
+  }).join('');
+
+  document.getElementById('result-screen').classList.add('show');
+  sfxVictory();
+}
+
+function restartGame() {
+  G.lives=3; G.score=0; G.step=0; G.timeLeft=240; G.timerRunning=false;
+  G.checkResults={}; G.wrongStreak=0;
+  currentWeight=0; rinseCount=0;
+  clearInterval(timerInterval);
+  document.getElementById('beaker-liq').style.height='0px';
+  document.getElementById('cyl-liq').style.height='0px';
+  document.getElementById('scale-read').textContent='0.000';
+  document.getElementById('result-screen').classList.remove('show');
+  document.getElementById('feedback-popup').classList.remove('show');
+  updateLivesDisplay();
+  updateScore();
+  // Reset checklist
+  for(let i=0;i<6;i++){
+    document.getElementById('chk-'+i).className='chk-item'+(i===0?' active':'');
+    document.getElementById('chk-icon-'+i).textContent=i===0?'⏳':'⬜';
+  }
+  renderStep(0);
+}
+
+function nextStation() {
+  alert('🚧 ระบบ Multi-station กำลังพัฒนา!\n\nเชื่อมกับ case-data-offline.js เพื่อโหลดสถานีถัดไปอัตโนมัติ');
+}
+
+// ════════════════════════════════════════════════════════
+//  VFX — Stars & Score Float
+// ════════════════════════════════════════════════════════
+function evPos(e){ const ev=e||window.event; return (ev&&ev.clientX!=null)?[ev.clientX,ev.clientY]:[innerWidth/2,innerHeight/2]; }
+function spawnStar(x, y, text, color) {
+  const el = document.createElement('div');
+  el.className = 'pixel-star';
+  el.textContent = text;
+  el.style.left = x + 'px';
+  el.style.top = y + 'px';
+  el.style.color = color;
+  document.body.appendChild(el);
+  setTimeout(() => el.remove(), 700);
+}
+
+function spawnScoreFloat(pts) {
+  const el = document.createElement('div');
+  el.className = 'score-float';
+  el.textContent = `+${pts.toFixed(1)}`;
+  el.style.color = 'var(--pixel-amber)';
+  el.style.left = '75%';
+  el.style.top = '50%';
+  document.body.appendChild(el);
+  setTimeout(() => el.remove(), 900);
+}
+
+// ════════════════════════════════════════════════════════
+//  SOUND — Web Audio API (Chiptune)
+// ════════════════════════════════════════════════════════
+let audioCtx = null;
+function getAudio() {
+  if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+  return audioCtx;
+}
+
+function playTone(freq, dur, type='square', vol=0.1) {
+  try {
+    const ctx = getAudio();
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+    osc.connect(gain); gain.connect(ctx.destination);
+    osc.type = type; osc.frequency.value = freq;
+    gain.gain.setValueAtTime(vol, ctx.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + dur);
+    osc.start(); osc.stop(ctx.currentTime + dur);
+  } catch(e) {}
+}
+
+function sfxClick() { playTone(880, 0.06, 'square', 0.05); }
+function sfxCoin() {
+  playTone(523, 0.08, 'square', 0.1);
+  setTimeout(() => playTone(659, 0.08, 'square', 0.1), 90);
+  setTimeout(() => playTone(784, 0.12, 'square', 0.1), 180);
+}
+function sfxWrong() {
+  playTone(220, 0.1, 'sawtooth', 0.12);
+  setTimeout(() => playTone(196, 0.15, 'sawtooth', 0.1), 100);
+}
+function sfxVictory() {
+  [523,659,784,1047].forEach((f,i) => setTimeout(()=>playTone(f,0.15,'square',0.1),i*120));
+}
+
+function shakeElement(id) {
+  const el = document.getElementById(id);
+  if (el) { el.classList.add('placed-wrong'); setTimeout(()=>el.classList.remove('placed-wrong'),400); }
+}
+
+function showVideo() {
+  alert('📹 ระบบวิดีโอ: เชื่อมกับ compounding_videos.json\nจะเปิดวิดีโอสอนเทคนิคที่เกี่ยวข้องใน Modal');
+}
+
+// ════════════════════════════════════════════════════════
+//  INIT
+// ════════════════════════════════════════════════════════
+renderStep(0);
+</script>
+</body>
+</html>

@@ -1,0 +1,1576 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>🎮 Virtual Compounding Lab Simulator — RxCU OSPE PLE-CC2 Demo</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Bai+Jamjuree:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&family=JetBrains+Mono:wght@400;600;800&family=Kanit:wght@400;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg-lab: #0f172a;
+      --bench-surface: #1e293b;
+      --bench-edge: #334155;
+      --accent-blue: #0284c7;
+      --accent-cyan: #38bdf8;
+      --accent-emerald: #10b981;
+      --accent-amber: #f59e0b;
+      --accent-rose: #f43f5e;
+      --text-main: #f8fafc;
+      --text-muted: #94a3b8;
+      --panel-bg: rgba(30, 41, 59, 0.85);
+      --panel-border: rgba(148, 163, 184, 0.2);
+      --font-body: 'Bai Jamjuree', sans-serif;
+      --font-heading: 'Kanit', sans-serif;
+      --font-mono: 'JetBrains Mono', monospace;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; user-select: none; }
+
+    body {
+      background: radial-gradient(circle at 50% 20%, #1e293b 0%, #0f172a 100%);
+      color: var(--text-main);
+      font-family: var(--font-body);
+      min-height: 100vh;
+      overflow-x: hidden;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* TOP HUD */
+    .lab-hud {
+      background: rgba(15, 23, 42, 0.95);
+      backdrop-filter: blur(12px);
+      border-bottom: 1.5px solid var(--panel-border);
+      padding: 10px 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      position: sticky;
+      top: 0;
+      z-index: 50;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.4);
+    }
+    .hud-title {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .hud-badge {
+      background: linear-gradient(135deg, #0369a1, #0284c7);
+      color: white;
+      font-size: 11px;
+      font-weight: 700;
+      padding: 4px 10px;
+      border-radius: 9999px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    .hud-station-name {
+      font-family: var(--font-heading);
+      font-size: 16px;
+      font-weight: 700;
+      color: #ffffff;
+    }
+    .hud-stats {
+      display: flex;
+      align-items: center;
+      gap: 20px;
+    }
+    .timer-box {
+      background: rgba(0, 0, 0, 0.4);
+      border: 1px solid rgba(56, 189, 248, 0.3);
+      padding: 4px 14px;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-family: var(--font-mono);
+      font-size: 18px;
+      font-weight: 800;
+      color: var(--accent-cyan);
+    }
+    .timer-warning {
+      color: var(--accent-rose) !important;
+      animation: pulse-red 1s infinite;
+    }
+    @keyframes pulse-red {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.5; }
+    }
+    .score-meter {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+      gap: 2px;
+    }
+    .score-text {
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--accent-emerald);
+    }
+    .score-bar-bg {
+      width: 140px;
+      height: 8px;
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 9999px;
+      overflow: hidden;
+    }
+    .score-bar-fill {
+      height: 100%;
+      background: linear-gradient(90deg, #10b981, #38bdf8);
+      width: 0%;
+      transition: width 0.4s ease;
+    }
+
+    /* MAIN CONTAINER */
+    .lab-container {
+      display: grid;
+      grid-template-columns: 280px 1fr 340px;
+      gap: 16px;
+      padding: 16px;
+      flex: 1;
+      height: calc(100vh - 65px);
+    }
+
+    /* LEFT PANEL: RECIPE & EQUIPMENT SHELF */
+    .shelf-panel {
+      background: var(--panel-bg);
+      border: 1px solid var(--panel-border);
+      border-radius: 12px;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+    .panel-header {
+      background: rgba(15, 23, 42, 0.7);
+      padding: 10px 14px;
+      font-family: var(--font-heading);
+      font-size: 13.5px;
+      font-weight: 700;
+      color: var(--accent-cyan);
+      border-bottom: 1px solid var(--panel-border);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .shelf-content {
+      padding: 12px;
+      overflow-y: auto;
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+    .recipe-card {
+      background: rgba(15, 23, 42, 0.6);
+      border: 1px solid rgba(56, 189, 248, 0.25);
+      border-radius: 8px;
+      padding: 10px;
+      font-size: 12px;
+    }
+    .recipe-title {
+      font-weight: 700;
+      color: var(--accent-cyan);
+      margin-bottom: 4px;
+      display: flex;
+      justify-content: space-between;
+    }
+    .recipe-item {
+      display: flex;
+      justify-content: space-between;
+      padding: 3px 0;
+      border-bottom: 1px dashed rgba(255,255,255,0.06);
+      color: #cbd5e1;
+    }
+    .shelf-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 8px;
+    }
+    .shelf-item {
+      background: rgba(15, 23, 42, 0.5);
+      border: 1.5px solid rgba(148, 163, 184, 0.2);
+      border-radius: 8px;
+      padding: 8px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 6px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      text-align: center;
+    }
+    .shelf-item:hover {
+      border-color: var(--accent-cyan);
+      background: rgba(56, 189, 248, 0.1);
+      transform: translateY(-2px);
+    }
+    .shelf-item.selected {
+      border-color: var(--accent-emerald);
+      background: rgba(16, 185, 129, 0.15);
+      box-shadow: 0 0 12px rgba(16, 185, 129, 0.3);
+    }
+    .shelf-item svg {
+      width: 44px;
+      height: 44px;
+    }
+    .shelf-item-name {
+      font-size: 11px;
+      font-weight: 600;
+      color: #e2e8f0;
+      line-height: 1.2;
+    }
+
+    /* CENTER STAGE: VIRTUAL LAB BENCH */
+    .lab-stage {
+      background: var(--panel-bg);
+      border: 1px solid var(--panel-border);
+      border-radius: 12px;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      position: relative;
+    }
+    .stage-canvas {
+      flex: 1;
+      background: radial-gradient(circle at 50% 40%, #1e293b 0%, #0f172a 100%);
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      padding: 20px;
+      overflow: hidden;
+    }
+    .stage-instructions {
+      position: absolute;
+      top: 14px;
+      left: 14px;
+      right: 14px;
+      background: rgba(15, 23, 42, 0.85);
+      border: 1px solid rgba(56, 189, 248, 0.3);
+      border-radius: 8px;
+      padding: 10px 14px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      z-index: 10;
+    }
+    .step-badge {
+      background: var(--accent-blue);
+      color: white;
+      font-size: 11px;
+      font-weight: 700;
+      padding: 3px 8px;
+      border-radius: 4px;
+      margin-right: 8px;
+    }
+    .step-prompt {
+      font-size: 13px;
+      font-weight: 600;
+      color: #f1f5f9;
+      flex: 1;
+    }
+
+    /* LAB WORKBENCH SIMULATION RIG */
+    .bench-rig {
+      width: 100%;
+      max-width: 620px;
+      height: 380px;
+      background: linear-gradient(180deg, #1e293b 0%, #0f172a 100%);
+      border: 2px solid #334155;
+      border-radius: 16px;
+      box-shadow: 0 20px 50px rgba(0,0,0,0.6), inset 0 1px 0 rgba(255,255,255,0.1);
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+
+    /* DIGITAL SCALE DEVICE */
+    .scale-device {
+      width: 320px;
+      background: #0f172a;
+      border: 2px solid #475569;
+      border-radius: 12px;
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 12px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.8);
+      position: relative;
+    }
+    .scale-pan {
+      width: 180px;
+      height: 28px;
+      background: linear-gradient(180deg, #94a3b8 0%, #64748b 100%);
+      border: 2px solid #cbd5e1;
+      border-radius: 6px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.4);
+      position: relative;
+      display: flex;
+      justify-content: center;
+      align-items: flex-end;
+    }
+    .paper-boat {
+      width: 90px;
+      height: 24px;
+      background: #f8fafc;
+      border: 1px dashed #94a3b8;
+      clip-path: polygon(15% 0%, 85% 0%, 100% 100%, 0% 100%);
+      position: absolute;
+      bottom: 22px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      font-size: 9px;
+      color: #64748b;
+      font-weight: 700;
+      transition: all 0.3s ease;
+    }
+    .powder-pile {
+      position: absolute;
+      bottom: 4px;
+      width: 0px;
+      height: 0px;
+      background: #ffffff;
+      border-radius: 50% 50% 20% 20%;
+      box-shadow: 0 0 6px rgba(255,255,255,0.8);
+      transition: all 0.2s ease;
+    }
+    .scale-screen {
+      width: 100%;
+      background: #022c22;
+      border: 1.5px solid #059669;
+      border-radius: 6px;
+      padding: 8px 12px;
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      font-family: var(--font-mono);
+    }
+    .scale-val {
+      font-size: 28px;
+      font-weight: 800;
+      color: #34d399;
+      text-shadow: 0 0 10px rgba(52, 211, 153, 0.5);
+    }
+    .scale-unit {
+      font-size: 14px;
+      color: #10b981;
+      font-weight: 700;
+    }
+    .scale-status {
+      font-size: 10px;
+      color: #6ee7b7;
+      font-weight: 600;
+    }
+    .scale-btn-row {
+      display: flex;
+      gap: 10px;
+      width: 100%;
+    }
+    .game-btn {
+      flex: 1;
+      background: linear-gradient(180deg, #1e293b 0%, #0f172a 100%);
+      border: 1px solid #475569;
+      color: #e2e8f0;
+      font-family: var(--font-heading);
+      font-size: 12px;
+      font-weight: 700;
+      padding: 8px 10px;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: all 0.15s ease;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 6px;
+    }
+    .game-btn:hover {
+      border-color: var(--accent-cyan);
+      color: white;
+      transform: translateY(-1px);
+    }
+    .game-btn:active {
+      transform: translateY(1px);
+    }
+    .game-btn-primary {
+      background: linear-gradient(180deg, #0284c7 0%, #0369a1 100%);
+      border-color: #38bdf8;
+      color: white;
+    }
+
+    /* INTERACTION CONTROLS BAR */
+    .stage-actions {
+      background: rgba(15, 23, 42, 0.95);
+      border-top: 1px solid var(--panel-border);
+      padding: 12px 18px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+    }
+    .action-guide {
+      font-size: 12px;
+      color: var(--text-muted);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    /* RIGHT PANEL: CHECKLIST & FLOWCHART */
+    .rubric-panel {
+      background: var(--panel-bg);
+      border: 1px solid var(--panel-border);
+      border-radius: 12px;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+    .rubric-tabs {
+      display: flex;
+      background: rgba(15, 23, 42, 0.7);
+      border-bottom: 1px solid var(--panel-border);
+    }
+    .rubric-tab-btn {
+      flex: 1;
+      padding: 10px;
+      text-align: center;
+      font-family: var(--font-heading);
+      font-size: 12.5px;
+      font-weight: 700;
+      color: var(--text-muted);
+      cursor: pointer;
+      border: none;
+      background: transparent;
+      border-bottom: 2px solid transparent;
+      transition: all 0.2s ease;
+    }
+    .rubric-tab-btn.active {
+      color: var(--accent-cyan);
+      border-bottom-color: var(--accent-cyan);
+      background: rgba(56, 189, 248, 0.05);
+    }
+    .rubric-content {
+      padding: 12px;
+      overflow-y: auto;
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    .chk-item {
+      background: rgba(15, 23, 42, 0.5);
+      border: 1px solid rgba(148, 163, 184, 0.15);
+      border-radius: 6px;
+      padding: 8px 10px;
+      font-size: 11.5px;
+      display: flex;
+      align-items: flex-start;
+      gap: 8px;
+      transition: all 0.25s ease;
+    }
+    .chk-item.passed {
+      border-color: rgba(16, 185, 129, 0.5);
+      background: rgba(16, 185, 129, 0.08);
+    }
+    .chk-item.failed {
+      border-color: rgba(244, 63, 94, 0.5);
+      background: rgba(244, 63, 94, 0.08);
+    }
+    .chk-icon {
+      font-size: 13px;
+      flex-shrink: 0;
+      margin-top: 1px;
+    }
+    .chk-text {
+      flex: 1;
+      line-height: 1.4;
+      color: #cbd5e1;
+    }
+    .chk-score {
+      font-family: var(--font-mono);
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--accent-cyan);
+      flex-shrink: 0;
+    }
+
+    /* MODAL POPUP */
+    .modal-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.75);
+      backdrop-filter: blur(8px);
+      z-index: 100;
+      display: none;
+      justify-content: center;
+      align-items: center;
+      padding: 20px;
+    }
+    .modal-card {
+      background: #1e293b;
+      border: 1.5px solid var(--accent-cyan);
+      border-radius: 16px;
+      width: 100%;
+      max-width: 580px;
+      padding: 24px;
+      box-shadow: 0 25px 60px rgba(0,0,0,0.8);
+      position: relative;
+    }
+    .modal-title {
+      font-family: var(--font-heading);
+      font-size: 18px;
+      font-weight: 800;
+      color: #ffffff;
+      margin-bottom: 12px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    /* ANIMATED TRITURATION WHEEL */
+    .triturate-zone {
+      width: 220px;
+      height: 220px;
+      border-radius: 50%;
+      background: radial-gradient(circle, #334155 30%, #1e293b 70%, #0f172a 100%);
+      border: 6px solid #64748b;
+      box-shadow: inset 0 0 30px rgba(0,0,0,0.8), 0 10px 25px rgba(0,0,0,0.5);
+      position: relative;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      cursor: grab;
+      touch-action: none;
+    }
+    .triturate-zone:active {
+      cursor: grabbing;
+    }
+    .mortar-pestle-head {
+      width: 42px;
+      height: 42px;
+      background: radial-gradient(circle at 35% 35%, #e2e8f0, #94a3b8);
+      border-radius: 50%;
+      position: absolute;
+      pointer-events: none;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.6);
+      transform: translate(-50%, -50%);
+    }
+    .fineness-bar-container {
+      width: 100%;
+      margin-top: 14px;
+    }
+    .fineness-bar {
+      height: 10px;
+      background: rgba(255,255,255,0.1);
+      border-radius: 9999px;
+      overflow: hidden;
+      margin-top: 4px;
+    }
+    .fineness-fill {
+      height: 100%;
+      background: linear-gradient(90deg, #f59e0b, #10b981);
+      width: 0%;
+      transition: width 0.15s ease;
+    }
+
+    /* MENISCUS SIMULATION */
+    .cylinder-container {
+      width: 90px;
+      height: 260px;
+      background: rgba(255,255,255,0.05);
+      border-left: 3px solid rgba(255,255,255,0.4);
+      border-right: 3px solid rgba(255,255,255,0.4);
+      border-bottom: 5px solid rgba(255,255,255,0.6);
+      border-radius: 0 0 10px 10px;
+      position: relative;
+      display: flex;
+      flex-direction: column-reverse;
+      overflow: hidden;
+    }
+    .liquid-fill {
+      width: 100%;
+      background: linear-gradient(180deg, rgba(56, 189, 248, 0.4) 0%, rgba(2, 132, 199, 0.7) 100%);
+      transition: height 0.3s ease;
+      position: relative;
+    }
+    .meniscus-curve {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 12px;
+      background: transparent;
+      border-bottom: 2.5px solid #38bdf8;
+      border-radius: 50%;
+      transform: translateY(-50%);
+    }
+    .grad-mark {
+      position: absolute;
+      right: 0;
+      width: 14px;
+      height: 1px;
+      background: rgba(255,255,255,0.4);
+    }
+    .grad-mark.major {
+      width: 24px;
+      background: #ffffff;
+    }
+    .grad-label {
+      position: absolute;
+      right: 28px;
+      font-size: 8px;
+      font-family: var(--font-mono);
+      color: rgba(255,255,255,0.7);
+      transform: translateY(-50%);
+    }
+  </style>
+</head>
+<body>
+
+  <!-- TOP HUD -->
+  <header class="lab-hud">
+    <div class="hud-title">
+      <span class="hud-badge">OSPE-PD Lab</span>
+      <div class="hud-station-name">สถานีที่ 1: การเตรียมยา Sodium Bicarbonate Oral Solution 30 mL</div>
+    </div>
+    <div class="hud-stats">
+      <div class="timer-box" id="hud-timer">⏱️ 04:00</div>
+      <div class="score-meter">
+        <div class="score-text" id="score-display">คะแนนสะสม: 0.0 / 10.0 (0%)</div>
+        <div class="score-bar-bg">
+          <div class="score-bar-fill" id="score-bar"></div>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- MAIN SIMULATION WORKSPACE -->
+  <div class="lab-container">
+
+    <!-- LEFT PANEL: RECIPE & EQUIPMENT SHELF -->
+    <aside class="shelf-panel">
+      <div class="panel-header">
+        <span>📋 สูตรตำรับ & ชั้นวางอุปกรณ์</span>
+        <span style="font-size:11px; color:#94a3b8;">Station Rx</span>
+      </div>
+      <div class="shelf-content">
+        <!-- RECIPE CARD -->
+        <div class="recipe-card">
+          <div class="recipe-title">
+            <span>สูตรยา (Master Formula 100 mL)</span>
+            <span style="color:#f59e0b;">เตรียม 30 mL</span>
+          </div>
+          <div class="recipe-item">
+            <span>Sodium bicarbonate (NaHCO3)</span>
+            <b>5.0 g</b>
+          </div>
+          <div class="recipe-item">
+            <span>Glycerin (สารหนืด)</span>
+            <b>15.0 mL</b>
+          </div>
+          <div class="recipe-item">
+            <span>Purified water qs to</span>
+            <b>100.0 mL</b>
+          </div>
+          <div style="margin-top:6px; font-size:10.5px; color:#38bdf8;">
+            💡 Factor การคำนวณ: 30 / 100 = <b>0.30</b>
+          </div>
+        </div>
+
+        <!-- EQUIPMENT SHELF -->
+        <div style="font-size:11.5px; font-weight:700; color:#94a3b8; margin-top:4px;">
+          📦 เลือกอุปกรณ์มาวางบนโต๊ะ (Click to Place):
+        </div>
+        <div class="shelf-grid">
+          <div class="shelf-item" id="eq-balance" onclick="selectEquipment('balance')">
+            <svg viewBox="0 0 24 24" fill="none" stroke="#38bdf8" stroke-width="1.8">
+              <rect x="2" y="14" width="20" height="7" rx="2"></rect>
+              <rect x="5" y="10" width="14" height="4" rx="1"></rect>
+              <rect x="7" y="16" width="10" height="3" fill="#0284c7"></rect>
+            </svg>
+            <div class="shelf-item-name">เครื่องชั่งไฟฟ้า (Balance)</div>
+          </div>
+
+          <div class="shelf-item" id="eq-mortar" onclick="selectEquipment('mortar')">
+            <svg viewBox="0 0 24 24" fill="none" stroke="#38bdf8" stroke-width="1.8">
+              <path d="M4 8C4 16 8 20 12 20C16 20 20 16 20 8H4Z"></path>
+              <path d="M14 4L11 9" stroke="#f59e0b" stroke-width="2.2" stroke-linecap="round"></path>
+            </svg>
+            <div class="shelf-item-name">โกร่งแก้ว (Glass Mortar)</div>
+          </div>
+
+          <div class="shelf-item" id="eq-beaker" onclick="selectEquipment('beaker')">
+            <svg viewBox="0 0 24 24" fill="none" stroke="#38bdf8" stroke-width="1.8">
+              <path d="M5 4V19C5 20.1 5.9 21 7 21H17C18.1 21 19 20.1 19 19V4H5Z"></path>
+              <path d="M4 4H20"></path>
+              <line x1="8" y1="10" x2="11" y2="10"></line>
+              <line x1="8" y1="14" x2="13" y2="14"></line>
+            </svg>
+            <div class="shelf-item-name">บีกเกอร์ 50 mL</div>
+          </div>
+
+          <div class="shelf-item" id="eq-cylinder" onclick="selectEquipment('cylinder')">
+            <svg viewBox="0 0 24 24" fill="none" stroke="#38bdf8" stroke-width="1.8">
+              <rect x="8" y="3" width="8" height="17" rx="1"></rect>
+              <line x1="10" y1="7" x2="14" y2="7"></line>
+              <line x1="10" y1="11" x2="14" y2="11"></line>
+              <line x1="10" y1="15" x2="14" y2="15"></line>
+              <path d="M6 21H18"></path>
+            </svg>
+            <div class="shelf-item-name">กระบอกตวง 50 mL</div>
+          </div>
+
+          <div class="shelf-item" id="eq-spatula" onclick="selectEquipment('spatula')">
+            <svg viewBox="0 0 24 24" fill="none" stroke="#38bdf8" stroke-width="1.8">
+              <path d="M4 20L15 9L18 12L7 23L4 20Z"></path>
+              <path d="M15 9L19 5C20 4 21 5 20 6L16 10"></path>
+            </svg>
+            <div class="shelf-item-name">Spatula สแตนเลส</div>
+          </div>
+
+          <div class="shelf-item" id="eq-washbottle" onclick="selectEquipment('washbottle')">
+            <svg viewBox="0 0 24 24" fill="none" stroke="#38bdf8" stroke-width="1.8">
+              <rect x="7" y="9" width="10" height="13" rx="2"></rect>
+              <path d="M12 9V5L17 3"></path>
+            </svg>
+            <div class="shelf-item-name">ขวดน้ำกลั่น (Water)</div>
+          </div>
+        </div>
+      </div>
+    </aside>
+
+    <!-- CENTER PANEL: INTERACTIVE LAB BENCH STAGE -->
+    <main class="lab-stage">
+      <div class="stage-instructions">
+        <div style="display:flex; align-items:center;">
+          <span class="step-badge" id="step-badge">ขั้นตอนที่ 1 / 5</span>
+          <span class="step-prompt" id="step-prompt">ตรวจสอบฉลากขวดสาร NaHCO3 แล้ววางกระทงและกด Tare บนเครื่องชั่ง</span>
+        </div>
+        <button class="game-btn game-btn-primary" style="flex:none; padding:4px 12px; font-size:11.5px;" onclick="nextStepManually()">ข้ามไปด่านถัดไป ⏩</button>
+      </div>
+
+      <div class="stage-canvas" id="stage-canvas">
+        <!-- DYNAMIC MINI-GAME STAGE RIG -->
+        <div class="bench-rig" id="bench-rig">
+          <!-- STAGE CONTENT INJECTED BY JAVASCRIPT -->
+        </div>
+      </div>
+
+      <!-- BOTTOM INTERACTION ACTIONS BAR -->
+      <div class="stage-actions">
+        <div class="action-guide" id="action-guide">
+          <span>💡 เคล็ดลับสถานี:</span> <span id="guide-text" style="color:#e2e8f0;">อ่านฉลากสารเคมีครบ 3 ครั้ง (ก่อนหยิบ, ก่อนชั่ง, หลังชั่ง) เพื่อรับ 1 คะแนนเต็ม</span>
+        </div>
+        <div style="display:flex; gap:8px;">
+          <button class="game-btn" onclick="playBeep(440, 0.1)">🔊 เปิดเสียงเอฟเฟกต์</button>
+          <button class="game-btn" onclick="resetCurrentGame()">🔄 เริ่มซ้อมด่านนี้ใหม่</button>
+        </div>
+      </div>
+    </main>
+
+    <!-- RIGHT PANEL: CHECKLIST & OSPE FLOWCHART -->
+    <aside class="rubric-panel">
+      <div class="rubric-tabs">
+        <button class="rubric-tab-btn active" id="tab-btn-chk" onclick="switchRubricTab('chk')">เกณฑ์ Checklist สภาฯ</button>
+        <button class="rubric-tab-btn" id="tab-btn-flow" onclick="switchRubricTab('flow')">Flowchart ลำดับผสม</button>
+      </div>
+
+      <div class="rubric-content" id="rubric-content-chk">
+        <!-- CHECKLIST ITEMS -->
+        <div class="chk-item" id="chk-label">
+          <span class="chk-icon" id="icon-label">⏳</span>
+          <div class="chk-text">
+            <b>1. การอ่านฉลากสารเคมี (Active Ingredient)</b><br>
+            อ่านฉลากขวด NaHCO3 ครบ 3 ครั้ง และวางหงายฝาขวดสารเสมอ
+          </div>
+          <span class="chk-score">+1.0</span>
+        </div>
+
+        <div class="chk-item" id="chk-tare">
+          <span class="chk-icon" id="icon-tare">⏳</span>
+          <div class="chk-text">
+            <b>2. การปรับสมดุลเครื่องชั่ง (Tare)</b><br>
+            พับกระทงกระดาษไข วางบนจานชั่ง และกด Tare ให้หน้าปัดเป็น 0.000 g
+          </div>
+          <span class="chk-score">+1.5</span>
+        </div>
+
+        <div class="chk-item" id="chk-weigh">
+          <span class="chk-icon" id="icon-weigh">⏳</span>
+          <div class="chk-text">
+            <b>3. พิกัดความแม่นยำในการชั่ง (Weight Precision)</b><br>
+            ชั่ง NaHCO3 ได้ 1.500 g ภายในช่วงความคลาดเคลื่อนยอมรับได้ (1.425 - 1.575 g)
+          </div>
+          <span class="chk-score">+2.0</span>
+        </div>
+
+        <div class="chk-item" id="chk-order">
+          <span class="chk-icon" id="icon-order">⏳</span>
+          <div class="chk-text">
+            <b>4. ลำดับการผสม (Order of Mixing)</b><br>
+            ละลาย NaHCO3 ในน้ำกลั่น 10-15 mL ก่อนเติมสารหนืด Glycerin
+          </div>
+          <span class="chk-score">+1.5</span>
+        </div>
+
+        <div class="chk-item" id="chk-drain">
+          <span class="chk-icon" id="icon-drain">⏳</span>
+          <div class="chk-text">
+            <b>5. เวลาการถ่ายสารหนืด (Draining Time)</b><br>
+            เท Glycerin และรอให้ของเหลวไหลลงจนหมดอย่างน้อย 15-30 วินาที
+          </div>
+          <span class="chk-score">+1.0</span>
+        </div>
+
+        <div class="chk-item" id="chk-rinse">
+          <span class="chk-icon" id="icon-rinse">⏳</span>
+          <div class="chk-text">
+            <b>6. การล้างภาชนะ (Rinsing Technique)</b><br>
+            Rinse บีกเกอร์ด้วยน้ำกลั่นอย่างน้อย 2 รอบ แล้วเทรวมลงกระบอกตวง
+          </div>
+          <span class="chk-score">+1.5</span>
+        </div>
+
+        <div class="chk-item" id="chk-meniscus">
+          <span class="chk-icon" id="icon-meniscus">⏳</span>
+          <div class="chk-text">
+            <b>7. การปรับปริมาตรและดู Meniscus</b><br>
+            ปรับปริมาตรจนท้องน้ำแตะขีด 30 mL ในระดับสายตาพอดี
+          </div>
+          <span class="chk-score">+1.5</span>
+        </div>
+      </div>
+
+      <div class="rubric-content" id="rubric-content-flow" style="display:none;">
+        <div style="background:rgba(15,23,42,0.6); padding:10px; border-radius:8px; border:1px solid #334155; font-size:11px; line-height:1.6;">
+          <div style="color:var(--accent-cyan); font-weight:700; margin-bottom:6px;">📊 ผังลำดับการเตรียมยา (Order of Mixing Flowchart)</div>
+          <div style="display:flex; flex-direction:column; gap:6px;">
+            <div style="padding:6px; background:#1e293b; border-left:3px solid #38bdf8; border-radius:4px;">
+              <b>1. ชั่ง NaHCO3:</b> 1.5 g (บดลดขนาดหากเป็นก้อนแข็ง)
+            </div>
+            <div style="text-align:center; color:#64748b;">⬇️</div>
+            <div style="padding:6px; background:#1e293b; border-left:3px solid #10b981; border-radius:4px;">
+              <b>2. ละลายผงยา:</b> ละลายใน Purified water 10-15 mL ในบีกเกอร์จนใสสนิท
+            </div>
+            <div style="text-align:center; color:#64748b;">⬇️</div>
+            <div style="padding:6px; background:#1e293b; border-left:3px solid #f59e0b; border-radius:4px;">
+              <b>3. เติม Glycerin:</b> ตวง 4.5 mL เทลงบีกเกอร์ รอ Draining time 30 วินาที
+            </div>
+            <div style="text-align:center; color:#64748b;">⬇️</div>
+            <div style="padding:6px; background:#1e293b; border-left:3px solid #8b5cf6; border-radius:4px;">
+              <b>4. Rinse บีกเกอร์ 2 ครั้ง:</b> ใช้น้ำกลั่นล้างบีกเกอร์เทลงกระบอกตวง
+            </div>
+            <div style="text-align:center; color:#64748b;">⬇️</div>
+            <div style="padding:6px; background:#1e293b; border-left:3px solid #ec4899; border-radius:4px;">
+              <b>5. ปรับปริมาตร:</b> เติมน้ำกลั่นจนท้องน้ำแตะขีด 30 mL บรรจุขวดชา
+            </div>
+          </div>
+        </div>
+      </div>
+    </aside>
+
+  </div>
+
+  <!-- COMPLETION MODAL -->
+  <div class="modal-overlay" id="finish-modal">
+    <div class="modal-card">
+      <div class="modal-title">
+        <span>🏆 สรุปผลการฝึกซ้อมสถานี OSPE Product</span>
+      </div>
+      <div style="text-align:center; padding:16px 0;">
+        <div style="font-size:48px;" id="modal-emoji">🎉</div>
+        <div style="font-size:24px; font-weight:800; color:#38bdf8; margin:8px 0;" id="modal-score-title">ได้คะแนน: 10.0 / 10.0</div>
+        <div style="font-size:14px; color:#10b981; font-weight:700;" id="modal-pass-status">✅ ผ่านเกณฑ์มาตรฐานสภาเภสัชกรรม (มากกว่า 80%)</div>
+      </div>
+      <div style="background:rgba(15,23,42,0.8); border-radius:8px; padding:12px; margin:12px 0; font-size:12px; line-height:1.5;" id="modal-feedback-list">
+        <!-- FEEDBACK ITEMS -->
+      </div>
+      <div style="display:flex; justify-content:flex-end; gap:10px; margin-top:16px;">
+        <button class="game-btn" onclick="document.getElementById('finish-modal').style.display='none'">ปิดหน้าต่าง</button>
+        <button class="game-btn game-btn-primary" onclick="restartEntireStation()">🔄 เริ่มทำสถานีนี้ใหม่อีกครั้ง</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    /* ============================================================
+       AUDIO SYNTHESIZER (Web Audio API - No external files needed)
+    ============================================================ */
+    const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    function playBeep(freq = 440, duration = 0.1, type = 'sine') {
+      try {
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+        osc.type = type;
+        osc.frequency.value = freq;
+        gain.gain.setValueAtTime(0.15, audioCtx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + duration);
+        osc.connect(gain);
+        gain.connect(audioCtx.destination);
+        osc.start();
+        osc.stop(audioCtx.currentTime + duration);
+      } catch(e) {}
+    }
+    function playSuccessChime() {
+      playBeep(523.25, 0.12, 'triangle');
+      setTimeout(() => playBeep(659.25, 0.14, 'triangle'), 100);
+      setTimeout(() => playBeep(783.99, 0.22, 'triangle'), 220);
+    }
+    function playErrorBuzzer() {
+      playBeep(220, 0.25, 'sawtooth');
+      setTimeout(() => playBeep(180, 0.35, 'sawtooth'), 120);
+    }
+
+    /* ============================================================
+       GAME STATE & SCORING
+    ============================================================ */
+    const G = {
+      currentStep: 1,
+      totalSteps: 5,
+      score: 0.0,
+      maxScore: 10.0,
+      checklist: {
+        label: false,
+        tare: false,
+        weigh: false,
+        order: false,
+        drain: false,
+        rinse: false,
+        meniscus: false
+      },
+      // Weighing stage variables
+      scaleTare: false,
+      paperPlaced: false,
+      currentWeight: 0.000,
+      targetWeight: 1.500,
+      // Trituration stage variables
+      grindProgress: 0,
+      isGrinding: false,
+      // Meniscus stage variables
+      liquidLevel: 0,
+      targetLevel: 30,
+      eyeAligned: false
+    };
+
+    function updateScore(itemKey, pts, pass) {
+      if (pass && !G.checklist[itemKey]) {
+        G.checklist[itemKey] = true;
+        G.score = Math.min(G.maxScore, G.score + pts);
+        playSuccessChime();
+        markChecklistDOM(itemKey, true);
+      } else if (!pass && G.checklist[itemKey]) {
+        G.checklist[itemKey] = false;
+        G.score = Math.max(0, G.score - pts);
+        playErrorBuzzer();
+        markChecklistDOM(itemKey, false);
+      }
+      renderHUD();
+    }
+
+    function markChecklistDOM(itemKey, passed) {
+      const el = document.getElementById('chk-' + itemKey);
+      const icon = document.getElementById('icon-' + itemKey);
+      if (!el || !icon) return;
+      if (passed) {
+        el.className = 'chk-item passed';
+        icon.textContent = '✅';
+      } else {
+        el.className = 'chk-item failed';
+        icon.textContent = '❌';
+      }
+    }
+
+    function renderHUD() {
+      const scoreEl = document.getElementById('score-display');
+      const barEl = document.getElementById('score-bar');
+      const pct = Math.round((G.score / G.maxScore) * 100);
+      if (scoreEl) scoreEl.textContent = `คะแนนสะสม: ${G.score.toFixed(1)} / ${G.maxScore.toFixed(1)} (${pct}%)`;
+      if (barEl) barEl.style.width = pct + '%';
+    }
+
+    /* ============================================================
+       STEP 1: BOTTLE INSPECTION & WEIGHING MINIGAME
+    ============================================================ */
+    function loadStep1_Weighing() {
+      G.currentStep = 1;
+      document.getElementById('step-badge').textContent = 'ขั้นตอนที่ 1 / 5';
+      document.getElementById('step-prompt').textContent = 'ตรวจอ่านฉลากขวดสาร NaHCO3 แล้ววางกระทงและกด Tare บนเครื่องชั่งไฟฟ้า';
+      document.getElementById('guide-text').textContent = 'เทคนิค: อ่านฉลากสาร 3 ครั้งเพื่อความปลอดภัย วางกระทงชั่งแล้วกด Tare ก่อนตักสาร';
+
+      const rig = document.getElementById('bench-rig');
+      rig.innerHTML = `
+        <div style="display:flex; gap:30px; align-items:center; width:100%; justify-content:center;">
+          <!-- CHEMICAL BOTTLE -->
+          <div style="display:flex; flex-direction:column; align-items:center; gap:8px;">
+            <div id="chem-bottle" style="width:100px; height:140px; background:linear-gradient(180deg, #334155, #1e293b); border:2px solid #64748b; border-radius:12px; position:relative; display:flex; flex-direction:column; align-items:center; padding:10px; cursor:pointer;" onclick="inspectLabel()">
+              <div style="width:50px; height:20px; background:#94a3b8; border-radius:4px; margin-top:-18px; border:1px solid #cbd5e1;"></div>
+              <div style="background:#ffffff; border-radius:4px; padding:6px; margin-top:14px; width:100%; text-align:center; box-shadow:0 2px 6px rgba(0,0,0,0.4);">
+                <div style="font-size:9.5px; font-weight:800; color:#0f172a; line-height:1.2;">Sodium Bicarbonate</div>
+                <div style="font-size:8px; color:#475569;">NaHCO3 Pure USP</div>
+                <div style="font-size:7px; color:#dc2626; font-weight:700; margin-top:2px;">EXP: 10/2028</div>
+              </div>
+            </div>
+            <button class="game-btn" id="btn-read-label" style="font-size:11px; padding:5px 10px;" onclick="inspectLabel()">🔍 อ่านฉลากสาร (0/3)</button>
+          </div>
+
+          <!-- DIGITAL BALANCE -->
+          <div class="scale-device">
+            <div class="scale-pan" id="scale-pan">
+              <div class="paper-boat" id="paper-boat" style="display:none;">
+                กระทงกระดาษ
+                <div class="powder-pile" id="powder-pile"></div>
+              </div>
+            </div>
+            <div class="scale-screen">
+              <span class="scale-status" id="scale-status">STANDBY</span>
+              <span class="scale-val" id="scale-val">0.000</span>
+              <span class="scale-unit">g</span>
+            </div>
+            <div class="scale-btn-row">
+              <button class="game-btn" id="btn-place-boat" onclick="placeWeighingBoat()">📄 วางกระทงชั่ง</button>
+              <button class="game-btn" id="btn-tare" onclick="pressTare()">⚡ กด TARE</button>
+            </div>
+            <div class="scale-btn-row">
+              <button class="game-btn game-btn-primary" id="btn-scoop-low" onclick="scoopPowder(0.200)">🥄 ตักสาร (+0.2g)</button>
+              <button class="game-btn game-btn-primary" id="btn-scoop-micro" onclick="scoopPowder(0.025)">🤏 เคาะช้อน (+0.025g)</button>
+            </div>
+          </div>
+        </div>
+      `;
+    }
+
+    let labelReadCount = 0;
+    function inspectLabel() {
+      labelReadCount++;
+      playBeep(600, 0.08);
+      const btn = document.getElementById('btn-read-label');
+      if (btn) btn.textContent = `🔍 อ่านฉลากสาร (${labelReadCount}/3)`;
+      if (labelReadCount >= 3) {
+        updateScore('label', 1.0, true);
+        if (btn) {
+          btn.textContent = '✅ ตรวจฉลากครบ 3 ครั้งแล้ว';
+          btn.style.borderColor = '#10b981';
+          btn.style.color = '#34d399';
+        }
+      }
+    }
+
+    function placeWeighingBoat() {
+      if (G.paperPlaced) return;
+      G.paperPlaced = true;
+      playBeep(350, 0.1);
+      document.getElementById('paper-boat').style.display = 'flex';
+      G.currentWeight = 0.320; // น้ำหนักกระทงเปล่า
+      document.getElementById('scale-val').textContent = G.currentWeight.toFixed(3);
+      document.getElementById('scale-status').textContent = 'WEIGHING';
+      document.getElementById('btn-place-boat').disabled = true;
+      document.getElementById('btn-place-boat').style.opacity = '0.5';
+    }
+
+    function pressTare() {
+      if (!G.paperPlaced) {
+        alert('กรุณาวางกระทงชั่งบนจานชั่งก่อนกด TARE!');
+        playErrorBuzzer();
+        return;
+      }
+      playBeep(800, 0.15);
+      G.scaleTare = true;
+      G.currentWeight = 0.000;
+      document.getElementById('scale-val').textContent = '0.000';
+      document.getElementById('scale-status').textContent = 'TARED [NET 0]';
+      updateScore('tare', 1.5, true);
+    }
+
+    function scoopPowder(amt) {
+      if (!G.paperPlaced) {
+        alert('กรุณาวางกระทงชั่งสารก่อน!');
+        return;
+      }
+      if (!G.scaleTare) {
+        alert('⚠️ คำเตือนเกณฑ์สภาฯ: ลืมกด TARE หักน้ำหนักกระทง! ถูกหักคะแนนความคลาดเคลื่อน');
+        playErrorBuzzer();
+      }
+      playBeep(520, 0.06);
+      G.currentWeight += amt;
+      const displayVal = G.scaleTare ? G.currentWeight : (G.currentWeight + 0.320);
+      document.getElementById('scale-val').textContent = displayVal.toFixed(3);
+
+      // Update powder graphic size
+      const pile = document.getElementById('powder-pile');
+      if (pile) {
+        const sz = Math.min(22, Math.round(G.currentWeight * 12));
+        pile.style.width = sz * 2 + 'px';
+        pile.style.height = sz + 'px';
+      }
+
+      // Check target range (1.500 g +/- 5% -> 1.425 to 1.575 g)
+      if (G.scaleTare && G.currentWeight >= 1.425 && G.currentWeight <= 1.575) {
+        updateScore('weigh', 2.0, true);
+        document.getElementById('scale-status').textContent = '✅ TARGET ACCURATE';
+        document.getElementById('scale-status').style.color = '#34d399';
+        setTimeout(() => {
+          alert('🎉 ยอดเยี่ยมมาก! ชั่ง NaHCO3 ได้ตรงพิกัดความถูกต้อง (1.500 g +/- 5%)\nกดตกลงเพื่อเข้าสู่ขั้นตอนที่ 2 (การบดลดขนาดผงยา)');
+          loadStep2_Trituration();
+        }, 300);
+      } else if (G.currentWeight > 1.65) {
+        playErrorBuzzer();
+        document.getElementById('scale-status').textContent = '⚠️ OVERWEIGHT (เกินพิกัด)';
+        document.getElementById('scale-status').style.color = '#f43f5e';
+      }
+    }
+
+    /* ============================================================
+       STEP 2: TRITURATION (MORTAR & PESTLE MINIGAME)
+    ============================================================ */
+    function loadStep2_Trituration() {
+      G.currentStep = 2;
+      document.getElementById('step-badge').textContent = 'ขั้นตอนที่ 2 / 5';
+      document.getElementById('step-prompt').textContent = 'เทผงยา NaHCO3 ลงในโกร่งแก้ว แล้วใช้เมาส์/นิ้วหมุนวนลูกโกร่งเพื่อบดลดขนาดผงยา (Triturate)';
+      document.getElementById('guide-text').textContent = 'เทคนิค: หมุนวนลูกโกร่งเป็นวงก้นหอยทวนเข็มนาฬิกาจนผงยาละเอียดสม่ำเสมอ';
+
+      const rig = document.getElementById('bench-rig');
+      rig.innerHTML = `
+        <div style="display:flex; flex-direction:column; align-items:center; gap:16px;">
+          <div style="font-size:13px; font-weight:700; color:#38bdf8;">🥣 ลากเมาส์หมุนวนในโกร่งเพื่อบดผงยา (Trituration)</div>
+          
+          <div class="triturate-zone" id="triturate-zone" onmousedown="startGrinding(event)" onmousemove="doGrinding(event)" onmouseup="stopGrinding()">
+            <div class="mortar-pestle-head" id="pestle-head" style="top:50%; left:50%;"></div>
+            <div id="grind-particles" style="font-size:24px; opacity:0.8;">🧂</div>
+          </div>
+
+          <div class="fineness-bar-container" style="width:280px; text-align:center;">
+            <div style="display:flex; justify-content:space-between; font-size:11px; font-weight:700;">
+              <span style="color:#94a3b8;">ผงหยาบ (Coarse)</span>
+              <span id="fineness-text" style="color:#38bdf8;">ความละเอียด: 0%</span>
+              <span style="color:#10b981;">ผงละเอียดเนียน (Fine)</span>
+            </div>
+            <div class="fineness-bar">
+              <div class="fineness-fill" id="fineness-fill"></div>
+            </div>
+          </div>
+
+          <button class="game-btn" onclick="scrapeMortarWall()">🧹 ใช้ Spatula ปาดผงยาที่เกาะขอบโกร่ง</button>
+        </div>
+      `;
+    }
+
+    function startGrinding(e) {
+      G.isGrinding = true;
+      doGrinding(e);
+    }
+    function stopGrinding() {
+      G.isGrinding = false;
+    }
+    function doGrinding(e) {
+      if (!G.isGrinding) return;
+      const zone = document.getElementById('triturate-zone');
+      const rect = zone.getBoundingClientRect();
+      const x = e.clientX - rect.left;
+      const y = e.clientY - rect.top;
+      const pestle = document.getElementById('pestle-head');
+      if (pestle) {
+        pestle.style.left = x + 'px';
+        pestle.style.top = y + 'px';
+      }
+
+      G.grindProgress = Math.min(100, G.grindProgress + 1.2);
+      playBeep(240 + Math.random() * 80, 0.04, 'triangle');
+
+      const fill = document.getElementById('fineness-fill');
+      const txt = document.getElementById('fineness-text');
+      if (fill) fill.style.width = G.grindProgress + '%';
+      if (txt) txt.textContent = `ความละเอียด: ${Math.round(G.grindProgress)}%`;
+
+      if (G.grindProgress >= 100) {
+        G.isGrinding = false;
+        playSuccessChime();
+        setTimeout(() => {
+          alert('🎉 บดลดขนาดผงยา NaHCO3 ละเอียดเนียนสม่ำเสมอแล้ว!\nเข้าสู่ขั้นตอนที่ 3: ลำดับการผสม (Order of Mixing)');
+          loadStep3_OrderOfMixing();
+        }, 200);
+      }
+    }
+    function scrapeMortarWall() {
+      playBeep(500, 0.1);
+      alert('🧹 ใช้ Spatula ปาดกวาดผงยาที่เกาะตามผนังโกร่งลงมารวมกันที่ก้นโกร่งเรียบร้อย (เทคนิคถูกต้องตาม Checklist)');
+      G.grindProgress = Math.min(100, G.grindProgress + 15);
+      const fill = document.getElementById('fineness-fill');
+      if (fill) fill.style.width = G.grindProgress + '%';
+    }
+
+    /* ============================================================
+       STEP 3: ORDER OF MIXING & DRAINING TIME
+    ============================================================ */
+    function loadStep3_OrderOfMixing() {
+      G.currentStep = 3;
+      document.getElementById('step-badge').textContent = 'ขั้นตอนที่ 3 / 5';
+      document.getElementById('step-prompt').textContent = 'เลือกลำดับการผสมให้ถูกต้องตามหลักเภสัชกรรม (Order of Mixing)';
+      document.getElementById('guide-text').textContent = 'คำถามสำคัญ: ละลายผง NaHCO3 ในน้ำก่อน หรือใส่ Glycerin ก่อน?';
+
+      const rig = document.getElementById('bench-rig');
+      rig.innerHTML = `
+        <div style="display:flex; flex-direction:column; align-items:center; gap:16px; width:100%; max-width:480px;">
+          <div style="font-size:14px; font-weight:700; color:#38bdf8; text-align:center;">
+            ❓ ควรละลายผงยา NaHCO3 ด้วยวิธีใดจึงถูกต้อง?
+          </div>
+
+          <div style="display:flex; flex-direction:column; gap:10px; width:100%;">
+            <button class="game-btn" style="padding:12px; font-size:13px; text-align:left;" onclick="chooseOrder(false)">
+              ❌ A. เท Glycerin 4.5 mL ลงไปในโกร่งผงยา NaHCO3 ทันที แล้วคนให้เข้ากัน
+            </button>
+            <button class="game-btn game-btn-primary" style="padding:12px; font-size:13px; text-align:left;" onclick="chooseOrder(true)">
+              ✅ B. ถ่ายผงยาลงบีกเกอร์ ละลายด้วยน้ำกลั่น 10-15 mL ก่อน แล้วจึงเติม Glycerin
+            </button>
+            <button class="game-btn" style="padding:12px; font-size:13px; text-align:left;" onclick="chooseOrder(false)">
+              ❌ C. เทส่วนผสมทั้งหมดลงในขวดบรรจุยาพร้อมกัน แล้วเขย่าขวดอย่างแรง
+            </button>
+          </div>
+
+          <div id="order-feedback" style="font-size:12px; line-height:1.5; color:#94a3b8; text-align:center; min-height:40px;"></div>
+        </div>
+      `;
+    }
+
+    function chooseOrder(isCorrect) {
+      const fb = document.getElementById('order-feedback');
+      if (isCorrect) {
+        updateScore('order', 1.5, true);
+        fb.innerHTML = '<span style="color:#34d399; font-weight:700;">✅ ถูกต้องยอดเยี่ยม!</span> NaHCO3 ต้องละลายในน้ำก่อน เพราะหากใส่ Glycerin ก่อน สารละลายจะหนืดมากจนผงยาไม่ละลาย';
+        setTimeout(() => {
+          loadStep3_2_Draining();
+        }, 1200);
+      } else {
+        playErrorBuzzer();
+        fb.innerHTML = '<span style="color:#f43f5e; font-weight:700;">❌ ผิดหลักการ Order of Mixing!</span> ห้ามเติมสารหนืด Glycerin ก่อนผงยาละลายน้ำ เพราะจะทำให้ตัวยาไม่ละลายและตำรับขุ่น';
+      }
+    }
+
+    function loadStep3_2_Draining() {
+      document.getElementById('step-prompt').textContent = 'ตวง Glycerin 4.5 mL เทลงในสารละลาย และรอ Draining Time';
+      const rig = document.getElementById('bench-rig');
+      rig.innerHTML = `
+        <div style="display:flex; flex-direction:column; align-items:center; gap:14px;">
+          <div style="font-size:14px; font-weight:700; color:#f59e0b;">⏳ เท Glycerin สารหนืด (Draining Time Countdown)</div>
+          <div style="font-size:12px; color:#cbd5e1; text-align:center; max-width:400px;">
+            เนื่องจาก Glycerin มีความหนืดสูง ต้องคว่ำภาชนะเทรอให้ของเหลวไหลลงจนหมดอย่างน้อย 15-30 วินาที
+          </div>
+
+          <div style="font-size:42px; font-family:var(--font-mono); font-weight:800; color:#38bdf8;" id="drain-timer">
+            15 s
+          </div>
+
+          <button class="game-btn game-btn-primary" id="btn-start-drain" onclick="startDrainingCountdown()">
+            💧 เริ่มคว่ำเทและจับเวลา Draining Time
+          </button>
+        </div>
+      `;
+    }
+
+    function startDrainingCountdown() {
+      const btn = document.getElementById('btn-start-drain');
+      if (btn) btn.disabled = true;
+      let timeLeft = 15;
+      const timerEl = document.getElementById('drain-timer');
+
+      const interval = setInterval(() => {
+        timeLeft--;
+        if (timerEl) timerEl.textContent = timeLeft + ' s';
+        playBeep(480, 0.05);
+
+        if (timeLeft <= 0) {
+          clearInterval(interval);
+          updateScore('drain', 1.0, true);
+          timerEl.textContent = '✅ COMPLETE';
+          timerEl.style.color = '#34d399';
+          setTimeout(() => {
+            alert('🎉 ผ่านเกณฑ์ Draining Time ครบถ้วนตามมาตรฐานสภาฯ!\nเข้าสู่ขั้นตอนที่ 4: การ Rinse และปรับปริมาตร Meniscus');
+            loadStep4_RinseAndMeniscus();
+          }, 300);
+        }
+      }, 300); // จำลอง 15 วิ ย่อให้เร็วขึ้นสำหรับเดโม
+    }
+
+    /* ============================================================
+       STEP 4: RINSING & MENISCUS ADJUSTMENT MINIGAME
+    ============================================================ */
+    function loadStep4_RinseAndMeniscus() {
+      G.currentStep = 4;
+      document.getElementById('step-badge').textContent = 'ขั้นตอนที่ 4 / 5';
+      document.getElementById('step-prompt').textContent = 'Rinse บีกเกอร์ด้วยน้ำกลั่น 2 รอบ แล้วปรับปริมาตรของเหลวจนท้องน้ำแตะขีด 30 mL';
+      document.getElementById('guide-text').textContent = 'เทคนิค: ปรับระดับสายตาให้อยู่ในระนาบเดียวกับท้องน้ำ (Concave Meniscus)';
+
+      const rig = document.getElementById('bench-rig');
+      rig.innerHTML = `
+        <div style="display:flex; gap:36px; align-items:center;">
+          <!-- CYLINDER -->
+          <div style="display:flex; flex-direction:column; align-items:center; gap:6px;">
+            <div class="cylinder-container" id="cyl-tube">
+              <div class="liquid-fill" id="liquid-fill" style="height:40px;">
+                <div class="meniscus-curve"></div>
+              </div>
+              <!-- Graduation marks -->
+              <div class="grad-mark major" style="bottom:200px;"><span class="grad-label">30 mL</span></div>
+              <div class="grad-mark" style="bottom:170px;"><span class="grad-label">25</span></div>
+              <div class="grad-mark" style="bottom:135px;"><span class="grad-label">20</span></div>
+              <div class="grad-mark" style="bottom:100px;"><span class="grad-label">15</span></div>
+              <div class="grad-mark" style="bottom:65px;"><span class="grad-label">10</span></div>
+            </div>
+            <div style="font-family:var(--font-mono); font-size:12px; color:#38bdf8;" id="cyl-reading">ปริมาตร: 6.0 mL</div>
+          </div>
+
+          <!-- CONTROLS -->
+          <div style="display:flex; flex-direction:column; gap:12px; width:260px;">
+            <button class="game-btn" id="btn-rinse-1" onclick="rinseBeaker(1)">🧼 Rinse บีกเกอร์รอบที่ 1 (+8 mL)</button>
+            <button class="game-btn" id="btn-rinse-2" onclick="rinseBeaker(2)">🧼 Rinse บีกเกอร์รอบที่ 2 (+8 mL)</button>
+            
+            <hr style="border:none; border-top:1px solid rgba(255,255,255,0.1); margin:4px 0;">
+
+            <div style="font-size:11.5px; font-weight:700; color:#38bdf8;">ปรับปริมาตรหยดสุดท้าย (Fine Adjust):</div>
+            <div style="display:flex; gap:8px;">
+              <button class="game-btn game-btn-primary" onclick="addWaterDrop(1.5)">💧 เติมน้ำ (+1.5 mL)</button>
+              <button class="game-btn game-btn-primary" onclick="addWaterDrop(0.5)">🤏 ปิเปตต์ (+0.5 mL)</button>
+            </div>
+
+            <div style="display:flex; align-items:center; gap:8px; margin-top:4px;">
+              <input type="checkbox" id="chk-eye-level" onchange="toggleEyeLevel(this.checked)">
+              <label for="chk-eye-level" style="font-size:11px; cursor:pointer;">👀 ก้มมองในระดับสายตา (Eye-level)</label>
+            </div>
+          </div>
+        </div>
+      `;
+    }
+
+    let rinseCount = 0;
+    let currentVol = 6.0;
+
+    function rinseBeaker(rNum) {
+      if (rNum === 1 && rinseCount === 0) {
+        rinseCount = 1;
+        currentVol += 8.0;
+        updateCylinder();
+        document.getElementById('btn-rinse-1').disabled = true;
+        document.getElementById('btn-rinse-1').style.borderColor = '#10b981';
+        playBeep(400, 0.1);
+      } else if (rNum === 2 && rinseCount === 1) {
+        rinseCount = 2;
+        currentVol += 8.0;
+        updateCylinder();
+        document.getElementById('btn-rinse-2').disabled = true;
+        document.getElementById('btn-rinse-2').style.borderColor = '#10b981';
+        updateScore('rinse', 1.5, true);
+        playSuccessChime();
+      } else {
+        alert('กรุณา Rinse บีกเกอร์ตามลำดับรอบที่ 1 ก่อนรอบที่ 2!');
+      }
+    }
+
+    function addWaterDrop(amt) {
+      if (rinseCount < 2) {
+        alert('⚠️ คำเตือน: ต้อง Rinse บีกเกอร์ให้ครบ 2 รอบก่อนปรับปริมาตร!');
+        return;
+      }
+      currentVol = Math.min(35, currentVol + amt);
+      updateCylinder();
+      playBeep(650, 0.05);
+
+      if (currentVol >= 29.8 && currentVol <= 30.2) {
+        const eye = document.getElementById('chk-eye-level');
+        if (eye && eye.checked) {
+          updateScore('meniscus', 1.5, true);
+          setTimeout(() => {
+            alert('🎉 ยอดเยี่ยม! ท้องน้ำ (Bottom of Meniscus) สัมผัสขีด 30 mL พอดีในระดับสายตา\nเข้าสู่ขั้นตอนสุดท้าย: บรรจุขวดและปิดฉลากยา');
+            loadStep5_Packaging();
+          }, 300);
+        } else {
+          alert('⚠️ ท้องน้ำอยู่ที่ขีด 30 mL แล้ว แต่อย่าลืมติ๊กก้มมองในระดับสายตา (Eye-level) ตามเกณฑ์ Checklist!');
+        }
+      } else if (currentVol > 30.5) {
+        playErrorBuzzer();
+        alert('❌ เติมน้ำเกินขีด 30 mL! ในการสอบจริงต้องเททิ้งและเริ่มเตรียมใหม่ (Over-volume error)');
+      }
+    }
+
+    function updateCylinder() {
+      const fill = document.getElementById('liquid-fill');
+      const reading = document.getElementById('cyl-reading');
+      if (fill) {
+        const heightPx = Math.round((currentVol / 30) * 200);
+        fill.style.height = heightPx + 'px';
+      }
+      if (reading) reading.textContent = `ปริมาตร: ${currentVol.toFixed(1)} mL`;
+    }
+
+    function toggleEyeLevel(checked) {
+      G.eyeAligned = checked;
+      playBeep(checked ? 750 : 300, 0.08);
+      if (checked && currentVol >= 29.8 && currentVol <= 30.2) {
+        updateScore('meniscus', 1.5, true);
+        setTimeout(() => {
+          loadStep5_Packaging();
+        }, 300);
+      }
+    }
+
+    /* ============================================================
+       STEP 5: PACKAGING & LABELS
+    ============================================================ */
+    function loadStep5_Packaging() {
+      G.currentStep = 5;
+      document.getElementById('step-badge').textContent = 'ขั้นตอนที่ 5 / 5';
+      document.getElementById('step-prompt').textContent = 'บรรจุยาลงในขวดสีชา (Amber bottle) และเลือกฉลากช่วยที่ถูกต้อง';
+      document.getElementById('guide-text').textContent = 'เกณฑ์: ยาน้ำ NaHCO3 ต้องใช้ขวดชา และกำหนดวันหมดอายุ BUD ไม่เกิน 14-30 วัน';
+
+      const rig = document.getElementById('bench-rig');
+      rig.innerHTML = `
+        <div style="display:flex; flex-direction:column; align-items:center; gap:16px; width:100%; max-width:480px;">
+          <div style="font-size:14px; font-weight:700; color:#38bdf8;">🏷️ เลือกฉลากช่วยและวันหมดอายุ (BUD) ที่ถูกต้อง</div>
+
+          <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px; width:100%;">
+            <label class="shelf-item" style="cursor:pointer;">
+              <input type="checkbox" id="aux-shake" style="margin-bottom:4px;">
+              <span style="font-size:12px; font-weight:700; color:#f59e0b;">เขย่าขวดก่อนใช้</span>
+              <span style="font-size:10px; color:#94a3b8;">(Shake well)</span>
+            </label>
+
+            <label class="shelf-item" style="cursor:pointer;">
+              <input type="checkbox" id="aux-light" style="margin-bottom:4px;" checked>
+              <span style="font-size:12px; font-weight:700; color:#38bdf8;">เก็บให้พ้นแสง</span>
+              <span style="font-size:10px; color:#94a3b8;">(Protect from light)</span>
+            </label>
+
+            <label class="shelf-item" style="cursor:pointer;">
+              <input type="checkbox" id="aux-fridge" style="margin-bottom:4px;">
+              <span style="font-size:12px; font-weight:700; color:#10b981;">เก็บในตู้เย็น 2-8°C</span>
+              <span style="font-size:10px; color:#94a3b8;">(Refrigerate)</span>
+            </label>
+
+            <label class="shelf-item" style="cursor:pointer;">
+              <input type="checkbox" id="aux-external" style="margin-bottom:4px;">
+              <span style="font-size:12px; font-weight:700; color:#f43f5e;">ยาใช้ภายนอก</span>
+              <span style="font-size:10px; color:#94a3b8;">(For External Use)</span>
+            </label>
+          </div>
+
+          <button class="game-btn game-btn-primary" style="padding:10px 24px; font-size:14px;" onclick="submitFinalStation()">
+            🏁 ส่งตรวจสถานี OSPE (Submit Station)
+          </button>
+        </div>
+      `;
+    }
+
+    function submitFinalStation() {
+      const shake = document.getElementById('aux-shake').checked;
+      const light = document.getElementById('aux-light').checked;
+      const external = document.getElementById('aux-external').checked;
+
+      // NaHCO3 Oral Solution เป็นยาน้ำใสรับประทาน ไม่ใช่ยาใช้ภายนอก
+      if (external) {
+        alert('⚠️ ผิดพลาด: NaHCO3 Oral Solution เป็นยาน้ำสำหรับรับประทาน ห้ามติดฉลากยาใช้ภายนอก!');
+        playErrorBuzzer();
+        return;
+      }
+
+      playSuccessChime();
+      showCompletionModal();
+    }
+
+    function showCompletionModal() {
+      const modal = document.getElementById('finish-modal');
+      const title = document.getElementById('modal-score-title');
+      const pass = document.getElementById('modal-pass-status');
+      const list = document.getElementById('modal-feedback-list');
+
+      title.textContent = `ได้คะแนน: ${G.score.toFixed(1)} / ${G.maxScore.toFixed(1)}`;
+      const isPassed = G.score >= 8.0;
+
+      pass.textContent = isPassed 
+        ? '✅ ผ่านเกณฑ์สมรรถนะสภาเภสัชกรรม (ได้คะแนนเกิน 80%)'
+        : '⚠️ ยังไม่ผ่านเกณฑ์ 80% (ควรทบทวนขั้นตอนที่ถูกตัดคะแนน)';
+      pass.style.color = isPassed ? '#10b981' : '#f59e0b';
+
+      let fbHtml = '<div style="font-weight:700; color:#38bdf8; margin-bottom:6px;">สรุปผลการประเมินแต่ละข้อ:</div>';
+      for (const [k, v] of Object.entries(G.checklist)) {
+        fbHtml += `<div>${v ? '✅' : '❌'} เกณฑ์ข้อ ${k}: ${v ? 'ได้คะแนนเต็ม' : 'ยังไม่ผ่านหรือข้ามขั้นตอนนี้'}</div>`;
+      }
+      list.innerHTML = fbHtml;
+      modal.style.display = 'flex';
+    }
+
+    function restartEntireStation() {
+      document.getElementById('finish-modal').style.display = 'none';
+      G.score = 0;
+      G.currentWeight = 0;
+      G.paperPlaced = false;
+      G.scaleTare = false;
+      G.grindProgress = 0;
+      currentVol = 6.0;
+      rinseCount = 0;
+      labelReadCount = 0;
+      for (const k in G.checklist) G.checklist[k] = false;
+      document.querySelectorAll('.chk-item').forEach(el => el.className = 'chk-item');
+      document.querySelectorAll('.chk-icon').forEach(el => el.textContent = '⏳');
+      renderHUD();
+      loadStep1_Weighing();
+    }
+
+    function nextStepManually() {
+      if (G.currentStep === 1) loadStep2_Trituration();
+      else if (G.currentStep === 2) loadStep3_OrderOfMixing();
+      else if (G.currentStep === 3) loadStep4_RinseAndMeniscus();
+      else if (G.currentStep === 4) loadStep5_Packaging();
+      else showCompletionModal();
+    }
+
+    function switchRubricTab(tab) {
+      document.getElementById('tab-btn-chk').className = tab === 'chk' ? 'rubric-tab-btn active' : 'rubric-tab-btn';
+      document.getElementById('tab-btn-flow').className = tab === 'flow' ? 'rubric-tab-btn active' : 'rubric-tab-btn';
+      document.getElementById('rubric-content-chk').style.display = tab === 'chk' ? 'flex' : 'none';
+      document.getElementById('rubric-content-flow').style.display = tab === 'flow' ? 'flex' : 'none';
+    }
+
+    function selectEquipment(type) {
+      playBeep(500, 0.08);
+      document.querySelectorAll('.shelf-item').forEach(el => el.classList.remove('selected'));
+      const target = document.getElementById('eq-' + type);
+      if (target) target.classList.add('selected');
+    }
+
+    function resetCurrentGame() {
+      if (G.currentStep === 1) loadStep1_Weighing();
+      else if (G.currentStep === 2) loadStep2_Trituration();
+      else if (G.currentStep === 3) loadStep3_OrderOfMixing();
+      else if (G.currentStep === 4) loadStep4_RinseAndMeniscus();
+      else if (G.currentStep === 5) loadStep5_Packaging();
+    }
+
+    // Timer Countdown
+    let totalSec = 240;
+    setInterval(() => {
+      if (totalSec > 0) {
+        totalSec--;
+        const m = String(Math.floor(totalSec / 60)).padStart(2, '0');
+        const s = String(totalSec % 60).padStart(2, '0');
+        const tEl = document.getElementById('hud-timer');
+        if (tEl) {
+          tEl.textContent = `⏱️ ${m}:${s}`;
+          if (totalSec <= 60) tEl.className = 'timer-box timer-warning';
+        }
+      }
+    }, 1000);
+
+    // Boot First Step
+    window.onload = function() {
+      loadStep1_Weighing();
+      renderHUD();
+    };
+  </script>
+</body>
+</html>

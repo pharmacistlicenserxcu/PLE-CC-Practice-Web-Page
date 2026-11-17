@@ -1913,9 +1913,9 @@
   </div><!-- /.page-viewport -->
 </div><!-- /.app-shell -->
 
-  <script src="case-data-offline.js?v=v_20261113_100604"></script>
-  <script src="case-details-offline.js?v=v_20261113_100604"></script>
-  <script src="app.js?v=v_20261113_100604"></script>
+  <script src="case-data-offline.js?v=v_20261117_144224"></script>
+  <script src="case-details-offline.js?v=v_20261117_144224"></script>
+  <script src="app.js?v=v_20261117_144224"></script>
   <script src="scratchpad.js?v=20261004_234400"></script>
   <script src="station-chat.js?v=v_20261026_140000"></script>
 
@@ -2693,6 +2693,28 @@
       const stickyBadge = document.getElementById('sticky-case-id-badge');
       if (stickyBadge) stickyBadge.textContent = caseId ? (caseId.startsWith('OSPE-') ? caseId : ('OSPE-' + caseId)) : 'OSPE';
 
+      // Inject 3D OSPE Lab launcher button for Clinic, SAP & Product stations
+      let lab3dBtn = document.getElementById('btn-launch-3d-lab');
+      const catLower = String(c.category || '').toLowerCase();
+      const isProductCase = /OSPE-PD/i.test(caseId) || catLower === 'product';
+      const isSapCase = /OSPE-SP/i.test(caseId) || catLower === 'sap';
+      const bgGrad = isProductCase ? 'linear-gradient(135deg,#7c3aed,#6d28d9)' : (isSapCase ? 'linear-gradient(135deg,#d97706,#b45309)' : 'linear-gradient(135deg,#0891b2,#0e7490)');
+      const btnLabel = isProductCase ? '⚗️ ซ้อมเตรียมยาในแลป 3D' : (isSapCase ? '⚖️ ซ้อมกฎหมาย SAP 3D' : '🩺 ซ้อมสถานี Clinic 3D');
+      const btnHref = 'compounding-lab-3d.html?caseId=' + encodeURIComponent(caseId);
+
+      if (stickyBadge && stickyBadge.parentElement) {
+        if (!lab3dBtn) {
+          lab3dBtn = document.createElement('a');
+          lab3dBtn.id = 'btn-launch-3d-lab';
+          lab3dBtn.target = '_blank';
+          stickyBadge.parentElement.appendChild(lab3dBtn);
+        }
+        lab3dBtn.style.cssText = `margin-left:8px;background:${bgGrad};color:#fff;padding:4px 12px;border-radius:9999px;font-size:12px;font-weight:700;text-decoration:none;display:inline-flex;align-items:center;gap:4px;box-shadow:0 2px 8px rgba(0,0,0,0.18)`;
+        lab3dBtn.textContent = btnLabel;
+        lab3dBtn.href = btnHref;
+        lab3dBtn.style.display = 'inline-flex';
+      }
+
       // Auto-extract checklist items if checklist is empty but items leaked into patientInfoHtml or contentHtml
       if ((!c.checklist || c.checklist.length === 0) && (c.patientInfoHtml || c.contentHtml)) {
         const rawHtml = c.patientInfoHtml || c.contentHtml || '';
@@ -2811,6 +2833,15 @@
         <span class="case-card-tag">ผู้เขียน: ${authorVal}</span>
         <span class="case-card-tag" style="background:rgba(16,185,129,0.12);color:#047857;border:1px solid rgba(16,185,129,0.3);">⏱ ${Math.round(parseCaseDurationSec(c) / 60)} นาที</span>
       `;
+      if (metaContainer) {
+        const headerLabBtn = document.createElement('a');
+        headerLabBtn.id = 'btn-launch-3d-lab-header';
+        headerLabBtn.target = '_blank';
+        headerLabBtn.style.cssText = `background:${bgGrad};color:#fff;padding:5px 14px;border-radius:9999px;font-size:12.5px;font-weight:700;text-decoration:none;display:inline-flex;align-items:center;gap:5px;box-shadow:0 2px 8px rgba(0,0,0,0.15)`;
+        headerLabBtn.textContent = btnLabel;
+        headerLabBtn.href = btnHref;
+        metaContainer.appendChild(headerLabBtn);
+      }
       
       function stripSectionHeaders(str) {
         if (!str) return '';

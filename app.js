@@ -2378,8 +2378,9 @@ function renderCaseList() {
         ${sourceBadge}
         ${durationBadge}
       </div>
-      <div class="case-card-meta">
+      <div class="case-card-meta" style="display:flex;justify-content:space-between;align-items:center;gap:8px;">
         <span>ผู้เขียน: ${escapeHtml(isProtected ? "🔒 สงวนสิทธิ์" : (c.author || 'ไม่ระบุ'))}</span>
+        <a href="compounding-lab-3d.html?caseId=${encodeURIComponent(c.caseId)}" target="_blank" onclick="event.stopPropagation()" style="background:linear-gradient(135deg,#0891b2,#0e7490);color:#fff;padding:3px 10px;border-radius:9999px;font-size:11px;font-weight:700;text-decoration:none;white-space:nowrap;">🏥 3D OSPE</a>
       </div>
     `;
     
@@ -3049,7 +3050,7 @@ if ('serviceWorker' in navigator && window.location.protocol !== 'file:') {
 const DB_NAME = 'RxCU_OSPE_DB';
 const DB_VERSION = 1;
 const STORE_NAME = 'case_details';
-const DB_VERSION_STR = 'v_20261117_144224'; // อัปเดตเวอร์ชันนี้เพื่อบังคับโหลดใหม่เมื่อมีเคสเพิ่มเติมในสคริปต์ออฟไลน์
+const DB_VERSION_STR = 'v_20261117_150642'; // อัปเดตเวอร์ชันนี้เพื่อบังคับโหลดใหม่เมื่อมีเคสเพิ่มเติมในสคริปต์ออฟไลน์
 
 function openIndexedDB() {
   return new Promise((resolve, reject) => {

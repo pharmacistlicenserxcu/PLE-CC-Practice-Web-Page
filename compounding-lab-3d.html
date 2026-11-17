@@ -95,7 +95,29 @@ canvas#c.dragging{cursor:grabbing}
 .ai-block-btn{font-family:var(--f-b);font-size:11.5px;font-weight:600;padding:7px 10px;border-radius:10px;border:1px solid var(--clinic-bd);background:var(--clinic-soft);color:var(--clinic);cursor:pointer;transition:all .12s;text-align:left;line-height:1.4}
 .ai-block-btn:hover{filter:brightness(.97)}
 .ai-block-btn.used{background:var(--ok-soft);border-color:var(--ok);color:#15803d}
-@media(max-width:960px){.stage-actions{width:calc(100vw - 24px)}#ai-blocks-panel{left:12px;right:12px;top:auto;bottom:170px;width:auto;max-height:120px}.ai-blocks{flex-direction:row;flex-wrap:nowrap;overflow-x:auto}.ai-block-btn{white-space:nowrap}}
+@media(max-width:1080px){
+  .pill{padding:4px 9px;font-size:11.5px;gap:4px}
+  #hud{top:8px;left:8px;right:8px;gap:5px}
+  .hud-group{padding:3px 5px;gap:4px}
+  #cam-bar{top:96px;flex-wrap:nowrap;overflow-x:auto;justify-content:flex-start;max-width:calc(100vw - 16px);white-space:nowrap;padding:4px 8px}
+  .cam-chip{white-space:nowrap;flex-shrink:0}
+  #telemetry{top:138px;right:8px;width:180px;padding:7px 9px;font-size:10.5px}
+  #check{top:138px;left:8px;width:240px;max-height:calc(100vh - 380px)}
+  .stage-actions{bottom:72px;width:calc(100vw - 20px);max-width:calc(100vw - 20px);padding:8px 12px}
+  .ai-chat-feed{min-height:70px;max-height:112px;padding:7px 10px;font-size:12px}
+  #ai-blocks-panel{left:10px;right:10px;top:auto;bottom:238px;width:auto;max-height:54px;padding:6px 10px;border-radius:12px}
+  #ai-blocks-panel h4{display:none}
+  .ai-blocks{flex-direction:row;flex-wrap:nowrap;overflow-x:auto;gap:6px}
+  .ai-block-btn{white-space:nowrap;padding:5px 10px;font-size:11px;flex-shrink:0}
+  #dock{bottom:8px;padding:6px 10px;gap:6px}
+}
+@media(max-width:720px){
+  #telemetry{display:none!important}
+  #step-hint{display:none}
+  #step-title{font-size:12px}
+  .stage-actions{bottom:62px}
+  #ai-blocks-panel{bottom:226px}
+}
 
 /* 3D PROJECTED SPEECH BUBBLE (MATCHING MOCKUP) */
 #speech-bubble-3d{position:fixed;z-index:13;max-width:320px;background:#fff;color:var(--ink);border:2px solid var(--clinic-bd);border-radius:16px;padding:10px 14px;font-size:13px;line-height:1.45;box-shadow:0 8px 24px rgba(15,23,42,.15);pointer-events:none;display:none;transform:translate(-50%,-100%)}
@@ -197,7 +219,7 @@ input[type=range]{width:110px;accent-color:var(--clinic);cursor:pointer}
 
 @media(max-width:960px){
   #check{display:none}
-  #telemetry{top:100px;right:8px;width:176px;padding:8px;font-size:10.5px}
+  #telemetry{top:138px;right:8px;width:176px;padding:7px 9px;font-size:10.5px}
 }
 @media(max-width:600px){
   #hud{gap:4px;top:6px;left:6px;right:6px}
@@ -212,7 +234,7 @@ input[type=range]{width:110px;accent-color:var(--clinic);cursor:pointer}
 </head>
 <body>
 <canvas id="c"></canvas>
-<div id="loading">🩺 กำลังเตรียมห้องปฏิบัติการ 3D &amp; คลังข้อสอบ OSPE 438 สถานี...</div>
+<div id="loading">🩺 กำลังเตรียม 3D OSPE &amp; คลังข้อสอบ 438 สถานี...</div>
 
 <!-- TOP HUD -->
 <div id="hud">
@@ -638,6 +660,11 @@ function buildHumanoidRig(opts) {
   mk(new THREE.SphereGeometry(0.10, 10, 8), hairMat, 0.09, 0.18, 0.08, head).scale.set(1.2, 0.55, 0.85);
   mk(new THREE.BoxGeometry(0.038, 0.10, 0.07), hairMat, -0.19, 0.05, -0.01, head);
   mk(new THREE.BoxGeometry(0.038, 0.10, 0.07), hairMat, 0.19, 0.05, -0.01, head);
+  // Optional Female Shoulder-Length Hair Group (toggled by case gender)
+  const hairLong = new THREE.Group(); hairLong.visible = false; head.add(hairLong);
+  mk(new THREE.CylinderGeometry(0.21, 0.24, 0.34, 12, 1, false, Math.PI * 0.55, Math.PI * 0.9), hairMat, 0, -0.12, -0.03, hairLong);
+  mk(new THREE.BoxGeometry(0.06, 0.28, 0.10), hairMat, -0.195, -0.10, -0.01, hairLong);
+  mk(new THREE.BoxGeometry(0.06, 0.28, 0.10), hairMat, 0.195, -0.10, -0.01, hairLong);
 
   // Expressive Eyes + Brows + Subtle Mouth
   const makeEye = (x) => {
@@ -672,7 +699,7 @@ function buildHumanoidRig(opts) {
   };
   const armL = makeArm(-1), armR = makeArm(1);
 
-  return { root, pelvis, torso, neck, head, legL, legR, armL, armR, eyeLO, eyeRO, browL, browR, mouth, shirtMat };
+  return { root, pelvis, torso, neck, head, legL, legR, armL, armR, eyeLO, eyeRO, browL, browR, mouth, shirtMat, hairLong };
 }
 
 /* ── PHARMACIST HUMANOID RIG ── */
@@ -1500,7 +1527,12 @@ function syncSceneVisibility() {
   clinicGroup.visible = clinicMode;
   counterGroup.visible = isTwoPerson;
   if (isTwoPerson) {
-    patientShirtMat.color.setHex(dev === 'isbar_phone' ? 0xf8fafc : 0x0284c7);
+    const cid = state.customStation?.caseId || rec.code;
+    const det = (typeof OFFLINE_CASE_DETAILS !== 'undefined') ? OFFLINE_CASE_DETAILS[cid] : null;
+    const gTxt = `${state.customStation?.title || ''} ${det?.scenario || ''} ${det?.patientInfoHtml || ''}`.toLowerCase();
+    const isFemale = /ผู้หญิง|เพศหญิง|นางสาว|นาง\s|คุณแม่|ตั้งครรภ์|ประจำเดือน|ยาคุม|ช่องคลอด|vaginal|female|pregnant/.test(gTxt) && !/เพศชาย|ผู้ชาย|นาย\s/.test(gTxt.slice(0, 120));
+    patientRig.hairLong.visible = isFemale;
+    patientShirtMat.color.setHex(dev === 'isbar_phone' ? 0xf8fafc : (isFemale ? 0xe11d48 : 0x1d4ed8));
   }
 
   Object.values(clinicDevices).forEach(d => d.g.visible = false);

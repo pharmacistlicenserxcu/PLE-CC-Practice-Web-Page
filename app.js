@@ -2380,7 +2380,7 @@ function renderCaseList() {
       </div>
       <div class="case-card-meta" style="display:flex;justify-content:space-between;align-items:center;gap:8px;">
         <span>ผู้เขียน: ${escapeHtml(isProtected ? "🔒 สงวนสิทธิ์" : (c.author || 'ไม่ระบุ'))}</span>
-        <a href="compounding-lab-3d.html?caseId=${encodeURIComponent(c.caseId)}" target="_blank" onclick="event.stopPropagation()" style="background:linear-gradient(135deg,#0891b2,#0e7490);color:#fff;padding:3px 10px;border-radius:9999px;font-size:11px;font-weight:700;text-decoration:none;white-space:nowrap;">🏥 3D OSPE</a>
+        <a href="compounding-lab-3d.html?caseId=${encodeURIComponent(c.caseId)}" target="_blank" onclick="event.stopPropagation()" style="background:linear-gradient(135deg,#0891b2,#0e7490);color:#fff;padding:3px 10px;border-radius:9999px;font-size:11px;font-weight:700;text-decoration:none;white-space:nowrap;">🏥 3D OSPE (ทดลองใช้)</a>
       </div>
     `;
     
@@ -5200,6 +5200,17 @@ const StationDocViewer = (function() {
       }
 
       if (links.length === 0) {
+        const bareRe = /(https?:\/\/(?:drive\.google\.com|docs\.google\.com)[^\s<"'\)]+)/gi;
+        let bm;
+        while ((bm = bareRe.exec(chunk)) !== null) {
+          links.push({
+            url: bm[1].trim(),
+            text: ''
+          });
+        }
+      }
+
+      if (links.length === 0) {
         out.push(chunk);
         return;
       }
@@ -5219,7 +5230,7 @@ const StationDocViewer = (function() {
       const typeLabel = driveId ? 'Google Drive PDF' : 'PDF Document';
       const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=110x110&margin=2&data=${encodeURIComponent(cleanUrl)}`;
 
-      out.push(`<div class="station-doc-card no-print" onclick="window.StationDocViewer && window.StationDocViewer.openByUrl('${cleanUrl}')" title="คลิกเพื่อเปิดอ่านแบบแบ่งจอในหน้านี้"><div class="station-doc-card-icon-wrap"><span style="font-size:1.15rem;">📄</span></div><div class="station-doc-card-main"><div class="station-doc-card-header-row"><span class="station-doc-card-badge">เอกสารแนบ ${num}</span><span class="station-doc-card-title">${title}</span></div><div class="station-doc-card-meta"><span>📄 ${typeLabel}</span><span>•</span><span>คลิกเปิดอ่านแบ่งจอ หรือเลือกเปิดแท็บใหม่</span></div></div><div class="station-doc-card-actions"><button type="button" class="station-doc-card-btn station-doc-card-btn-primary" onclick="event.stopPropagation(); window.StationDocViewer && window.StationDocViewer.openByUrl('${cleanUrl}')" title="เปิดอ่านแบบแบ่งจอ (ไม่บังตัวจับเวลา 4 นาที)"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg><span>เปิดอ่าน</span></button><a href="${cleanUrl}" target="_blank" rel="noopener noreferrer" class="station-doc-card-btn station-doc-card-btn-secondary doc-ext-link" onclick="event.stopPropagation();" title="เปิดดูใน Google Drive แท็บใหม่ ↗"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg><span>แท็บใหม่ ↗</span></a></div></div><div class="station-doc-print-card print-only" style="display:none;"><div class="station-doc-print-main"><div class="station-doc-print-badge">เอกสารแนบ ${num}</div><div class="station-doc-print-title">${title}</div><div class="station-doc-print-url">ลิงก์เอกสารฉบับเต็ม: ${cleanUrl}</div></div><img src="${qrUrl}" class="station-doc-print-qr" alt="QR Code"></div>`);
+      out.push(`<div class="station-doc-card no-print" onclick="window.StationDocViewer && window.StationDocViewer.openByUrl('${cleanUrl}')" title="คลิกเพื่อเปิดอ่านแบบแบ่งจอในหน้านี้"><div class="station-doc-card-icon-wrap"><span style="font-size:1.15rem;">📄</span></div><div class="station-doc-card-main"><div class="station-doc-card-header-row"><span class="station-doc-card-badge">เอกสารแนบ ${num}</span><span class="station-doc-card-title">${title}</span></div><div class="station-doc-card-meta"><span>📄 ${typeLabel}</span><span>•</span><span>คลิกเปิดอ่านแบ่งจอ หรือเลือกเปิดแท็บใหม่</span></div></div><div class="station-doc-card-actions"><button type="button" class="station-doc-card-btn station-doc-card-btn-primary" onclick="event.stopPropagation(); window.StationDocViewer && window.StationDocViewer.openByUrl('${cleanUrl}')" title="เปิดอ่านแบบแบ่งจอ (ไม่บังตัวจับเวลา 4 นาที)"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg><span>เปิดอ่าน</span></button><a href="${cleanUrl}" target="_blank" rel="noopener noreferrer" class="station-doc-card-btn station-doc-card-btn-secondary doc-ext-link" onclick="event.stopPropagation();" title="เปิดดูใน Google Drive แท็บใหม่ ↗"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg><span>แท็บใหม่ ↗</span></a></div></div><a href="${cleanUrl}" target="_blank" rel="noopener noreferrer" class="station-doc-print-card print-only" title="คลิกเพื่อเปิดดูเอกสารฉบับเต็มบน Google Drive: ${title}"><div class="station-doc-print-main"><div class="station-doc-print-badge">เอกสารแนบ ${num} (คลิกเพื่อเปิดดูฉบับเต็มบน Google Drive) ↗</div><div class="station-doc-print-title">📄 ${title}</div><div class="station-doc-print-url">🔗 ลิงก์ตรง: ${cleanUrl}</div><div class="station-doc-print-hint">💡 หากเปิดใน PDF สามารถคลิกที่กล่องนี้ได้ทันที หรือสแกน QR Code บนมือถือ</div></div><div class="station-doc-print-qr-wrap"><img src="${qrUrl}" class="station-doc-print-qr" alt="QR Code"><div class="station-doc-print-qr-label">สแกนเปิดบนมือถือ</div></div></a>`);
     });
 
     return out.join('');

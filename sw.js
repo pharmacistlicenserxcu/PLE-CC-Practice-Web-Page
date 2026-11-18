@@ -4,10 +4,10 @@
  * ====================================================
  * จัดการ Caching ทรัพยากรระบบเพื่อเพิ่มความเร็วในการโหลด (Preloading) 
  * และสนับสนุนการเข้าใช้งานแบบออฟไลน์ (Offline Mode)
- * Version: ple-cc2-ospe-v1.7.0 (Compact Snug Doc Cards & Split Multi-Attachments Parser)
+ * Version: ple-cc2-ospe-v1.7.2 (Full-Card Clickable Hyperlink & QR in Print/PDF Mode)
  */
 
-const CACHE_NAME = 'ple-cc2-ospe-v1.7.0';
+const CACHE_NAME = 'ple-cc2-ospe-v1.7.2';
 const ASSETS = [
   './',
   './index.html',

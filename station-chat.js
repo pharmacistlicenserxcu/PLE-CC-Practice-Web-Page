@@ -875,7 +875,7 @@
           const currentEntry = this._geminiKeyPool[this._currentKeyIdx];
           const customKey = localStorage.getItem('_gemini_api_key');
           const API_KEY = (customKey && attempt === 0) ? customKey : currentEntry.key;
-          const targetModel = attempt === 0 ? 'gemini-flash-lite-latest' : 'gemini-3.5-flash-lite';
+          const targetModel = attempt === 0 ? 'gemini-3.1-flash-lite' : (attempt === 1 ? 'gemini-3-flash-preview' : 'gemini-3.5-flash-lite');
           const ENDPOINT = `https://generativelanguage.googleapis.com/v1beta/models/${targetModel}:generateContent?key=${API_KEY}`;
 
           try {
@@ -993,6 +993,122 @@
       this._aiTypingEl = null;
     },
 
+    formatCleanAIMessage(raw) {
+      let s = String(raw || '');
+      s = s.replace(/\\frac\s*\{([^{}]+)\}\s*\{([^{}]+)\}/g, '($1 ÷ $2)');
+      s = s.replace(/\\(?:text|mathbf|mathrm|mathit|textbf)\s*\{([^{}]+)\}/g, '$1');
+      s = s.replace(/\\times/g, ' × ');
+      s = s.replace(/\\div/g, ' ÷ ');
+      s = s.replace(/\\pm/g, ' ± ');
+      s = s.replace(/\\leq/g, ' ≤ ');
+      s = s.replace(/\\geq/g, ' ≥ ');
+      s = s.replace(/\\neq/g, ' ≠ ');
+      s = s.replace(/\\approx/g, ' ≈ ');
+      s = s.replace(/\\cdot/g, ' · ');
+      s = s.replace(/\\[a-zA-Z]+/g, ' ');
+      s = s.replace(/[\{\}]/g, '');
+      s = s.replace(/\$/g, '');
+      s = s.replace(/\*+/g, '');
+      s = s.replace(/[ \t]{2,}/g, ' ');
+      return s.trim();
+    },
+
+    createAIStreamingMessage() {
+      const container = document.getElementById('station-chat-messages');
+      if (!container) return { updateText: () => {}, finalize: () => {}, discard: () => {} };
+      const timeStr = new Date().toLocaleTimeString('th-TH', { hour: '2-digit', minute: '2-digit' });
+      const el = document.createElement('div');
+      el.className = 'st-chat-msg theirs ai-msg streaming-msg';
+
+      const isGuru = (this.aiRole === 'guru');
+      const senderEmoji = isGuru ? '🧠' : '👨‍🏫';
+      const senderTitle = isGuru ? 'เภสัชกรติวเตอร์ (Gemini AI Guru)' : 'อาจารย์คุมสอบ & คนไข้ (Examiner & SP)';
+      const badgeColor = isGuru ? 'background:#0284c7;' : 'background:#7c3aed;';
+      const badgeLabel = isGuru ? '🧠 ติวเตอร์ผู้เชี่ยวชาญ (Academic Guru)' : '👨‍🏫 ผู้ประเมิน & คนไข้จำลอง (Exam Mode)';
+      const rolePill = isGuru
+        ? '<span style="font-size:0.68rem;background:rgba(2,132,199,0.15);color:#0369a1;padding:1px 5px;border-radius:4px;font-weight:700;">GURU</span>'
+        : '<span style="font-size:0.68rem;background:rgba(124,58,237,0.15);color:#6d28d9;padding:1px 5px;border-radius:4px;font-weight:700;">EXAM</span>';
+
+      if (isGuru) {
+        el.style.borderColor = '#0284c7';
+        el.style.background = 'linear-gradient(135deg, #f0f9ff, #e0f2fe)';
+        el.style.color = '#0c4a6e';
+      }
+
+      el.innerHTML = `
+        <div class="st-chat-ai-badge" style="${badgeColor}">⚡ ${badgeLabel}</div>
+        <div class="st-chat-msg-sender">
+          <span>${senderEmoji}</span>
+          <span>${senderTitle}</span>
+          ${rolePill}
+          <span style="opacity:0.65;margin-left:2px;">${timeStr}</span>
+        </div>
+        <div class="st-chat-stream-body" style="line-height:1.55;">
+          <span class="st-chat-stream-text"></span><span class="st-chat-cursor">▍</span>
+        </div>
+      `;
+      container.appendChild(el);
+      container.scrollTop = container.scrollHeight;
+
+      const textSpan = el.querySelector('.st-chat-stream-text');
+      const cursorSpan = el.querySelector('.st-chat-cursor');
+      const self = this;
+
+      return {
+        updateText(raw) {
+          if (textSpan) {
+            let s = String(raw || '').replace(/\*+/g, '');
+            s = s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/\n/g, '<br>');
+            textSpan.innerHTML = s;
+            container.scrollTop = container.scrollHeight;
+          }
+        },
+        finalize(finalText, originalUserText) {
+          if (cursorSpan) cursorSpan.remove();
+          el.classList.remove('streaming-msg');
+          const cleanedReply = self.formatCleanAIMessage(finalText);
+          if (textSpan) {
+            textSpan.innerHTML = cleanedReply
+              .replace(/&/g, '&amp;')
+              .replace(/</g, '&lt;')
+              .replace(/>/g, '&gt;')
+              .replace(/\n/g, '<br>');
+          }
+          container.scrollTop = container.scrollHeight;
+
+          const stationKey = String(self.currentStationNum || '1');
+          if (!self.soloMessages[stationKey]) self.soloMessages[stationKey] = [];
+          self.soloMessages[stationKey].push({
+            id: 'ai_' + Date.now(),
+            senderId: 'gemini_ai_' + self.aiRole,
+            senderName: senderTitle,
+            senderRole: isGuru ? 'guru' : 'examiner',
+            senderEmoji: senderEmoji,
+            text: cleanedReply,
+            timestamp: Date.now(),
+            stationNumber: self.currentStationNum,
+            isAi: true
+          });
+          if (self.soloMessages[stationKey].length > 40) {
+            self.soloMessages[stationKey].shift();
+          }
+
+          self.incrementAIDailyCount();
+
+          if (self.autoChecklistEnabled && self.canUseAutoChecklist() && originalUserText) {
+            self.classifyAndApplyChecklist(originalUserText, cleanedReply);
+          }
+
+          if (self.aiSoundEnabled && cleanedReply) {
+            self.speakText(cleanedReply);
+          }
+        },
+        discard() {
+          if (el && el.parentNode) el.parentNode.removeChild(el);
+        }
+      };
+    },
+
     renderAIMessage(replyText) {
       const container = document.getElementById('station-chat-messages');
       if (!container) return;
@@ -1015,28 +1131,7 @@
         el.style.color = '#0c4a6e';
       }
 
-      // Format clean plain text: strip markdown asterisks and transform LaTeX to readable plain arithmetic
-      const formatCleanAIMessage = (raw) => {
-        let s = String(raw || '');
-        s = s.replace(/\\frac\s*\{([^{}]+)\}\s*\{([^{}]+)\}/g, '($1 ÷ $2)');
-        s = s.replace(/\\(?:text|mathbf|mathrm|mathit|textbf)\s*\{([^{}]+)\}/g, '$1');
-        s = s.replace(/\\times/g, ' × ');
-        s = s.replace(/\\div/g, ' ÷ ');
-        s = s.replace(/\\pm/g, ' ± ');
-        s = s.replace(/\\leq/g, ' ≤ ');
-        s = s.replace(/\\geq/g, ' ≥ ');
-        s = s.replace(/\\neq/g, ' ≠ ');
-        s = s.replace(/\\approx/g, ' ≈ ');
-        s = s.replace(/\\cdot/g, ' · ');
-        s = s.replace(/\\[a-zA-Z]+/g, ' ');
-        s = s.replace(/[\{\}]/g, '');
-        s = s.replace(/\$/g, '');
-        s = s.replace(/\*+/g, '');
-        s = s.replace(/[ \t]{2,}/g, ' ');
-        return s.trim();
-      };
-
-      const cleanedReply = formatCleanAIMessage(replyText);
+      const cleanedReply = this.formatCleanAIMessage(replyText);
 
       const safeText = cleanedReply
         .replace(/&/g, '&amp;')
@@ -1229,12 +1324,14 @@ ${caseContext || '(ยังไม่มีข้อมูลเคส)'}
       const maxAttempts = this._geminiKeyPool.length;
       let lastError = null;
 
+      const models = ['gemini-3.1-flash-lite', 'gemini-3-flash-preview', 'gemini-3.5-flash-lite'];
+
       for (let attempt = 0; attempt < maxAttempts; attempt++) {
         const currentEntry = this._geminiKeyPool[this._currentKeyIdx];
         const customKey = localStorage.getItem('_gemini_api_key');
         const API_KEY = (customKey && attempt === 0) ? customKey : currentEntry.key;
-        const targetModel = attempt === 0 ? 'gemini-flash-lite-latest' : 'gemini-3.5-flash-lite';
-        const ENDPOINT = `https://generativelanguage.googleapis.com/v1beta/models/${targetModel}:generateContent?key=${API_KEY}`;
+        const targetModel = models[Math.min(attempt, models.length - 1)];
+        const ENDPOINT = `https://generativelanguage.googleapis.com/v1beta/models/${targetModel}:streamGenerateContent?alt=sse&key=${API_KEY}`;
 
         try {
           const controller = new AbortController();
@@ -1278,22 +1375,42 @@ ${caseContext || '(ยังไม่มีข้อมูลเคส)'}
             throw new Error(`Gemini API HTTP ${res.status}: ${errBody}`);
           }
 
-          const json = await res.json();
-          const candidate = json.candidates && json.candidates[0];
-          const replyText = candidate?.content?.parts?.[0]?.text;
-
+          // Connection established - remove typing indicator and stream response
           this.removeAITyping();
+          const streamHandler = this.createAIStreamingMessage();
+          const reader = res.body.getReader();
+          const decoder = new TextDecoder();
+          let buf = '', accumulatedText = '';
 
-          if (replyText) {
-            this.renderAIMessage(replyText.trim());
-            this.incrementAIDailyCount();
-            // Automatically classify checklist items if enabled
-            if (this.autoChecklistEnabled && this.canUseAutoChecklist()) {
-              this.classifyAndApplyChecklist(userText, replyText.trim());
+          while (true) {
+            const { done, value } = await reader.read();
+            if (done) break;
+            buf += decoder.decode(value, { stream: true });
+            const lines = buf.split('\n');
+            buf = lines.pop();
+            for (const line of lines) {
+              if (line.startsWith('data: ')) {
+                const jStr = line.slice(6).trim();
+                if (jStr) {
+                  try {
+                    const chunkData = JSON.parse(jStr);
+                    const token = chunkData?.candidates?.[0]?.content?.parts?.[0]?.text;
+                    if (token) {
+                      accumulatedText += token;
+                      streamHandler.updateText(accumulatedText);
+                    }
+                  } catch (_) {}
+                }
+              }
             }
+          }
+
+          if (accumulatedText.trim()) {
+            streamHandler.finalize(accumulatedText.trim(), userText);
             return true;
           } else {
-            throw new Error('Empty candidate response');
+            streamHandler.discard();
+            throw new Error('Empty streamed response');
           }
         } catch (err) {
           lastError = err;

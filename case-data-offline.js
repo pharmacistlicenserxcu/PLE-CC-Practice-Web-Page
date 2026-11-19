@@ -7,7 +7,7 @@
 const OFFLINE_DATA = {
   "version": "v_20261119_130515",
   "generatedAt": "2026-11-19 13:05:15",
-  "totalCases": 455,
+  "totalCases": 456,
   "cases": [
     {
       "caseId": "OSPE-CL4801",
@@ -7787,6 +7787,23 @@ const OFFLINE_DATA = {
       "author": "RxCU",
       "createdDate": "01/10/2026",
       "source": "ข้อสอบจริง ปี 2568",
+      "isActive": true,
+      "caseStatus": "Active",
+      "linkedNextCase": "",
+      "linkedFromCase": ""
+    },
+    {
+      "caseId": "OSPE-CLSP04",
+      "title": "การแนะนำสูตรยารักษาวัณโรคปอด (Antituberculosis Therapy: 2HRZE)",
+      "category": "Clinic",
+      "mainGroup": "คำแนะนำสำหรับยาที่ต้องระมัดระวังในการใช้เป็นพิเศษ (ภาคผนวก ข)",
+      "subTopic": "",
+      "disease": "Pulmonary Tuberculosis (2HRZE)",
+      "difficulty": 2,
+      "docId": "1ZNKvEBVAUeVcJ2GSH4gGKujA8whv7zY0fH4pXVEJa4g",
+      "author": "คณะทำงานคลังข้อสอบร่วมสมรรถนะเภสัชกรรม",
+      "createdDate": "30/09/2026",
+      "source": "Practice RxCU84 Clinic ครั้งที่ 1",
       "isActive": true,
       "caseStatus": "Active",
       "linkedNextCase": "",

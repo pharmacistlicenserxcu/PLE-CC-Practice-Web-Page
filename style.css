@@ -8295,3 +8295,26 @@ hr.case-divider,
   }
 }
 
+/* ──────────────────────────────────────────────────────────────
+   Real-Time AI Streaming Cursor & Message Bubble Animations
+   ────────────────────────────────────────────────────────────── */
+@keyframes st-chat-blink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0; }
+}
+
+.st-chat-cursor {
+  display: inline-block;
+  color: var(--primary, #0284c7);
+  font-weight: 700;
+  margin-left: 2px;
+  animation: st-chat-blink 0.75s infinite;
+  vertical-align: baseline;
+}
+
+.st-chat-msg.streaming-msg {
+  border-left: 3px solid #0284c7 !important;
+  transition: all 0.15s ease;
+}
+
+

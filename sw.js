@@ -4,10 +4,10 @@
  * ====================================================
  * จัดการ Caching ทรัพยากรระบบเพื่อเพิ่มความเร็วในการโหลด (Preloading) 
  * และสนับสนุนการเข้าใช้งานแบบออฟไลน์ (Offline Mode)
- * Version: ple-cc2-ospe-v1.7.2 (Full-Card Clickable Hyperlink & QR in Print/PDF Mode)
+ * Version: ple-cc2-ospe-v1.7.3 (Instant AI Response: Gemini 3.1 Flash Lite & SSE Real-Time Streaming)
  */
 
-const CACHE_NAME = 'ple-cc2-ospe-v1.7.2';
+const CACHE_NAME = 'ple-cc2-ospe-v1.7.3';
 const ASSETS = [
   './',
   './index.html',

@@ -53,6 +53,7 @@ const AppState = {
     mainGroup: 'All',
     disease: 'All',
     source: 'All',
+    preset: 'All',
     search: ''
   },
   checklistProgress: {}, // { caseId: [checked_id1, checked_id2] }
@@ -1974,6 +1975,7 @@ function restoreFilterState() {
     const urlParams = new URLSearchParams(window.location.search);
     const urlSearch = urlParams.get('search') || urlParams.get('q');
     const urlCat = urlParams.get('cat');
+    const urlPreset = urlParams.get('preset');
 
     const saved = sessionStorage.getItem('ple_case_library_filters');
     if (saved) {
@@ -1984,18 +1986,21 @@ function restoreFilterState() {
           AppState.activeFilters.mainGroup = 'All';
           AppState.activeFilters.disease = 'All';
           AppState.activeFilters.source = 'All';
+          AppState.activeFilters.preset = urlPreset || 'All';
           AppState.activeFilters.search = urlSearch || '';
         } else {
           AppState.activeFilters.category = urlCat || parsed.category || 'All';
           AppState.activeFilters.mainGroup = parsed.mainGroup || 'All';
           AppState.activeFilters.disease = parsed.disease || 'All';
           AppState.activeFilters.source = parsed.source || 'All';
+          AppState.activeFilters.preset = urlPreset || parsed.preset || 'All';
           AppState.activeFilters.search = urlSearch || parsed.search || '';
         }
         return true;
       }
     } else {
       if (urlCat) AppState.activeFilters.category = urlCat;
+      if (urlPreset) AppState.activeFilters.preset = urlPreset;
       if (urlSearch) AppState.activeFilters.search = urlSearch;
     }
   } catch (e) {
@@ -2010,6 +2015,7 @@ function resetAllFilters() {
     mainGroup: 'All',
     disease: 'All',
     source: 'All',
+    preset: 'All',
     search: ''
   };
   try {
@@ -2026,6 +2032,9 @@ function resetAllFilters() {
 
   const selectCat = document.getElementById('filter-category');
   if (selectCat) selectCat.value = 'All';
+
+  const selectPreset = document.getElementById('filter-preset');
+  if (selectPreset) selectPreset.value = 'All';
 
   renderFilterSelectOptions();
   applyFilters();
@@ -2087,6 +2096,7 @@ function updateActiveFilterCountBadge() {
   if (filters.mainGroup && filters.mainGroup !== 'All') count++;
   if (filters.disease && filters.disease !== 'All') count++;
   if (filters.source && filters.source !== 'All') count++;
+  if (filters.preset && filters.preset !== 'All') count++;
 
   if (badge) {
     if (count > 0) {
@@ -2147,7 +2157,7 @@ window.parseDiseaseTags = parseDiseaseTags;
 
 function applyFilters() {
   let list = Array.isArray(AppState.cases) ? [...AppState.cases] : [];
-  const { category, mainGroup, disease, source, search } = AppState.activeFilters;
+  const { category, mainGroup, disease, source, preset, search } = AppState.activeFilters;
   
   if (category && category !== 'All') {
     list = list.filter(c => c && c.category === category);
@@ -2175,6 +2185,16 @@ function applyFilters() {
       const cNorm = c.source.replace(/^ข้อสอบจริง\s*ปี\s*/, 'ข้อสอบจริง ปี ').replace(/^ข้อสอบจริงปี\s*/, 'ข้อสอบจริง ปี ');
       return cNorm === normSource;
     });
+  }
+
+  if (preset && preset !== 'All' && typeof getCaseIdsForPreset === 'function') {
+    const orderedIds = getCaseIdsForPreset(preset);
+    if (Array.isArray(orderedIds)) {
+      const idOrderMap = new Map();
+      orderedIds.forEach((id, idx) => idOrderMap.set(id, idx));
+      list = list.filter(c => c && idOrderMap.has(c.caseId));
+      list.sort((a, b) => idOrderMap.get(a.caseId) - idOrderMap.get(b.caseId));
+    }
   }
   
   if (search) {
@@ -2321,6 +2341,8 @@ function renderCaseList() {
   
   AppState.filteredCases.forEach(c => {
     const isProtected = Boolean(c.isProtected || c.hasPassword);
+    const isFeaturedPresetCase = typeof isCaseInFeaturedPreset === 'function' && isCaseInFeaturedPreset(c.caseId);
+    const featuredBadge = isFeaturedPresetCase ? `<span class="case-card-tag preset-featured-badge">⭐ แนะนำ</span>` : '';
     const sourceBadge = c.source ? `<span class="case-card-tag" style="background: rgba(14, 116, 144, 0.10); color: var(--primary); font-weight: 600; border: 1px solid rgba(14, 116, 144, 0.25);">🏷️ ${c.source}</span>` : '';
     const lockBadge = isProtected ? `<span class="case-card-tag" style="background: rgba(239, 68, 68, 0.12); color: #ef4444; font-weight: 700; border: 1px solid rgba(239, 68, 68, 0.25);">🔒 ข้อสอบลับ</span>` : '';
     const durMin = Math.round(parseCaseDurationSec(c) / 60);
@@ -2373,6 +2395,7 @@ function renderCaseList() {
       </div>
       <h3 class="case-card-title">${escapeHtml(displayTitle)}</h3>
       <div style="margin-bottom: 0.5rem; display: flex; flex-wrap: wrap; gap: 0.35rem;">
+        ${featuredBadge}
         ${lockBadge}
         ${topicBadges}
         ${sourceBadge}
@@ -2814,6 +2837,19 @@ function detectCurrentPage() {
     if (selectSource) {
       selectSource.addEventListener('change', (e) => {
         AppState.activeFilters.source = e.target.value;
+        saveFilterState();
+        applyFilters();
+        renderCaseList();
+      });
+    }
+
+    const selectPreset = document.getElementById('filter-preset');
+    if (selectPreset) {
+      if (typeof initRecommendedPresetsSystem === 'function') {
+        initRecommendedPresetsSystem();
+      }
+      selectPreset.addEventListener('change', (e) => {
+        AppState.activeFilters.preset = e.target.value;
         saveFilterState();
         applyFilters();
         renderCaseList();
@@ -5730,3 +5766,629 @@ if (typeof window !== 'undefined') {
 if (typeof module !== 'undefined' && module.exports) {
   module.exports = StationDocViewer;
 }
+
+
+// ──────────────────────────────────────────────────────────────
+// RECOMMENDED PRESETS & ADMIN PRESET MANAGER (FIREBASE RTDB SYNC)
+// ──────────────────────────────────────────────────────────────
+(function () {
+  const ADMIN_PRESET_PASSCODE = '8485';
+  const PRESET_CACHE_KEY = 'ple_admin_preset_config_v1';
+  const PRESET_FB_PATH = 'config/recommended_presets';
+  const PRESET_FB_CONFIG = {
+    apiKey: "AIzaSyAnhyqwtMeAyDu_aDLW-Qc27F6d3qmJ2YQ",
+    authDomain: "realtime-database-11f5e.firebaseapp.com",
+    projectId: "realtime-database-11f5e",
+    storageBucket: "realtime-database-11f5e.firebasestorage.app",
+    messagingSenderId: "431990525852",
+    appId: "1:431990525852:web:220c425051890b7c768259",
+    databaseURL: "https://realtime-database-11f5e-default-rtdb.firebaseio.com"
+  };
+
+  let _fbPresetDb = null;
+  let _presetConfig = null;
+  let _presetInitialized = false;
+  let _adminDraftConfig = null;
+  let _adminActivePresetId = null;
+
+  function getFirebasePresetDb() {
+    if (_fbPresetDb) return _fbPresetDb;
+    try {
+      if (typeof firebase !== 'undefined' && typeof firebase.database === 'function') {
+        const appInst = (firebase.apps && firebase.apps.length > 0)
+          ? firebase.app()
+          : firebase.initializeApp(PRESET_FB_CONFIG);
+        _fbPresetDb = appInst.database();
+        return _fbPresetDb;
+      }
+    } catch (e) {
+      console.warn('[PresetSystem] Firebase init skipped:', e);
+    }
+    return null;
+  }
+
+  function matchBuiltInPresetIds(presetId) {
+    const all = Array.isArray(AppState.cases) ? AppState.cases : [];
+    if (presetId === 'product_weekly') {
+      return all.filter(c => c && (c.category === 'Product' || (c.caseId && c.caseId.startsWith('OSPE-PD'))) && c.source && (c.source.includes('Product') || c.source.includes('PRODUCT') || c.source.includes('Prodct'))).map(c => c.caseId);
+    }
+    if (presetId === 'clsd') {
+      return all.filter(c => c && c.caseId && c.caseId.startsWith('OSPE-CLSD')).map(c => c.caseId);
+    }
+    if (presetId === 'clsp') {
+      return all.filter(c => c && c.caseId && c.caseId.startsWith('OSPE-CLSP')).map(c => c.caseId);
+    }
+    if (presetId === 'isbar') {
+      return all.filter(c => c && (c.source === 'ISBAR' || (c.caseId && c.caseId.includes('ISBAR')))).map(c => c.caseId);
+    }
+    if (presetId === 'clinic_weekly') {
+      return all.filter(c => c && c.source && (
+        c.source.includes('ซักประวัติจ่ายยา') ||
+        c.source.includes('Clinic Week') ||
+        (c.source.includes('Mock Exam 2569') && c.category === 'Clinic') ||
+        c.source.includes('RxCU83 Practice')
+      )).map(c => c.caseId);
+    }
+    if (presetId === 'clinic_mock_ab') {
+      return all.filter(c => c && (
+        (c.source && (c.source.includes('Mock Clinic 2569 RxCU84 Set A') || c.source.includes('Mock Clinic 2569 RxCU84 Set B'))) ||
+        (c.caseId && (c.caseId.startsWith('OSPE-CLMA') || c.caseId.startsWith('OSPE-CLMB')))
+      )).map(c => c.caseId);
+    }
+    return [];
+  }
+
+  function buildDefaultPresetConfig() {
+    return {
+      defaultFeaturedId: '',
+      updatedAt: 0,
+      presets: [
+        { id: 'product_weekly', label: '🧪 Weekly Mock ของ Product', visible: true, builtIn: true, caseIds: matchBuiltInPresetIds('product_weekly') },
+        { id: 'clsd', label: '💊 เคสสั่งจ่ายยา (CLSD)', visible: true, builtIn: true, caseIds: matchBuiltInPresetIds('clsd') },
+        { id: 'clsp', label: '👶 ผู้ป่วยกลุ่มพิเศษ (CLSP)', visible: true, builtIn: true, caseIds: matchBuiltInPresetIds('clsp') },
+        { id: 'isbar', label: '📞 สื่อสาร & ส่งต่อแพทย์ (ISBAR)', visible: true, builtIn: true, caseIds: matchBuiltInPresetIds('isbar') },
+        { id: 'clinic_weekly', label: '🩺 ซักประวัติจ่ายยา Weekly Mock (Clinic)', visible: true, builtIn: true, caseIds: matchBuiltInPresetIds('clinic_weekly') },
+        { id: 'clinic_mock_ab', label: '📋 Mock Exam 2569 Set A & B (Clinic)', visible: true, builtIn: true, caseIds: matchBuiltInPresetIds('clinic_mock_ab') }
+      ]
+    };
+  }
+
+  function normalizePresetConfig(raw) {
+    const def = buildDefaultPresetConfig();
+    if (!raw || !Array.isArray(raw.presets) || raw.presets.length === 0) return def;
+    const normalized = raw.presets.map(p => ({
+      id: String(p.id || ('preset_' + Date.now())),
+      label: String(p.label || 'ชุดเคสแนะนำ'),
+      visible: p.visible !== false,
+      builtIn: Boolean(p.builtIn),
+      caseIds: Array.isArray(p.caseIds) ? p.caseIds.filter(Boolean) : matchBuiltInPresetIds(p.id)
+    }));
+    return {
+      defaultFeaturedId: raw.defaultFeaturedId || '',
+      updatedAt: Number(raw.updatedAt || 0),
+      presets: normalized
+    };
+  }
+
+  function getActivePresetConfig() {
+    if (_presetConfig) return _presetConfig;
+    try {
+      const cached = localStorage.getItem(PRESET_CACHE_KEY);
+      if (cached) {
+        _presetConfig = normalizePresetConfig(JSON.parse(cached));
+        return _presetConfig;
+      }
+    } catch (e) {}
+    _presetConfig = buildDefaultPresetConfig();
+    return _presetConfig;
+  }
+
+  window.getCaseIdsForPreset = function (presetId) {
+    if (!presetId || presetId === 'All') return null;
+    const cfg = getActivePresetConfig();
+    const found = cfg.presets.find(p => p.id === presetId);
+    if (found && Array.isArray(found.caseIds) && found.caseIds.length > 0) {
+      return found.caseIds;
+    }
+    return matchBuiltInPresetIds(presetId);
+  };
+
+  window.isCaseInFeaturedPreset = function (caseId) {
+    if (!caseId) return false;
+    const cfg = getActivePresetConfig();
+    if (!cfg.defaultFeaturedId) return false;
+    const feat = cfg.presets.find(p => p.id === cfg.defaultFeaturedId);
+    if (!feat || !Array.isArray(feat.caseIds)) return false;
+    return feat.caseIds.includes(caseId);
+  };
+
+  function renderPresetDropdownOptions() {
+    const sel = document.getElementById('filter-preset');
+    if (!sel) return;
+    const cfg = getActivePresetConfig();
+    const prevVal = AppState.activeFilters.preset || sel.value || 'All';
+    sel.innerHTML = '<option value="All">ทุกเคสทั่วไป (All Cases)</option>';
+    cfg.presets.forEach(p => {
+      if (p.visible === false) return;
+      const opt = document.createElement('option');
+      opt.value = p.id;
+      const isFeat = cfg.defaultFeaturedId && cfg.defaultFeaturedId === p.id;
+      const cnt = Array.isArray(p.caseIds) ? p.caseIds.length : 0;
+      opt.textContent = (isFeat ? '⭐ [แนะนำ] ' : '') + p.label + ' (' + cnt + ')';
+      sel.appendChild(opt);
+    });
+    if ([...sel.options].some(o => o.value === prevVal)) {
+      sel.value = prevVal;
+    } else {
+      sel.value = 'All';
+      AppState.activeFilters.preset = 'All';
+    }
+  }
+  window.renderPresetDropdownOptions = renderPresetDropdownOptions;
+
+  window.initRecommendedPresetsSystem = function () {
+    if (_presetInitialized) {
+      renderPresetDropdownOptions();
+      return;
+    }
+    _presetInitialized = true;
+    const cfg = getActivePresetConfig();
+    renderPresetDropdownOptions();
+
+    // Auto-select defaultFeaturedId if user arrived fresh without URL filters or saved session filters
+    try {
+      const urlParams = new URLSearchParams(window.location.search);
+      const hasExplicitUrl = urlParams.has('preset') || urlParams.has('cat') || urlParams.has('search') || urlParams.has('q');
+      const hasSession = Boolean(sessionStorage.getItem('ple_case_library_filters'));
+      if (!hasExplicitUrl && !hasSession && cfg.defaultFeaturedId) {
+        const exists = cfg.presets.some(p => p.id === cfg.defaultFeaturedId && p.visible !== false);
+        if (exists) {
+          AppState.activeFilters.preset = cfg.defaultFeaturedId;
+          const sel = document.getElementById('filter-preset');
+          if (sel) sel.value = cfg.defaultFeaturedId;
+        }
+      }
+    } catch (e) {}
+
+    const db = getFirebasePresetDb();
+    if (db) {
+      db.ref(PRESET_FB_PATH).on('value', (snap) => {
+        const val = snap.val();
+        if (val && Array.isArray(val.presets) && val.presets.length > 0) {
+          _presetConfig = normalizePresetConfig(val);
+          try {
+            localStorage.setItem(PRESET_CACHE_KEY, JSON.stringify(_presetConfig));
+          } catch (e) {}
+          renderPresetDropdownOptions();
+          if (typeof applyFilters === 'function' && typeof renderCaseList === 'function') {
+            applyFilters();
+            renderCaseList();
+          }
+        }
+      }, (err) => {
+        console.warn('[PresetSystem] Firebase listen warning:', err);
+      });
+    }
+  };
+
+  // ── Admin Preset Manager Modal (Passcode Protected) ──────────────────────
+  window.openAdminPresetModal = function () {
+    let unlocked = false;
+    try { unlocked = sessionStorage.getItem('ple_admin_preset_unlocked') === '1'; } catch (e) {}
+    if (!unlocked) {
+      const entered = window.prompt('🔐 กรุณาใส่รหัสผ่าน Admin เพื่อจัดการชุดเคสแนะนำ:');
+      if (entered === null) return;
+      if (entered.trim() !== ADMIN_PRESET_PASSCODE) {
+        alert('❌ รหัสผ่าน Admin ไม่ถูกต้อง');
+        return;
+      }
+      try { sessionStorage.setItem('ple_admin_preset_unlocked', '1'); } catch (e) {}
+    }
+
+    _adminDraftConfig = JSON.parse(JSON.stringify(getActivePresetConfig()));
+    if (!_adminDraftConfig.presets || _adminDraftConfig.presets.length === 0) {
+      _adminDraftConfig = buildDefaultPresetConfig();
+    }
+    _adminActivePresetId = _adminDraftConfig.presets[0].id;
+
+    let modal = document.getElementById('admin-preset-modal');
+    if (!modal) {
+      createAdminPresetModalDOM();
+      modal = document.getElementById('admin-preset-modal');
+    }
+    if (modal) {
+      modal.style.display = 'flex';
+      populateAdminPresetFilterDropdowns();
+      renderAdminPresetEditor();
+    }
+  };
+
+  window.closeAdminPresetModal = function () {
+    const modal = document.getElementById('admin-preset-modal');
+    if (modal) modal.style.display = 'none';
+  };
+
+  function createAdminPresetModalDOM() {
+    const div = document.createElement('div');
+    div.id = 'admin-preset-modal';
+    div.className = 'print-modal-overlay no-print';
+    div.style.display = 'none';
+    div.innerHTML = `
+      <div class="print-modal-card" style="max-width: 1120px;">
+        <div class="print-modal-header">
+          <h3 style="margin: 0; font-family: var(--font-title); font-size: 1.12rem; display: flex; align-items: center; gap: 0.5rem;">
+            ⚙️ Admin Preset &amp; Featured Manager (ตั้งค่าเคสแนะนำให้นิสิต)
+          </h3>
+          <button type="button" class="btn btn-secondary" onclick="closeAdminPresetModal()" style="padding: 4px 10px; font-size: 0.85rem;">✕ ปิด</button>
+        </div>
+
+        <div class="print-modal-body">
+          <!-- Top Preset Selector & Settings Bar -->
+          <div class="print-option-group" style="margin-bottom: 0.85rem;">
+            <div style="display: flex; flex-wrap: wrap; gap: 0.5rem; align-items: center; justify-content: space-between; margin-bottom: 0.6rem;">
+              <div style="display: flex; align-items: center; gap: 0.45rem; flex-wrap: wrap; flex: 1;">
+                <label style="font-size: 0.82rem; font-weight: 700;">🎯 เลือกชุดเคส:</label>
+                <select id="admin-preset-select" class="form-control" style="min-width: 240px; padding: 0.4rem 0.6rem; font-size: 0.84rem;" onchange="onAdminSelectPresetChange()"></select>
+                <button type="button" class="admin-order-btn" title="เลื่อนชุดนี้ขึ้นใน Dropdown" onclick="moveAdminPresetOrder(-1)">▲</button>
+                <button type="button" class="admin-order-btn" title="เลื่อนชุดนี้ลงใน Dropdown" onclick="moveAdminPresetOrder(1)">▼</button>
+                <button type="button" class="btn btn-secondary" style="padding: 4px 10px; font-size: 0.78rem;" onclick="createNewAdminPreset()">+ สร้างชุดใหม่</button>
+                <button type="button" id="btn-admin-delete-preset" class="btn btn-secondary" style="padding: 4px 10px; font-size: 0.78rem; color: #dc2626;" onclick="deleteCurrentAdminPreset()">🗑️ ลบชุดนี้</button>
+              </div>
+            </div>
+
+            <div style="display: grid; grid-template-columns: 1.4fr auto auto; gap: 0.75rem; align-items: center;">
+              <div>
+                <label style="font-size: 0.75rem; font-weight: 600; color: var(--text-secondary); display: block; margin-bottom: 2px;">ชื่อแสดงใน Dropdown:</label>
+                <input type="text" id="admin-preset-label-input" class="form-control" style="width: 100%; padding: 0.38rem 0.6rem; font-size: 0.84rem;" oninput="onAdminPresetLabelInput(this.value)">
+              </div>
+              <label style="display: flex; align-items: center; gap: 0.35rem; font-size: 0.82rem; font-weight: 600; cursor: pointer; padding-top: 14px;">
+                <input type="checkbox" id="admin-preset-visible-chk" onchange="onAdminPresetVisibleChange(this.checked)">
+                <span>👁️ แสดงใน Dropdown</span>
+              </label>
+              <label style="display: flex; align-items: center; gap: 0.35rem; font-size: 0.82rem; font-weight: 600; cursor: pointer; padding-top: 14px; color: #b45309;">
+                <input type="checkbox" id="admin-preset-featured-chk" onchange="onAdminPresetFeaturedChange(this.checked)">
+                <span>⭐ ตั้งเป็นชุดแนะนำหลัก (Default)</span>
+              </label>
+            </div>
+          </div>
+
+          <div class="admin-preset-layout">
+            <!-- Left: 4D Filter & Checkbox Rail (Same UX as Batch Print) -->
+            <div class="print-option-group">
+              <div class="print-option-title" style="justify-content: space-between; flex-wrap: wrap; gap: 0.5rem;">
+                <span>📦 ตัวกรอง 4 มิติ &amp; ติ๊กเลือกเคสเข้าชุด</span>
+                <span id="admin-filter-match-badge" style="font-size: 0.78rem; color: var(--text-secondary);">พบ 0 เคส</span>
+              </div>
+
+              <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 0.45rem; margin-bottom: 0.55rem;">
+                <div>
+                  <label style="font-size: 0.73rem; font-weight: 600; color: var(--text-secondary); display: block; margin-bottom: 2px;">📂 หมวดวิชา:</label>
+                  <select id="admin-cat-select" class="form-control" style="width: 100%; padding: 0.35rem 0.5rem; font-size: 0.8rem;" onchange="onAdminCategoryChange()">
+                    <option value="All">ทุกหมวด (All)</option>
+                    <option value="Clinic">Clinic</option>
+                    <option value="Product">Product</option>
+                    <option value="SAP">SAP</option>
+                  </select>
+                </div>
+                <div>
+                  <label style="font-size: 0.73rem; font-weight: 600; color: var(--text-secondary); display: block; margin-bottom: 2px;">📚 กลุ่มโรค/วิชา:</label>
+                  <select id="admin-group-select" class="form-control" style="width: 100%; padding: 0.35rem 0.5rem; font-size: 0.8rem;" onchange="renderAdminCaseCheckboxList()">
+                    <option value="All">ทุกกลุ่ม (All Groups)</option>
+                  </select>
+                </div>
+                <div>
+                  <label style="font-size: 0.73rem; font-weight: 600; color: var(--text-secondary); display: block; margin-bottom: 2px;">🏷️ Source / แหล่งที่มา:</label>
+                  <select id="admin-source-select" class="form-control" style="width: 100%; padding: 0.35rem 0.5rem; font-size: 0.8rem;" onchange="renderAdminCaseCheckboxList()">
+                    <option value="All">ทุกแหล่งที่มา (All Sources)</option>
+                  </select>
+                </div>
+              </div>
+
+              <div style="display: flex; gap: 0.45rem; margin-bottom: 0.6rem; flex-wrap: wrap; align-items: center;">
+                <input type="text" id="admin-search-input" class="form-control" placeholder="🔍 ค้นหาชื่อเคส, รหัสเคส, ตัวยา..." style="flex: 2; min-width: 180px; padding: 0.36rem 0.6rem; font-size: 0.82rem;" oninput="renderAdminCaseCheckboxList()">
+                <button type="button" class="btn btn-secondary" onclick="adminSelectAllFiltered(true)" style="padding: 4px 9px; font-size: 0.78rem;">☑️ ติ๊กทั้งหมดที่กรอง</button>
+                <button type="button" class="btn btn-secondary" onclick="adminSelectAllFiltered(false)" style="padding: 4px 9px; font-size: 0.78rem;">☐ ล้างที่กรอง</button>
+              </div>
+
+              <div id="admin-case-checkbox-list" style="max-height: 290px; overflow-y: auto; border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 0.5rem; background: var(--bg-primary); display: grid; grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); gap: 0.4rem;"></div>
+            </div>
+
+            <!-- Right: Selected Cases & Ordering Rail -->
+            <div class="print-option-group" style="display: flex; flex-direction: column;">
+              <div class="print-option-title" style="justify-content: space-between;">
+                <span>🔢 ลำดับเคสในชุดนี้</span>
+                <span id="admin-selected-count-badge" style="font-size: 0.78rem; font-weight: 700; background: var(--primary); color: #fff; padding: 2px 8px; border-radius: 12px;">0 เคส</span>
+              </div>
+              <div id="admin-selected-order-list" style="flex: 1; max-height: 355px; overflow-y: auto; display: flex; flex-direction: column; gap: 0.35rem; padding-right: 2px;"></div>
+            </div>
+          </div>
+        </div>
+
+        <div style="padding: 0.9rem 1.4rem; background: var(--bg-secondary); border-top: 1px solid var(--border); display: flex; gap: 0.75rem; justify-content: space-between; align-items: center; flex-wrap: wrap;">
+          <button type="button" class="btn btn-secondary" style="font-size: 0.82rem;" onclick="resetAdminPresetsToDefault()">🔄 รีเซ็ตเป็นค่าเริ่มต้น (6 ชุด)</button>
+          <div style="display: flex; gap: 0.65rem; align-items: center;">
+            <button type="button" class="btn btn-secondary" onclick="closeAdminPresetModal()">ยกเลิก</button>
+            <button type="button" class="btn btn-primary" onclick="saveAndPublishAdminPresets()" style="padding: 0.55rem 1.35rem; font-size: 0.92rem; background: linear-gradient(135deg, var(--primary), #0284c7);">
+              💾 บันทึกและเผยแพร่ให้นิสิตทุกคน
+            </button>
+          </div>
+        </div>
+      </div>
+    `;
+    document.body.appendChild(div);
+  }
+
+  function getAdminFilteredPool() {
+    const cat = (document.getElementById('admin-cat-select') || {}).value || 'All';
+    const grp = (document.getElementById('admin-group-select') || {}).value || 'All';
+    const src = (document.getElementById('admin-source-select') || {}).value || 'All';
+    const q = ((document.getElementById('admin-search-input') || {}).value || '').toLowerCase().trim();
+    return (AppState.cases || []).filter(c => {
+      if (!c) return false;
+      if (cat !== 'All' && c.category !== cat) return false;
+      if (grp !== 'All' && c.mainGroup !== grp) return false;
+      if (src !== 'All' && c.source !== src) return false;
+      if (q) {
+        const hay = [c.caseId, c.title, c.source, c.mainGroup, c.disease].filter(Boolean).join(' ').toLowerCase();
+        if (!hay.includes(q)) return false;
+      }
+      return true;
+    });
+  }
+
+  function populateAdminPresetFilterDropdowns() {
+    const cat = (document.getElementById('admin-cat-select') || {}).value || 'All';
+    const grpSel = document.getElementById('admin-group-select');
+    const srcSel = document.getElementById('admin-source-select');
+    const pool = (AppState.cases || []).filter(c => c && (cat === 'All' || c.category === cat));
+    if (grpSel) {
+      const prev = grpSel.value;
+      const groups = [...new Set(pool.map(c => c.mainGroup).filter(Boolean))].sort();
+      grpSel.innerHTML = '<option value="All">ทุกกลุ่ม (All Groups)</option>' + groups.map(g => `<option value="${escapeHtml(g)}">${escapeHtml(g)}</option>`).join('');
+      if ([...grpSel.options].some(o => o.value === prev)) grpSel.value = prev;
+    }
+    if (srcSel) {
+      const prev = srcSel.value;
+      const sources = [...new Set(pool.map(c => c.source).filter(Boolean))].sort();
+      srcSel.innerHTML = '<option value="All">ทุกแหล่งที่มา (All Sources)</option>' + sources.map(s => `<option value="${escapeHtml(s)}">${escapeHtml(s)}</option>`).join('');
+      if ([...srcSel.options].some(o => o.value === prev)) srcSel.value = prev;
+    }
+  }
+
+  window.onAdminCategoryChange = function () {
+    populateAdminPresetFilterDropdowns();
+    renderAdminCaseCheckboxList();
+  };
+
+  function getDraftPreset() {
+    if (!_adminDraftConfig) return null;
+    return _adminDraftConfig.presets.find(p => p.id === _adminActivePresetId) || _adminDraftConfig.presets[0];
+  }
+
+  function renderAdminPresetEditor() {
+    const sel = document.getElementById('admin-preset-select');
+    const preset = getDraftPreset();
+    if (!sel || !preset) return;
+    _adminActivePresetId = preset.id;
+    sel.innerHTML = _adminDraftConfig.presets.map((p, idx) => {
+      const star = (_adminDraftConfig.defaultFeaturedId === p.id) ? '⭐ ' : '';
+      const eye = (p.visible === false) ? ' [ซ่อน]' : '';
+      return `<option value="${escapeHtml(p.id)}">${idx + 1}. ${star}${escapeHtml(p.label)} (${(p.caseIds || []).length})${eye}</option>`;
+    }).join('');
+    sel.value = preset.id;
+
+    const lblInp = document.getElementById('admin-preset-label-input');
+    if (lblInp) lblInp.value = preset.label || '';
+    const visChk = document.getElementById('admin-preset-visible-chk');
+    if (visChk) visChk.checked = preset.visible !== false;
+    const featChk = document.getElementById('admin-preset-featured-chk');
+    if (featChk) featChk.checked = (_adminDraftConfig.defaultFeaturedId === preset.id);
+    const delBtn = document.getElementById('btn-admin-delete-preset');
+    if (delBtn) delBtn.style.display = (_adminDraftConfig.presets.length > 1) ? 'inline-flex' : 'none';
+
+    renderAdminCaseCheckboxList();
+    renderAdminSelectedOrderList();
+  }
+
+  window.onAdminSelectPresetChange = function () {
+    const sel = document.getElementById('admin-preset-select');
+    if (sel) _adminActivePresetId = sel.value;
+    renderAdminPresetEditor();
+  };
+
+  window.onAdminPresetLabelInput = function (val) {
+    const p = getDraftPreset();
+    if (p) {
+      p.label = val;
+      const sel = document.getElementById('admin-preset-select');
+      if (sel && sel.selectedOptions[0]) {
+        sel.selectedOptions[0].textContent = `${_adminDraftConfig.presets.indexOf(p) + 1}. ${(_adminDraftConfig.defaultFeaturedId === p.id ? '⭐ ' : '')}${val} (${(p.caseIds || []).length})`;
+      }
+    }
+  };
+
+  window.onAdminPresetVisibleChange = function (checked) {
+    const p = getDraftPreset();
+    if (p) p.visible = checked;
+  };
+
+  window.onAdminPresetFeaturedChange = function (checked) {
+    const p = getDraftPreset();
+    if (!p) return;
+    _adminDraftConfig.defaultFeaturedId = checked ? p.id : '';
+    renderAdminPresetEditor();
+  };
+
+  window.moveAdminPresetOrder = function (dir) {
+    const idx = _adminDraftConfig.presets.findIndex(p => p.id === _adminActivePresetId);
+    if (idx < 0) return;
+    const target = idx + dir;
+    if (target < 0 || target >= _adminDraftConfig.presets.length) return;
+    const arr = _adminDraftConfig.presets;
+    [arr[idx], arr[target]] = [arr[target], arr[idx]];
+    renderAdminPresetEditor();
+  };
+
+  window.createNewAdminPreset = function () {
+    const name = window.prompt('ตั้งชื่อชุดเคสแนะนำใหม่ (เช่น 🔥 เคสเก็งสอบสัปดาห์สุดท้าย):');
+    if (!name || !name.trim()) return;
+    const newId = 'custom_' + Date.now();
+    _adminDraftConfig.presets.push({
+      id: newId,
+      label: name.trim(),
+      visible: true,
+      builtIn: false,
+      caseIds: []
+    });
+    _adminActivePresetId = newId;
+    renderAdminPresetEditor();
+  };
+
+  window.deleteCurrentAdminPreset = function () {
+    if (_adminDraftConfig.presets.length <= 1) return;
+    const p = getDraftPreset();
+    if (!p || !window.confirm(`ต้องการลบชุด "${p.label}" ออกจากรายการหรือไม่?`)) return;
+    _adminDraftConfig.presets = _adminDraftConfig.presets.filter(item => item.id !== p.id);
+    if (_adminDraftConfig.defaultFeaturedId === p.id) _adminDraftConfig.defaultFeaturedId = '';
+    _adminActivePresetId = _adminDraftConfig.presets[0].id;
+    renderAdminPresetEditor();
+  };
+
+  window.renderAdminCaseCheckboxList = function () {
+    const box = document.getElementById('admin-case-checkbox-list');
+    const badge = document.getElementById('admin-filter-match-badge');
+    const p = getDraftPreset();
+    if (!box || !p) return;
+    const pool = getAdminFilteredPool();
+    if (badge) badge.textContent = `พบ ${pool.length} เคส`;
+    const selectedSet = new Set(p.caseIds || []);
+
+    if (pool.length === 0) {
+      box.innerHTML = '<div style="grid-column:1/-1;text-align:center;color:var(--text-secondary);padding:1.25rem;font-size:0.84rem;">ไม่พบเคสที่ตรงกับตัวกรอง</div>';
+      return;
+    }
+
+    box.innerHTML = pool.map(c => {
+      const checked = selectedSet.has(c.caseId) ? 'checked' : '';
+      return `
+        <label style="display:flex;align-items:flex-start;gap:0.4rem;padding:0.4rem 0.5rem;border:1px solid var(--border);border-radius:6px;background:var(--bg-secondary);cursor:pointer;font-size:0.78rem;line-height:1.3;">
+          <input type="checkbox" ${checked} onchange="toggleAdminPresetCase('${escapeHtml(c.caseId)}', this.checked)" style="margin-top:2px;">
+          <span style="min-width:0;">
+            <strong style="color:var(--primary);">${escapeHtml(c.caseId)}</strong>
+            <span style="display:block;color:var(--text-primary);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:185px;" title="${escapeHtml(c.title || '')}">${escapeHtml(c.title || '')}</span>
+            ${c.source ? `<small style="color:var(--text-secondary);font-size:0.7rem;">🏷️ ${escapeHtml(c.source)}</small>` : ''}
+          </span>
+        </label>
+      `;
+    }).join('');
+  };
+
+  window.toggleAdminPresetCase = function (caseId, isChecked) {
+    const p = getDraftPreset();
+    if (!p) return;
+    if (!Array.isArray(p.caseIds)) p.caseIds = [];
+    if (isChecked) {
+      if (!p.caseIds.includes(caseId)) p.caseIds.push(caseId);
+    } else {
+      p.caseIds = p.caseIds.filter(id => id !== caseId);
+    }
+    renderAdminSelectedOrderList();
+  };
+
+  window.adminSelectAllFiltered = function (isSelect) {
+    const p = getDraftPreset();
+    if (!p) return;
+    if (!Array.isArray(p.caseIds)) p.caseIds = [];
+    const pool = getAdminFilteredPool();
+    const poolIds = new Set(pool.map(c => c.caseId));
+    if (isSelect) {
+      pool.forEach(c => {
+        if (!p.caseIds.includes(c.caseId)) p.caseIds.push(c.caseId);
+      });
+    } else {
+      p.caseIds = p.caseIds.filter(id => !poolIds.has(id));
+    }
+    renderAdminCaseCheckboxList();
+    renderAdminSelectedOrderList();
+  };
+
+  function renderAdminSelectedOrderList() {
+    const container = document.getElementById('admin-selected-order-list');
+    const badge = document.getElementById('admin-selected-count-badge');
+    const p = getDraftPreset();
+    if (!container || !p) return;
+    const ids = p.caseIds || [];
+    if (badge) badge.textContent = `${ids.length} เคส`;
+
+    if (ids.length === 0) {
+      container.innerHTML = '<div style="text-align:center;color:var(--text-secondary);padding:1.5rem 0.5rem;font-size:0.8rem;">ยังไม่ได้ติ๊กเลือกเคสในชุดนี้</div>';
+      return;
+    }
+
+    const caseMap = new Map((AppState.cases || []).map(c => [c.caseId, c]));
+    container.innerHTML = ids.map((id, idx) => {
+      const c = caseMap.get(id);
+      const title = c ? c.title : id;
+      return `
+        <div class="admin-selected-item">
+          <span class="admin-order-num">${idx + 1}</span>
+          <div style="flex:1;min-width:0;">
+            <div style="font-weight:700;color:var(--primary);font-size:0.76rem;">${escapeHtml(id)}</div>
+            <div style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:var(--text-secondary);font-size:0.74rem;" title="${escapeHtml(title)}">${escapeHtml(title)}</div>
+          </div>
+          <div class="admin-order-btns">
+            <button type="button" class="admin-order-btn" title="เลื่อนขึ้น" onclick="moveAdminCaseInPreset(${idx}, -1)">▲</button>
+            <button type="button" class="admin-order-btn" title="เลื่อนลง" onclick="moveAdminCaseInPreset(${idx}, 1)">▼</button>
+            <button type="button" class="admin-order-btn danger" title="เอาออก" onclick="toggleAdminPresetCase('${escapeHtml(id)}', false); renderAdminCaseCheckboxList();">✕</button>
+          </div>
+        </div>
+      `;
+    }).join('');
+  }
+
+  window.moveAdminCaseInPreset = function (idx, dir) {
+    const p = getDraftPreset();
+    if (!p || !Array.isArray(p.caseIds)) return;
+    const target = idx + dir;
+    if (target < 0 || target >= p.caseIds.length) return;
+    [p.caseIds[idx], p.caseIds[target]] = [p.caseIds[target], p.caseIds[idx]];
+    renderAdminSelectedOrderList();
+  };
+
+  window.resetAdminPresetsToDefault = function () {
+    if (!window.confirm('ต้องการรีเซ็ตชุดเคสแนะนำทั้งหมดกลับเป็น 6 ชุดมาตรฐานหรือไม่?')) return;
+    _adminDraftConfig = buildDefaultPresetConfig();
+    _adminActivePresetId = _adminDraftConfig.presets[0].id;
+    renderAdminPresetEditor();
+  };
+
+  window.saveAndPublishAdminPresets = async function () {
+    if (!_adminDraftConfig) return;
+    _adminDraftConfig.updatedAt = Date.now();
+    _presetConfig = normalizePresetConfig(_adminDraftConfig);
+    try {
+      localStorage.setItem(PRESET_CACHE_KEY, JSON.stringify(_presetConfig));
+    } catch (e) {}
+
+    const db = getFirebasePresetDb();
+    let fbSaved = false;
+    if (db) {
+      try {
+        await db.ref(PRESET_FB_PATH).set(_presetConfig);
+        fbSaved = true;
+      } catch (err) {
+        console.warn('[PresetSystem] Firebase save error:', err);
+      }
+    }
+
+    renderPresetDropdownOptions();
+    if (typeof applyFilters === 'function' && typeof renderCaseList === 'function') {
+      applyFilters();
+      renderCaseList();
+    }
+    closeAdminPresetModal();
+    alert(fbSaved
+      ? '✅ บันทึกและเผยแพร่ชุดเคสแนะนำขึ้นระบบกลางเรียบร้อยแล้ว! นิสิตทุกคนจะเห็นการอัปเดตทันที'
+      : '⚠️ บันทึกการตั้งค่าลงเครื่องนี้เรียบร้อยแล้ว (ไม่สามารถเชื่อมต่อ Firebase ในขณะนี้)');
+  };
+})();

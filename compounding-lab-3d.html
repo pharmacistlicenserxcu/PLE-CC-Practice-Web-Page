@@ -239,7 +239,7 @@ input[type=range]{width:110px;accent-color:var(--clinic);cursor:pointer}
 <!-- TOP HUD -->
 <div id="hud">
   <div class="hud-group">
-    <button class="pill" style="border-color:var(--clinic-bd);color:var(--clinic);background:var(--clinic-soft)" onclick="openLobby()">🏠 Lobby</button>
+    <button class="pill" style="border-color:var(--clinic-bd);color:var(--clinic);background:var(--clinic-soft)" onclick="window.location.href='case-library.html'">📚 คลังเคส</button>
     <span class="pill static title" id="hud-title">🩺 3D OSPE (ทดลองใช้)</span>
   </div>
   <div class="hud-group">
@@ -312,7 +312,7 @@ input[type=range]{width:110px;accent-color:var(--clinic);cursor:pointer}
 <div id="modal"><div class="box" id="mbox"></div></div>
 
 <!-- UNIFIED LOBBY SCREEN (MATCHING OSPE PLE-CC case-library.html) -->
-<div id="lobby-screen" class="show">
+<div id="lobby-screen" style="display:none">
   <div class="lobby-topbar">
     <div class="lobby-topbar-left">
       <a href="index.html" class="lobby-back-btn">
@@ -859,8 +859,17 @@ const tools = {};
   mk(new THREE.CylinderGeometry(.38, .38, .92, 18), M(0xf8fafc), 0, .46, 0, g);
   mk(new THREE.CylinderGeometry(.22, .35, .18, 16), M(0xf8fafc), 0, 1.0, 0, g);
   const cap = mk(new THREE.CylinderGeometry(.24, .24, .18, 16), M(0x2563eb), 0, 1.18, 0, g);
-  mk(new THREE.PlaneGeometry(.56, .52), new THREE.MeshBasicMaterial({ map: labelTex('NaHCO₃', 'AR Grade', '#fff', '#2563eb') }), 0, .46, .39, g).castShadow = false;
-  tools.nahco3 = { g, cap, uncapped: false, capFaceUp: false, labelReads: 0 };
+  const labelMesh = mk(new THREE.PlaneGeometry(.56, .52), new THREE.MeshBasicMaterial({ map: labelTex('NaHCO₃', 'AR Grade', '#fff', '#2563eb') }), 0, .46, .39, g);
+  labelMesh.castShadow = false;
+  tools.nahco3 = { g, cap, labelMesh, uncapped: false, capFaceUp: false, labelReads: 0 };
+}
+
+function updateProductBottleLabel(title, sub) {
+  if (!tools.nahco3?.labelMesh) return;
+  const oldMap = tools.nahco3.labelMesh.material.map;
+  tools.nahco3.labelMesh.material.map = labelTex(String(title || 'NaHCO₃').slice(0, 14), String(sub || 'Compounding').slice(0, 16), '#fff', '#2563eb');
+  tools.nahco3.labelMesh.material.needsUpdate = true;
+  if (oldMap && oldMap.dispose) oldMap.dispose();
 }
 
 // 4. SPATULA
@@ -1598,8 +1607,164 @@ const state = {
 };
 
 const $ = id => document.getElementById(id);
+function stripHtmlPlain(h) {
+  return String(h || '').replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim();
+}
+
+function buildCaseAdaptedRecipe(base, station, det, isExamLocked = false) {
+  if (!base || !station) return base;
+  const rec = {
+    ...base,
+    code: station.caseId || base.code,
+    name: station.title || base.name,
+    steps: (base.steps || []).map(s => ({
+      ...s,
+      choices: s.choices ? s.choices.map(c => ({ ...c })) : undefined,
+      blocks: s.blocks ? [...s.blocks] : undefined
+    }))
+  };
+
+  const scenPlain = stripHtmlPlain(det?.scenario || det?.contentHtml || '');
+  const notePlain = isExamLocked ? '' : stripHtmlPlain(det?.noteHtml || '');
+  const combined = `${station.title || ''} ${scenPlain} ${notePlain}`;
+
+  if (scenPlain) {
+    rec.rxText = scenPlain.slice(0, 240) + (scenPlain.length > 240 ? '...' : '');
+  } else if (station.title) {
+    rec.rxText = station.title;
+  }
+
+  const isClinicSap = !!window.CLINIC_SAP_ARCHETYPES[base.id];
+  if (!isClinicSap) {
+    // Extract real target volume (mL)
+    let foundVol = null;
+    const volMatch = combined.match(/(?:ad|ปริมาณ|ปริมาตร|จำนวน|เตรียม|ขนาด)\s*(\d+(?:\.\d+)?)\s*(?:ml|มล\.?)/i)
+      || combined.match(/(\d+(?:\.\d+)?)\s*(?:ml|มล\.?)\b/i);
+    if (volMatch) {
+      const v = parseFloat(volMatch[1]);
+      if (v >= 5 && v <= 500) foundVol = v;
+    }
+    if (foundVol) rec.targetVol = foundVol;
+
+    // Extract real target mass (g) or compute from % w/v * vol
+    let foundMass = null;
+    const massMatch = combined.match(/(\d+(?:\.\d+)?)\s*(?:g|กรัม)(?!\s*\/|\w)/i);
+    if (massMatch) {
+      const m = parseFloat(massMatch[1]);
+      if (m >= 0.05 && m <= 50) foundMass = m;
+    } else if (foundVol) {
+      const pctMatch = combined.match(/(\d+(?:\.\d+)?)\s*%\s*(?:w\/v)?/i);
+      if (pctMatch) {
+        const pct = parseFloat(pctMatch[1]);
+        const calcM = +(pct * foundVol / 100).toFixed(3);
+        if (calcM >= 0.05 && calcM <= 50) foundMass = calcM;
+      }
+    }
+
+    // Extract primary drug/chemical label for 3D bottle
+    let drugLbl = String(station.title || base.name)
+      .replace(/^(?:การเตรียม|การชั่งสารระเหยง่าย|การคำนวณและชั่งสารเคมี|การนับเม็ดยา|การนับและบันทึก|การนับและบรรจุ|Oral Solution Preparation:|Solution Preparation:|Extemporaneous.*?Preparation:|Topical.*?Preparation:|Gel Preparation:|Hydrogel Preparation:|Solution Dilution:)\s*/i, '')
+      .replace(/\(.*?\)/g, '').trim();
+    rec.primaryDrugLabel = (drugLbl || base.name).slice(0, 14);
+    rec.primaryDrugSub = foundVol ? `${foundVol} mL` : (foundMass ? `${foundMass} g` : 'OSPE Lab');
+
+    // Adapt numeric steps
+    rec.steps.forEach(s => {
+      if (s.type === 'scoop_weigh' && foundMass) {
+        s.targetMass = foundMass;
+        s.tol = Math.max(0.01, +(foundMass * 0.05).toFixed(3));
+        s.title = `3. ตัก & ชั่ง ${rec.primaryDrugLabel} (${foundMass.toFixed(3)} g)`;
+        s.hint = `ใช้ Spatula ตักสารลงกระทงให้ได้ ${foundMass.toFixed(3)} g (±5%: ${(foundMass - s.tol).toFixed(3)}–${(foundMass + s.tol).toFixed(3)} g)`;
+      }
+      if (s.type === 'eye_meniscus' && foundVol) {
+        s.targetVol = foundVol;
+        s.title = s.title.replace(/\(\d+(?:\.\d+)?\s*mL\)/i, `(${foundVol.toFixed(1)} mL)`);
+        if (!s.title.includes('mL')) s.title += ` (${foundVol.toFixed(1)} mL)`;
+        s.hint = `ปรับปริมาตรระดับสายตาจนท้องน้ำแตะขีด ${foundVol.toFixed(1)} mL`;
+      }
+      if (s.type === 'label_uncap' && rec.primaryDrugLabel) {
+        s.title = `1. ตรวจฉลาก ${rec.primaryDrugLabel} 3 ครั้ง & เปิดฝาหงาย`;
+      }
+      if (s.type === 'tray_count') {
+        const cntMatch = combined.match(/#\s*(\d+)|จำนวน\s*(\d+)\s*เม็ด/);
+        if (cntMatch) s.targetCount = parseInt(cntMatch[1] || cntMatch[2], 10);
+      }
+    });
+  } else {
+    // Clinic & SAP Data-Driven Overrides
+    const isDiazepamCase = /diazepam|fluoxetine/i.test(`${station.title || ''} ${scenPlain}`);
+    if (base.id === 'SAP_LAW_DISPENSING' && !isDiazepamCase) {
+      rec.steps.forEach((s, idx) => {
+        if (s.id === 'classify_law' && s.choices?.length >= 2) {
+          s.title = '1. จำแนกสถานะทางกฎหมายของยา & ข้อกำหนดการจ่ายยา';
+          s.choices[0].label = 'ตรวจสอบประเภทยาตาม พ.ร.บ.ยา / กฎหมายยาเสพติด และเงื่อนไขการต้องใช้ใบสั่งแพทย์หรือการควบคุมการขาย';
+          s.choices[1].label = 'สามารถจำหน่ายยาควบคุม/ยาอันตรายได้โดยไม่ต้องซักประวัติหรือตรวจสอบข้อกฎหมาย';
+          s.hint = 'จำแนกประเภทยาและข้อกฎหมายที่เกี่ยวข้องกับสถานการณ์นี้';
+        } else if (s.id === 'refuse_polite') {
+          s.title = '2. สื่อสารปฏิเสธ/ให้คำแนะนำตามกฎหมายอย่างเหมาะสม (AI Chat)';
+          s.requiredKeywords = ['กฎหมาย', 'อันตราย', 'ควบคุม', 'ใบสั่ง', 'แนะนำ', 'ปลอดภัย', 'ซัก'];
+          s.blocks = [
+            '⚖️ ขออภัยครับ ยาดังกล่าวมีข้อกำหนดตามกฎหมายและเพื่อความปลอดภัยของผู้ป่วย จึงไม่สามารถจ่ายให้ได้ในกรณีนี้ครับ',
+            '🔍 ไม่ทราบว่ามีอาการอย่างไร เคยได้รับยาจากแพทย์หรือมีโรคประจำตัวอะไรบ้างครับ',
+            '✅ แนะนำแนวทางปฏิบัติที่ปลอดภัยหรือทางเลือกที่เหมาะสมตามหลักวิชาชีพครับ'
+          ];
+          s.hint = 'สื่อสารเหตุผลทางกฎหมายและซักประวัติเพิ่มเติมอย่างสุภาพ';
+        } else if (s.id === 'solve_drp' && s.choices?.length >= 2) {
+          s.title = '3. ประเมินปัญหาด้านยา (DRP) และแนวทางแก้ไขที่ปลอดภัย';
+          s.choices[0].label = 'วิเคราะห์สาเหตุ/ความเสี่ยงของการใช้ยาผิดวิธี และให้ทางเลือกการรักษาหรือคำแนะนำที่ปลอดภัย';
+          s.choices[1].label = 'จ่ายยาตามคำขอของผู้มารับบริการโดยไม่ประเมินความเสี่ยงหรือ DRP';
+          s.hint = 'ประเมินความเสี่ยงและให้คำแนะนำทางคลินิก/กฎหมายที่เหมาะสม';
+        } else if (s.id === 'refer_doc' && s.choices?.length >= 2) {
+          s.choices[0].label = 'ให้คำแนะนำติดตามอาการ ข้อควรระวัง และประสานส่งต่อแพทย์เมื่อมีข้อบ่งชี้';
+          s.choices[1].label = 'ไม่จำเป็นต้องให้คำแนะนำเพิ่มเติมหรือส่งต่อแพทย์';
+        }
+      });
+    }
+
+    const items = isExamLocked ? [] : (det?.checklist || []).filter(c => !c.isSubset && c.text);
+    const genericArchetypes = new Set([
+      'CLINIC_HISTORY_COUNSELING', 'CLINIC_RX_AUDIT', 'CLINIC_ISBAR',
+      'CLINIC_DIS_CONSULT', 'CLINIC_ADR_ALLERGY', 'CLINIC_HIGH_ALERT', 'CLINIC_LAB_PK',
+      'SAP_LAW_DISPENSING', 'SAP_ETHICS', 'SAP_REGULATORY_DOC', 'SAP_HEALTH_SYSTEM'
+    ]);
+    const isDoctorStation = base.track !== 'SAP' && base.id !== 'CLINIC_LAB_PK' &&
+      /ประสานงาน|isbar|สืบค้นข้อมูล|เภสัชสนเทศ|drug information|ตรวจใบสั่งยา/i.test(`${station.mainGroup || ''} ${station.title || ''}`);
+
+    if (!isExamLocked && genericArchetypes.has(base.id) && items.length > 0) {
+      const mid = Math.floor(items.length / 2);
+      const confirmSteps = rec.steps.filter(s => s.type === 'clinic_confirm');
+      confirmSteps.forEach((s, idx) => {
+        const slice = idx === 0 ? items.slice(0, Math.min(3, mid || items.length)) : items.slice(mid, mid + 3);
+        if (slice.length > 0 && s.choices && s.choices.length >= 2) {
+          const summary = slice.map(x => String(x.text).replace(/^\d+[\.\)]\s*/, '').slice(0, 58)).join(' · ');
+          s.choices[0].label = `ปฏิบัติครบเกณฑ์เคสนี้: ${summary}`;
+          s.choices[1].label = 'ข้ามขั้นตอนการซักประวัติ/ตรวจสอบความปลอดภัยและจ่ายยาทันที';
+          s.hint = notePlain ? notePlain.slice(0, 180) : slice[0].text;
+        }
+      });
+    }
+
+    rec.steps.forEach(s => {
+      if (s.type === 'ai_dialogue' && isDoctorStation) {
+        s.role = 'doctor';
+      }
+    });
+  }
+  return rec;
+}
+
 function getRecipe() {
-  return window.CLINIC_SAP_ARCHETYPES[state.recipeKey] || window.LAB_ARCHETYPES[state.recipeKey];
+  const base = window.CLINIC_SAP_ARCHETYPES[state.recipeKey] || window.LAB_ARCHETYPES[state.recipeKey];
+  if (!state.customStation) return base;
+  const cid = state.customStation.caseId || '';
+  const isExamLocked = state.mode === 'exam' && !state.finished;
+  const cacheKey = `${state.recipeKey}::${cid}::${isExamLocked ? 'exam' : 'open'}`;
+  if (state._adaptedCacheKey === cacheKey && state._adaptedCacheVal) return state._adaptedCacheVal;
+  const det = (typeof OFFLINE_CASE_DETAILS !== 'undefined') ? OFFLINE_CASE_DETAILS[cid] : null;
+  const adapted = buildCaseAdaptedRecipe(base, state.customStation, det, isExamLocked);
+  state._adaptedCacheKey = cacheKey;
+  state._adaptedCacheVal = adapted;
+  return adapted;
 }
 function isClinicOrSap() {
   return !!window.CLINIC_SAP_ARCHETYPES[state.recipeKey];
@@ -1614,8 +1779,9 @@ function showToast(msg, bad=false) {
 
 function getSceneState() {
   const rec = getRecipe();
-  if (!isClinicOrSap()) return 'STATE_LAB';
   if (rec.sceneState) return rec.sceneState;
+  if (!isClinicOrSap()) return 'STATE_LAB';
+  if (rec.device && rec.device !== 'desk') return 'STATE_COUNSEL';
   const txt = `${state.customStation?.mainGroup || ''} ${state.customStation?.title || ''}`.toLowerCase();
   if (txt.includes('ใบสั่งยา') || txt.includes('แพ้ยา') || txt.includes('ค้นข้อมูล') || rec.track === 'SAP') return 'STATE_DOCUMENT';
   return 'STATE_COUNSEL';
@@ -1624,13 +1790,17 @@ function getSceneState() {
 function syncSceneVisibility() {
   const rec = getRecipe();
   const clinicMode = isClinicOrSap();
+  const isProdCounting = rec.id === 'PRODUCT_TABLET_COUNTING';
   const scState = getSceneState();
   const dev = rec.device;
   const isTwoPerson = scState === 'STATE_COUNSEL' && (dev === 'counter_consult' || dev === 'isbar_phone');
 
-  productGroup.visible = !clinicMode;
-  clinicGroup.visible = clinicMode;
+  productGroup.visible = !clinicMode && !isProdCounting;
+  clinicGroup.visible = clinicMode || isProdCounting;
   counterGroup.visible = isTwoPerson;
+  if (!clinicMode && !isProdCounting) {
+    updateProductBottleLabel(rec.primaryDrugLabel || rec.code, rec.primaryDrugSub || rec.category || 'OSPE Lab');
+  }
   if (isTwoPerson) {
     const cid = state.customStation?.caseId || rec.code;
     const det = (typeof OFFLINE_CASE_DETAILS !== 'undefined') ? OFFLINE_CASE_DETAILS[cid] : null;
@@ -1641,7 +1811,7 @@ function syncSceneVisibility() {
   }
 
   Object.values(clinicDevices).forEach(d => d.g.visible = false);
-  if (clinicMode) {
+  if (clinicMode || isProdCounting) {
     if (isTwoPerson) {
       if (dev === 'isbar_phone') clinicDevices.desk.g.visible = true;
     } else if (clinicDevices[dev]) {
@@ -1672,10 +1842,11 @@ function syncSceneVisibility() {
     $('telemetry').style.display = 'block';
   }
 
+  const showDeviceCam = clinicMode || isProdCounting;
   ['cam-weigh', 'cam-pour', 'cam-birdeye', 'cam-meniscus'].forEach(id => {
-    const el = $(id); if (el) el.style.display = clinicMode ? 'none' : 'inline-flex';
+    const el = $(id); if (el) el.style.display = showDeviceCam ? 'none' : 'inline-flex';
   });
-  const devBtn = $('cam-device'); if (devBtn) devBtn.style.display = clinicMode ? 'inline-flex' : 'none';
+  const devBtn = $('cam-device'); if (devBtn) devBtn.style.display = showDeviceCam ? 'inline-flex' : 'none';
 }
 
 window.rotateActiveObject = () => {
@@ -1694,7 +1865,7 @@ window.toggleSeatSwap = () => {
 
 function updateTelemetryUI() {
   const rec = getRecipe();
-  if (!isClinicOrSap()) {
+  if (!isClinicOrSap() && rec.id !== 'PRODUCT_TABLET_COUNTING') {
     $('tel-title').textContent = '📊 ค่าบนโต๊ะเตรียมยา';
     const paper = tools.paper;
     const scaleReading = paper.onPan ? (state.tared ? paper.powderMass : 0.350 + paper.powderMass) : 0.000;
@@ -1709,7 +1880,10 @@ function updateTelemetryUI() {
     $('tel-title').textContent = '📊 สถานะอุปกรณ์ & ทักษะ';
     const dev = rec.device;
     let rows = `<div class="tel-row"><span>หมวดวิชา:</span><span class="tel-val">${rec.track}</span></div>`;
-    if (dev === 'mdi' || dev === 'turbuhaler' || dev === 'accuhaler' || dev === 'nasal_spray') {
+    if (dev === 'tablet_counting') {
+      rows += `<div class="tel-row"><span>นับเม็ดยา:</span><span class="tel-val">${state.trayCounted ? 'ครบแล้ว' : 'รอนับ'}</span></div>
+        <div class="tel-row"><span>ขั้นตอนที่:</span><span class="tel-val">${state.step + 1} / ${rec.steps.length}</span></div>`;
+    } else if (dev === 'mdi' || dev === 'turbuhaler' || dev === 'accuhaler' || dev === 'nasal_spray') {
       rows += `
         <div class="tel-row"><span>เปิดฝาครอบ:</span><span class="tel-val">${state.uncapped || state.coverSlid ? 'เปิดแล้ว' : 'ปิดอยู่'}</span></div>
         <div class="tel-row"><span>เตรียมยา/เขย่า:</span><span class="tel-val">${dev==='mdi' ? state.shakes+'/5' : (state.twistedLeft||state.leverPushed||state.nasalPrimed ? 'พร้อมสูด' : 'ยังไม่พร้อม')}</span></div>
@@ -2198,7 +2372,45 @@ function getDynamicAiBlocks(cur) {
   ];
 }
 
-function autoTickRealChecklist(userText) {
+const ACTION_TAG_KEYWORDS = {
+  label_uncap: ['ตรวจฉลาก', '3 ครั้ง', 'เปิดฝา', 'วันหมดอายุ'],
+  fold_tare: ['กระดาษ', 'พับ', 'tare', 'zero', 'ตาชั่ง', 'กระจก'],
+  scoop_weigh: ['ชั่ง', 'น้ำหนัก', 'spatula', 'ตัก'],
+  pour_beaker: ['ตวง', 'เท', 'บีกเกอร์', 'ละลาย', 'คน'],
+  rinse_transfer: ['rinse', 'ล้าง', 'กระบอกตวง', 'ย้าย'],
+  eye_meniscus: ['meniscus', 'ระดับสายตา', 'ปรับปริมาตร', 'ท้องน้ำ'],
+  sprinkle_stir: ['โปรย', 'กวน', 'คน', 'ฟอง', 'ก้อน'],
+  drop_neutralize: ['หยด', 'tea', 'ปรับ ph'],
+  mortar_grind: ['บด', 'โกร่ง', 'ละเอียด'],
+  mortar_levigate: ['levigat', 'paste', 'หยด', 'alcohol'],
+  geometric_dilute: ['geometric', '1:1', 'ผสม'],
+  slab_spatulate: ['slab', 'เลข 8', 'levigat', 'geometric'],
+  package_label: ['บรรจุ', 'ขวด', 'ตลับ', 'ซอง', 'ฉลาก', 'bud', 'เขย่าขวด', 'ตู้เย็น', 'ภายนอก'],
+  tray_count: ['นับ', 'ถาด', 'ไม้พาย', '70%', 'ซองยา', 'บรรจุ'],
+  device_uncap: ['เปิดฝา', 'ตั้งตรง'],
+  device_shake: ['เขย่า'],
+  turbuhaler_load: ['บิด', 'คลิก', 'ขวา', 'ซ้าย'],
+  accuhaler_open: ['เลื่อน', 'ฝาครอบ', 'คลิก'],
+  accuhaler_lever: ['ก้าน', 'lever', 'คลิก'],
+  patient_exhale: ['หายใจออก', 'ห้ามเป่า'],
+  mdi_actuate: ['อมปากหลอด', 'กด', 'สูด'],
+  dpi_inhale: ['สูด', 'แรงและลึก'],
+  breath_hold: ['กลั้นหายใจ', '10 วินาที'],
+  device_clean_cap: ['เช็ด', 'ปิดฝา', 'ทิชชูแห้ง'],
+  nasal_prime: ['prime', 'เขย่า'],
+  nasal_angle: ['ก้ม', 'หางตา', 'เฉียงออก'],
+  nasal_actuate: ['ปิดรูจมูก', 'พ่น', 'สูดเบา'],
+  eye_pull_sac: ['เงยหน้า', 'กระพุ้งตา', 'เปลือกตาล่าง'],
+  eye_instill: ['หยอด', '1 หยด', 'ห้ามแตะตา'],
+  eye_occlude: ['หลับตา', 'กดหัวตา', '1-2 นาที'],
+  insulin_roll: ['คลึง', '10 ครั้ง', 'ห้ามเขย่า'],
+  insulin_swab_needle: ['70%', 'จุกยาง', 'หัวเข็ม'],
+  insulin_prime: ['prime', '2 unit', 'ไล่อากาศ'],
+  insulin_dial: ['หมุน', 'unit', 'ตั้งขนาด'],
+  insulin_inject: ['90', '10 วินาที', 'ฉีด']
+};
+
+function autoTickRealChecklist(text = '', actionTags = []) {
   const rec = getRecipe();
   const cid = state.customStation?.caseId || rec.code;
   const det = (typeof OFFLINE_CASE_DETAILS !== 'undefined') ? OFFLINE_CASE_DETAILS[cid] : null;
@@ -2206,20 +2418,36 @@ function autoTickRealChecklist(userText) {
   const items = det.checklist.filter(c => !c.isSubset);
   const listToShow = items.length > 0 ? items : det.checklist;
   state.realChecked = state.realChecked || {};
-  const allUserMsgs = (state.aiMessages || []).filter(m => m.who === 'user').map(m => m.text).join(' ') + ' ' + userText;
+  state.autoTickLog = state.autoTickLog || [];
+  if (text) state.autoTickLog.push(text);
+  (actionTags || []).forEach(t => {
+    if (!t) return;
+    state.autoTickLog.push(t);
+    if (ACTION_TAG_KEYWORDS[t]) state.autoTickLog.push(...ACTION_TAG_KEYWORDS[t]);
+  });
+  const allUserMsgs = (state.aiMessages || []).filter(m => m.who === 'user').map(m => m.text).join(' ') + ' ' + state.autoTickLog.join(' ');
   const lowAll = allUserMsgs.toLowerCase();
   let newlyTicked = 0;
   listToShow.forEach((c, idx) => {
     const chkId = `real_chk_${idx}`;
     if (state.realChecked[chkId]) return;
-    // Extract meaningful Thai/English tokens >= 3 chars
-    const tokens = String(c.text || '').toLowerCase()
+    const raw = String(c.text || '').toLowerCase().replace(/^\d+[\.\)]\s*/, '');
+    const tokens = raw
       .replace(/[^\u0E00-\u0E7Fa-z0-9\s]/g, ' ')
       .split(/\s+/)
       .filter(w => w.length >= 3 && !['และ','หรือ','การ','ของ','ให้','กับ','ได้','ผู้ป่วย','แนะนำ','สอบถาม','ซักประวัติ'].includes(w));
     if (tokens.length === 0) return;
-    const matched = tokens.filter(t => lowAll.includes(t)).length;
-    if (matched >= 2 || (tokens.length <= 2 && matched >= 1) || (matched / tokens.length) >= 0.38) {
+    let matched = 0;
+    tokens.forEach(t => {
+      if (lowAll.includes(t)) { matched++; return; }
+      // Thai continuous phrase fallback: check 5-char sub-chunks for long Thai words
+      if (/^[\u0E00-\u0E7F]{8,}$/.test(t)) {
+        for (let k = 0; k <= t.length - 5; k += 3) {
+          if (lowAll.includes(t.slice(k, k + 5))) { matched++; break; }
+        }
+      }
+    });
+    if (matched >= 2 || (tokens.length <= 2 && matched >= 1) || (matched / tokens.length) >= 0.35) {
       state.realChecked[chkId] = true;
       newlyTicked++;
     }
@@ -2252,8 +2480,8 @@ window.sendAiDialogue = async () => {
   state.aiMessages.push({ who: 'user', text: userText });
   state.aiBusy = true;
   if (inp) inp.value = '';
-  const tickedNow = autoTickRealChecklist(userText);
-  if (tickedNow > 0) showToast(`✅ ติ๊ก Checklist จริงอัตโนมัติ +${tickedNow} ข้อ`);
+  const tickedNow = autoTickRealChecklist(userText, ['ai_dialogue', cur.id]);
+  if (tickedNow > 0 && state.mode !== 'exam') showToast(`✅ ติ๊ก Checklist จริงอัตโนมัติ +${tickedNow} ข้อ`);
   sfx.sfxTap();
 
   // Instant speech feedback right away (0ms)
@@ -2279,7 +2507,17 @@ window.sendAiDialogue = async () => {
   if (!reply) {
     const cid = state.customStation?.caseId || rec.code;
     const det = (typeof OFFLINE_CASE_DETAILS !== 'undefined') ? OFFLINE_CASE_DETAILS[cid] : null;
-    const ctxText = `สถานการณ์: ${det?.scenario || rec.rxText || rec.name}\nข้อมูลผู้ป่วย: ${(det?.patientInfoHtml || '').replace(/<[^>]+>/g,' ').slice(0,500)}`;
+    const isEncrypted = !!(det?.isEncrypted || det?.encrypted);
+    const scenCtx = isEncrypted ? (rec.rxText || rec.name) : (stripHtmlPlain(det?.scenario || det?.contentHtml || '') || rec.rxText || rec.name);
+    const patCtx = isEncrypted ? '' : stripHtmlPlain(det?.patientInfoHtml || '').slice(0, 550);
+    const noteCtx = isEncrypted ? '' : stripHtmlPlain(det?.noteHtml || '').slice(0, 650);
+    const chkCtx = isEncrypted ? '' : (det?.checklist || []).filter(c => !c.isSubset && c.text).slice(0, 8).map(c => c.text).join(' | ').slice(0, 450);
+    const ctxText = [
+      `สถานการณ์: ${scenCtx}`,
+      patCtx ? `ข้อมูลผู้ป่วย: ${patCtx}` : '',
+      noteCtx ? `ข้อมูลผู้ป่วยจำลอง/เฉลย: ${noteCtx}` : '',
+      chkCtx ? `ประเด็น Checklist: ${chkCtx}` : ''
+    ].filter(Boolean).join('\n');
     const rolePrompt = isDoctor
       ? 'คุณคือแพทย์เจ้าของไข้ ตอบกลับเภสัชกรอย่างมืออาชีพ กระชับ 1-3 ประโยค ภาษาไทยสุภาพ'
       : 'คุณคือผู้ป่วยจำลอง (SP) ตอบคำถามเภสัชกรตามข้อมูลผู้ป่วยอย่างเป็นธรรมชาติ 1-3 ประโยค ภาษาไทย';
@@ -2977,7 +3215,15 @@ window.verifyCurrentStep = () => {
 
   state.results[cur.id] = { pass, pts, note };
   state.score += pts;
-  if (pass) { sfx.sfxGood(); setMood('happy', 1.2); showToast(`✅ ผ่าน! +${pts.toFixed(1)}`); }
+  if (pass) {
+    const selectedChoiceLabel = (cur.type === 'clinic_confirm' && state.selectedChoice && cur.choices)
+      ? (cur.choices.find(c => c.id === state.selectedChoice)?.label || '') : '';
+    const stepTags = [cur.type, cur.id, cur.title, selectedChoiceLabel].filter(Boolean);
+    const tickedStep = autoTickRealChecklist(`${cur.title || ''} ${selectedChoiceLabel} ${note || ''}`, stepTags);
+    sfx.sfxGood(); setMood('happy', 1.2);
+    const tickNote = (tickedStep > 0 && state.mode !== 'exam') ? ` (ติ๊ก Checklist จริง +${tickedStep})` : '';
+    showToast(`✅ ผ่าน! +${pts.toFixed(1)}${tickNote}`);
+  }
   else { sfx.sfxBad(); setMood('sad', 1.2); }
 
   state.selectedChoice = null; state.multiChecked = {}; state.actuated = false;
@@ -3015,7 +3261,7 @@ function finishStation() {
     </div>
     <div style="display:flex;gap:8px">
       <button class="btn ok" style="flex:1;justify-content:center" onclick="closeModal();resetStation()">🔄 ฝึกซ้อมอีกครั้ง</button>
-      <button class="btn sec" style="flex:1;justify-content:center" onclick="closeModal();openLobby()">🏠 กลับ Lobby</button>
+      <button class="btn sec" style="flex:1;justify-content:center" onclick="window.location.href='case-library.html'">📚 กลับคลังเคส</button>
     </div>`;
   $('modal').classList.add('show'); updateUI();
 }
@@ -3061,7 +3307,7 @@ window.openScenarioModal = () => {
     ${det?.equipmentHtml ? `<div style="${secStyle}"><div style="${hdrStyle}">🧰 สิ่งที่มีให้ในสถานี</div><div>${det.equipmentHtml}</div></div>` : ''}
     ${(state.mode === 'exam' && !state.finished)
       ? `<div style="${secStyle};background:var(--clinic-soft);border-color:var(--clinic-bd);color:var(--clinic)">🔒 <strong>โหมดสอบจริง (Exam Mode):</strong> ซ่อน Checklist เกณฑ์คะแนนและข้อมูลผู้ตรวจไว้ชั่วคราว จนกว่าจะกดส่งข้อสอบหรือหมดเวลา</div>`
-      : `${chkHtml}<details open style="${secStyle}"><summary style="${hdrStyle};cursor:pointer;margin-bottom:0;border-bottom:0">📝 ข้อมูลผู้ตรวจ / เฉลย</summary><div style="margin-top:8px;padding-top:8px;border-top:1px solid var(--border)">${det?.examinerNotesHtml || '<span style="color:var(--muted)">ไม่มีข้อมูลผู้ตรวจ/เฉลยเพิ่มเติมในฐานข้อมูลสำหรับเคสนี้ (ดูเกณฑ์คะแนนได้จาก Checklist ด้านบน)</span>'}</div></details>`}
+      : `${chkHtml}<details open style="${secStyle}"><summary style="${hdrStyle};cursor:pointer;margin-bottom:0;border-bottom:0">📝 ข้อมูลผู้ตรวจ / เฉลย</summary><div style="margin-top:8px;padding-top:8px;border-top:1px solid var(--border)">${det?.noteHtml || det?.examinerNotesHtml || '<span style="color:var(--muted)">ไม่มีข้อมูลผู้ตรวจ/เฉลยเพิ่มเติมในฐานข้อมูลสำหรับเคสนี้ (ดูเกณฑ์คะแนนได้จาก Checklist ด้านบน)</span>'}</div></details>`}
     <button class="btn sec" style="width:100%;justify-content:center;margin-top:8px" onclick="closeModal()">ปิด</button>`;
   $('modal').classList.add('show');
 };
@@ -3088,8 +3334,8 @@ window.switchRubricTab = (tab) => {
 };
 
 window.openLobby = () => {
-  closeModal(); clearInterval(state.timerH); clearInterval(state.holdTimer); sfx.setPourSound(0);
-  renderLobby(); $('lobby-screen').classList.add('show');
+  clearInterval(state.timerH); clearInterval(state.holdTimer); sfx.setPourSound(0);
+  window.location.href = 'case-library.html';
 };
 
 function renderLobby() {
@@ -3206,7 +3452,7 @@ window.resetStation = () => {
     step: 0, timeLeft: 240, score: 0, results: {}, spillVol: 0, powderSpill: 0,
     tiltValue: 0, tared: false, shieldClosed: false, rinseCount: 0, drainSecs: 0,
     sprinklePct: 0, dropsAdded: 0, emulsionWaterAdded: false, selectedBud: null, selectedAux: null,
-    aiMessages: [], aiCovered: {}, aiUsedBlocks: {}, aiBusy: false,
+    aiMessages: [], aiCovered: {}, aiUsedBlocks: {}, aiBusy: false, autoTickLog: [], realChecked: {},
     objRotY: 0, seatSwapped: false, lastSpeech: '', pTalkAnim: 0,
     selectedChoice: null, multiChecked: {}, uncapped: false, shakes: 0, exhaled: false,
     actuated: false, holdSecs: 0, cleanedCapped: false, twistedRight: false, twistedLeft: false,
@@ -3608,7 +3854,10 @@ const urlCaseId = new URLSearchParams(location.search).get('caseId');
 if (urlCaseId && typeof OFFLINE_DATA !== 'undefined' && OFFLINE_DATA.cases && OFFLINE_DATA.cases.some(c => c.caseId === urlCaseId)) {
   enterLabWithStation(urlCaseId);
 } else {
-  openLobby();
+  const fallbackId = (typeof OFFLINE_DATA !== 'undefined' && OFFLINE_DATA.cases && OFFLINE_DATA.cases.length > 0)
+    ? (OFFLINE_DATA.cases.find(c => c.caseId === 'OSPE-PD01')?.caseId || OFFLINE_DATA.cases[0].caseId)
+    : 'OSPE-PD01';
+  enterLabWithStation(fallbackId);
 }
 animate();
 window.__lab3d = { vessels, vesselRack, state, tools, clinicDevices, setCamera, adjustZoom, enterLabWithArchetype, enterLabWithStation, openLobby, switchRubricTab };

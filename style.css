@@ -8317,4 +8317,100 @@ hr.case-divider,
   transition: all 0.15s ease;
 }
 
+/* ──────────────────────────────────────────────────────────────────────────
+   Recommended Presets Filter & Admin Preset Manager Modal
+   ────────────────────────────────────────────────────────────────────────── */
+.btn-admin-gear {
+  background: rgba(15, 23, 42, 0.05);
+  border: 1px solid var(--border, #e2e8f0);
+  color: var(--text-secondary, #475569);
+  border-radius: 6px;
+  padding: 2px 7px;
+  font-size: 0.72rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+}
+.btn-admin-gear:hover {
+  background: var(--primary, #0e7490);
+  color: #ffffff;
+  border-color: var(--primary, #0e7490);
+}
+
+.preset-featured-badge {
+  background: linear-gradient(135deg, #f59e0b, #d97706);
+  color: #ffffff;
+  font-weight: 700;
+  border: none;
+  box-shadow: 0 1px 4px rgba(217, 119, 6, 0.3);
+}
+
+.admin-preset-layout {
+  display: grid;
+  grid-template-columns: 1fr 310px;
+  gap: 0.9rem;
+}
+@media (max-width: 860px) {
+  .admin-preset-layout {
+    grid-template-columns: 1fr;
+  }
+}
+
+.admin-selected-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.45rem;
+  padding: 0.45rem 0.6rem;
+  background: var(--bg-secondary, #f8fafc);
+  border: 1px solid var(--border, #e2e8f0);
+  border-radius: 8px;
+  font-size: 0.8rem;
+}
+.admin-selected-item .admin-order-num {
+  min-width: 22px;
+  height: 22px;
+  border-radius: 999px;
+  background: var(--primary, #0e7490);
+  color: #fff;
+  font-weight: 700;
+  font-size: 0.72rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+.admin-order-btns {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  flex-shrink: 0;
+}
+.admin-order-btn {
+  background: #ffffff;
+  border: 1px solid var(--border, #cbd5e1);
+  border-radius: 5px;
+  width: 24px;
+  height: 24px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  font-size: 0.72rem;
+  color: var(--text-primary, #1e293b);
+  padding: 0;
+}
+.admin-order-btn:hover {
+  background: var(--primary, #0e7490);
+  color: #fff;
+  border-color: var(--primary, #0e7490);
+}
+.admin-order-btn.danger:hover {
+  background: #ef4444;
+  border-color: #ef4444;
+}
+
 

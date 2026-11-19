@@ -223,6 +223,16 @@
               <option value="All">All Sources</option>
               <!-- Filled dynamically by JS -->
             </select>
+
+            <!-- Recommended Preset Filter + Admin Config -->
+            <div class="filter-label-row" style="display:flex; align-items:center; justify-content:space-between; margin-top: 0.35rem; margin-bottom: 0.25rem;">
+              <label class="filter-group-label" for="filter-preset" style="margin:0;">🎯 เคสแนะนำ (Presets)</label>
+              <button type="button" id="btn-admin-preset-config" class="btn-admin-gear" onclick="openAdminPresetModal()" title="ตั้งค่าเคสแนะนำ (เฉพาะ Admin)" aria-label="ตั้งค่าเคสแนะนำ (เฉพาะ Admin)">⚙️ Admin</button>
+            </div>
+            <select id="filter-preset" class="select-filter" aria-label="Filter by Recommended Preset">
+              <option value="All">ทุกเคสทั่วไป (All Cases)</option>
+              <!-- Filled dynamically by JS from Admin/Firebase Preset Config -->
+            </select>
             
             <!-- Compact View Toggles & Reset Bar -->
             <div class="filter-toolbar-row">
@@ -392,8 +402,11 @@
   </div><!-- /.page-viewport -->
 </div><!-- /.app-shell -->
 
+  <!-- Firebase SDK (Compat) for Live Admin Preset Sync -->
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
   <script src="case-data-offline.js?v=v_20261119_222211"></script>
-  <script src="app.js?v=v_20261119_222211"></script>
+  <script src="app.js?v=v_20261120_005700"></script>
 
   <script>
     function toggleFullscreen() {
@@ -432,7 +445,14 @@
         }
       }
 
-      if (searchParam || catParam) {
+      const presetParam = getUrlParam('preset');
+      if (presetParam) {
+        AppState.activeFilters.preset = presetParam;
+        const selectPreset = document.getElementById('filter-preset');
+        if (selectPreset) selectPreset.value = presetParam;
+      }
+
+      if (searchParam || catParam || presetParam) {
         setTimeout(() => {
           applyFilters();
           renderCaseList();

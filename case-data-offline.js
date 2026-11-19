@@ -1,13 +1,13 @@
 /**
  * PLE-CC2 OSPE Practice System — Offline Case List Metadata (Auto-Generated)
- * Version: v_20261119_130515
- * Generated on 2026-11-19 13:05:15
+ * Version: v_20261119_222211
+ * Generated on 2026-11-19 22:22:11
  */
 
 const OFFLINE_DATA = {
-  "version": "v_20261119_130515",
-  "generatedAt": "2026-11-19 13:05:15",
-  "totalCases": 456,
+  "version": "v_20261119_222211",
+  "generatedAt": "2026-11-19 22:22:11",
+  "totalCases": 455,
   "cases": [
     {
       "caseId": "OSPE-CL4801",
@@ -364,7 +364,8 @@ const OFFLINE_DATA = {
       "isActive": true,
       "caseStatus": "Active",
       "linkedNextCase": "",
-      "linkedFromCase": ""
+      "linkedFromCase": "",
+      "durationMin": 4
     },
     {
       "caseId": "OSPE-CL5303",
@@ -381,7 +382,8 @@ const OFFLINE_DATA = {
       "isActive": true,
       "caseStatus": "Active",
       "linkedNextCase": "",
-      "linkedFromCase": ""
+      "linkedFromCase": "",
+      "durationMin": 4
     },
     {
       "caseId": "OSPE-CL5318",
@@ -398,7 +400,8 @@ const OFFLINE_DATA = {
       "isActive": true,
       "caseStatus": "Active",
       "linkedNextCase": "",
-      "linkedFromCase": ""
+      "linkedFromCase": "",
+      "durationMin": 4
     },
     {
       "caseId": "OSPE-CL5320",
@@ -415,7 +418,8 @@ const OFFLINE_DATA = {
       "isActive": true,
       "caseStatus": "Active",
       "linkedNextCase": "",
-      "linkedFromCase": ""
+      "linkedFromCase": "",
+      "durationMin": 4
     },
     {
       "caseId": "OSPE-CL53211",
@@ -432,7 +436,8 @@ const OFFLINE_DATA = {
       "isActive": true,
       "caseStatus": "Active",
       "linkedNextCase": "",
-      "linkedFromCase": ""
+      "linkedFromCase": "",
+      "durationMin": 4
     },
     {
       "caseId": "OSPE-CL5322",
@@ -449,7 +454,8 @@ const OFFLINE_DATA = {
       "isActive": true,
       "caseStatus": "Active",
       "linkedNextCase": "",
-      "linkedFromCase": ""
+      "linkedFromCase": "",
+      "durationMin": 4
     },
     {
       "caseId": "OSPE-CL5323",
@@ -466,7 +472,8 @@ const OFFLINE_DATA = {
       "isActive": true,
       "caseStatus": "Active",
       "linkedNextCase": "",
-      "linkedFromCase": ""
+      "linkedFromCase": "",
+      "durationMin": 4
     },
     {
       "caseId": "OSPE-CL5324",
@@ -483,7 +490,8 @@ const OFFLINE_DATA = {
       "isActive": true,
       "caseStatus": "Active",
       "linkedNextCase": "",
-      "linkedFromCase": ""
+      "linkedFromCase": "",
+      "durationMin": 4
     },
     {
       "caseId": "OSPE-CL5327",
@@ -500,7 +508,8 @@ const OFFLINE_DATA = {
       "isActive": true,
       "caseStatus": "Active",
       "linkedNextCase": "",
-      "linkedFromCase": ""
+      "linkedFromCase": "",
+      "durationMin": 4
     },
     {
       "caseId": "OSPE-CL5328",
@@ -517,7 +526,8 @@ const OFFLINE_DATA = {
       "isActive": true,
       "caseStatus": "Active",
       "linkedNextCase": "",
-      "linkedFromCase": ""
+      "linkedFromCase": "",
+      "durationMin": 4
     },
     {
       "caseId": "OSPE-CL5329",
@@ -534,7 +544,8 @@ const OFFLINE_DATA = {
       "isActive": true,
       "caseStatus": "Active",
       "linkedNextCase": "",
-      "linkedFromCase": ""
+      "linkedFromCase": "",
+      "durationMin": 4
     },
     {
       "caseId": "OSPE-CL5402",
@@ -551,7 +562,8 @@ const OFFLINE_DATA = {
       "isActive": true,
       "caseStatus": "Active",
       "linkedNextCase": "",
-      "linkedFromCase": ""
+      "linkedFromCase": "",
+      "durationMin": 4
     },
     {
       "caseId": "OSPE-CL5404",
@@ -568,7 +580,8 @@ const OFFLINE_DATA = {
       "isActive": true,
       "caseStatus": "Active",
       "linkedNextCase": "",
-      "linkedFromCase": ""
+      "linkedFromCase": "",
+      "durationMin": 4
     },
     {
       "caseId": "OSPE-CL5410",
@@ -585,7 +598,8 @@ const OFFLINE_DATA = {
       "isActive": true,
       "caseStatus": "Active",
       "linkedNextCase": "",
-      "linkedFromCase": ""
+      "linkedFromCase": "",
+      "durationMin": 4
     },
     {
       "caseId": "OSPE-CL5412",
@@ -602,7 +616,8 @@ const OFFLINE_DATA = {
       "isActive": true,
       "caseStatus": "Active",
       "linkedNextCase": "",
-      "linkedFromCase": ""
+      "linkedFromCase": "",
+      "durationMin": 4
     },
     {
       "caseId": "OSPE-CL5413",
@@ -619,7 +634,8 @@ const OFFLINE_DATA = {
       "isActive": true,
       "caseStatus": "Active",
       "linkedNextCase": "",
-      "linkedFromCase": ""
+      "linkedFromCase": "",
+      "durationMin": 4
     },
     {
       "caseId": "OSPE-CL5415",
@@ -636,7 +652,8 @@ const OFFLINE_DATA = {
       "isActive": true,
       "caseStatus": "Active",
       "linkedNextCase": "",
-      "linkedFromCase": ""
+      "linkedFromCase": "",
+      "durationMin": 4
     },
     {
       "caseId": "OSPE-CL5421",
@@ -653,7 +670,8 @@ const OFFLINE_DATA = {
       "isActive": true,
       "caseStatus": "Active",
       "linkedNextCase": "",
-      "linkedFromCase": ""
+      "linkedFromCase": "",
+      "durationMin": 4
     },
     {
       "caseId": "OSPE-CL5423",
@@ -670,7 +688,8 @@ const OFFLINE_DATA = {
       "isActive": true,
       "caseStatus": "Active",
       "linkedNextCase": "",
-      "linkedFromCase": ""
+      "linkedFromCase": "",
+      "durationMin": 4
     },
     {
       "caseId": "OSPE-CL5424",
@@ -687,7 +706,8 @@ const OFFLINE_DATA = {
       "isActive": true,
       "caseStatus": "Active",
       "linkedNextCase": "",
-      "linkedFromCase": ""
+      "linkedFromCase": "",
+      "durationMin": 4
     },
     {
       "caseId": "OSPE-CL5425",
@@ -704,7 +724,8 @@ const OFFLINE_DATA = {
       "isActive": true,
       "caseStatus": "Active",
       "linkedNextCase": "",
-      "linkedFromCase": ""
+      "linkedFromCase": "",
+      "durationMin": 4
     },
     {
       "caseId": "OSPE-CL5426",
@@ -721,7 +742,8 @@ const OFFLINE_DATA = {
       "isActive": true,
       "caseStatus": "Active",
       "linkedNextCase": "",
-      "linkedFromCase": ""
+      "linkedFromCase": "",
+      "durationMin": 4
     },
     {
       "caseId": "OSPE-CL5429",
@@ -738,7 +760,8 @@ const OFFLINE_DATA = {
       "isActive": true,
       "caseStatus": "Active",
       "linkedNextCase": "",
-      "linkedFromCase": ""
+      "linkedFromCase": "",
+      "durationMin": 4
     },
     {
       "caseId": "OSPE-CL5502",
@@ -755,7 +778,8 @@ const OFFLINE_DATA = {
       "isActive": true,
       "caseStatus": "Active",
       "linkedNextCase": "",
-      "linkedFromCase": ""
+      "linkedFromCase": "",
+      "durationMin": 4
     },
     {
       "caseId": "OSPE-CL5504",
@@ -772,7 +796,8 @@ const OFFLINE_DATA = {
       "isActive": true,
       "caseStatus": "Active",
       "linkedNextCase": "",
-      "linkedFromCase": ""
+      "linkedFromCase": "",
+      "durationMin": 4
     },
     {
       "caseId": "OSPE-CL5509",
@@ -789,7 +814,8 @@ const OFFLINE_DATA = {
       "isActive": true,
       "caseStatus": "Active",
       "linkedNextCase": "",
-      "linkedFromCase": ""
+      "linkedFromCase": "",
+      "durationMin": 4
     },
     {
       "caseId": "OSPE-CL5510",
@@ -806,7 +832,8 @@ const OFFLINE_DATA = {
       "isActive": true,
       "caseStatus": "Active",
       "linkedNextCase": "",
-      "linkedFromCase": ""
+      "linkedFromCase": "",
+      "durationMin": 4
     },
     {
       "caseId": "OSPE-CL5512",
@@ -823,7 +850,8 @@ const OFFLINE_DATA = {
       "isActive": true,
       "caseStatus": "Active",
       "linkedNextCase": "",
-      "linkedFromCase": ""
+      "linkedFromCase": "",
+      "durationMin": 4
     },
     {
       "caseId": "OSPE-CL5513",
@@ -840,7 +868,8 @@ const OFFLINE_DATA = {
       "isActive": true,
       "caseStatus": "Active",
       "linkedNextCase": "",
-      "linkedFromCase": ""
+      "linkedFromCase": "",
+      "durationMin": 4
     },
     {
       "caseId": "OSPE-CL5514",
@@ -857,7 +886,8 @@ const OFFLINE_DATA = {
       "isActive": true,
       "caseStatus": "Active",
       "linkedNextCase": "",
-      "linkedFromCase": ""
+      "linkedFromCase": "",
+      "durationMin": 4
     },
     {
       "caseId": "OSPE-CL5515",
@@ -874,7 +904,8 @@ const OFFLINE_DATA = {
       "isActive": true,
       "caseStatus": "Active",
       "linkedNextCase": "",
-      "linkedFromCase": ""
+      "linkedFromCase": "",
+      "durationMin": 4
     },
     {
       "caseId": "OSPE-CL5521",
@@ -891,7 +922,8 @@ const OFFLINE_DATA = {
       "isActive": true,
       "caseStatus": "Active",
       "linkedNextCase": "",
-      "linkedFromCase": ""
+      "linkedFromCase": "",
+      "durationMin": 4
     },
     {
       "caseId": "OSPE-CL5523",
@@ -908,7 +940,8 @@ const OFFLINE_DATA = {
       "isActive": true,
       "caseStatus": "Active",
       "linkedNextCase": "",
-      "linkedFromCase": ""
+      "linkedFromCase": "",
+      "durationMin": 4
     },
     {
       "caseId": "OSPE-CL5524",
@@ -925,7 +958,8 @@ const OFFLINE_DATA = {
       "isActive": true,
       "caseStatus": "Active",
       "linkedNextCase": "",
-      "linkedFromCase": ""
+      "linkedFromCase": "",
+      "durationMin": 4
     },
     {
       "caseId": "OSPE-CL5525",
@@ -942,7 +976,8 @@ const OFFLINE_DATA = {
       "isActive": true,
       "caseStatus": "Active",
       "linkedNextCase": "",
-      "linkedFromCase": ""
+      "linkedFromCase": "",
+      "durationMin": 4
     },
     {
       "caseId": "OSPE-CL5527",
@@ -959,7 +994,8 @@ const OFFLINE_DATA = {
       "isActive": true,
       "caseStatus": "Active",
       "linkedNextCase": "",
-      "linkedFromCase": ""
+      "linkedFromCase": "",
+      "durationMin": 4
     },
     {
       "caseId": "OSPE-CL5528",
@@ -976,7 +1012,8 @@ const OFFLINE_DATA = {
       "isActive": true,
       "caseStatus": "Active",
       "linkedNextCase": "",
-      "linkedFromCase": ""
+      "linkedFromCase": "",
+      "durationMin": 4
     },
     {
       "caseId": "OSPE-CL5529",
@@ -993,7 +1030,8 @@ const OFFLINE_DATA = {
       "isActive": true,
       "caseStatus": "Active",
       "linkedNextCase": "",
-      "linkedFromCase": ""
+      "linkedFromCase": "",
+      "durationMin": 4
     },
     {
       "caseId": "OSPE-CL5602",
@@ -1010,7 +1048,8 @@ const OFFLINE_DATA = {
       "isActive": true,
       "caseStatus": "Active",
       "linkedNextCase": "",
-      "linkedFromCase": ""
+      "linkedFromCase": "",
+      "durationMin": 4
     },
     {
       "caseId": "OSPE-CL5604",
@@ -1027,7 +1066,8 @@ const OFFLINE_DATA = {
       "isActive": true,
       "caseStatus": "Active",
       "linkedNextCase": "",
-      "linkedFromCase": ""
+      "linkedFromCase": "",
+      "durationMin": 4
     },
     {
       "caseId": "OSPE-CL5608",
@@ -1044,7 +1084,8 @@ const OFFLINE_DATA = {
       "isActive": true,
       "caseStatus": "Active",
       "linkedNextCase": "",
-      "linkedFromCase": ""
+      "linkedFromCase": "",
+      "durationMin": 4
     },
     {
       "caseId": "OSPE-CL5610",
@@ -1061,7 +1102,8 @@ const OFFLINE_DATA = {
       "isActive": true,
       "caseStatus": "Active",
       "linkedNextCase": "",
-      "linkedFromCase": ""
+      "linkedFromCase": "",
+      "durationMin": 4
     },
     {
       "caseId": "OSPE-CL5613",
@@ -1078,7 +1120,8 @@ const OFFLINE_DATA = {
       "isActive": true,
       "caseStatus": "Active",
       "linkedNextCase": "",
-      "linkedFromCase": ""
+      "linkedFromCase": "",
+      "durationMin": 4
     },
     {
       "caseId": "OSPE-CL5614",
@@ -1095,7 +1138,8 @@ const OFFLINE_DATA = {
       "isActive": true,
       "caseStatus": "Active",
       "linkedNextCase": "",
-      "linkedFromCase": ""
+      "linkedFromCase": "",
+      "durationMin": 4
     },
     {
       "caseId": "OSPE-CL5615",
@@ -1112,7 +1156,8 @@ const OFFLINE_DATA = {
       "isActive": true,
       "caseStatus": "Active",
       "linkedNextCase": "",
-      "linkedFromCase": ""
+      "linkedFromCase": "",
+      "durationMin": 4
     },
     {
       "caseId": "OSPE-CL5621",
@@ -1129,7 +1174,8 @@ const OFFLINE_DATA = {
       "isActive": true,
       "caseStatus": "Active",
       "linkedNextCase": "",
-      "linkedFromCase": ""
+      "linkedFromCase": "",
+      "durationMin": 4
     },
     {
       "caseId": "OSPE-CL5622",
@@ -1146,7 +1192,8 @@ const OFFLINE_DATA = {
       "isActive": true,
       "caseStatus": "Active",
       "linkedNextCase": "",
-      "linkedFromCase": ""
+      "linkedFromCase": "",
+      "durationMin": 4
     },
     {
       "caseId": "OSPE-CL5701",
@@ -1163,7 +1210,8 @@ const OFFLINE_DATA = {
       "isActive": true,
       "caseStatus": "Active",
       "linkedNextCase": "",
-      "linkedFromCase": ""
+      "linkedFromCase": "",
+      "durationMin": 4
     },
     {
       "caseId": "OSPE-CL5702",
@@ -1180,7 +1228,8 @@ const OFFLINE_DATA = {
       "isActive": true,
       "caseStatus": "Active",
       "linkedNextCase": "",
-      "linkedFromCase": ""
+      "linkedFromCase": "",
+      "durationMin": 4
     },
     {
       "caseId": "OSPE-CL5709",
@@ -1197,7 +1246,8 @@ const OFFLINE_DATA = {
       "isActive": true,
       "caseStatus": "Active",
       "linkedNextCase": "",
-      "linkedFromCase": ""
+      "linkedFromCase": "",
+      "durationMin": 4
     },
     {
       "caseId": "OSPE-CL5710",
@@ -1214,7 +1264,8 @@ const OFFLINE_DATA = {
       "isActive": true,
       "caseStatus": "Active",
       "linkedNextCase": "",
-      "linkedFromCase": ""
+      "linkedFromCase": "",
+      "durationMin": 4
     },
     {
       "caseId": "OSPE-CL5712",
@@ -1231,7 +1282,8 @@ const OFFLINE_DATA = {
       "isActive": true,
       "caseStatus": "Active",
       "linkedNextCase": "",
-      "linkedFromCase": ""
+      "linkedFromCase": "",
+      "durationMin": 4
     },
     {
       "caseId": "OSPE-CL5713",
@@ -1248,7 +1300,8 @@ const OFFLINE_DATA = {
       "isActive": true,
       "caseStatus": "Active",
       "linkedNextCase": "",
-      "linkedFromCase": ""
+      "linkedFromCase": "",
+      "durationMin": 4
     },
     {
       "caseId": "OSPE-CL5715",
@@ -1265,7 +1318,8 @@ const OFFLINE_DATA = {
       "isActive": true,
       "caseStatus": "Active",
       "linkedNextCase": "",
-      "linkedFromCase": ""
+      "linkedFromCase": "",
+      "durationMin": 4
     },
     {
       "caseId": "OSPE-CL5716",
@@ -1282,7 +1336,8 @@ const OFFLINE_DATA = {
       "isActive": true,
       "caseStatus": "Active",
       "linkedNextCase": "",
-      "linkedFromCase": ""
+      "linkedFromCase": "",
+      "durationMin": 4
     },
     {
       "caseId": "OSPE-CL5717",
@@ -1299,7 +1354,8 @@ const OFFLINE_DATA = {
       "isActive": true,
       "caseStatus": "Active",
       "linkedNextCase": "",
-      "linkedFromCase": ""
+      "linkedFromCase": "",
+      "durationMin": 4
     },
     {
       "caseId": "OSPE-CL5718",
@@ -1316,7 +1372,8 @@ const OFFLINE_DATA = {
       "isActive": true,
       "caseStatus": "Active",
       "linkedNextCase": "",
-      "linkedFromCase": ""
+      "linkedFromCase": "",
+      "durationMin": 4
     },
     {
       "caseId": "OSPE-CL5719",
@@ -1333,7 +1390,8 @@ const OFFLINE_DATA = {
       "isActive": true,
       "caseStatus": "Active",
       "linkedNextCase": "",
-      "linkedFromCase": ""
+      "linkedFromCase": "",
+      "durationMin": 4
     },
     {
       "caseId": "OSPE-CL5720",
@@ -1350,7 +1408,8 @@ const OFFLINE_DATA = {
       "isActive": true,
       "caseStatus": "Active",
       "linkedNextCase": "",
-      "linkedFromCase": ""
+      "linkedFromCase": "",
+      "durationMin": 4
     },
     {
       "caseId": "OSPE-CL5723",
@@ -1367,7 +1426,8 @@ const OFFLINE_DATA = {
       "isActive": true,
       "caseStatus": "Active",
       "linkedNextCase": "",
-      "linkedFromCase": ""
+      "linkedFromCase": "",
+      "durationMin": 4
     },
     {
       "caseId": "OSPE-CL5724",
@@ -1384,7 +1444,8 @@ const OFFLINE_DATA = {
       "isActive": true,
       "caseStatus": "Active",
       "linkedNextCase": "",
-      "linkedFromCase": ""
+      "linkedFromCase": "",
+      "durationMin": 4
     },
     {
       "caseId": "OSPE-CL5802",
@@ -1401,7 +1462,8 @@ const OFFLINE_DATA = {
       "isActive": true,
       "caseStatus": "Active",
       "linkedNextCase": "",
-      "linkedFromCase": ""
+      "linkedFromCase": "",
+      "durationMin": 4
     },
     {
       "caseId": "OSPE-CL5804",
@@ -1418,7 +1480,8 @@ const OFFLINE_DATA = {
       "isActive": true,
       "caseStatus": "Active",
       "linkedNextCase": "",
-      "linkedFromCase": ""
+      "linkedFromCase": "",
+      "durationMin": 4
     },
     {
       "caseId": "OSPE-CL5805",
@@ -1435,7 +1498,8 @@ const OFFLINE_DATA = {
       "isActive": true,
       "caseStatus": "Active",
       "linkedNextCase": "",
-      "linkedFromCase": ""
+      "linkedFromCase": "",
+      "durationMin": 4
     },
     {
       "caseId": "OSPE-CL5810",
@@ -1452,7 +1516,8 @@ const OFFLINE_DATA = {
       "isActive": true,
       "caseStatus": "Active",
       "linkedNextCase": "",
-      "linkedFromCase": ""
+      "linkedFromCase": "",
+      "durationMin": 4
     },
     {
       "caseId": "OSPE-CL5811",
@@ -1469,7 +1534,8 @@ const OFFLINE_DATA = {
       "isActive": true,
       "caseStatus": "Active",
       "linkedNextCase": "",
-      "linkedFromCase": ""
+      "linkedFromCase": "",
+      "durationMin": 4
     },
     {
       "caseId": "OSPE-CL5814",
@@ -1486,7 +1552,8 @@ const OFFLINE_DATA = {
       "isActive": true,
       "caseStatus": "Active",
       "linkedNextCase": "",
-      "linkedFromCase": ""
+      "linkedFromCase": "",
+      "durationMin": 4
     },
     {
       "caseId": "OSPE-CL5902",
@@ -1503,7 +1570,8 @@ const OFFLINE_DATA = {
       "isActive": true,
       "caseStatus": "Active",
       "linkedNextCase": "",
-      "linkedFromCase": ""
+      "linkedFromCase": "",
+      "durationMin": 4
     },
     {
       "caseId": "OSPE-CL5904",
@@ -1520,7 +1588,8 @@ const OFFLINE_DATA = {
       "isActive": true,
       "caseStatus": "Active",
       "linkedNextCase": "",
-      "linkedFromCase": ""
+      "linkedFromCase": "",
+      "durationMin": 4
     },
     {
       "caseId": "OSPE-CL5910A",
@@ -1537,7 +1606,8 @@ const OFFLINE_DATA = {
       "isActive": true,
       "caseStatus": "Active",
       "linkedNextCase": "",
-      "linkedFromCase": ""
+      "linkedFromCase": "",
+      "durationMin": 4
     },
     {
       "caseId": "OSPE-CL5910B",
@@ -1554,7 +1624,8 @@ const OFFLINE_DATA = {
       "isActive": true,
       "caseStatus": "Active",
       "linkedNextCase": "",
-      "linkedFromCase": ""
+      "linkedFromCase": "",
+      "durationMin": 4
     },
     {
       "caseId": "OSPE-CL5911",
@@ -1571,7 +1642,8 @@ const OFFLINE_DATA = {
       "isActive": true,
       "caseStatus": "Active",
       "linkedNextCase": "",
-      "linkedFromCase": ""
+      "linkedFromCase": "",
+      "durationMin": 4
     },
     {
       "caseId": "OSPE-CL5914",
@@ -1588,7 +1660,8 @@ const OFFLINE_DATA = {
       "isActive": true,
       "caseStatus": "Active",
       "linkedNextCase": "",
-      "linkedFromCase": ""
+      "linkedFromCase": "",
+      "durationMin": 4
     },
     {
       "caseId": "OSPE-CL5916",
@@ -1605,7 +1678,8 @@ const OFFLINE_DATA = {
       "isActive": true,
       "caseStatus": "Active",
       "linkedNextCase": "",
-      "linkedFromCase": ""
+      "linkedFromCase": "",
+      "durationMin": 4
     },
     {
       "caseId": "OSPE-CL6002",
@@ -1622,7 +1696,8 @@ const OFFLINE_DATA = {
       "isActive": true,
       "caseStatus": "Active",
       "linkedNextCase": "",
-      "linkedFromCase": ""
+      "linkedFromCase": "",
+      "durationMin": 4
     },
     {
       "caseId": "OSPE-CL6004",
@@ -1639,7 +1714,8 @@ const OFFLINE_DATA = {
       "isActive": true,
       "caseStatus": "Active",
       "linkedNextCase": "",
-      "linkedFromCase": ""
+      "linkedFromCase": "",
+      "durationMin": 4
     },
     {
       "caseId": "OSPE-CL6005",
@@ -1656,7 +1732,8 @@ const OFFLINE_DATA = {
       "isActive": true,
       "caseStatus": "Active",
       "linkedNextCase": "",
-      "linkedFromCase": ""
+      "linkedFromCase": "",
+      "durationMin": 4
     },
     {
       "caseId": "OSPE-CL6010",
@@ -1673,7 +1750,8 @@ const OFFLINE_DATA = {
       "isActive": true,
       "caseStatus": "Active",
       "linkedNextCase": "",
-      "linkedFromCase": ""
+      "linkedFromCase": "",
+      "durationMin": 4
     },
     {
       "caseId": "OSPE-CL6011",
@@ -1690,7 +1768,8 @@ const OFFLINE_DATA = {
       "isActive": true,
       "caseStatus": "Active",
       "linkedNextCase": "",
-      "linkedFromCase": ""
+      "linkedFromCase": "",
+      "durationMin": 4
     },
     {
       "caseId": "OSPE-CL6014S",
@@ -1707,7 +1786,8 @@ const OFFLINE_DATA = {
       "isActive": true,
       "caseStatus": "Active",
       "linkedNextCase": "",
-      "linkedFromCase": ""
+      "linkedFromCase": "",
+      "durationMin": 4
     },
     {
       "caseId": "OSPE-CL6014V",
@@ -1724,7 +1804,8 @@ const OFFLINE_DATA = {
       "isActive": true,
       "caseStatus": "Active",
       "linkedNextCase": "",
-      "linkedFromCase": ""
+      "linkedFromCase": "",
+      "durationMin": 4
     },
     {
       "caseId": "OSPE-CL6016",
@@ -1741,7 +1822,8 @@ const OFFLINE_DATA = {
       "isActive": true,
       "caseStatus": "Active",
       "linkedNextCase": "",
-      "linkedFromCase": ""
+      "linkedFromCase": "",
+      "durationMin": 4
     },
     {
       "caseId": "OSPE-CL61102",
@@ -2010,7 +2092,8 @@ const OFFLINE_DATA = {
       "isActive": true,
       "caseStatus": "Active",
       "linkedNextCase": "",
-      "linkedFromCase": ""
+      "linkedFromCase": "",
+      "durationMin": 4
     },
     {
       "caseId": "OSPE-CL6205",
@@ -2027,7 +2110,8 @@ const OFFLINE_DATA = {
       "isActive": true,
       "caseStatus": "Active",
       "linkedNextCase": "",
-      "linkedFromCase": ""
+      "linkedFromCase": "",
+      "durationMin": 4
     },
     {
       "caseId": "OSPE-CL6212",
@@ -2044,7 +2128,8 @@ const OFFLINE_DATA = {
       "isActive": true,
       "caseStatus": "Active",
       "linkedNextCase": "",
-      "linkedFromCase": ""
+      "linkedFromCase": "",
+      "durationMin": 4
     },
     {
       "caseId": "OSPE-CL6213",
@@ -2061,7 +2146,8 @@ const OFFLINE_DATA = {
       "isActive": true,
       "caseStatus": "Active",
       "linkedNextCase": "",
-      "linkedFromCase": ""
+      "linkedFromCase": "",
+      "durationMin": 4
     },
     {
       "caseId": "OSPE-CL6214",
@@ -2078,7 +2164,8 @@ const OFFLINE_DATA = {
       "isActive": true,
       "caseStatus": "Active",
       "linkedNextCase": "",
-      "linkedFromCase": ""
+      "linkedFromCase": "",
+      "durationMin": 4
     },
     {
       "caseId": "OSPE-CL6604",
@@ -2095,7 +2182,8 @@ const OFFLINE_DATA = {
       "isActive": true,
       "caseStatus": "Active",
       "linkedNextCase": "",
-      "linkedFromCase": ""
+      "linkedFromCase": "",
+      "durationMin": 4
     },
     {
       "caseId": "OSPE-CL6605",
@@ -2112,7 +2200,8 @@ const OFFLINE_DATA = {
       "isActive": true,
       "caseStatus": "Active",
       "linkedNextCase": "",
-      "linkedFromCase": ""
+      "linkedFromCase": "",
+      "durationMin": 4
     },
     {
       "caseId": "OSPE-CL6607",
@@ -2129,7 +2218,8 @@ const OFFLINE_DATA = {
       "isActive": true,
       "caseStatus": "Active",
       "linkedNextCase": "",
-      "linkedFromCase": ""
+      "linkedFromCase": "",
+      "durationMin": 4
     },
     {
       "caseId": "OSPE-CL6608",
@@ -2146,7 +2236,8 @@ const OFFLINE_DATA = {
       "isActive": true,
       "caseStatus": "Active",
       "linkedNextCase": "",
-      "linkedFromCase": ""
+      "linkedFromCase": "",
+      "durationMin": 4
     },
     {
       "caseId": "OSPE-CL6611",
@@ -2163,7 +2254,8 @@ const OFFLINE_DATA = {
       "isActive": true,
       "caseStatus": "Active",
       "linkedNextCase": "",
-      "linkedFromCase": ""
+      "linkedFromCase": "",
+      "durationMin": 4
     },
     {
       "caseId": "OSPE-CL6614",
@@ -2180,7 +2272,8 @@ const OFFLINE_DATA = {
       "isActive": true,
       "caseStatus": "Active",
       "linkedNextCase": "",
-      "linkedFromCase": ""
+      "linkedFromCase": "",
+      "durationMin": 4
     },
     {
       "caseId": "OSPE-CL6615",
@@ -2197,7 +2290,8 @@ const OFFLINE_DATA = {
       "isActive": true,
       "caseStatus": "Active",
       "linkedNextCase": "",
-      "linkedFromCase": ""
+      "linkedFromCase": "",
+      "durationMin": 4
     },
     {
       "caseId": "OSPE-CL6616",
@@ -2214,7 +2308,8 @@ const OFFLINE_DATA = {
       "isActive": true,
       "caseStatus": "Active",
       "linkedNextCase": "",
-      "linkedFromCase": ""
+      "linkedFromCase": "",
+      "durationMin": 4
     },
     {
       "caseId": "OSPE-CL6802",
@@ -2231,7 +2326,8 @@ const OFFLINE_DATA = {
       "isActive": true,
       "caseStatus": "Active",
       "linkedNextCase": "",
-      "linkedFromCase": ""
+      "linkedFromCase": "",
+      "durationMin": 4
     },
     {
       "caseId": "OSPE-CL6803",
@@ -2248,7 +2344,8 @@ const OFFLINE_DATA = {
       "isActive": true,
       "caseStatus": "Active",
       "linkedNextCase": "",
-      "linkedFromCase": ""
+      "linkedFromCase": "",
+      "durationMin": 4
     },
     {
       "caseId": "OSPE-CL6807",
@@ -2265,7 +2362,8 @@ const OFFLINE_DATA = {
       "isActive": true,
       "caseStatus": "Active",
       "linkedNextCase": "",
-      "linkedFromCase": ""
+      "linkedFromCase": "",
+      "durationMin": 4
     },
     {
       "caseId": "OSPE-CL6808",
@@ -2282,7 +2380,8 @@ const OFFLINE_DATA = {
       "isActive": true,
       "caseStatus": "Active",
       "linkedNextCase": "",
-      "linkedFromCase": ""
+      "linkedFromCase": "",
+      "durationMin": 4
     },
     {
       "caseId": "OSPE-CL6814",
@@ -2299,7 +2398,8 @@ const OFFLINE_DATA = {
       "isActive": true,
       "caseStatus": "Active",
       "linkedNextCase": "",
-      "linkedFromCase": ""
+      "linkedFromCase": "",
+      "durationMin": 4
     },
     {
       "caseId": "OSPE-CL6816",
@@ -2316,7 +2416,8 @@ const OFFLINE_DATA = {
       "isActive": true,
       "caseStatus": "Active",
       "linkedNextCase": "",
-      "linkedFromCase": ""
+      "linkedFromCase": "",
+      "durationMin": 4
     },
     {
       "caseId": "OSPE-CL83M101",
@@ -3545,11 +3646,11 @@ const OFFLINE_DATA = {
     },
     {
       "caseId": "OSPE-CLALLERGY01",
-      "title": "การประเมินและส่งมอบบัตรแพ้ยา Amoxicillin (ผื่นลมพิษและ Angioedema)",
+      "title": "OSPE-CLALLERGY01",
       "category": "Clinic",
-      "mainGroup": "การประเมินการแพ้ยา",
-      "subTopic": "",
-      "disease": "Type I Immediate Hypersensitivity, Drug Allergy Card Delivery, Complete Naranjo Algorithm",
+      "mainGroup": "Mock Exam 2569",
+      "subTopic": "🔒 ข้อสอบลับ (ต้องใช้รหัสผ่าน)",
+      "disease": "🔒 ล็อกด้วยรหัสผ่าน (Secret Mock)",
       "difficulty": 2,
       "docId": "1Bjdz8c6-Gr5GIHGllXIvt0FLPeWTAdZy586vtVDOr24",
       "author": "คณะทำงานคลังข้อสอบร่วมสมรรถนะเภสัชกรรม (ระบบกลาง)",
@@ -3558,15 +3659,17 @@ const OFFLINE_DATA = {
       "isActive": true,
       "caseStatus": "Active",
       "linkedNextCase": "",
-      "linkedFromCase": ""
+      "linkedFromCase": "",
+      "isProtected": true,
+      "hasPassword": true
     },
     {
       "caseId": "OSPE-CLCOUNSEL01",
-      "title": "การแยกแยะอาการไม่พึงประสงค์ Hypoglycemia vs Drug Allergy ในผู้ป่วยเบาหวาน",
+      "title": "OSPE-CLCOUNSEL01",
       "category": "Clinic",
-      "mainGroup": "การให้คำแนะนำด้านยา",
-      "subTopic": "",
-      "disease": "Type 2 Diabetes, Glipizide-induced Hypoglycemia, Rule of 15",
+      "mainGroup": "Mock Exam 2569",
+      "subTopic": "🔒 ข้อสอบลับ (ต้องใช้รหัสผ่าน)",
+      "disease": "🔒 ล็อกด้วยรหัสผ่าน (Secret Mock)",
       "difficulty": 2,
       "docId": "1Bjdz8c6-Gr5GIHGllXIvt0FLPeWTAdZy586vtVDOr24",
       "author": "คณะทำงานคลังข้อสอบร่วมสมรรถนะเภสัชกรรม (ระบบกลาง)",
@@ -3575,15 +3678,17 @@ const OFFLINE_DATA = {
       "isActive": true,
       "caseStatus": "Active",
       "linkedNextCase": "",
-      "linkedFromCase": ""
+      "linkedFromCase": "",
+      "isProtected": true,
+      "hasPassword": true
     },
     {
       "caseId": "OSPE-CLCOUNSEL02",
-      "title": "การให้คำปรึกษาและจัดการผลข้างเคียงในผู้ป่วยเริ่มยารักษาวัณโรคปอดสูตรมาตรฐาน (2HRZE Counseling)",
+      "title": "OSPE-CLCOUNSEL02",
       "category": "Clinic",
-      "mainGroup": "การให้คำแนะนำด้านยา",
-      "subTopic": "",
-      "disease": "Pulmonary Tuberculosis, 2HRZE Regimen, ADR Management & Adherence",
+      "mainGroup": "Mock Exam 2569",
+      "subTopic": "🔒 ข้อสอบลับ (ต้องใช้รหัสผ่าน)",
+      "disease": "🔒 ล็อกด้วยรหัสผ่าน (Secret Mock)",
       "difficulty": 2,
       "docId": "1Bjdz8c6-Gr5GIHGllXIvt0FLPeWTAdZy586vtVDOr24",
       "author": "คณะทำงานคลังข้อสอบร่วมสมรรถนะเภสัชกรรม (ระบบกลาง)",
@@ -3592,15 +3697,17 @@ const OFFLINE_DATA = {
       "isActive": true,
       "caseStatus": "Active",
       "linkedNextCase": "",
-      "linkedFromCase": ""
+      "linkedFromCase": "",
+      "isProtected": true,
+      "hasPassword": true
     },
     {
       "caseId": "OSPE-CLISBAR01",
-      "title": "การโทรประสานงานแพทย์กรณี Major DDI ระหว่าง Warfarin และ Co-trimoxazole",
+      "title": "OSPE-CLISBAR01",
       "category": "Clinic",
-      "mainGroup": "การค้นข้อมูลและประสานงาน",
-      "subTopic": "",
-      "disease": "Atrial Fibrillation with Simple UTI, Major Drug-Drug Interaction",
+      "mainGroup": "Mock Exam 2569",
+      "subTopic": "🔒 ข้อสอบลับ (ต้องใช้รหัสผ่าน)",
+      "disease": "🔒 ล็อกด้วยรหัสผ่าน (Secret Mock)",
       "difficulty": 2,
       "docId": "1Bjdz8c6-Gr5GIHGllXIvt0FLPeWTAdZy586vtVDOr24",
       "author": "คณะทำงานคลังข้อสอบร่วมสมรรถนะเภสัชกรรม (ระบบกลาง)",
@@ -3609,15 +3716,17 @@ const OFFLINE_DATA = {
       "isActive": true,
       "caseStatus": "Active",
       "linkedNextCase": "",
-      "linkedFromCase": ""
+      "linkedFromCase": "",
+      "isProtected": true,
+      "hasPassword": true
     },
     {
       "caseId": "OSPE-CLISBAR03",
-      "title": "การโทรประสานงานแพทย์กรณี Colchicine Overdose ในผู้ป่วย Acute Kidney Injury (AKI)",
+      "title": "OSPE-CLISBAR03",
       "category": "Clinic",
-      "mainGroup": "การค้นข้อมูลและประสานงาน",
-      "subTopic": "",
-      "disease": "Gout with Acute Kidney Injury, Colchicine Toxicity Risk, Lexicomp Renal Dosing",
+      "mainGroup": "Mock Exam 2569",
+      "subTopic": "🔒 ข้อสอบลับ (ต้องใช้รหัสผ่าน)",
+      "disease": "🔒 ล็อกด้วยรหัสผ่าน (Secret Mock)",
       "difficulty": 2,
       "docId": "1Bjdz8c6-Gr5GIHGllXIvt0FLPeWTAdZy586vtVDOr24",
       "author": "คณะทำงานคลังข้อสอบร่วมสมรรถนะเภสัชกรรม (ระบบกลาง)",
@@ -3626,7 +3735,9 @@ const OFFLINE_DATA = {
       "isActive": true,
       "caseStatus": "Active",
       "linkedNextCase": "",
-      "linkedFromCase": ""
+      "linkedFromCase": "",
+      "isProtected": true,
+      "hasPassword": true
     },
     {
       "caseId": "OSPE-CLMA01",
@@ -3643,7 +3754,8 @@ const OFFLINE_DATA = {
       "isActive": true,
       "caseStatus": "Active",
       "linkedNextCase": "",
-      "linkedFromCase": ""
+      "linkedFromCase": "",
+      "durationMin": 4
     },
     {
       "caseId": "OSPE-CLMA02",
@@ -3660,7 +3772,8 @@ const OFFLINE_DATA = {
       "isActive": true,
       "caseStatus": "Active",
       "linkedNextCase": "",
-      "linkedFromCase": ""
+      "linkedFromCase": "",
+      "durationMin": 4
     },
     {
       "caseId": "OSPE-CLMA03",
@@ -3677,7 +3790,8 @@ const OFFLINE_DATA = {
       "isActive": true,
       "caseStatus": "Active",
       "linkedNextCase": "",
-      "linkedFromCase": ""
+      "linkedFromCase": "",
+      "durationMin": 4
     },
     {
       "caseId": "OSPE-CLMA04",
@@ -3694,7 +3808,8 @@ const OFFLINE_DATA = {
       "isActive": true,
       "caseStatus": "Active",
       "linkedNextCase": "",
-      "linkedFromCase": ""
+      "linkedFromCase": "",
+      "durationMin": 4
     },
     {
       "caseId": "OSPE-CLMA05",
@@ -3711,7 +3826,8 @@ const OFFLINE_DATA = {
       "isActive": true,
       "caseStatus": "Active",
       "linkedNextCase": "",
-      "linkedFromCase": ""
+      "linkedFromCase": "",
+      "durationMin": 4
     },
     {
       "caseId": "OSPE-CLMA06",
@@ -3728,7 +3844,8 @@ const OFFLINE_DATA = {
       "isActive": true,
       "caseStatus": "Active",
       "linkedNextCase": "",
-      "linkedFromCase": ""
+      "linkedFromCase": "",
+      "durationMin": 4
     },
     {
       "caseId": "OSPE-CLMA07",
@@ -3745,7 +3862,8 @@ const OFFLINE_DATA = {
       "isActive": true,
       "caseStatus": "Active",
       "linkedNextCase": "",
-      "linkedFromCase": ""
+      "linkedFromCase": "",
+      "durationMin": 4
     },
     {
       "caseId": "OSPE-CLMA08",
@@ -3762,7 +3880,8 @@ const OFFLINE_DATA = {
       "isActive": true,
       "caseStatus": "Active",
       "linkedNextCase": "",
-      "linkedFromCase": ""
+      "linkedFromCase": "",
+      "durationMin": 4
     },
     {
       "caseId": "OSPE-CLMA09",
@@ -3779,7 +3898,8 @@ const OFFLINE_DATA = {
       "isActive": true,
       "caseStatus": "Active",
       "linkedNextCase": "",
-      "linkedFromCase": ""
+      "linkedFromCase": "",
+      "durationMin": 4
     },
     {
       "caseId": "OSPE-CLMA10",
@@ -3813,7 +3933,8 @@ const OFFLINE_DATA = {
       "isActive": true,
       "caseStatus": "Active",
       "linkedNextCase": "",
-      "linkedFromCase": ""
+      "linkedFromCase": "",
+      "durationMin": 4
     },
     {
       "caseId": "OSPE-CLMB02",
@@ -3830,7 +3951,8 @@ const OFFLINE_DATA = {
       "isActive": true,
       "caseStatus": "Active",
       "linkedNextCase": "",
-      "linkedFromCase": ""
+      "linkedFromCase": "",
+      "durationMin": 4
     },
     {
       "caseId": "OSPE-CLMB03",
@@ -3847,7 +3969,8 @@ const OFFLINE_DATA = {
       "isActive": true,
       "caseStatus": "Active",
       "linkedNextCase": "",
-      "linkedFromCase": ""
+      "linkedFromCase": "",
+      "durationMin": 4
     },
     {
       "caseId": "OSPE-CLMB04",
@@ -3864,7 +3987,8 @@ const OFFLINE_DATA = {
       "isActive": true,
       "caseStatus": "Active",
       "linkedNextCase": "",
-      "linkedFromCase": ""
+      "linkedFromCase": "",
+      "durationMin": 4
     },
     {
       "caseId": "OSPE-CLMB05",
@@ -3881,7 +4005,8 @@ const OFFLINE_DATA = {
       "isActive": true,
       "caseStatus": "Active",
       "linkedNextCase": "",
-      "linkedFromCase": ""
+      "linkedFromCase": "",
+      "durationMin": 4
     },
     {
       "caseId": "OSPE-CLMB06",
@@ -3898,7 +4023,8 @@ const OFFLINE_DATA = {
       "isActive": true,
       "caseStatus": "Active",
       "linkedNextCase": "",
-      "linkedFromCase": ""
+      "linkedFromCase": "",
+      "durationMin": 4
     },
     {
       "caseId": "OSPE-CLMB07",
@@ -3915,7 +4041,8 @@ const OFFLINE_DATA = {
       "isActive": true,
       "caseStatus": "Active",
       "linkedNextCase": "",
-      "linkedFromCase": ""
+      "linkedFromCase": "",
+      "durationMin": 4
     },
     {
       "caseId": "OSPE-CLMB08",
@@ -3932,7 +4059,8 @@ const OFFLINE_DATA = {
       "isActive": true,
       "caseStatus": "Active",
       "linkedNextCase": "",
-      "linkedFromCase": ""
+      "linkedFromCase": "",
+      "durationMin": 4
     },
     {
       "caseId": "OSPE-CLMB09",
@@ -3949,7 +4077,8 @@ const OFFLINE_DATA = {
       "isActive": true,
       "caseStatus": "Active",
       "linkedNextCase": "",
-      "linkedFromCase": ""
+      "linkedFromCase": "",
+      "durationMin": 4
     },
     {
       "caseId": "OSPE-CLMB10",
@@ -4714,11 +4843,11 @@ const OFFLINE_DATA = {
     },
     {
       "caseId": "OSPE-CLW2M01",
-      "title": "การตรวจสอบใบสั่งยา Mock RxCU84 Clinic Week 2",
+      "title": "OSPE-CLW2M01",
       "category": "Clinic",
-      "mainGroup": "การเขียนฉลากช่วย และการเก็บรักษายา",
-      "subTopic": "",
-      "disease": "การใช้ยาเบาหวาน",
+      "mainGroup": "Mock Exam 2569",
+      "subTopic": "🔒 ข้อสอบลับ (ต้องใช้รหัสผ่าน)",
+      "disease": "🔒 ล็อกด้วยรหัสผ่าน (Secret Mock)",
       "difficulty": 2,
       "docId": "1ZNKvEBVAUeVcJ2GSH4gGKujA8whv7zY0fH4pXVEJa4g",
       "author": "",
@@ -4727,7 +4856,10 @@ const OFFLINE_DATA = {
       "isActive": true,
       "caseStatus": "Active",
       "linkedNextCase": "",
-      "linkedFromCase": ""
+      "linkedFromCase": "",
+      "durationMin": 4,
+      "isProtected": true,
+      "hasPassword": true
     },
     {
       "caseId": "OSPE-CLW2M02",
@@ -4740,19 +4872,20 @@ const OFFLINE_DATA = {
       "docId": "1ZNKvEBVAUeVcJ2GSH4gGKujA8whv7zY0fH4pXVEJa4g",
       "author": "มิ้นท์, มดเขียว, ฟ้าใส",
       "createdDate": "29/10/2026",
-      "source": "Mock RxCU84 Clinic Week 2",
+      "source": "Practice RxCU84 Clinic ครั้งที่ 1",
       "isActive": true,
       "caseStatus": "Active",
       "linkedNextCase": "",
-      "linkedFromCase": ""
+      "linkedFromCase": "",
+      "durationMin": 4
     },
     {
       "caseId": "OSPE-CLW2M04",
-      "title": "เปิดหนังสือ Mock RxCU84 Clinic Week 2",
+      "title": "OSPE-CLW2M04",
       "category": "Clinic",
-      "mainGroup": "การค้นข้อมูลและประสานงาน",
-      "subTopic": "",
-      "disease": "",
+      "mainGroup": "Mock Exam 2569",
+      "subTopic": "🔒 ข้อสอบลับ (ต้องใช้รหัสผ่าน)",
+      "disease": "🔒 ล็อกด้วยรหัสผ่าน (Secret Mock)",
       "difficulty": 2,
       "docId": "1ZNKvEBVAUeVcJ2GSH4gGKujA8whv7zY0fH4pXVEJa4g",
       "author": "มิ้นท์, มดเขียว, ฟ้าใส",
@@ -4761,15 +4894,18 @@ const OFFLINE_DATA = {
       "isActive": true,
       "caseStatus": "Active",
       "linkedNextCase": "",
-      "linkedFromCase": ""
+      "linkedFromCase": "",
+      "durationMin": 4,
+      "isProtected": true,
+      "hasPassword": true
     },
     {
       "caseId": "OSPE-CLW2M05",
-      "title": "ข้อสอบผลิตภัณฑ์ Mock RxCU84 Clinic Week 2",
+      "title": "OSPE-CLW2M05",
       "category": "Product",
-      "mainGroup": "",
-      "subTopic": "",
-      "disease": "Special precaution",
+      "mainGroup": "Mock Exam 2569",
+      "subTopic": "🔒 ข้อสอบลับ (ต้องใช้รหัสผ่าน)",
+      "disease": "🔒 ล็อกด้วยรหัสผ่าน (Secret Mock)",
       "difficulty": 2,
       "docId": "1ZNKvEBVAUeVcJ2GSH4gGKujA8whv7zY0fH4pXVEJa4g",
       "author": "",
@@ -4778,15 +4914,18 @@ const OFFLINE_DATA = {
       "isActive": true,
       "caseStatus": "Active",
       "linkedNextCase": "",
-      "linkedFromCase": ""
+      "linkedFromCase": "",
+      "durationMin": 4,
+      "isProtected": true,
+      "hasPassword": true
     },
     {
       "caseId": "OSPE-CLW2M06",
-      "title": "ข้อสอบกฎหมาย Mock RxCU84 Clinic Week 2",
+      "title": "OSPE-CLW2M06",
       "category": "SAP",
-      "mainGroup": "",
-      "subTopic": "",
-      "disease": "",
+      "mainGroup": "Mock Exam 2569",
+      "subTopic": "🔒 ข้อสอบลับ (ต้องใช้รหัสผ่าน)",
+      "disease": "🔒 ล็อกด้วยรหัสผ่าน (Secret Mock)",
       "difficulty": 2,
       "docId": "1ZNKvEBVAUeVcJ2GSH4gGKujA8whv7zY0fH4pXVEJa4g",
       "author": "",
@@ -4795,15 +4934,18 @@ const OFFLINE_DATA = {
       "isActive": true,
       "caseStatus": "Active",
       "linkedNextCase": "",
-      "linkedFromCase": ""
+      "linkedFromCase": "",
+      "durationMin": 4,
+      "isProtected": true,
+      "hasPassword": true
     },
     {
       "caseId": "OSPE-CLW3M01",
-      "title": "การตรวจสอบใบสั่งยา Mock RxCU84 Clinic Week 3",
+      "title": "OSPE-CLW3M01",
       "category": "Clinic",
-      "mainGroup": "การตรวจสอบใบสั่งยา",
-      "subTopic": "",
-      "disease": "",
+      "mainGroup": "Mock Exam 2569",
+      "subTopic": "🔒 ข้อสอบลับ (ต้องใช้รหัสผ่าน)",
+      "disease": "🔒 ล็อกด้วยรหัสผ่าน (Secret Mock)",
       "difficulty": 2,
       "docId": "1ZNKvEBVAUeVcJ2GSH4gGKujA8whv7zY0fH4pXVEJa4g",
       "author": "",
@@ -4812,7 +4954,10 @@ const OFFLINE_DATA = {
       "isActive": true,
       "caseStatus": "Active",
       "linkedNextCase": "",
-      "linkedFromCase": ""
+      "linkedFromCase": "",
+      "durationMin": 4,
+      "isProtected": true,
+      "hasPassword": true
     },
     {
       "caseId": "OSPE-CLW3M02",
@@ -4825,19 +4970,20 @@ const OFFLINE_DATA = {
       "docId": "1ZNKvEBVAUeVcJ2GSH4gGKujA8whv7zY0fH4pXVEJa4g",
       "author": "",
       "createdDate": "17/11/2569",
-      "source": "Mock RxCU84 Clinic Week 3",
+      "source": "Practice RxCU84 Clinic ครั้งที่ 1",
       "isActive": true,
       "caseStatus": "Active",
       "linkedNextCase": "",
-      "linkedFromCase": ""
+      "linkedFromCase": "",
+      "durationMin": 4
     },
     {
       "caseId": "OSPE-CLW3M04",
-      "title": "เปิดหนังสือ Mock RxCU84 Clinic Week 3",
+      "title": "OSPE-CLW3M04",
       "category": "Clinic",
-      "mainGroup": "การค้นข้อมูลและประสานงาน",
-      "subTopic": "",
-      "disease": "",
+      "mainGroup": "Mock Exam 2569",
+      "subTopic": "🔒 ข้อสอบลับ (ต้องใช้รหัสผ่าน)",
+      "disease": "🔒 ล็อกด้วยรหัสผ่าน (Secret Mock)",
       "difficulty": 2,
       "docId": "1ZNKvEBVAUeVcJ2GSH4gGKujA8whv7zY0fH4pXVEJa4g",
       "author": "",
@@ -4846,15 +4992,18 @@ const OFFLINE_DATA = {
       "isActive": true,
       "caseStatus": "Active",
       "linkedNextCase": "",
-      "linkedFromCase": ""
+      "linkedFromCase": "",
+      "durationMin": 4,
+      "isProtected": true,
+      "hasPassword": true
     },
     {
       "caseId": "OSPE-CLW3M05",
-      "title": "ข้อสอบผลิตภัณฑ์ Mock RxCU84 Clinic Week 3",
+      "title": "OSPE-CLW3M05",
       "category": "Product",
-      "mainGroup": "Special precaution",
-      "subTopic": "",
-      "disease": "",
+      "mainGroup": "Mock Exam 2569",
+      "subTopic": "🔒 ข้อสอบลับ (ต้องใช้รหัสผ่าน)",
+      "disease": "🔒 ล็อกด้วยรหัสผ่าน (Secret Mock)",
       "difficulty": 2,
       "docId": "1ZNKvEBVAUeVcJ2GSH4gGKujA8whv7zY0fH4pXVEJa4g",
       "author": "",
@@ -4863,15 +5012,18 @@ const OFFLINE_DATA = {
       "isActive": true,
       "caseStatus": "Active",
       "linkedNextCase": "",
-      "linkedFromCase": ""
+      "linkedFromCase": "",
+      "durationMin": 4,
+      "isProtected": true,
+      "hasPassword": true
     },
     {
       "caseId": "OSPE-CLW3M06",
-      "title": "ข้อสอบกฎหมาย Mock RxCU84 Clinic Week 3",
+      "title": "OSPE-CLW3M06",
       "category": "SAP",
-      "mainGroup": "",
-      "subTopic": "",
-      "disease": "",
+      "mainGroup": "Mock Exam 2569",
+      "subTopic": "🔒 ข้อสอบลับ (ต้องใช้รหัสผ่าน)",
+      "disease": "🔒 ล็อกด้วยรหัสผ่าน (Secret Mock)",
       "difficulty": 2,
       "docId": "1ZNKvEBVAUeVcJ2GSH4gGKujA8whv7zY0fH4pXVEJa4g",
       "author": "",
@@ -4880,15 +5032,18 @@ const OFFLINE_DATA = {
       "isActive": true,
       "caseStatus": "Active",
       "linkedNextCase": "",
-      "linkedFromCase": ""
+      "linkedFromCase": "",
+      "durationMin": 4,
+      "isProtected": true,
+      "hasPassword": true
     },
     {
       "caseId": "OSPE-CLW4M01",
-      "title": "การตรวจสอบใบสั่งยา Mock RxCU84 Clinic Week 4",
+      "title": "OSPE-CLW4M01",
       "category": "Clinic",
-      "mainGroup": "การตรวจสอบใบสั่งยา",
-      "subTopic": "",
-      "disease": "",
+      "mainGroup": "Mock Exam 2569",
+      "subTopic": "🔒 ข้อสอบลับ (ต้องใช้รหัสผ่าน)",
+      "disease": "🔒 ล็อกด้วยรหัสผ่าน (Secret Mock)",
       "difficulty": 2,
       "docId": "1ZNKvEBVAUeVcJ2GSH4gGKujA8whv7zY0fH4pXVEJa4g",
       "author": "",
@@ -4897,7 +5052,10 @@ const OFFLINE_DATA = {
       "isActive": true,
       "caseStatus": "Active",
       "linkedNextCase": "",
-      "linkedFromCase": ""
+      "linkedFromCase": "",
+      "durationMin": 4,
+      "isProtected": true,
+      "hasPassword": true
     },
     {
       "caseId": "OSPE-CLW4M02",
@@ -4910,19 +5068,20 @@ const OFFLINE_DATA = {
       "docId": "1ZNKvEBVAUeVcJ2GSH4gGKujA8whv7zY0fH4pXVEJa4g",
       "author": "กิ๊ฟ",
       "createdDate": "12/11/2569",
-      "source": "Mock RxCU84 Clinic Week 4",
+      "source": "Practice RxCU84 Clinic ครั้งที่ 1",
       "isActive": true,
       "caseStatus": "Active",
       "linkedNextCase": "",
-      "linkedFromCase": ""
+      "linkedFromCase": "",
+      "durationMin": 4
     },
     {
       "caseId": "OSPE-CLW4M03",
-      "title": "เปิดหนังสือ Mock RxCU84 Clinic Week 4",
+      "title": "OSPE-CLW4M03",
       "category": "Clinic",
-      "mainGroup": "การค้นข้อมูลและประสานงาน",
-      "subTopic": "",
-      "disease": "CAP",
+      "mainGroup": "Mock Exam 2569",
+      "subTopic": "🔒 ข้อสอบลับ (ต้องใช้รหัสผ่าน)",
+      "disease": "🔒 ล็อกด้วยรหัสผ่าน (Secret Mock)",
       "difficulty": 2,
       "docId": "1ZNKvEBVAUeVcJ2GSH4gGKujA8whv7zY0fH4pXVEJa4g",
       "author": "กิ๊ฟ",
@@ -4931,15 +5090,18 @@ const OFFLINE_DATA = {
       "isActive": true,
       "caseStatus": "Active",
       "linkedNextCase": "",
-      "linkedFromCase": ""
+      "linkedFromCase": "",
+      "durationMin": 4,
+      "isProtected": true,
+      "hasPassword": true
     },
     {
       "caseId": "OSPE-CLW4M04",
-      "title": "ข้อสอบผลิตภัณฑ์ Mock RxCU84 Clinic Week 4",
+      "title": "OSPE-CLW4M04",
       "category": "Product",
-      "mainGroup": "Special precaution",
-      "subTopic": "",
-      "disease": "Digoxin",
+      "mainGroup": "Mock Exam 2569",
+      "subTopic": "🔒 ข้อสอบลับ (ต้องใช้รหัสผ่าน)",
+      "disease": "🔒 ล็อกด้วยรหัสผ่าน (Secret Mock)",
       "difficulty": 2,
       "docId": "1ZNKvEBVAUeVcJ2GSH4gGKujA8whv7zY0fH4pXVEJa4g",
       "author": "เพ้นท์",
@@ -4948,15 +5110,18 @@ const OFFLINE_DATA = {
       "isActive": true,
       "caseStatus": "Active",
       "linkedNextCase": "",
-      "linkedFromCase": ""
+      "linkedFromCase": "",
+      "durationMin": 4,
+      "isProtected": true,
+      "hasPassword": true
     },
     {
       "caseId": "OSPE-CLW4M05",
-      "title": "ข้อสอบกฎหมาย Mock RxCU84 Clinic Week 4",
+      "title": "OSPE-CLW4M05",
       "category": "SAP",
-      "mainGroup": "",
-      "subTopic": "",
-      "disease": "",
+      "mainGroup": "Mock Exam 2569",
+      "subTopic": "🔒 ข้อสอบลับ (ต้องใช้รหัสผ่าน)",
+      "disease": "🔒 ล็อกด้วยรหัสผ่าน (Secret Mock)",
       "difficulty": 2,
       "docId": "1ZNKvEBVAUeVcJ2GSH4gGKujA8whv7zY0fH4pXVEJa4g",
       "author": "",
@@ -4965,7 +5130,10 @@ const OFFLINE_DATA = {
       "isActive": true,
       "caseStatus": "Active",
       "linkedNextCase": "",
-      "linkedFromCase": ""
+      "linkedFromCase": "",
+      "durationMin": 4,
+      "isProtected": true,
+      "hasPassword": true
     },
     {
       "caseId": "OSPE-PD83M01",
@@ -4982,7 +5150,8 @@ const OFFLINE_DATA = {
       "isActive": true,
       "caseStatus": "Active",
       "linkedNextCase": "",
-      "linkedFromCase": ""
+      "linkedFromCase": "",
+      "durationMin": 8
     },
     {
       "caseId": "OSPE-PD83M02",
@@ -5563,7 +5732,8 @@ const OFFLINE_DATA = {
       "isActive": true,
       "caseStatus": "Active",
       "linkedNextCase": "",
-      "linkedFromCase": ""
+      "linkedFromCase": "",
+      "durationMin": 4
     },
     {
       "caseId": "OSPE-PD84M1W201B",
@@ -5580,7 +5750,8 @@ const OFFLINE_DATA = {
       "isActive": true,
       "caseStatus": "Active",
       "linkedNextCase": "",
-      "linkedFromCase": ""
+      "linkedFromCase": "",
+      "durationMin": 4
     },
     {
       "caseId": "OSPE-PD84M1W202A",
@@ -5597,7 +5768,8 @@ const OFFLINE_DATA = {
       "isActive": true,
       "caseStatus": "Active",
       "linkedNextCase": "",
-      "linkedFromCase": ""
+      "linkedFromCase": "",
+      "durationMin": 4
     },
     {
       "caseId": "OSPE-PD84M1W202B",
@@ -5614,7 +5786,8 @@ const OFFLINE_DATA = {
       "isActive": true,
       "caseStatus": "Active",
       "linkedNextCase": "",
-      "linkedFromCase": ""
+      "linkedFromCase": "",
+      "durationMin": 4
     },
     {
       "caseId": "OSPE-PD84M1W203A",
@@ -5631,7 +5804,8 @@ const OFFLINE_DATA = {
       "isActive": true,
       "caseStatus": "Active",
       "linkedNextCase": "",
-      "linkedFromCase": ""
+      "linkedFromCase": "",
+      "durationMin": 8
     },
     {
       "caseId": "OSPE-PD84M1W203B",
@@ -5648,7 +5822,8 @@ const OFFLINE_DATA = {
       "isActive": true,
       "caseStatus": "Active",
       "linkedNextCase": "",
-      "linkedFromCase": ""
+      "linkedFromCase": "",
+      "durationMin": 8
     },
     {
       "caseId": "OSPE-PD84M1W204A",
@@ -5665,7 +5840,8 @@ const OFFLINE_DATA = {
       "isActive": true,
       "caseStatus": "Active",
       "linkedNextCase": "",
-      "linkedFromCase": ""
+      "linkedFromCase": "",
+      "durationMin": 4
     },
     {
       "caseId": "OSPE-PD84M1W204B",
@@ -5682,7 +5858,8 @@ const OFFLINE_DATA = {
       "isActive": true,
       "caseStatus": "Active",
       "linkedNextCase": "",
-      "linkedFromCase": ""
+      "linkedFromCase": "",
+      "durationMin": 4
     },
     {
       "caseId": "OSPE-PD84M1W205A",
@@ -5699,7 +5876,8 @@ const OFFLINE_DATA = {
       "isActive": true,
       "caseStatus": "Active",
       "linkedNextCase": "",
-      "linkedFromCase": ""
+      "linkedFromCase": "",
+      "durationMin": 4
     },
     {
       "caseId": "OSPE-PD84M1W205B",
@@ -5716,7 +5894,8 @@ const OFFLINE_DATA = {
       "isActive": true,
       "caseStatus": "Active",
       "linkedNextCase": "",
-      "linkedFromCase": ""
+      "linkedFromCase": "",
+      "durationMin": 4
     },
     {
       "caseId": "OSPE-PD84M1W301A",
@@ -5733,7 +5912,8 @@ const OFFLINE_DATA = {
       "isActive": true,
       "caseStatus": "Active",
       "linkedNextCase": "",
-      "linkedFromCase": ""
+      "linkedFromCase": "",
+      "durationMin": 4
     },
     {
       "caseId": "OSPE-PD84M1W301B",
@@ -5750,7 +5930,8 @@ const OFFLINE_DATA = {
       "isActive": true,
       "caseStatus": "Active",
       "linkedNextCase": "",
-      "linkedFromCase": ""
+      "linkedFromCase": "",
+      "durationMin": 4
     },
     {
       "caseId": "OSPE-PD84M1W302A",
@@ -5767,7 +5948,8 @@ const OFFLINE_DATA = {
       "isActive": true,
       "caseStatus": "Active",
       "linkedNextCase": "",
-      "linkedFromCase": ""
+      "linkedFromCase": "",
+      "durationMin": 8
     },
     {
       "caseId": "OSPE-PD84M1W302B",
@@ -5784,7 +5966,8 @@ const OFFLINE_DATA = {
       "isActive": true,
       "caseStatus": "Active",
       "linkedNextCase": "",
-      "linkedFromCase": ""
+      "linkedFromCase": "",
+      "durationMin": 8
     },
     {
       "caseId": "OSPE-PD84M1W303A",
@@ -5801,7 +5984,8 @@ const OFFLINE_DATA = {
       "isActive": true,
       "caseStatus": "Active",
       "linkedNextCase": "",
-      "linkedFromCase": ""
+      "linkedFromCase": "",
+      "durationMin": 4
     },
     {
       "caseId": "OSPE-PD84M1W303B",
@@ -5818,7 +6002,8 @@ const OFFLINE_DATA = {
       "isActive": true,
       "caseStatus": "Active",
       "linkedNextCase": "",
-      "linkedFromCase": ""
+      "linkedFromCase": "",
+      "durationMin": 4
     },
     {
       "caseId": "OSPE-PD84M1W401A",
@@ -5835,7 +6020,8 @@ const OFFLINE_DATA = {
       "isActive": true,
       "caseStatus": "Active",
       "linkedNextCase": "",
-      "linkedFromCase": ""
+      "linkedFromCase": "",
+      "durationMin": 8
     },
     {
       "caseId": "OSPE-PD84M1W401B",
@@ -5852,7 +6038,8 @@ const OFFLINE_DATA = {
       "isActive": true,
       "caseStatus": "Active",
       "linkedNextCase": "",
-      "linkedFromCase": ""
+      "linkedFromCase": "",
+      "durationMin": 8
     },
     {
       "caseId": "OSPE-PD84M1W402A",
@@ -5869,7 +6056,8 @@ const OFFLINE_DATA = {
       "isActive": true,
       "caseStatus": "Active",
       "linkedNextCase": "",
-      "linkedFromCase": ""
+      "linkedFromCase": "",
+      "durationMin": 4
     },
     {
       "caseId": "OSPE-PD84M1W402B",
@@ -5886,7 +6074,8 @@ const OFFLINE_DATA = {
       "isActive": true,
       "caseStatus": "Active",
       "linkedNextCase": "",
-      "linkedFromCase": ""
+      "linkedFromCase": "",
+      "durationMin": 4
     },
     {
       "caseId": "OSPE-PD84M1W403A",
@@ -5903,7 +6092,8 @@ const OFFLINE_DATA = {
       "isActive": true,
       "caseStatus": "Active",
       "linkedNextCase": "",
-      "linkedFromCase": ""
+      "linkedFromCase": "",
+      "durationMin": 6
     },
     {
       "caseId": "OSPE-PD84M1W403B",
@@ -5920,7 +6110,8 @@ const OFFLINE_DATA = {
       "isActive": true,
       "caseStatus": "Active",
       "linkedNextCase": "",
-      "linkedFromCase": ""
+      "linkedFromCase": "",
+      "durationMin": 6
     },
     {
       "caseId": "OSPE-PD84W101",
@@ -7787,23 +7978,6 @@ const OFFLINE_DATA = {
       "author": "RxCU",
       "createdDate": "01/10/2026",
       "source": "ข้อสอบจริง ปี 2568",
-      "isActive": true,
-      "caseStatus": "Active",
-      "linkedNextCase": "",
-      "linkedFromCase": ""
-    },
-    {
-      "caseId": "OSPE-CLSP04",
-      "title": "การแนะนำสูตรยารักษาวัณโรคปอด (Antituberculosis Therapy: 2HRZE)",
-      "category": "Clinic",
-      "mainGroup": "คำแนะนำสำหรับยาที่ต้องระมัดระวังในการใช้เป็นพิเศษ (ภาคผนวก ข)",
-      "subTopic": "",
-      "disease": "Pulmonary Tuberculosis (2HRZE)",
-      "difficulty": 2,
-      "docId": "1ZNKvEBVAUeVcJ2GSH4gGKujA8whv7zY0fH4pXVEJa4g",
-      "author": "คณะทำงานคลังข้อสอบร่วมสมรรถนะเภสัชกรรม",
-      "createdDate": "30/09/2026",
-      "source": "Practice RxCU84 Clinic ครั้งที่ 1",
       "isActive": true,
       "caseStatus": "Active",
       "linkedNextCase": "",

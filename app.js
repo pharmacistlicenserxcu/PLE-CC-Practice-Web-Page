@@ -5772,7 +5772,7 @@ if (typeof module !== 'undefined' && module.exports) {
 // RECOMMENDED PRESETS & ADMIN PRESET MANAGER (FIREBASE RTDB SYNC)
 // ──────────────────────────────────────────────────────────────
 (function () {
-  const ADMIN_PRESET_PASSCODE = '8485';
+  const ADMIN_PRESET_PASSCODE = 'rxcu';
   const PRESET_CACHE_KEY = 'ple_admin_preset_config_v1';
   const PRESET_FB_PATH = 'config/recommended_presets';
   const PRESET_FB_CONFIG = {

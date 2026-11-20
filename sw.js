@@ -4,10 +4,10 @@
  * ====================================================
  * จัดการ Caching ทรัพยากรระบบเพื่อเพิ่มความเร็วในการโหลด (Preloading) 
  * และสนับสนุนการเข้าใช้งานแบบออฟไลน์ (Offline Mode)
- * Version: ple-cc2-ospe-v1.7.4 (Recommended Presets Dropdown, Admin Modal with Firebase Sync & Seamless 3D Entry)
+ * Version: ple-cc2-ospe-v1.7.5 (Admin Preset Passcode updated to rxcu)
  */
 
-const CACHE_NAME = 'ple-cc2-ospe-v1.7.4';
+const CACHE_NAME = 'ple-cc2-ospe-v1.7.5';
 const ASSETS = [
   './',
   './index.html',

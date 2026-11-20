@@ -1006,9 +1006,223 @@ window.CLINIC_SAP_ARCHETYPES = {
           'จึงขอเสนอแนะทางเลือกในการปรับเปลี่ยนยา/ขนาดยาที่เหมาะสมคือ...',
           'รบกวนแพทย์พิจารณายืนยันคำสั่งการรักษาด้วยครับ/ค่ะ'
         ],
+        role: 'doctor',
         aiRole: 'แพทย์เจ้าของไข้ / ผู้ประเมิน',
-        aiSuccessKeywords: ['ปัญหา', 'เสนอ', 'ปรับ', 'แพ้', 'interaction', 'ขนาด', 'ยืนยัน', 'drp', 'dose'],
+        requiredKeywords: ['ปัญหา', 'เสนอ', 'ปรับ', 'แพ้', 'interaction', 'ขนาด', 'ยืนยัน', 'drp', 'dose'],
         hint: 'ใช้ Block ประโยคหรือพิมพ์ข้อความสื่อสารปัญหา DRP และข้อเสนอแนะอย่างสุภาพชัดเจน' }
+    ]
+  },
+
+  CLINIC_DIS_CONSULT: {
+    id: 'CLINIC_DIS_CONSULT',
+    track: 'Clinic',
+    code: 'OSPE-CL-DIS',
+    week: 'DIS',
+    name: 'การสืบค้นข้อมูลยาและตอบคำถามบุคลากรทางการแพทย์ (DIS & Consultation)',
+    category: 'งานบริบาล · เภสัชสนเทศ (DIS)',
+    sceneState: 'STATE_DOCUMENT',
+    rxText: 'สืบค้นข้อมูลจากแหล่งอ้างอิงมาตรฐาน (Micromedex / Lexicomp / MIMS / Thai NLEM) เพื่อตอบคำถามแพทย์/พยาบาลอย่างเป็นระบบ',
+    device: 'desk',
+    videos: [],
+    steps: [
+      { id: 'dis_identify', type: 'clinic_confirm', title: '1. วิเคราะห์คำถาม & เลือกแหล่งข้อมูลปฐมภูมิ/ทุติยภูมิที่เหมาะสม', pts: 4.0, cam: 'overview',
+        choices: [
+          { id: 'ebm_ok', label: 'ระบุ Ultimate Question ของผู้ถาม ค้นข้อมูลจากฐานข้อมูลมาตรฐาน (เช่น Lexicomp/Micromedex/Guideline) พร้อมประเมินความน่าเชื่อถือ', correct: true },
+          { id: 'guess_dis', label: 'ตอบคำถามจากความจำโดยไม่ตรวจสอบข้อมูลอ้างอิงหรือระบุแหล่งที่มา', correct: false }
+        ],
+        hint: 'ตรวจสอบข้อมูลจากเอกสารสถานีด้านขวา (ตารางยา/บทความ/คำถามแพทย์) แล้วสรุปคำตอบที่ตรงประเด็น' },
+      { id: 'dis_reply', type: 'ai_dialogue', title: '2. ตอบคำถามและประสานงานบุคลากรทางการแพทย์ (Doctor / Nurse)', pts: 6.0, cam: 'overview',
+        role: 'doctor',
+        blocks: [
+          'สวัสดีครับ/ค่ะ จากงานเภสัชสนเทศ ขอตอบคำถามเรื่องการใช้ยาของผู้ป่วยรายนี้ครับ/ค่ะ',
+          'จากข้อมูลอ้างอิงมาตรฐาน พบคำแนะนำ/ขนาดยา/ความเข้ากันได้ของยา คือ...',
+          'ข้อควรระวังและการติดตามอาการเพิ่มเติมที่แนะนำคือ...',
+          'หากต้องการข้อมูลเพิ่มเติมสามารถแจ้งได้ทันทีครับ/ค่ะ'
+        ],
+        requiredKeywords: ['ข้อมูล', 'แนะนำ', 'ขนาด', 'ติดตาม', 'ระวัง', 'เอกสาร', 'dose'],
+        hint: 'สื่อสารคำตอบที่สืบค้นได้ชัดเจน กระชับ พร้อมระบุข้อควรระวังและการติดตามผล' }
+    ]
+  },
+
+  CLINIC_ADR_ALLERGY: {
+    id: 'CLINIC_ADR_ALLERGY',
+    track: 'Clinic',
+    code: 'OSPE-CL-ADR',
+    week: 'ADR',
+    name: 'การประเมินอาการไม่พึงประสงค์และประวัติแพ้ยา (ADR & Allergy Assessment)',
+    category: 'งานบริบาล · ประเมิน ADR/แพ้ยา',
+    sceneState: 'STATE_DOCUMENT',
+    rxText: 'ซักประวัติไทม์ไลน์การเกิดผื่น/อาการแพ้ยา ประเมินความสัมพันธ์ (Naranjo Algorithm) แยก Type A/B และออกบัตรแพ้ยา',
+    device: 'desk',
+    videos: [],
+    steps: [
+      { id: 'adr_assess', type: 'clinic_confirm', title: '1. ประเมิน Naranjo Score, ชนิดการแพ้ยา (Type A/B) & Cross-reactivity', pts: 4.0, cam: 'overview',
+        choices: [
+          { id: 'adr_ok', label: 'ซัก Timeline (ระยะเวลาเริ่มยา-เกิดอาการ), ลักษณะผื่น/SJS-TEN danger signs, ประเมิน Naranjo และหลีกเลี่ยงยาที่มี Cross-reactivity', correct: true },
+          { id: 'adr_bad', label: 'ให้รับประทานยาเดิมต่อเพื่อดูอาการและไม่ต้องออกบัตรแพ้ยา', correct: false }
+        ],
+        hint: 'คัดกรอง Severe Cutaneous Adverse Reactions (SCARs) เช่น ไข้สูง ตุ่มพอง เยื่อบุอักเสบ และประเมินความน่าจะเป็นตาม Naranjo' },
+      { id: 'adr_counsel', type: 'ai_dialogue', title: '2. แจ้งผลประเมิน ออกบัตรแพ้ยา & ให้คำแนะนำผู้ป่วย', pts: 6.0, cam: 'overview',
+        role: 'patient',
+        blocks: [
+          'สวัสดีครับ/ค่ะ ขออนุญาตซักประวัติเพิ่มเติมเรื่องเวลาที่เริ่มทานยาและลักษณะอาการแพ้ครับ/ค่ะ',
+          'จากการประเมิน พบว่าอาการดังกล่าวเข้าข่ายอาการไม่พึงประสงค์/แพ้ยา จึงต้องหยุดยาที่สงสัยทันที',
+          'เภสัชกรจะออกบัตรแพ้ยาให้พกติดตัว และแสดงทุกครั้งที่เข้ารับการรักษาครับ/ค่ะ',
+          'หากมีอาการผิดปกติรุนแรง เช่น หายใจลำบาก ปากบวม ผื่นลอก ให้รีบไปโรงพยาบาลทันทีครับ/ค่ะ'
+        ],
+        requiredKeywords: ['แพ้', 'หยุด', 'บัตร', 'ระวัง', 'cross', 'ผื่น', 'โรงพยาบาล'],
+        hint: 'แจ้งชื่อยาที่แพ้ ยาที่ห้ามใช้ร่วม ออกบัตรแพ้ยา และเตือนอาการอันตรายที่ต้องรีบพบแพทย์' }
+    ]
+  },
+
+  CLINIC_HIGH_ALERT: {
+    id: 'CLINIC_HIGH_ALERT',
+    track: 'Clinic',
+    code: 'OSPE-CLSP01',
+    week: 'Special Precautions',
+    name: 'การให้คำแนะนำยาความเสี่ยงสูง/ต้องระมัดระวังเป็นพิเศษ (High-Alert Drugs)',
+    category: 'งานบริบาล · ภาคผนวก ข / High-Alert',
+    sceneState: 'STATE_COUNSEL',
+    rxText: 'ยาที่มีดัชนีการรักษาแคบหรือความเสี่ยงสูง (Warfarin, Digoxin, Phenytoin, Lithium, Methotrexate, Colchicine) — เน้นย้ำขนาดยา DDI และอาการพิษ',
+    device: 'counter_consult',
+    videos: [],
+    steps: [
+      { id: 'ha_verify', type: 'clinic_confirm', title: '1. ตรวจสอบขนาดยา, ค่า Lab เป้าหมาย (INR/Level) & ปฏิกิริยาระหว่างยา/อาหาร', pts: 3.5, cam: 'overview',
+        choices: [
+          { id: 'ha_ok', label: 'ยืนยันขนาดยา/ความแรงตรงตามเม็ดยา ตรวจ DDI/อาหาร (เช่น วิตามิน K, NSAIDs, สมุนไพร) และย้ำการตรวจติดตามค่า Lab', correct: true },
+          { id: 'ha_skip', label: 'ปรับเพิ่ม-ลดขนาดยาเองได้เมื่อลืมกินยา และซื้อยาแก้ปวด NSAIDs ทานร่วมได้ตามปกติ', correct: false }
+        ],
+        hint: 'ตรวจสอบความถูกต้องของขนาดยา อาหาร/ยาที่ตีกัน และเกณฑ์ค่าทางห้องปฏิบัติการที่ต้องติดตาม' },
+      { id: 'ha_counsel', type: 'ai_dialogue', title: '2. สื่อสารคำแนะนำเฉพาะ & สัญญาณเตือนพิษจากยา (Red Flags)', pts: 6.5, cam: 'device',
+        role: 'patient',
+        blocks: [
+          'สวัสดีครับ/ค่ะ ยานี้เป็นยาที่ต้องระมัดระวังเป็นพิเศษ ขอแนะนำวิธีรับประทานที่ถูกต้องและสม่ำเสมอครับ/ค่ะ',
+          'ควรหลีกเลี่ยงการซื้อยาอื่น สมุนไพร หรืออาหารบางชนิดรับประทานร่วมกันโดยไม่ปรึกษาแพทย์/เภสัชกร',
+          'หากพบอาการเตือนความเป็นพิษหรือเลือดออกผิดปกติ (เช่น จ้ำเลือด เลือดออกตามไรฟัน ถ่ายดำ มองเห็นภาพสีเหลือง) ให้รีบพบแพทย์ทันที',
+          'หากลืมรับประทานยา ห้ามเพิ่มขนาดยาเป็น 2 เท่าในมื้อถัดไปเด็ดขาดครับ/ค่ะ'
+        ],
+        requiredKeywords: ['ขนาด', 'ห้าม', 'พบแพทย์', 'เลือด', 'ลืม', 'ติดตาม', 'ระวัง'],
+        hint: 'เน้นวิธีรับประทานที่แม่นยำ การจัดการเมื่อลืมกินยา และอาการ Red Flags ที่ต้องรีบมาโรงพยาบาล' }
+    ]
+  },
+
+  CLINIC_LAB_PK: {
+    id: 'CLINIC_LAB_PK',
+    track: 'Clinic',
+    code: 'OSPE-CL4806',
+    week: 'Lab / PK',
+    name: 'การแปลผลทางห้องปฏิบัติการ & คำนวณทางคลินิก (Clinical Lab & PK)',
+    category: 'งานบริบาล · แปลผล Lab / PK',
+    sceneState: 'STATE_DOCUMENT',
+    rxText: 'คำนวณค่าพารามิเตอร์ทางคลินิก (LDL-C Friedewald, CrCl Cockcroft-Gault, Corrected Ca, Dose Adjustment) และแปลผลให้คำแนะนำ',
+    device: 'desk',
+    videos: [],
+    steps: [
+      { id: 'lab_calc', type: 'clinic_confirm', title: '1. คำนวณค่าทางคลินิก & แปลผลความผิดปกติจากใบรายงาน Lab', pts: 4.0, cam: 'overview',
+        choices: [
+          { id: 'calc_ok', label: 'เลือกใช้สูตรคำนวณมาตรฐานให้ถูกต้อง ตรวจสอบเงื่อนไขข้อจำกัดของสูตร (เช่น TG < 400 mg/dL) และแปลผลเทียบค่าปกติ', correct: true },
+          { id: 'calc_bad', label: 'ใช้สูตรคำนวณโดยไม่ตรวจสอบหน่วยและเงื่อนไขข้อจำกัดของค่า Lab', correct: false }
+        ],
+        hint: 'ตรวจสอบตัวเลข Lab จากเอกสารสถานีด้านขวา คำนวณตามสูตรมาตรฐาน และประเมินเป้าหมายการรักษา' },
+      { id: 'lab_counsel', type: 'ai_dialogue', title: '2. อธิบายผลการตรวจ & แนวทางการปรับพฤติกรรม/การใช้ยา', pts: 6.0, cam: 'overview',
+        role: 'patient',
+        blocks: [
+          'สวัสดีครับ/ค่ะ จากผลการตรวจทางห้องปฏิบัติการและค่าที่คำนวณได้ พบว่า...',
+          'เกณฑ์เป้าหมายที่เหมาะสมสำหรับผู้ป่วยรายนี้คือ...',
+          'ขอแนะนำการปรับพฤติกรรมและการใช้ยาอย่างต่อเนื่องพร้อมนัดตรวจติดตามผล Lab ครับ/ค่ะ'
+        ],
+        requiredKeywords: ['ผล', 'คำนวณ', 'เกณฑ์', 'อาหาร', 'ออกกำลัง', 'ติดตาม', 'ยา'],
+        hint: 'สรุปค่าที่คำนวณได้ให้เข้าใจง่าย พร้อมแนะนำเป้าหมายการรักษาและการดูแลตนเอง' }
+    ]
+  },
+
+  SAP_ETHICS: {
+    id: 'SAP_ETHICS',
+    track: 'SAP',
+    code: 'OSPE-SP-ETHICS',
+    week: 'SAP',
+    name: 'จรรยาบรรณแห่งวิชาชีพเภสัชกรรม (Professional Ethics)',
+    category: 'SAP · จรรยาบรรณวิชาชีพ',
+    sceneState: 'STATE_DOCUMENT',
+    rxText: 'วิเคราะห์ประเด็นจริยธรรมทางเภสัชกรรม (Autonomy, Beneficence, Non-maleficence, Justice, Confidentiality) และข้อบังคับสภาเภสัชกรรมว่าด้วยจรรยาบรรณ',
+    device: 'desk',
+    videos: [],
+    steps: [
+      { id: 'ethics_principle', type: 'clinic_confirm', title: '1. ระบุประเด็นผิดจรรยาบรรณ & หลักจริยธรรมที่เกี่ยวข้อง', pts: 4.0, cam: 'overview',
+        choices: [
+          { id: 'eth_ok', label: 'ยึดประโยชน์และความปลอดภัยของผู้ป่วยเป็นสำคัญ (Beneficence/Non-maleficence) รักษาความลับ ไม่โฆษณาโอ้อวด และปฏิบัติตามจรรยาบรรณสภาฯ', correct: true },
+          { id: 'eth_bad', label: 'เปิดเผยข้อมูลการรักษาผู้ป่วยเพื่อผลประโยชน์ทางการค้าหรือจ่ายยาโดยไม่คำนึงถึงจรรยาบรรณ', correct: false }
+        ],
+        hint: 'วิเคราะห์สถานการณ์ตามข้อบังคับสภาเภสัชกรรมว่าด้วยจรรยาบรรณแห่งวิชาชีพเภสัชกรรม' },
+      { id: 'ethics_resolve', type: 'ai_dialogue', title: '2. ชี้แจงแนวทางปฏิบัติที่ถูกต้องตามจรรยาบรรณวิชาชีพ', pts: 6.0, cam: 'overview',
+        role: 'patient',
+        blocks: [
+          'ตามหลักจรรยาบรรณแห่งวิชาชีพเภสัชกรรม เภสัชกรมีหน้าที่ปกป้องสิทธิและความปลอดภัยของผู้ป่วยเป็นอันดับแรกครับ/ค่ะ',
+          'ในสถานการณ์นี้ แนวทางปฏิบัติที่ถูกต้องและเหมาะสมตามข้อบังคับสภาเภสัชกรรมคือ...',
+          'ขอชี้แจงเหตุผลด้านวิชาการและจริยธรรมเพื่อความเข้าใจที่ตรงกันครับ/ค่ะ'
+        ],
+        requiredKeywords: ['จรรยาบรรณ', 'สิทธิ', 'ความลับ', 'ปลอดภัย', 'วิชาชีพ', 'แนะนำ'],
+        hint: 'สื่อสารเหตุผลเชิงจริยธรรมอย่างสุภาพ มั่นคง และเป็นมืออาชีพ' }
+    ]
+  },
+
+  SAP_REGULATORY_DOC: {
+    id: 'SAP_REGULATORY_DOC',
+    track: 'SAP',
+    code: 'OSPE-SP-REG',
+    week: 'SAP',
+    name: 'กฎหมายยา การจำแนกประเภทยา & เอกสารกำกับสถานที่ (Regulatory & Docs)',
+    category: 'SAP · กฎหมายยาและเอกสาร',
+    sceneState: 'STATE_DOCUMENT',
+    rxText: 'ตรวจสอบความถูกต้องตาม พ.ร.บ.ยา พ.ศ.2510, ประเภทยา (ยาอันตราย/ควบคุมพิเศษ/สามัญประจำบ้าน), ทะเบียนยา, บัญชี ข.ย. และข้อกำหนดสถานที่ขายยา (GPP)',
+    device: 'desk',
+    videos: [],
+    steps: [
+      { id: 'reg_audit', type: 'clinic_confirm', title: '1. ตรวจสอบข้อกำหนดกฎหมายยา / การจำแนกประเภทยา / เอกสารบัญชี', pts: 4.0, cam: 'overview',
+        choices: [
+          { id: 'reg_ok', label: 'จำแนกประเภทยา ตรวจเลขทะเบียนตำรับยา ตรวจสอบความครบถ้วนของบัญชี ข.ย. และปฏิบัติตามมาตรฐาน GPP อย่างเคร่งครัด', correct: true },
+          { id: 'reg_bad', label: 'สามารถจัดเก็บและจ่ายยาทุกประเภทปะปนกันได้โดยไม่ต้องมีใบอนุญาตหรือบัญชีควบคุม', correct: false }
+        ],
+        hint: 'อ่านรายละเอียดเอกสารกฎหมาย/ฉลาก/ตารางในหน้าต่างด้านขวาเพื่อระบุจุดที่ผิดหรือไม่ครบถ้วน' },
+      { id: 'reg_explain', type: 'ai_dialogue', title: '2. อธิบายข้อกฎหมายและแนวทางแก้ไขให้ถูกต้อง (Regulatory Explanation)', pts: 6.0, cam: 'overview',
+        role: 'doctor',
+        blocks: [
+          'จากการตรวจสอบตาม พ.ร.บ.ยา และกฎกระทรวงที่เกี่ยวข้อง พบประเด็นสำคัญดังนี้ครับ/ค่ะ',
+          'ประเภทยาและข้อกำหนดในการจัดเก็บ/ส่งมอบ/จัดทำบัญชีที่ถูกต้องคือ...',
+          'แนวทางแก้ไขเพื่อให้เป็นไปตามกฎหมายและมาตรฐาน GPP คือ...'
+        ],
+        requiredKeywords: ['พ.ร.บ.', 'ประเภท', 'ทะเบียน', 'บัญชี', 'กฎหมาย', 'gpp', 'ใบอนุญาต'],
+        hint: 'สรุปข้อกฎหมาย ประเภทยา เอกสารที่ต้องจัดทำ และแนวทางแก้ไขให้ถูกต้อง' }
+    ]
+  },
+
+  SAP_HEALTH_SYSTEM: {
+    id: 'SAP_HEALTH_SYSTEM',
+    track: 'SAP',
+    code: 'OSPE-SP-SYS',
+    week: 'SAP',
+    name: 'ระบบสุขภาพ สิทธิการรักษา & เภสัชเศรษฐศาสตร์ (Health Systems & NLEM)',
+    category: 'SAP · ระบบสุขภาพและสิทธิ',
+    sceneState: 'STATE_DOCUMENT',
+    rxText: 'ให้คำปรึกษาสิทธิหลักประกันสุขภาพ (บัตรทอง UC / ประกันสังคม SSS / ข้าราชการ CSMBS), บัญชียาหลักแห่งชาติ (NLEM) และความคุ้มค่าทางเศรษฐศาสตร์',
+    device: 'desk',
+    videos: [],
+    steps: [
+      { id: 'sys_check', type: 'clinic_confirm', title: '1. ประเมินสิทธิการรักษา เกณฑ์เบิกจ่ายยา (NLEM) & ทางเลือกที่คุ้มค่า', pts: 4.0, cam: 'overview',
+        choices: [
+          { id: 'sys_ok', label: 'ตรวจสอบสิทธิการรักษา (UC/SSS/CSMBS) เกณฑ์บัญชียาหลักแห่งชาติ (ก-ง/จ(2)) และประสานส่งต่อ/ขออนุมัติเบิกจ่ายตามระบบ', correct: true },
+          { id: 'sys_bad', label: 'ปฏิเสธการรักษาทันทีโดยไม่แนะนำสิทธิหรือทางเลือกยาในบัญชียาหลักแห่งชาติ', correct: false }
+        ],
+        hint: 'ตรวจสอบสิทธิและเงื่อนไขการเบิกจ่ายยาตามบัญชียาหลักแห่งชาติจากข้อมูลสถานี' },
+      { id: 'sys_counsel', type: 'ai_dialogue', title: '2. อธิบายสิทธิการรักษาและทางเลือกการใช้ยาอย่างเข้าใจง่าย', pts: 6.0, cam: 'overview',
+        role: 'patient',
+        blocks: [
+          'สวัสดีครับ/ค่ะ ขอชี้แจงรายละเอียดสิทธิการรักษาและการเบิกจ่ายยาให้ทราบครับ/ค่ะ',
+          'สำหรับยานี้มีเกณฑ์ในบัญชียาหลักแห่งชาติ/ทางเลือกทดแทนที่เบิกจ่ายได้ตามสิทธิคือ...',
+          'ขั้นตอนการประสานงานหรือเอกสารที่ต้องใช้เพิ่มเติมมีดังนี้ครับ/ค่ะ'
+        ],
+        requiredKeywords: ['สิทธิ', 'บัญชี', 'เบิก', 'ยาหลัก', 'ส่งต่อ', 'แนะนำ'],
+        hint: 'อธิบายสิทธิการรักษา ทางเลือกยา และขั้นตอนดำเนินการให้ผู้ป่วย/ผู้เกี่ยวข้องเข้าใจชัดเจน' }
     ]
   }
 };
@@ -1018,11 +1232,21 @@ window.CLINIC_SAP_ARCHETYPES = {
  */
 window.mapClinicSapToArchetype = function(station) {
   const cid = String(station.caseId || '').toUpperCase();
-  const txt = `${cid} ${station.title || ''} ${station.mainGroup || ''} ${station.disease || ''}`.toLowerCase();
+  const titleTxt = `${station.title || ''}`.toLowerCase();
+  const mg = `${station.mainGroup || ''}`.toLowerCase();
+  const txt = `${cid} ${titleTxt} ${mg} ${station.disease || ''}`.toLowerCase();
   const cat = String(station.category || '').toLowerCase();
-  if (cat === 'sap' || cid.startsWith('OSPE-SP') || txt.includes('กฎหมาย') || txt.includes('จรรยาบรรณ') || txt.includes('วัตถุออกฤทธิ์')) {
-    return 'SAP_LAW_DISPENSING';
+
+  // 0. SAP Track routing (only true SAP cases or OSPE-SP*; keep OSPE-CL83M203 in Clinic!)
+  if (cat === 'sap' || cid.startsWith('OSPE-SP')) {
+    if (txt.includes('จรรยาบรรณ') || txt.includes('ethic')) return 'SAP_ETHICS';
+    if (mg.includes('ซักประวัติและจ่ายยา') || txt.includes('tramadol') || txt.includes('diazepam') || txt.includes('cough syrup') || txt.includes('ยาแก้ไอ') || txt.includes('เยาวชน')) {
+      return 'SAP_LAW_DISPENSING';
+    }
+    if (txt.includes('สิทธิ') || txt.includes('หลักประกัน') || txt.includes('บัญชียาหลัก') || txt.includes('เศรษฐศาสตร์') || txt.includes('health system')) return 'SAP_HEALTH_SYSTEM';
+    return 'SAP_REGULATORY_DOC';
   }
+
   // 1. Exact CLSD Case ID priority (prevents keyword cross-matches like 'spacer', 'spiriva', 'syringe')
   if (cid.includes('CLSD01')) return 'CLINIC_MDI';
   if (cid.includes('CLSD02')) return 'CLINIC_MDI_SPACER';
@@ -1048,7 +1272,24 @@ window.mapClinicSapToArchetype = function(station) {
   if (cid.includes('CLSD21')) return 'CLINIC_DRY_SYRUP';
   if (cid.includes('CLSD22') || cid.includes('CLSD23')) return 'CLINIC_OC_PILLS';
 
-  // 2. Keyword fallback for general Clinic stations
+  // 2. High-priority Clinic functional categories (check BEFORE device keywords to prevent false matches like CL4814/CL6611/CL5717)
+  if (mg.includes('ตรวจสอบใบสั่งยา') || txt.includes('ตรวจใบสั่งยา') || txt.includes('ตรวจสอบใบสั่งยา') || txt.includes('prescription screening')) {
+    return 'CLINIC_RX_AUDIT';
+  }
+  if (mg.includes('ประเมินการแพ้ยา') || txt.includes('การแพ้ยา') || txt.includes('naranjo') || txt.includes('บัตรแพ้ยา') || txt.includes('ประเมินและจัดการ adr')) {
+    return 'CLINIC_ADR_ALLERGY';
+  }
+  if (mg.includes('แปลผลทางห้องปฏิบัติการ') || mg.includes('แปลผลทางคลินิก') || txt.includes('friedewald') || txt.includes('ldl-c') || txt.includes('แปลผลทางห้องปฏิบัติการ') || txt.includes('คำนวณขนาดยาทางคลินิก')) {
+    return 'CLINIC_LAB_PK';
+  }
+  if (mg.includes('ค้นข้อมูลและประสานงาน') || txt.includes('สืบค้นข้อมูล') || txt.includes('เภสัชสนเทศ') || txt.includes('drug information')) {
+    return 'CLINIC_DIS_CONSULT';
+  }
+  if (cid.includes('CLSP') || mg.includes('ภาคผนวก ข') || mg.includes('ระมัดระวังในการใช้เป็นพิเศษ')) {
+    return 'CLINIC_HIGH_ALERT';
+  }
+
+  // 3. Keyword fallback for general Clinic device/skill stations (with strict boundaries)
   if (txt.includes('spacer') || txt.includes('aerochamber')) return 'CLINIC_MDI_SPACER';
   if (txt.includes('turbuhaler') || txt.includes('budesonide/formoterol')) return 'CLINIC_TURBUHALER';
   if (txt.includes('accuhaler') || txt.includes('diskus')) return 'CLINIC_ACCUHALER';
@@ -1057,26 +1298,25 @@ window.mapClinicSapToArchetype = function(station) {
   if (txt.includes('easyhaler')) return 'CLINIC_EASYHALER';
   if (txt.includes('swinghaler')) return 'CLINIC_SWINGHALER';
   if (txt.includes('ellipta') || txt.includes('relvar')) return 'CLINIC_ELLIPTA';
-  if (txt.includes('mdi') || txt.includes('salbutamol') || txt.includes('evohaler')) return 'CLINIC_MDI';
+  if (/\bmdi\b/.test(txt) || txt.includes('salbutamol') || txt.includes('evohaler')) return 'CLINIC_MDI';
   if (txt.includes('nasal drop') || txt.includes('หยอดจมูก')) return 'CLINIC_NASAL_DROPS';
   if (txt.includes('irrigation') || txt.includes('ล้างจมูก') || txt.includes('0.9% nss')) return 'CLINIC_NASAL_IRRIGATION';
   if (txt.includes('nasal') || txt.includes('พ่นจมูก')) return 'CLINIC_NASAL_SPRAY';
-  if (txt.includes('ear drop') || txt.includes('หยอดหู') || txt.includes('otic')) return 'CLINIC_EAR_DROPS';
-  if (txt.includes('ointment') || txt.includes('ป้ายตา')) return 'CLINIC_EYE_OINTMENT';
-  if (txt.includes('eye') || txt.includes('หยอดตา') || txt.includes('conjunctivitis')) return 'CLINIC_EYE_DROPS';
+  if ((titleTxt.includes('ear drop') || titleTxt.includes('หยอดหู') || /\botic\b/.test(txt) || txt.includes('otitis externa')) && !txt.includes('otitis media')) return 'CLINIC_EAR_DROPS';
+  if (txt.includes('ป้ายตา') || ((txt.includes('eye') || txt.includes('ophthalmic') || txt.includes('ตา')) && txt.includes('ointment'))) return 'CLINIC_EYE_OINTMENT';
+  if (txt.includes('หยอดตา') || txt.includes('eye drop') || txt.includes('conjunctivitis')) return 'CLINIC_EYE_DROPS';
   if (txt.includes('sublingual') || txt.includes('อมใต้ลิ้น') || txt.includes('nitrate') || txt.includes('isosorbide')) return 'CLINIC_SUBLINGUAL';
-  if (txt.includes('rectal') || txt.includes('ทวาร') || txt.includes('enema')) return 'CLINIC_RECTAL_SUPP';
-  if (txt.includes('vaginal') || txt.includes('ช่องคลอด') || txt.includes('clotrimazole')) return 'CLINIC_VAGINAL_SUPP';
+  if (txt.includes('rectal') || txt.includes('เหน็บทวาร') || txt.includes('ทวารหนัก') || txt.includes('enema')) return 'CLINIC_RECTAL_SUPP';
+  if (txt.includes('เหน็บช่องคลอด') || txt.includes('สอดช่องคลอด') || txt.includes('vaginal supp') || txt.includes('vaginal tab') || txt.includes('applicator') || (txt.includes('clotrimazole') && txt.includes('ช่องคลอด'))) return 'CLINIC_VAGINAL_SUPP';
   if (txt.includes('clear before cloudy') || txt.includes('ผสมอินซูลิน')) return 'CLINIC_INSULIN_MIX';
   if (txt.includes('insulin') || txt.includes('อินซูลิน')) return 'CLINIC_INSULIN_PEN';
   if (txt.includes('nicotine') || txt.includes('เลิกบุหรี่') || txt.includes('หมากฝรั่ง')) return 'CLINIC_NICOTINE';
-  if (txt.includes('dry syrup') || txt.includes('ยาผงแห้ง') || txt.includes('oral syringe')) return 'CLINIC_DRY_SYRUP';
-  if (txt.includes('contraceptive') || txt.includes('ยาคุม') || txt.includes('coc') || txt.includes('pop')) return 'CLINIC_OC_PILLS';
+  if (txt.includes('dry syrup') || txt.includes('ยาผงแห้ง') || txt.includes('ยาน้ำเชื่อมแห้ง') || txt.includes('oral syringe')) return 'CLINIC_DRY_SYRUP';
+  if (txt.includes('contraceptive') || txt.includes('ยาคุม') || /\b(coc|pop)\b/.test(txt)) return 'CLINIC_OC_PILLS';
 
-  // Tablet counting & Prescription audit
+  // Tablet counting & ISBAR
   if (txt.includes('นับเม็ดยา') || txt.includes('tablet counting') || txt.includes('เขียนฉลาก')) return 'CLINIC_TABLET_COUNTING';
-  if (txt.includes('ตรวจใบสั่งยา') || txt.includes('ตรวจสอบใบสั่งยา') || txt.includes('screening')) return 'CLINIC_RX_AUDIT';
-
   if (txt.includes('isbar') || txt.includes('ประสานงานแพทย์') || txt.includes('สื่อสารประสานงาน')) return 'CLINIC_ISBAR';
+
   return 'CLINIC_HISTORY_COUNSELING';
 };

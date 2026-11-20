@@ -350,20 +350,118 @@ window.LAB_ARCHETYPES = {
         fallbackReply: 'ถูกต้องครับ การอธิบายกลไกความไม่คงตัวและวิธีแก้ไขตำรับชัดเจนและเป็นระบบมากครับ',
         hint: 'อธิบายกลไกความไม่คงตัว วิธีแก้ไขตำรับ และภาชนะ/BUD ที่เหมาะสม' }
     ]
+  },
+
+  PRODUCT_TABLET_COUNTING: {
+    id: 'PRODUCT_TABLET_COUNTING',
+    track: 'Product',
+    code: 'OSPE-PDT01',
+    name: 'การนับเม็ดยา/แคปซูล & การบรรจุ (Tablet & Capsule Counting)',
+    category: 'Solid Dispensing & Counting',
+    device: 'tablet_counting',
+    rxText: 'ตรวจฉลากสต็อก 3 ครั้ง เช็ดถาดนับยาด้วย 70% Alcohol นับเม็ดยาด้วยไม้พาย บรรจุซอง/ขวดกันแสง-ความชื้น และติดฉลากครบถ้วน',
+    bud: '30d_room',
+    auxLabels: ['เก็บพ้นแสงและความชื้น'],
+    videos: [],
+    steps: [
+      { id: 'prep_check', type: 'clinic_confirm', title: '1. ตรวจฉลากยา 3 ครั้ง & การเตรียมถาดนับยา/ข้อควรระวังเฉพาะยา', pts: 3.0, cam: 'device',
+        choices: [
+          { id: 'safe_count', label: 'ตรวจฉลาก 3 ครั้ง เช็ดถาดด้วย 70% Alcohol รอแห้ง (แยกถาด/สวมถุงมือสำหรับ Penicillin หรือ Cytotoxic) และซักประวัติแพ้ยา', correct: true },
+          { id: 'bare_hand', label: 'ใช้มือเปล่าหยิบนับเม็ดยาได้เลย และไม่ต้องทำความสะอาดถาดนับยาระหว่างชนิดยา', correct: false }
+        ],
+        hint: 'ตรวจสอบชื่อยา ความแรง วันหมดอายุ 3 ครั้ง (ก่อนหยิบ-ก่อนเท-หลังเก็บ) และเลือกใช้ถาด/อุปกรณ์ป้องกันการปนเปื้อนข้าม' },
+      { id: 'count_tray', type: 'tray_count', title: '2. นับเม็ดยา/แคปซูลบนถาดนับยาด้วยไม้พาย (Spatula)', pts: 4.0, cam: 'device',
+        targetCount: 20,
+        hint: 'ใช้ไม้พายกวาดนับเม็ดยาลงรางถาดนับยาให้ครบจำนวนตามใบสั่งยา โดยไม่ใช้มือเปล่าสัมผัสเม็ดยาโดยตรง' },
+      { id: 'pack_label', type: 'clinic_confirm', title: '3. บรรจุซอง/ภาชนะกันแสง-ความชื้น & ติดฉลากหลัก/ฉลากช่วย', pts: 3.0, cam: 'overview',
+        choices: [
+          { id: 'pkg_ok', label: 'บรรจุซองยา/ขวดสีชาปิดสนิท (ใส่ซองกันชื้นสำหรับ Soft Gel / Effervescent) เทส่วนเกินกลับขวดเดิม และติดฉลากครบถ้วน', correct: true },
+          { id: 'pkg_bad', label: 'เทยาส่วนเกินทิ้งถังขยะทั้งหมด และไม่ต้องระบุฉลากช่วยการเก็บรักษา', correct: false }
+        ],
+        hint: 'เลือกบรรจุภัณฑ์ที่เหมาะสมกับความไวต่อแสง/ความชื้น และระบุฉลากหลัก + ฉลากช่วยอย่างครบถ้วน' }
+    ]
+  },
+
+  PRODUCT_CALIBRATION_MEASUREMENT: {
+    id: 'PRODUCT_CALIBRATION_MEASUREMENT',
+    track: 'Product',
+    code: 'OSPE-PDT09',
+    name: 'การสอบเทียบเครื่องมือ & การชั่ง/ตวงความละเอียดสูง (Calibration & Precision)',
+    category: 'Analytical / Calibration & Measurement',
+    rxText: 'ปฏิบัติการสอบเทียบ (Calibration) หรือการชั่ง/ตวงสารความละเอียดสูง (Analytical Balance, Aliquot, Dropper, Micropipette, pH Meter)',
+    bud: '30d_room',
+    auxLabels: ['ตรวจสอบความถูกต้องก่อนใช้งาน'],
+    videos: ['T03', 'T04-1', 'T04-2'],
+    steps: [
+      { id: 'calib_principle', type: 'clinic_confirm', title: '1. ตรวจสอบหลักการสอบเทียบ / การคำนวณความคลาดเคลื่อน (Calibration & Calculation)', pts: 3.5, cam: 'overview',
+        choices: [
+          { id: 'calib_ok', label: 'ปรับระดับน้ำ (Leveling) / เลือก Standard Buffer หรือตุ้มน้ำหนักมาตรฐาน / คำนวณ %Error หรือ Aliquot ตามเกณฑ์ ±5%', correct: true },
+          { id: 'calib_skip', label: 'ไม่ต้องปรับ Zero/Tare หรือใช้ Single-point แทน 2-point calibration ได้ทุกกรณี', correct: false }
+        ],
+        hint: 'ตรวจสอบระดับน้ำบนฐานเครื่อง ปิดกระจกกันลม กด Tare/Zero หรือเตรียมสารมาตรฐานตามเกณฑ์ SOP' },
+      { id: 'precision_exec', type: 'clinic_confirm', title: '2. ปฏิบัติการวัด/ชั่ง/ตวงตามเทคนิคมาตรฐาน (Standard Technique)', pts: 3.5, cam: 'weigh',
+        choices: [
+          { id: 'exec_ok', label: 'อ่านค่า Meniscus ระดับสายตา / ถือ Dropper แนวตั้ง 90° / ชั่งในภาชนะปิดสนิท (สารดูดชื้นหรือระเหยง่าย) / เปลี่ยนทิป Micropipette', correct: true },
+          { id: 'exec_bad', label: 'อ่านค่าขณะถือภาชนะเอียง และใช้ทิปเดิมดูดสารต่างชนิดซ้ำ', correct: false }
+        ],
+        hint: 'ปฏิบัติตามเทคนิคเฉพาะของเครื่องมือวัดแต่ละชนิดเพื่อลด Random & Systematic Error' },
+      { id: 'qc_accept', type: 'clinic_confirm', title: '3. บันทึกผล & ประเมินเกณฑ์การยอมรับ (Acceptance Criteria / QC)', pts: 3.0, cam: 'overview',
+        choices: [
+          { id: 'qc_ok', label: 'คำนวณค่าเฉลี่ย ปริมาตรต่อหยด หรือ Slope (95–105%) และบันทึกผลลงแบบฟอร์ม QC อย่างครบถ้วน', correct: true },
+          { id: 'qc_bad', label: 'ใช้งานต่อได้ทันทีแม้ค่า Slope หรือ %Error เกินเกณฑ์มาตรฐาน', correct: false }
+        ],
+        hint: 'สรุปผลการสอบเทียบ/การชั่งตวงและตัดสินใจว่าผ่านเกณฑ์พร้อมใช้งานหรือไม่' }
+    ]
+  },
+
+  PRODUCT_REST_STATION: {
+    id: 'PRODUCT_REST_STATION',
+    track: 'Product',
+    code: 'OSPE-REST',
+    name: 'สถานีพัก (Rest Station)',
+    category: 'Rest Station',
+    sceneState: 'STATE_DOCUMENT',
+    rxText: 'สถานีพักระหว่างรอบสอบ OSPE — ใช้เวลาเตรียมความพร้อมและทบทวนสมาธิก่อนเข้าสู่สถานีถัดไป',
+    bud: '30d_room',
+    auxLabels: ['สถานีพัก'],
+    videos: [],
+    steps: [
+      { id: 'rest_ready', type: 'clinic_confirm', title: '1. สถานีพัก: พักสายตาและเตรียมความพร้อมสำหรับสถานีถัดไป', pts: 10.0, cam: 'overview',
+        choices: [
+          { id: 'ready', label: 'รับทราบ (สถานีพัก ไม่มีภารกิจเตรียมยา — พร้อมเข้าสู่สถานีถัดไป)', correct: true },
+          { id: 'skip', label: 'ข้ามสถานีพัก', correct: false }
+        ],
+        hint: 'สถานีนี้เป็นสถานีพัก (Rest Station) กดยืนยันเพื่อจบสถานีได้อย่างสมบูรณ์' }
+    ]
   }
 };
 
 /**
- * Map any of the 126 OSPE-PD stations in OFFLINE_DATA to a playable 3D Dosage Form Archetype
+ * Map any of the 125 OSPE-PD stations in OFFLINE_DATA to a playable 3D Dosage Form Archetype
  */
 window.mapStationToArchetype = function(station) {
   const cid = String(station.caseId || '').toUpperCase();
   const titleTxt = `${station.title || ''}`.toLowerCase();
   const txt = `${cid} ${titleTxt} ${station.mainGroup || ''} ${station.disease || ''}`.toLowerCase();
-  if (txt.includes('ความไม่คงตัว') || txt.includes('incompat') || txt.includes('การระบุรูปแบบยา') || cid.startsWith('OSPE-CL')) {
+
+  // 0. Rest stations (e.g. OSPE-PD84M1W203A/B: พัก 3A/3B)
+  if (/^พัก\s*\d|^พัก$/.test(titleTxt.trim()) || txt.includes('rest station') || cid.includes('W203A') || cid.includes('W203B')) {
+    return 'PRODUCT_REST_STATION';
+  }
+  // 1. Stability / Incompatibility / Dosage form audit
+  if (txt.includes('ความไม่คงตัว') || txt.includes('incompat') || txt.includes('การระบุรูปแบบยา')) {
     return 'PRODUCT_STABILITY_AUDIT';
   }
-  if (txt.includes('sterile') || txt.includes('kcl') || txt.includes('iv ') || txt.includes('laf') || txt.includes('aseptic') || txt.includes('parenteral')) {
+  // 2. Product Tablet / Capsule Counting (PDT01/02/06/07/08/10/12/14/15) — check before GEL_CARBOPOL ('เจล' in เจลาติน)
+  if (txt.includes('นับเม็ดยา') || txt.includes('นับแคปซูล') || txt.includes('ถาดนับ') || txt.includes('soft gelatin') || txt.includes('เจลาตินนิ่ม') || txt.includes('effervescent tablet') || txt.includes('นับและบรรจุ') || txt.includes('นับและบันทึก') || txt.includes('นับยาเคมีบำบัด')) {
+    return 'PRODUCT_TABLET_COUNTING';
+  }
+  // 3. Calibration / Precision Measurement (PDT05/09/11/19/20/21/23/24, PD84W102, PD84M1W102*)
+  if (txt.includes('calibration') || txt.includes('calibrate') || txt.includes('dropper') || txt.includes('หลอดหยด') || txt.includes('micropipette') || txt.includes('ph meter') || txt.includes('aliquot') || txt.includes('hygroscopic') || txt.includes('เครื่องชั่งวิเคราะห์') || txt.includes('ตวงของเหลว')) {
+    return 'PRODUCT_CALIBRATION_MEASUREMENT';
+  }
+  // 4. Sterile / IV Admixture (avoid bare 'kcl' or 'iv ' matching 'xiv' in NF XIV)
+  if (txt.includes('sterile') || txt.includes('laf') || txt.includes('aseptic') || txt.includes('parenteral') || /\biv\s*(drip|admixture|push|infusion|fluid)\b/i.test(txt)) {
     return 'STERILE_IV_CALC';
   }
   if (txt.includes('suppository') || txt.includes('suppositories') || txt.includes('ยาเหน็บ') || txt.includes('displacement')) {
@@ -375,23 +473,24 @@ window.mapStationToArchetype = function(station) {
   if (txt.includes('emulsion') || txt.includes('อิมัลชัน') || txt.includes('dry gum') || txt.includes('wet gum')) {
     return 'EMULSION_DRYGUM';
   }
-  if (txt.includes('camphor') || txt.includes('intervention') || txt.includes('เมนทอล') || txt.includes('พิมเสน')) {
+  if (txt.includes('camphor') || txt.includes('menthol') || txt.includes('intervention') || txt.includes('เมนทอล') || txt.includes('พิมเสน') || txt.includes('การบูร')) {
     return 'CAMPHOR_INTERVENTION';
   }
-  if (txt.includes('carbopol') || txt.includes('hydrogel') || txt.includes('เจล') || /\bgel\b/.test(txt)) {
+  if (txt.includes('carbopol') || txt.includes('hydrogel') || /\bgel\b/.test(txt) || (txt.includes('เจล') && !txt.includes('เจลาติน'))) {
     return 'GEL_CARBOPOL';
   }
-  if (txt.includes('suspension') || txt.includes('แขวนตะกอน') || txt.includes('เม็ดยา') || txt.includes('enalapril') || txt.includes('extemporaneous') || titleTxt.includes('calamine lotion')) {
+  // 5. Solid / Trituration / Powder (check before generic 'semisolid' mainGroup so PD84M1W204A/B Trituration maps here)
+  if (txt.includes('trituration') || txt.includes('geometric') || txt.includes('chartulae') || /\bsolid dosage\b/.test(txt) || txt.includes('powder') || txt.includes('ยาผง') || (txt.includes('capsule') && !txt.includes('soft gelatin'))) {
+    return 'SOLID_POWDER_CHARTULAE';
+  }
+  if (txt.includes('suspension') || txt.includes('แขวนตะกอน') || txt.includes('เม็ดยา') || txt.includes('enalapril') || txt.includes('extemporaneous') || titleTxt.includes('lotion')) {
     return 'SUSPENSION_TABLET';
   }
-  if (txt.includes('mucilage') || txt.includes('scmc') || txt.includes('cmc')) {
+  if (txt.includes('mucilage') || txt.includes('scmc') || /\bcmc\b/.test(txt)) {
     return 'MUCILAGE_SCMC';
   }
   if (txt.includes('ointment') || txt.includes('cream') || txt.includes('paste') || txt.includes('slab') || txt.includes('ขี้ผึ้ง') || txt.includes('ครีม') || txt.includes('semisolid')) {
     return 'SEMISOLID_SLAB';
-  }
-  if (/\bsolid dosage\b/.test(txt) || txt.includes('trituration') || txt.includes('geometric') || txt.includes('powder') || txt.includes('capsule') || txt.includes('ยาผง') || txt.includes('แคปซูล')) {
-    return 'SOLID_POWDER_CHARTULAE';
   }
   return 'SOLUTION_NAHCO3';
 };

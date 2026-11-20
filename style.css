@@ -7914,21 +7914,34 @@ hr.case-divider,
   border-color: var(--danger, #ef4444);
 }
 
-/* Tabs list in header */
+/* Attachment selector dropdown in header */
 .doc-drawer-tabs-wrapper {
   display: flex;
   align-items: center;
   gap: 0.4rem;
-  overflow-x: auto;
-  padding-bottom: 0.2rem;
-  scrollbar-width: thin;
+  overflow-x: visible;
+  padding-bottom: 0;
 }
-.doc-drawer-tabs-wrapper::-webkit-scrollbar {
-  height: 4px;
+.doc-drawer-select {
+  width: 100%;
+  padding: 0.42rem 0.75rem;
+  border-radius: 8px;
+  border: 1.5px solid var(--border, #cbd5e1);
+  background: var(--bg-secondary, #f8fafc);
+  color: var(--text-primary, #0f172a);
+  font-family: var(--font-body, 'Sarabun', sans-serif);
+  font-size: 0.84rem;
+  font-weight: 600;
+  cursor: pointer;
+  outline: none;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+  text-overflow: ellipsis;
 }
-.doc-drawer-tabs-wrapper::-webkit-scrollbar-thumb {
-  background: #cbd5e1;
-  border-radius: 4px;
+.doc-drawer-select:hover,
+.doc-drawer-select:focus {
+  border-color: var(--primary, #0e7490);
+  box-shadow: 0 0 0 2px rgba(14, 116, 144, 0.15);
+  background: #ffffff;
 }
 .doc-drawer-tab {
   display: inline-flex;

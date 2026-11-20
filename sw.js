@@ -4,10 +4,10 @@
  * ====================================================
  * จัดการ Caching ทรัพยากรระบบเพื่อเพิ่มความเร็วในการโหลด (Preloading) 
  * และสนับสนุนการเข้าใช้งานแบบออฟไลน์ (Offline Mode)
- * Version: ple-cc2-ospe-v1.7.5 (Admin Preset Passcode updated to rxcu)
+ * Version: ple-cc2-ospe-v1.7.6 (StationDocViewer attachment selector converted to Dropdown)
  */
 
-const CACHE_NAME = 'ple-cc2-ospe-v1.7.5';
+const CACHE_NAME = 'ple-cc2-ospe-v1.7.6';
 const ASSETS = [
   './',
   './index.html',

@@ -5549,19 +5549,25 @@ const StationDocViewer = (function() {
     }
     _tabsContainer.style.display = 'flex';
 
+    const select = document.createElement('select');
+    select.id = 'doc-drawer-select';
+    select.className = 'doc-drawer-select';
+    select.setAttribute('aria-label', 'เลือกเอกสารแนบ');
+
     _attachments.forEach((att, idx) => {
-      const tab = document.createElement('button');
-      tab.type = 'button';
-      tab.className = 'doc-drawer-tab' + (idx === _currentIndex ? ' active' : '');
+      const opt = document.createElement('option');
+      opt.value = String(idx);
       const icon = att.type === 'image' ? '🖼️' : '📄';
-      tab.innerHTML = `<span>${icon}</span> <span>${att.num}. ${escapeHtml(att.title || 'เอกสาร')}</span>`;
-      tab.onclick = () => {
-        _currentIndex = idx;
-        _renderTabs();
-        _renderCurrentAttachment();
-      };
-      _tabsContainer.appendChild(tab);
+      opt.textContent = `${icon} เอกสารแนบ ${att.num}: ${att.title || 'เอกสาร'}`;
+      if (idx === _currentIndex) opt.selected = true;
+      select.appendChild(opt);
     });
+
+    select.onchange = () => {
+      _currentIndex = parseInt(select.value, 10) || 0;
+      _renderCurrentAttachment();
+    };
+    _tabsContainer.appendChild(select);
   }
 
   function _renderCurrentAttachment() {
@@ -5584,10 +5590,10 @@ const StationDocViewer = (function() {
       _extLinkEl.href = att.url || att.previewUrl || '#';
     }
 
-    // Update Tab highlights
+    // Sync Dropdown selection
     if (_tabsContainer) {
-      const tabs = Array.from(_tabsContainer.querySelectorAll('.doc-drawer-tab'));
-      tabs.forEach((t, i) => t.classList.toggle('active', i === _currentIndex));
+      const sel = document.getElementById('doc-drawer-select');
+      if (sel) sel.value = String(_currentIndex);
     }
 
     // Render Body according to type

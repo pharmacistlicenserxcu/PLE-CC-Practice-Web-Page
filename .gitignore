@@ -22,3 +22,4 @@ tmp_*.txt
 k6-v0.54.0-windows-amd64/
 .bin/
 tests/
+quiz-data-offline.js
